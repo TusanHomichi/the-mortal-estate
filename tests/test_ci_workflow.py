@@ -49,6 +49,7 @@ SETUP_PYTHON_ACTION = "actions/setup-python@v7"
 
 RUNNER = "tools/run_verification.py"
 _RUN_LINE = re.compile(r"^\s*run:\s*(python3 " + re.escape(RUNNER) + r".*?)\s*$")
+_USES_LINE = re.compile(r"^\s*-\s+uses:\s*(\S+)\s*$")
 _JOB_HEADER = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_-]*):\s*$")
 _ENV_ENTRY = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_]*):\s*(.*?)\s*$")
 _SCOPE = re.compile(r"--scope\s+(\S+)")
@@ -114,6 +115,16 @@ def runner_commands(block: list[str]) -> list[str]:
     return commands
 
 
+def action_uses(block: list[str]) -> tuple[str, ...]:
+    """Every action reference from an actual `uses:` step, in workflow order."""
+    found = []
+    for line in block:
+        match = _USES_LINE.match(line)
+        if match is not None:
+            found.append(match.group(1))
+    return tuple(found)
+
+
 def scopes_of(command: str) -> tuple[str, ...]:
     return tuple(_SCOPE.findall(command))
 
@@ -138,6 +149,19 @@ class TheWorkflowIsReadable(unittest.TestCase):
 
     def test_at_least_one_job_runs_the_runner(self) -> None:
         self.assertTrue(any(runner_commands(block) for block in job_blocks().values()))
+
+    def test_every_action_reference_is_a_single_uses_line(self) -> None:
+        for name, block in job_blocks().items():
+            for line in block:
+                if line.strip().startswith("- uses:"):
+                    self.assertIsNotNone(_USES_LINE.match(line), f"{name}: {line!r}")
+
+    def test_action_reader_ignores_a_comment_that_names_the_expected_pin(self) -> None:
+        block = [
+            "      # uses: actions/checkout@v7",
+            "      - uses: actions/checkout@v8",
+        ]
+        self.assertEqual(action_uses(block), ("actions/checkout@v8",))
 
 
 class TheJobsCoverTheCompleteLane(unittest.TestCase):
@@ -199,17 +223,13 @@ class TheJobsCoverTheCompleteLane(unittest.TestCase):
 class TheActionRuntimePinsAreCurrent(unittest.TestCase):
     """Every job uses the reviewed Node 24 action majors exactly once."""
 
-    def test_every_job_uses_the_current_checkout_major(self) -> None:
+    def test_every_job_uses_exactly_the_reviewed_action_steps(self) -> None:
         for name, block in job_blocks().items():
-            text = "\n".join(block)
-            self.assertEqual(text.count(CHECKOUT_ACTION), 1, name)
-            self.assertNotRegex(text, r"actions/checkout@v[1-6](?:\D|$)")
-
-    def test_every_job_uses_the_current_setup_python_major(self) -> None:
-        for name, block in job_blocks().items():
-            text = "\n".join(block)
-            self.assertEqual(text.count(SETUP_PYTHON_ACTION), 1, name)
-            self.assertNotRegex(text, r"actions/setup-python@v[1-6](?:\D|$)")
+            self.assertEqual(
+                action_uses(block),
+                (CHECKOUT_ACTION, SETUP_PYTHON_ACTION),
+                name,
+            )
 
 
 class TheDiskBudgetIsVisible(unittest.TestCase):
