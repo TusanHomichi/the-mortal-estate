@@ -42,6 +42,11 @@ BUDGET_SCRIPT_NAME = ".github/disk-budget.sh"
 #: a job that costs real disk.
 INSTALL_SCRIPT_NAME = ".github/install-rust.sh"
 
+#: Current Node 24 action majors, selected from their official releases on
+#: 2026-08-27. A future runtime migration changes these deliberately.
+CHECKOUT_ACTION = "actions/checkout@v7"
+SETUP_PYTHON_ACTION = "actions/setup-python@v7"
+
 RUNNER = "tools/run_verification.py"
 _RUN_LINE = re.compile(r"^\s*run:\s*(python3 " + re.escape(RUNNER) + r".*?)\s*$")
 _JOB_HEADER = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_-]*):\s*$")
@@ -189,6 +194,22 @@ class TheJobsCoverTheCompleteLane(unittest.TestCase):
                 if "--list" in command:
                     continue
                 self.assertIn("--allow-unavailable", command, name)
+
+
+class TheActionRuntimePinsAreCurrent(unittest.TestCase):
+    """Every job uses the reviewed Node 24 action majors exactly once."""
+
+    def test_every_job_uses_the_current_checkout_major(self) -> None:
+        for name, block in job_blocks().items():
+            text = "\n".join(block)
+            self.assertEqual(text.count(CHECKOUT_ACTION), 1, name)
+            self.assertNotRegex(text, r"actions/checkout@v[1-6](?:\D|$)")
+
+    def test_every_job_uses_the_current_setup_python_major(self) -> None:
+        for name, block in job_blocks().items():
+            text = "\n".join(block)
+            self.assertEqual(text.count(SETUP_PYTHON_ACTION), 1, name)
+            self.assertNotRegex(text, r"actions/setup-python@v[1-6](?:\D|$)")
 
 
 class TheDiskBudgetIsVisible(unittest.TestCase):
