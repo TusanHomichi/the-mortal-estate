@@ -1,0 +1,476 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/release-operation"
+
+[ "$#" -eq 1 ] || fail 'usage: recover-production <latest|UTC-timestamp>'
+target=$1
+[ "${TME_DESTRUCTIVE_RESTORE_CONFIRM-}" = 'destroy-disposable-tme-database' ] || \
+    fail 'set the exact destructive restore confirmation'
+production_data=/var/lib/postgresql/18/main
+production_socket=/var/run/postgresql
+production_port=5432
+production_unit=postgresql@18-main.service
+[ "${TME_POSTGRES_DATA_DIRECTORY:-$production_data}" = "$production_data" ] || \
+    fail 'production data directory override differs from the locked PostgreSQL 18 path'
+require_root
+load_environment
+[ "${TME_POSTGRES_DATA_DIRECTORY:-$production_data}" = "$production_data" ] || \
+    fail 'production data directory override differs from the locked PostgreSQL 18 path'
+require_production_database_target
+TME_DATABASE_SOCKET=$production_socket
+TME_DATABASE_PORT=$production_port
+export TME_DATABASE_SOCKET TME_DATABASE_PORT
+if [ "$target" != latest ]; then
+    case "$target" in ????-??-??T??:??:??Z) ;; *) fail 'recovery target must be latest or a whole-second UTC timestamp' ;; esac
+    [ "$(date -u -d "$target" +'%Y-%m-%dT%H:%M:%SZ')" = "$target" ] || \
+        fail 'recovery target is not a real UTC timestamp'
+fi
+for command in curl flock jq pg_isready psql runuser systemctl timeout
+do
+    require_command "$command"
+done
+release=$(current_release) || fail 'current release is unavailable'
+release_id=$(basename -- "$release")
+RELEASE_VERIFIED_MANIFEST_SHA256=$(verify_release_integrity "$release") || \
+    fail 'current release integrity is invalid'
+RELEASE_VERIFIED_SOURCE_REVISION=$(sed -n '1p' "$release/source-revision")
+RELEASE_VERIFIED_CONTRACT_SHA256=$(sha256sum "$release/contract-versions.json" | awk '{print $1}')
+RELEASE_PRIOR_SUCCESS_SHA256=$(verify_success_receipt_for_release "$release") || \
+    fail 'active release success receipt is invalid'
+case "$production_data" in /*) ;; *) fail 'production data directory must be absolute' ;; esac
+production_parent=$(canonical_directory 'production data parent' "$(dirname -- "$production_data")")
+[ "$production_data" = "$production_parent/$(basename -- "$production_data")" ] || \
+    fail 'production data directory must be canonical'
+credential_file migrator-database-url >/dev/null
+credential_file migrator-pgpass >/dev/null
+credential_file smoke-username-one >/dev/null
+credential_file smoke-password-one >/dev/null
+credential_file smoke-username-two >/dev/null
+credential_file smoke-password-two >/dev/null
+validate_production_database_credentials
+
+require_operation_lock
+exec 9>"$OPERATION_LOCK"
+flock -n 9 || fail 'another release or recovery operation is active'
+recovery_projection=''
+recovery_committed=false
+recovery_phase=''
+recovery_failed_data=''
+recovery_system_identifier=''
+recovery_database_oid=''
+recovery_pre_fence_epoch=''
+recovery_post_fence_epoch=''
+recovery_restored_quarantine=''
+
+wait_for_postgres() {
+    postgres_deadline=$(( $(date +%s) + 120 ))
+    until PGPASSFILE=$(credential_file migrator-pgpass) \
+        pg_isready --quiet --host="$production_socket" --port="$production_port" \
+        --dbname="$TME_DATABASE_NAME" --username=tme_migrator
+    do
+        [ "$(date +%s)" -lt "$postgres_deadline" ] || fail 'restored PostgreSQL did not become ready'
+        sleep 2
+    done
+}
+
+recovery_psql() {
+    PGPASSFILE=$(credential_file migrator-pgpass) \
+        psql --host="$production_socket" --port="$production_port" \
+        --dbname="$TME_DATABASE_NAME" --username=tme_migrator \
+        --no-align --tuples-only --set=ON_ERROR_STOP=on "$@"
+}
+
+read_recovery_identity() {
+    recovery_identity=$(recovery_psql --command="SELECT
+        system_identifier::text || '|' ||
+        (SELECT oid::text FROM pg_database WHERE datname=current_database()) || '|' ||
+        (SELECT restore_fence_epoch::text FROM tme.store_state WHERE singleton) || '|' ||
+        current_setting('data_directory') || '|' || current_setting('port') || '|' ||
+        current_setting('server_version_num') FROM pg_control_system()")
+    old_ifs=$IFS
+    IFS='|'
+    read -r recovery_observed_system_identifier recovery_observed_database_oid \
+        recovery_observed_fence_epoch recovery_observed_data_directory \
+        recovery_observed_port recovery_observed_server_version recovery_identity_extra <<EOF
+$recovery_identity
+EOF
+    IFS=$old_ifs
+    [ -z "$recovery_identity_extra" ] || fail 'restored database identity is malformed'
+    case "$recovery_observed_system_identifier:$recovery_observed_database_oid:$recovery_observed_fence_epoch:$recovery_observed_port:$recovery_observed_server_version" in
+        *[!0-9:]*) fail 'restored database identity is malformed' ;;
+    esac
+    [ "$recovery_observed_data_directory" = "$production_data" ] || \
+        fail 'connected PostgreSQL cluster is not the exact restored 18/main data directory'
+    [ "$recovery_observed_port" -eq "$production_port" ] && \
+        [ "$recovery_observed_server_version" -ge 180000 ] && \
+        [ "$recovery_observed_server_version" -lt 190000 ] || \
+        fail 'connected PostgreSQL cluster is not the locked PostgreSQL 18 service'
+}
+
+write_recovery_journal() {
+    journal_phase=$1
+    validate_component 'recovery phase' "$journal_phase"
+    case "$recovery_pre_fence_epoch:$recovery_post_fence_epoch" in
+        *[!0-9:]*) fail 'recovery fence journal is malformed' ;;
+    esac
+    recovery_temporary=$(mktemp "$ADMISSION_ROOT/.recovery.XXXXXX") || \
+        fail 'recovery journal temporary could not be created'
+    journal_system_identifier=$recovery_system_identifier
+    journal_database_oid=$recovery_database_oid
+    journal_pre_fence_epoch=$recovery_pre_fence_epoch
+    journal_post_fence_epoch=$recovery_post_fence_epoch
+    case "$journal_phase" in
+        pre_move|failed_data_move_pending|failed_data_quarantined|pre_fence_quarantined|files_restored|postgres_ready)
+            journal_system_identifier=''
+            journal_database_oid=''
+            journal_pre_fence_epoch=''
+            journal_post_fence_epoch=''
+            ;;
+    esac
+    jq --arg phase "$journal_phase" --arg target "$target" \
+        --arg failed_data "$recovery_failed_data" \
+        --arg restored_quarantine "$recovery_restored_quarantine" \
+        --arg system_identifier "$journal_system_identifier" \
+        --arg database_oid "$journal_database_oid" \
+        --arg pre_fence_epoch "$journal_pre_fence_epoch" \
+        --arg post_fence_epoch "$journal_post_fence_epoch" \
+        --arg updated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" '
+        .phase=$phase | .updated_at=$updated_at |
+        .recovery={
+            target:$target,
+            failed_data:$failed_data,
+            restored_quarantine:(if $restored_quarantine == "" then null else $restored_quarantine end),
+            system_identifier:$system_identifier,
+            database_oid:$database_oid,
+            fence_epoch_before:(if $pre_fence_epoch == "" then null else ($pre_fence_epoch|tonumber) end),
+            fence_epoch_after:(if $post_fence_epoch == "" then null else ($post_fence_epoch|tonumber) end)
+        }' "$ADMISSION_MARKER" >"$recovery_temporary" || {
+            rm -f -- "$recovery_temporary"
+            fail 'recovery journal could not be updated'
+        }
+    chmod 0644 "$recovery_temporary"
+    sync -f "$recovery_temporary"
+    mv -Tf "$recovery_temporary" "$ADMISSION_MARKER"
+    sync -f "$ADMISSION_ROOT"
+    # Consumed by the sourced release-operation state model.
+    # shellcheck disable=SC2034
+    RELEASE_OPERATION_PHASE=$journal_phase
+    recovery_phase=$journal_phase
+}
+
+load_recovery_journal() {
+    [ -f "$ADMISSION_MARKER" ] && [ ! -L "$ADMISSION_MARKER" ] || return 1
+    [ "$(stat -c '%u:%g:%a:%h' "$ADMISSION_MARKER")" = '0:0:644:1' ] || \
+        fail 'recovery journal metadata is unsafe'
+    jq -e --arg release_id "$release_id" --arg target "$target" \
+        --arg prior_success_sha256 "$RELEASE_PRIOR_SUCCESS_SHA256" \
+        --arg source_revision "$RELEASE_VERIFIED_SOURCE_REVISION" \
+        --arg contract_sha256 "$RELEASE_VERIFIED_CONTRACT_SHA256" \
+        --arg manifest_sha256 "$RELEASE_VERIFIED_MANIFEST_SHA256" '
+        .schema_version == 2 and .operation == "destructive-recovery" and
+        .state == "in_progress" and .release_id == $release_id and
+        .prior_success_receipt_sha256 == $prior_success_sha256 and
+        .release.source_revision == $source_revision and
+        .release.contract_sha256 == $contract_sha256 and
+        .release.manifest_sha256 == $manifest_sha256 and
+        .recovery.target == $target and
+        (.phase == "pre_move" or .phase == "failed_data_move_pending" or .phase == "failed_data_quarantined" or
+         .phase == "pre_fence_quarantined" or .phase == "files_restored" or
+         .phase == "postgres_ready" or .phase == "fence_pending" or .phase == "fenced" or
+         .phase == "database_verified_after_fence" or .phase == "service_started" or
+         .phase == "readiness_verified" or .phase == "smoke_verified") and
+        (.recovery.failed_data | type == "string" and length > 0) and
+        ((.recovery.restored_quarantine == null) or
+         (.recovery.restored_quarantine | type == "string" and length > 0)) and
+        (if (.phase == "pre_move" or .phase == "failed_data_move_pending" or .phase == "failed_data_quarantined" or
+             .phase == "pre_fence_quarantined" or .phase == "files_restored" or
+             .phase == "postgres_ready") then
+            .recovery.system_identifier == "" and .recovery.database_oid == "" and
+            .recovery.fence_epoch_before == null and .recovery.fence_epoch_after == null
+         else
+            (.recovery.system_identifier | test("^[0-9]+$")) and
+            (.recovery.database_oid | test("^[0-9]+$")) and
+            (.recovery.fence_epoch_before | type == "number") and
+            (if .phase == "fence_pending" then .recovery.fence_epoch_after == null
+             else (.recovery.fence_epoch_after | type == "number") end)
+         end)
+    ' "$ADMISSION_MARKER" >/dev/null || \
+        fail 'admission is closed by an operation that cannot be resumed automatically'
+    RELEASE_OPERATION_ID=$(jq -er '.operation_id' "$ADMISSION_MARKER")
+    recovery_phase=$(jq -er '.phase' "$ADMISSION_MARKER")
+    recovery_failed_data=$(jq -er '.recovery.failed_data' "$ADMISSION_MARKER")
+    recovery_restored_quarantine=$(jq -r '.recovery.restored_quarantine // ""' "$ADMISSION_MARKER")
+    recovery_system_identifier=$(jq -er '.recovery.system_identifier' "$ADMISSION_MARKER")
+    recovery_database_oid=$(jq -er '.recovery.database_oid' "$ADMISSION_MARKER")
+    recovery_pre_fence_epoch=$(jq -r '.recovery.fence_epoch_before // "" | tostring' "$ADMISSION_MARKER")
+    recovery_post_fence_epoch=$(jq -r '.recovery.fence_epoch_after // "" | tostring' "$ADMISSION_MARKER")
+    recovery_failed_name=$(basename -- "$recovery_failed_data")
+    case "$recovery_failed_name" in main.failed-*) ;; *) fail 'recovery journal failed-data path is unsafe' ;; esac
+    validate_component 'recovery failed-data name' "$recovery_failed_name"
+    [ "$recovery_failed_data" = "$production_parent/$recovery_failed_name" ] || \
+        fail 'recovery journal failed-data path is unsafe'
+    if [ -e "$recovery_failed_data" ] || [ -L "$recovery_failed_data" ]; then
+        canonical_failed_data=$(canonical_direct_child \
+            'recovery failed-data quarantine' "$production_parent" "$recovery_failed_name")
+        [ "$canonical_failed_data" = "$recovery_failed_data" ] || \
+            fail 'recovery journal failed-data quarantine changed'
+    else
+        { [ "$recovery_phase" = pre_move ] || [ "$recovery_phase" = failed_data_move_pending ]; } && \
+            [ -d "$production_data" ] && [ ! -L "$production_data" ] || \
+            fail 'recovery journal names an absent failed-data quarantine'
+    fi
+    if [ -n "$recovery_restored_quarantine" ]; then
+        restored_name=$(basename -- "$recovery_restored_quarantine")
+        case "$restored_name" in main.failed-recovery-*) ;; \
+            *) fail 'recovery restored-data quarantine path is unsafe' ;; esac
+        canonical_restored=$(canonical_direct_child \
+            'recovery restored-data quarantine' "$production_parent" "$restored_name")
+        [ "$canonical_restored" = "$recovery_restored_quarantine" ] || \
+            fail 'recovery restored-data quarantine changed'
+    fi
+    RELEASE_OPERATION_ADMISSION_CLOSED=true
+}
+
+stop_recovery_postgres() {
+    ensure_recovery_postgres_stopped || \
+        fail 'exact PostgreSQL 18/main service could not be stopped'
+}
+
+ensure_recovery_postgres_stopped() {
+    systemctl stop "$production_unit" >/dev/null 2>&1 || true
+    if systemctl is-active --quiet "$production_unit"; then
+        systemctl kill --kill-whom=all --signal=SIGKILL "$production_unit" \
+            >/dev/null 2>&1 || true
+        systemctl stop "$production_unit" >/dev/null 2>&1 || true
+    fi
+    ! systemctl is-active --quiet "$production_unit"
+}
+
+quarantine_restored_pre_fence_data() {
+    [ -e "$production_data" ] || [ -L "$production_data" ] || return 0
+    [ -d "$production_data" ] && [ ! -L "$production_data" ] || \
+        fail 'pre-fence restored production data is unsafe'
+    recovery_restored_quarantine=$production_parent/main.failed-recovery-$(date -u +'%Y%m%dT%H%M%SZ')-$$
+    [ ! -e "$recovery_restored_quarantine" ] && [ ! -L "$recovery_restored_quarantine" ] || \
+        fail 'pre-fence recovery quarantine destination already exists'
+    mv -- "$production_data" "$recovery_restored_quarantine"
+    chmod 0500 "$recovery_restored_quarantine"
+}
+
+recovery_failure() {
+    status=$?
+    trap - 0 1 2 15
+    [ "$recovery_committed" = false ] || exit "$status"
+    if release_operation_is_committed; then
+        recovery_committed=true
+        exit "$status"
+    fi
+    if [ -n "$RELEASE_OPERATION_PROJECTION" ]; then
+        (destroy_credential_projection "$RELEASE_OPERATION_PROJECTION") || true
+    fi
+    if [ "$RELEASE_OPERATION_ADMISSION_CLOSED" = false ] && \
+        release_operation_marker_matches_active
+    then
+        RELEASE_OPERATION_ADMISSION_CLOSED=true
+    fi
+    if [ "$RELEASE_OPERATION_ADMISSION_CLOSED" = false ]; then
+        printf '%s\n' 'error: destructive recovery failed before admission changed; the running services and prior receipt are unchanged' >&2
+        [ "$status" -ne 0 ] || status=1
+        exit "$status"
+    fi
+    if [ -z "$recovery_phase" ]; then
+        if rm -f -- "$ADMISSION_MARKER" && sync -f "$ADMISSION_ROOT"; then
+            printf '%s\n' 'error: destructive recovery failed before its first durable phase; admission reopened with the original services unchanged' >&2
+        else
+            printf '%s\n' 'error: destructive recovery failed before its first durable phase; admission remains closed for explicit recovery' >&2
+        fi
+        [ "$status" -ne 0 ] || status=1
+        exit "$status"
+    fi
+    systemctl stop tme-server.service >/dev/null 2>&1 || true
+    recovery_cleanup_ok=true
+    case "$recovery_phase" in
+        failed_data_quarantined|pre_fence_quarantined|files_restored|postgres_ready)
+            if ! ensure_recovery_postgres_stopped; then
+                recovery_cleanup_ok=false
+            elif ! (
+                quarantine_restored_pre_fence_data
+                write_recovery_journal pre_fence_quarantined
+            ) >/dev/null 2>&1
+            then
+                recovery_cleanup_ok=false
+            fi
+            ;;
+        failed_data_move_pending)
+            if [ -e "$recovery_failed_data" ]; then
+                if ! ensure_recovery_postgres_stopped; then
+                    recovery_cleanup_ok=false
+                elif ! (
+                    chmod 0500 "$recovery_failed_data"
+                    quarantine_restored_pre_fence_data
+                    write_recovery_journal pre_fence_quarantined
+                ) >/dev/null 2>&1
+                then
+                    recovery_cleanup_ok=false
+                fi
+            fi
+            ;;
+        fence_pending)
+            ensure_recovery_postgres_stopped || recovery_cleanup_ok=false
+            ;;
+    esac
+    if [ "$recovery_cleanup_ok" = false ]; then
+        printf '%s\n' 'error: exact PostgreSQL stop or recovery quarantine could not be proved; admission remains closed and the durable prior phase must be inspected' >&2
+    fi
+    printf '%s\n' 'error: destructive recovery did not commit; admission remains closed and the prior receipt is unchanged' >&2
+    [ "$status" -ne 0 ] || status=1
+    exit "$status"
+}
+recovery_signal() {
+    recovery_signal_number=$1
+    trap - 1 2 15
+    exit $((128 + recovery_signal_number))
+}
+trap recovery_failure 0
+trap 'recovery_signal 1' 1
+trap 'recovery_signal 2' 2
+trap 'recovery_signal 15' 15
+
+resume_recovery=false
+if [ -e "$ADMISSION_MARKER" ]; then
+    load_recovery_journal
+    resume_recovery=true
+else
+    [ -d "$production_data" ] && [ ! -L "$production_data" ] || \
+        fail 'production data directory is unavailable or unsafe'
+    recovery_failed_data=$production_parent/main.failed-$(date -u +'%Y%m%dT%H%M%SZ')
+    [ ! -e "$recovery_failed_data" ] && [ ! -L "$recovery_failed_data" ] || \
+        fail 'failed-data quarantine destination already exists'
+    RELEASE_OPERATION_NAME=destructive-recovery
+    RELEASE_OPERATION_RELEASE=$release
+    RELEASE_OPERATION_PREVIOUS=$release
+    RELEASE_OPERATION_ID=$(date -u +'%Y%m%dT%H%M%SZ')-$$
+    close_admission destructive-recovery "$release_id"
+    write_recovery_journal pre_move
+fi
+RELEASE_OPERATION_NAME=destructive-recovery
+RELEASE_OPERATION_RELEASE=$release
+RELEASE_OPERATION_PREVIOUS=$release
+RELEASE_RECOVERY_TARGET=$target
+RELEASE_OPERATION_ACTIVE=true
+verify_public_admission_closed
+
+if [ "$resume_recovery" = false ]; then
+    systemctl stop tme-server.service
+    RELEASE_OPERATION_SERVICE_STOPPED=true
+    stop_recovery_postgres
+    write_recovery_journal failed_data_move_pending
+    mv -- "$production_data" "$recovery_failed_data"
+    chmod 0500 "$recovery_failed_data"
+    write_recovery_journal failed_data_quarantined
+else
+    systemctl stop tme-server.service
+    RELEASE_OPERATION_SERVICE_STOPPED=true
+    case "$recovery_phase" in
+        pre_move)
+            stop_recovery_postgres
+            write_recovery_journal failed_data_move_pending
+            mv -- "$production_data" "$recovery_failed_data"
+            chmod 0500 "$recovery_failed_data"
+            write_recovery_journal failed_data_quarantined
+            ;;
+        failed_data_move_pending)
+            stop_recovery_postgres
+            if [ -e "$recovery_failed_data" ]; then
+                chmod 0500 "$recovery_failed_data"
+                quarantine_restored_pre_fence_data
+                write_recovery_journal pre_fence_quarantined
+            else
+                mv -- "$production_data" "$recovery_failed_data"
+                chmod 0500 "$recovery_failed_data"
+                write_recovery_journal failed_data_quarantined
+            fi
+            ;;
+        failed_data_quarantined|pre_fence_quarantined|files_restored|postgres_ready)
+            stop_recovery_postgres
+            quarantine_restored_pre_fence_data
+            write_recovery_journal pre_fence_quarantined
+            ;;
+        *)
+            systemctl start "$production_unit"
+            wait_for_postgres
+            ;;
+    esac
+fi
+
+case "$recovery_phase" in
+    failed_data_quarantined|pre_fence_quarantined)
+        TME_DESTRUCTIVE_RESTORE_CONFIRM=destroy-disposable-tme-database \
+            "$PRODUCTION_ROOT/bin/restore" "$production_data" "$target"
+        write_recovery_journal files_restored
+        systemctl start "$production_unit"
+        wait_for_postgres
+        write_recovery_journal postgres_ready
+        verify_database_contract "$release"
+        read_recovery_identity
+        recovery_system_identifier=$recovery_observed_system_identifier
+        recovery_database_oid=$recovery_observed_database_oid
+        recovery_pre_fence_epoch=$recovery_observed_fence_epoch
+        recovery_post_fence_epoch=''
+        write_recovery_journal fence_pending
+        ;;
+esac
+
+read_recovery_identity
+[ "$recovery_observed_system_identifier" = "$recovery_system_identifier" ] && \
+    [ "$recovery_observed_database_oid" = "$recovery_database_oid" ] || \
+    fail 'restored database identity differs from the durable recovery journal'
+if [ "$recovery_phase" = fence_pending ]; then
+    fence_outcome=$(restore_fence_outcome \
+        "$recovery_observed_fence_epoch" "$recovery_pre_fence_epoch")
+    if [ "$fence_outcome" = pending ]; then
+        recovery_projection=$(create_credential_projection restore-fence migrator-database-url)
+        RELEASE_OPERATION_PROJECTION=$recovery_projection
+        run_as_deploy env CREDENTIALS_DIRECTORY="$recovery_projection" \
+            "$release/bin/tme-server" store restore-fence --confirm-restored-database
+        destroy_credential_projection "$recovery_projection"
+        recovery_projection=''
+        RELEASE_OPERATION_PROJECTION=''
+        read_recovery_identity
+        [ "$recovery_observed_system_identifier" = "$recovery_system_identifier" ] && \
+            [ "$recovery_observed_database_oid" = "$recovery_database_oid" ] || \
+            fail 'restored database identity changed while applying the fence'
+        fence_outcome=$(restore_fence_outcome \
+            "$recovery_observed_fence_epoch" "$recovery_pre_fence_epoch")
+    fi
+    [ "$fence_outcome" = committed ] || fail 'restore fence did not commit exactly once'
+    recovery_post_fence_epoch=$recovery_observed_fence_epoch
+    write_recovery_journal fenced
+else
+    [ -n "$recovery_post_fence_epoch" ] && \
+        [ "$recovery_post_fence_epoch" -eq $((recovery_pre_fence_epoch + 1)) ] && \
+        [ "$recovery_observed_fence_epoch" -eq "$recovery_post_fence_epoch" ] || \
+        fail 'post-fence recovery journal does not match the restored database'
+fi
+verify_database_contract "$release"
+write_recovery_journal database_verified_after_fence
+
+systemctl start tme-server.service
+# Consumed by the sourced release-operation state model.
+# shellcheck disable=SC2034
+RELEASE_OPERATION_SERVICE_STOPPED=false
+write_recovery_journal service_started
+wait_private_readiness || fail 'recovered release did not become privately ready'
+write_recovery_journal readiness_verified
+run_authenticated_admission_smoke "$release"
+write_recovery_journal smoke_verified
+RELEASE_RECOVERY_FAILED_DATA=$recovery_failed_data
+RELEASE_RECOVERY_SYSTEM_IDENTIFIER=$recovery_system_identifier
+RELEASE_RECOVERY_DATABASE_OID=$recovery_database_oid
+RELEASE_RECOVERY_FENCE_EPOCH_BEFORE=$recovery_pre_fence_epoch
+RELEASE_RECOVERY_FENCE_EPOCH_AFTER=$recovery_post_fence_epoch
+commit_release_operation
+recovery_committed=true
+trap - 0 1 2 15
+printf '%s\n' "recover-production: $target committed and admission opened; failed data retained at $recovery_failed_data"

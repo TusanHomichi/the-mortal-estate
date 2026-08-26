@@ -1,0 +1,109 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "knight_promotion",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/knight_promotion/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:knight_promotion:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "fighter",
+          "display_class": "Fighter",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 14,
+          "dexterity": 12,
+          "constitution": 13,
+          "intelligence": 9,
+          "wisdom": 10,
+          "charisma": 8
+        },
+        "resources": {
+          "hp": 20,
+          "max_hp": 20,
+          "peak_hp": 20,
+          "mp": 18,
+          "max_mp": 18,
+          "stamina": 10,
+          "max_stamina": 10
+        },
+        "progression": {
+          "level": 8,
+          "experience": 2800
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "promotion_history": [],
+        "skill_ledger": []
+      },
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "dummy",
+      "actor_definition_id": "actor/knight_promotion/dummy",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {},
+  "ground_items": [],
+  "service_instances": [
+    {
+      "id": "knight_promoter",
+      "service_definition_id": "knight_promoter",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

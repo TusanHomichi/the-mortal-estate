@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3 uid="uid://b6n1m4q8t2v5x"]
+
+[ext_resource type="Script" path="res://scenes/login_screen.gd" id="1_login"]
+
+[node name="LoginScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_login")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.035, 0.045, 0.06, 1)
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 24
+
+[node name="Fields" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/Fields"]
+layout_mode = 2
+text = "The Mortal Estate"
+horizontal_alignment = 1
+
+[node name="EndpointIdentity" type="Label" parent="Center/Panel/Margin/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Endpoint: https://tme.invalid"
+horizontal_alignment = 1
+
+[node name="UsernameLabel" type="Label" parent="Center/Panel/Margin/Fields"]
+layout_mode = 2
+text = "Username"
+
+[node name="Username" type="LineEdit" parent="Center/Panel/Margin/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Account username"
+clear_button_enabled = true
+
+[node name="LoginValueLabel" type="Label" parent="Center/Panel/Margin/Fields"]
+layout_mode = 2
+text = "Password"
+
+[node name="LoginValue" type="LineEdit" parent="Center/Panel/Margin/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Password"
+secret = true
+clear_button_enabled = true
+virtual_keyboard_type = 6
+
+[node name="CredentialSource" type="Label" parent="Center/Panel/Margin/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "This client saves no credential. Sign in each run."
+autowrap_mode = 2
+
+[node name="ErrorLabel" type="Label" parent="Center/Panel/Margin/Fields"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Error"
+autowrap_mode = 2
+
+[node name="LoginButton" type="Button" parent="Center/Panel/Margin/Fields"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sign In"

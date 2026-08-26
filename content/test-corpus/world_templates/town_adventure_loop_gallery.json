@@ -1,0 +1,208 @@
+{
+  "arrivals": {},
+  "id": "town_adventure_loop_gallery",
+  "kind": "world_template",
+  "realms": {
+    "realm_0": {
+      "levels": {
+        "trailhead": {
+          "cells": [
+            [
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ]
+            ],
+            [
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_stone"
+              ],
+              [
+                "waystation_stairs_up"
+              ],
+              [
+                "trail_stone"
+              ],
+              [
+                "trail_wall"
+              ]
+            ],
+            [
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ],
+              [
+                "trail_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "waystation": {
+          "cells": [
+            [
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ]
+            ],
+            [
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_floor"
+              ],
+              [
+                "trailhead_stairs_down"
+              ],
+              [
+                "waystation_floor"
+              ],
+              [
+                "waystation_wall"
+              ]
+            ],
+            [
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ],
+              [
+                "waystation_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "town",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "overworld_town",
+          "scene_role": "overworld",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Town Adventure Loop Gallery"
+    }
+  },
+  "schema_version": 3,
+  "topology": {
+    "edge/trailhead/1/2": {
+      "at": {
+        "level": "trailhead",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "up",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "waystation",
+          "position": {
+            "x": 2,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/waystation/1/2": {
+      "at": {
+        "level": "waystation",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "down",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "trailhead",
+          "position": {
+            "x": 3,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    }
+  },
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+}

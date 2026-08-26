@@ -1,0 +1,63 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+load_environment
+require_command jq
+require_command pgbackrest
+require_command psql
+
+operations=$STATE_ROOT/operations
+install -d -o postgres -g tme-monitor -m 0750 "$operations"
+repository_status=99
+latest_backup=0
+latest_full=0
+repository_info=$(mktemp /run/.tme-pgbackrest-info.XXXXXX)
+trap 'rm -f "$repository_info"' EXIT HUP INT TERM
+if run_as_postgres pgbackrest --stanza=tme --output=json info >"$repository_info" 2>/dev/null; then
+    repository_status=$(jq '[.[].status.code] | max // 99' "$repository_info")
+    latest_backup=$(jq '[.[].backup[].timestamp.stop] | max // 0' "$repository_info")
+    latest_full=$(jq '[.[].backup[] | select(.type=="full") | .timestamp.stop] | max // 0' \
+        "$repository_info")
+fi
+rm -f "$repository_info"
+trap - EXIT HUP INT TERM
+
+archive_age=9223372036854775807
+archive_failures=9223372036854775807
+archive_row=$(run_as_postgres psql --dbname="$TME_DATABASE_NAME" --no-align \
+    --tuples-only --field-separator='|' --command="SELECT \
+        COALESCE(EXTRACT(EPOCH FROM statement_timestamp()-last_archived_time)::bigint,9223372036854775807), \
+        failed_count FROM pg_stat_archiver" 2>/dev/null || true)
+case "$archive_row" in
+    *'|'*)
+        candidate_age=${archive_row%%|*}
+        candidate_failures=${archive_row#*|}
+        case "$candidate_age:$candidate_failures" in
+            *[!0-9:]*|:) ;;
+            *) archive_age=$candidate_age; archive_failures=$candidate_failures ;;
+        esac
+        ;;
+esac
+archive_backlog=$(find /var/lib/postgresql/18/main/pg_wal/archive_status \
+    -maxdepth 1 -type f -name '*.ready' 2>/dev/null | wc -l)
+
+temporary=$operations/.postgres-status.$$
+jq -n \
+    --argjson collected_at "$(date +%s)" \
+    --argjson repository_status "$repository_status" \
+    --argjson latest_backup "$latest_backup" \
+    --argjson latest_full "$latest_full" \
+    --argjson archive_age "$archive_age" \
+    --argjson archive_failures "$archive_failures" \
+    --argjson archive_backlog "$archive_backlog" \
+    '{collected_at_epoch:$collected_at,repository_status_code:$repository_status,
+      latest_backup_epoch:$latest_backup,latest_full_epoch:$latest_full,
+      archive_age_seconds:$archive_age,archive_failed_count:$archive_failures,
+      archive_backlog:$archive_backlog}' >"$temporary"
+chown root:tme-monitor "$temporary"
+chmod 0640 "$temporary"
+mv -f "$temporary" "$operations/postgres-status.json"
+printf '%s\n' 'collect-postgres-status: sanitized status ready'

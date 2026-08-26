@@ -1,0 +1,92 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "supply_cache",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/supply_cache/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "watcher",
+      "actor_definition_id": "actor/supply_cache/watcher",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "hemp_rope": {
+      "definition_id": "hemp_rope",
+      "binding": {
+        "state": "unrestricted"
+      }
+    },
+    "waterskin": {
+      "definition_id": "waterskin",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [
+    {
+      "item_instance_id": "hemp_rope",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      }
+    },
+    {
+      "item_instance_id": "waterskin",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

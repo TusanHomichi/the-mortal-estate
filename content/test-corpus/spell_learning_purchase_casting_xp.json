@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "spell_learning_purchase_casting_xp",
+  "name": "Spell Learning Purchase Casting XP",
+  "description": "Clean fixture proving spell learning, purchase, successful casting, and wizard magic practice.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project Slice BV fixture for spell learning, purchase, casting, and skill-practice coverage.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/spell_learning_purchase_casting_xp.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/spell_learning_purchase_casting_xp",
+  "world_template": "world_templates/spell_learning_purchase_casting_xp.json",
+  "simulation_seed": "simulation_seeds/spell_learning_purchase_casting_xp.json",
+  "script": [
+    {
+      "move_item": {
+        "item_instance_id": "spell_book",
+        "destination": {
+          "kind": "carried",
+          "position": "right_hand"
+        }
+      }
+    },
+    {
+      "learn_spell": "spark"
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "spark",
+        "target": {
+          "actor": {
+            "actor_id": "target"
+          }
+        }
+      }
+    }
+  ]
+}

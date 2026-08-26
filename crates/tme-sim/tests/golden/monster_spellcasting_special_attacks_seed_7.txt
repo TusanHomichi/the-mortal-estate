@@ -1,0 +1,64 @@
+The Mortal Estate local simulation
+scenario: monster_spellcasting_special_attacks
+seed: 7
+
+loaded "Monster Spellcasting and Special Attacks" realms=[realm_0] levels=[realm_0/room_0]
+player Delver at realm_0/room_0:1,2 hp=12
+monster Ember Imp at realm_0/room_0:5,2 hp=8
+monster Viperling at realm_0/room_0:5,1 hp=6
+Delver gains poison_ward (protection) for 4 rounds.
+
+player ready: Delver at 1
+Delver intent at 1: wait
+readiness scheduled: Delver cost=1 ready_at=2
+poison_ward ticks on Delver (3 rounds remain).
+time 2
+monster ready: Ember Imp at 2
+Ember Imp intent: use Ember Spit on Delver
+Delver resolves ember_spit save [fire]: roll=11 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=2->2.
+Ember Imp's Ember Spit hits Delver for 2 damage (10 hp).
+contribution to player: character=None class=None damage=2
+readiness scheduled: Ember Imp cost=1 ready_at=3
+monster ready: Viperling at 2
+Viperling intent: use Venom Bite on Delver
+Delver resolves venom_bite save [poison]: roll=2 threshold=8/20 natural=5 boost=3 result=success mitigation=negate damage=none->none.
+readiness scheduled: Viperling cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: wait
+readiness scheduled: Delver cost=1 ready_at=3
+poison_ward ticks on Delver (2 rounds remain).
+time 3
+monster ready: Ember Imp at 3
+Ember Imp intent: move west
+Ember Imp walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Ember Imp step west -> (4,2): terrain=Flagstone cost=1 remaining=2
+Ember Imp moved from (5,2) to (4,2)
+readiness scheduled: Ember Imp cost=1 ready_at=4
+monster ready: Viperling at 3
+Viperling intent: use Venom Bite on Delver
+Delver resolves venom_bite save [poison]: roll=9 threshold=8/20 natural=5 boost=3 result=failure mitigation=none damage=none->none.
+Delver gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: wait
+readiness scheduled: Delver cost=1 ready_at=4
+poison_ward ticks on Delver (1 rounds remain).
+time 4
+monster ready: Ember Imp at 4
+Ember Imp intent: use Ember Spit on Delver
+Delver resolves ember_spit save [fire]: roll=8 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=2->2.
+Ember Imp's Ember Spit hits Delver for 2 damage (8 hp).
+contribution to player: character=None class=None damage=2
+readiness scheduled: Ember Imp cost=1 ready_at=5
+monster ready: Viperling at 4
+Viperling intent: use Venom Bite on Delver
+Delver resolves venom_bite save [poison]: roll=11 threshold=8/20 natural=5 boost=3 result=failure mitigation=none damage=none->none.
+Delver gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=5
+
+final state
+Delver at realm_0/room_0:1,2 hp=8 alive
+Ember Imp at realm_0/room_0:4,2 hp=8 alive
+Viperling at realm_0/room_0:5,1 hp=6 alive

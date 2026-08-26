@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "thrown_attack",
+  "name": "Thrown Attack",
+  "description": "A clean project-authored prototype fixture for thrown weapon landing and retrieval.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project thrown-attack fixture. Weapon profile, range value, terrain labels, actor names, script, and numeric tuning are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/thrown_attack.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/thrown_attack",
+  "world_template": "world_templates/thrown_attack.json",
+  "simulation_seed": "simulation_seeds/thrown_attack.json",
+  "script": [
+    {
+      "physical_attack": {
+        "mode": "throw",
+        "target_actor_id": "burr_hound",
+        "authorization": "safe"
+      }
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "move_path": [
+        "east",
+        "east"
+      ]
+    },
+    {
+      "move_item": {
+        "item_instance_id": "oak_javelin",
+        "destination": {
+          "kind": "carried",
+          "position": "right_hand"
+        }
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "burr_hound",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

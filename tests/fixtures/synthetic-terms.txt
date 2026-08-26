@@ -1,0 +1,15 @@
+# Synthetic banned-term fixture for tools/check_boundary_terms.py tests.
+#
+# Every term here is invented nonsense. The real denylist lives in the
+# git-ignored .boundary/ root and never enters this tree. This fixture exists so
+# the carried tree can prove the rejection MECHANISM — loading, matching, word
+# boundaries, separator tolerance, filename scanning, fail-closed behavior —
+# without carrying a single real term.
+#
+# Same format as the real file: one term per line, '#' starts a comment.
+
+zorbelquux
+mimsywort
+quendaraff
+plithnak
+vorpal grimble

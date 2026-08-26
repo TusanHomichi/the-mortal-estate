@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "merchant_item_services",
+  "name": "Crossroads Commerce",
+  "description": "A clean project-authored fixture proving merchants, a pawn pool, and item services end to end.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, stock, layout, and numeric values prove only the generic EC architecture. No marked or private commercial constants are copied.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/merchant_item_services.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/merchant_item_services",
+  "world_template": "world_templates/merchant_item_services.json",
+  "simulation_seed": "simulation_seeds/merchant_item_services.json",
+  "script": [
+    {
+      "use_item_service": {
+        "service_id": "crossroads_counter",
+        "capability_id": "item_care",
+        "operation": "appraise",
+        "item_instance_id": "moon_pebble"
+      }
+    },
+    {
+      "sell_to_merchant": {
+        "service_id": "crossroads_counter",
+        "capability_id": "shop_and_pawn",
+        "item_instance_id": "moon_pebble"
+      }
+    },
+    {
+      "buy_from_merchant": {
+        "service_id": "crossroads_counter",
+        "capability_id": "shop_and_pawn",
+        "item_instance_ids": [
+          "moon_pebble"
+        ]
+      }
+    },
+    {
+      "buy_from_merchant": {
+        "service_id": "crossroads_counter",
+        "capability_id": "shop_and_pawn",
+        "item_instance_ids": [
+          "copper_compass_stock",
+          "trail_lantern_stock"
+        ]
+      }
+    },
+    {
+      "buy_from_merchant": {
+        "service_id": "trail_vendor",
+        "capability_id": "wares",
+        "item_instance_ids": [
+          "berry_tonic_stock"
+        ]
+      }
+    },
+    {
+      "use_item_service": {
+        "service_id": "crossroads_counter",
+        "capability_id": "item_care",
+        "operation": "identify",
+        "item_instance_id": "sealed_charm"
+      }
+    },
+    {
+      "use_item_service": {
+        "service_id": "crossroads_counter",
+        "capability_id": "item_care",
+        "operation": "enchant_weapon",
+        "item_instance_id": "river_blade"
+      }
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

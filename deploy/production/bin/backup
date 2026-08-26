@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+[ "$#" -eq 1 ] || fail 'usage: backup <full|diff|incr>'
+case "$1" in full|diff|incr) backup_type=$1 ;; *) fail 'backup type is invalid' ;; esac
+require_command pgbackrest
+run_as_postgres pgbackrest --stanza=tme --type="$backup_type" backup
+run_as_postgres pgbackrest --stanza=tme check
+record_success "backup-$backup_type"
+printf '%s\n' "backup: $backup_type verified"

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "service_transactions",
+  "name": "Shared Service Transaction",
+  "description": "Original clean fixture for provider-neutral service transaction planning, discovery, commit receipts, and rollback-safe state mutation.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original clean architecture fixture; no commercial provider, row, value, or art asset is represented.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/service_transactions.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/service_transactions",
+  "world_template": "world_templates/service_transactions.json",
+  "simulation_seed": "simulation_seeds/service_transactions.json",
+  "script": [
+    {
+      "commit_service_transaction": {
+        "service_id": "waystation_clerk",
+        "capability_id": "exchanges",
+        "transaction_id": "token_for_badge",
+        "item_instance_id": "etched_token_stack"
+      }
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

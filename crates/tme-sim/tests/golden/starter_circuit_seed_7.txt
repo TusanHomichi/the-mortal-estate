@@ -1,0 +1,148 @@
+The Mortal Estate local simulation
+scenario: starter_circuit
+seed: 7
+
+loaded "Starter Circuit" realms=[realm_0] levels=[realm_0/room_0]
+player Delver at realm_0/room_0:1,1 hp=12
+monster Thornling at realm_0/room_0:3,3 hp=5
+
+player ready: Delver at 1
+Delver intent at 1: inspect
+Delver inspected at realm_0/room_0:1,1: tile=Arrival Stone
+  current tile: terrain=Arrival Stone cost=1
+  north -> realm_0/room_0:1,0: blocked terrain terrain=Stone Wall
+  northeast -> realm_0/room_0:2,0: blocked terrain terrain=Stone Wall
+  east -> realm_0/room_0:2,1: walkable terrain=Settlement Yard cost=1
+  southeast -> realm_0/room_0:2,2: blocked terrain terrain=Stone Wall
+  south -> realm_0/room_0:1,2: walkable terrain=Lantern Track cost=1
+  southwest -> realm_0/room_0:0,2: blocked terrain terrain=Stone Wall
+  west -> realm_0/room_0:0,1: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/room_0:0,0: blocked terrain terrain=Stone Wall
+readiness scheduled: Delver cost=0 ready_at=1
+
+player ready: Delver at 1
+Delver intent at 1: sprint east,east,east
+Delver sprint: requested=3 accepted=3 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Settlement Yard cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+  Delver step east -> (3,1): terrain=Ward Path cost=1 remaining=1
+Delver moved from (2,1) to (3,1)
+  Delver step east -> (4,1): terrain=Loop Track cost=1 remaining=0
+Delver moved from (3,1) to (4,1)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Thornling at 2
+Thornling intent: watch
+readiness scheduled: Thornling cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: sprint east,east,west
+Delver sprint: requested=3 accepted=3 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step east -> (5,1): terrain=Loop Track cost=1 remaining=2
+Delver moved from (4,1) to (5,1)
+  Delver step east -> (6,1): terrain=Marker Stone cost=1 remaining=1
+Delver moved from (5,1) to (6,1)
+  Delver step west -> (5,1): terrain=Loop Track cost=1 remaining=0
+Delver moved from (6,1) to (5,1)
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Thornling at 3
+Thornling intent: watch
+readiness scheduled: Thornling cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: sprint south,south,south
+Delver sprint: requested=3 accepted=3 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step south -> (5,2): terrain=Loop Track cost=1 remaining=2
+Delver moved from (5,1) to (5,2)
+  Delver step south -> (5,3): terrain=Loop Track cost=1 remaining=1
+Delver moved from (5,2) to (5,3)
+  Delver step south -> (5,4): terrain=Loop Track cost=1 remaining=0
+Delver moved from (5,3) to (5,4)
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Thornling at 4
+Thornling intent: watch
+readiness scheduled: Thornling cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: walk west
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step west -> (4,4): terrain=Briar Scrub cost=2 remaining=1
+Delver moved from (5,4) to (4,4)
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+monster ready: Thornling at 5
+Thornling intent: wait
+readiness scheduled: Thornling cost=1 ready_at=6
+
+player ready: Delver at 5
+Delver intent at 5: walk west
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step west -> (3,4): terrain=Briar Scrub cost=2 remaining=1
+Delver moved from (4,4) to (3,4)
+readiness scheduled: Delver cost=1 ready_at=6
+time 6
+monster ready: Thornling at 6
+Thornling intent: wait
+readiness scheduled: Thornling cost=1 ready_at=7
+
+player ready: Delver at 6
+Delver intent at 6: walk north
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step north -> (3,3): terrain=Briar Scrub cost=2 remaining=1
+Delver moved from (3,4) to (3,3)
+readiness scheduled: Delver cost=1 ready_at=7
+time 7
+monster ready: Thornling at 7
+Thornling intent: fight Delver
+Thornling missed Delver: roll=11 attack_score=1 defense_score=13
+readiness scheduled: Thornling cost=1 ready_at=8
+
+player ready: Delver at 7
+Delver intent at 7: fight thornling
+Delver missed Thornling: roll=9 attack_score=3 defense_score=13
+readiness scheduled: Delver cost=1 ready_at=8
+time 8
+monster ready: Thornling at 8
+Thornling intent: fight Delver
+Thornling missed Delver: roll=8 attack_score=1 defense_score=13
+readiness scheduled: Thornling cost=1 ready_at=9
+
+player ready: Delver at 8
+Delver intent at 8: run southwest,west
+Delver run: requested=2 accepted=2 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step southwest -> (2,4): terrain=Lantern Track cost=1 remaining=2
+Delver moved from (3,3) to (2,4)
+  Delver step west -> (1,4): terrain=Lantern Track cost=1 remaining=1
+Delver moved from (2,4) to (1,4)
+readiness scheduled: Delver cost=1 ready_at=9
+time 9
+monster ready: Thornling at 9
+Thornling intent: move southwest
+Thornling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Thornling step southwest -> (2,4): terrain=Lantern Track cost=1 remaining=0
+Thornling moved from (3,3) to (2,4)
+readiness scheduled: Thornling cost=1 ready_at=10
+
+player ready: Delver at 9
+Delver intent at 9: sprint north,north,north
+Delver sprint: requested=3 accepted=3 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step north -> (1,3): terrain=Lantern Track cost=1 remaining=2
+Delver moved from (1,4) to (1,3)
+  Delver step north -> (1,2): terrain=Lantern Track cost=1 remaining=1
+Delver moved from (1,3) to (1,2)
+  Delver step north -> (1,1): terrain=Arrival Stone cost=1 remaining=0
+Delver moved from (1,2) to (1,1)
+readiness scheduled: Delver cost=1 ready_at=10
+time 10
+monster ready: Thornling at 10
+Thornling intent: move northwest
+Thornling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Thornling step northwest -> (1,3): terrain=Lantern Track cost=1 remaining=0
+Thornling moved from (2,4) to (1,3)
+readiness scheduled: Thornling cost=1 ready_at=11
+
+final state
+Delver at realm_0/room_0:1,1 hp=12 alive
+Thornling at realm_0/room_0:1,3 hp=5 alive

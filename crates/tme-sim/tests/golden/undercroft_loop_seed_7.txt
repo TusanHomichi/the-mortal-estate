@@ -1,0 +1,105 @@
+The Mortal Estate local simulation
+scenario: undercroft_loop
+seed: 7
+
+loaded "Undercroft Loop" realms=[realm_0] levels=[realm_0/entrance_hall, realm_0/guard_post, realm_0/lower_crypt, realm_0/troll_den]
+player Delver at realm_0/entrance_hall:1,1 hp=12
+monster Kobold at realm_0/guard_post:2,1 hp=7
+monster Mireling at realm_0/lower_crypt:2,1 hp=7
+monster Cave Troll at realm_0/troll_den:2,2 hp=15
+
+player ready: Delver at 1
+Delver intent at 1: inspect
+Delver inspected at realm_0/entrance_hall:1,1: tile=Flagstone
+  current tile: terrain=Flagstone cost=1
+  north -> realm_0/entrance_hall:1,0: blocked terrain terrain=Stone Wall
+  northeast -> realm_0/entrance_hall:2,0: blocked terrain terrain=Stone Wall
+  east -> realm_0/entrance_hall:2,1: door (closed; opens on movement) -> realm_0/guard_post:0,1 terrain=Oak Door cost=1
+  southeast -> realm_0/entrance_hall:2,2: walkable terrain=Flagstone cost=1
+  south -> realm_0/entrance_hall:1,2: walkable terrain=Stone Stairs Down cost=2
+  southwest -> realm_0/entrance_hall:0,2: blocked terrain terrain=Stone Wall
+  west -> realm_0/entrance_hall:0,1: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/entrance_hall:0,0: blocked terrain terrain=Stone Wall
+readiness scheduled: Delver cost=0 ready_at=1
+
+player ready: Delver at 1
+Delver intent at 1: walk south
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step south -> (1,2): terrain=Stone Stairs Down cost=2 remaining=1
+Delver moved from (1,1) to (1,2)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Kobold at 2
+Kobold intent: hold
+readiness scheduled: Kobold cost=1 ready_at=3
+monster ready: Mireling at 2
+Mireling intent: watch
+readiness scheduled: Mireling cost=1 ready_at=3
+monster ready: Cave Troll at 2
+Cave Troll intent: watch
+readiness scheduled: Cave Troll cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: traverse stairs_down
+--- Delver uses down stairs: realm_0/entrance_hall:1,2 -> realm_0/lower_crypt:1,1 ---
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Kobold at 3
+Kobold intent: hold
+readiness scheduled: Kobold cost=1 ready_at=4
+monster ready: Mireling at 3
+Mireling intent: wait
+readiness scheduled: Mireling cost=1 ready_at=4
+monster ready: Cave Troll at 3
+Cave Troll intent: watch
+readiness scheduled: Cave Troll cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: inspect
+Delver inspected at realm_0/lower_crypt:1,1: tile=Stone Stairs Up
+  current tile: terrain=Stone Stairs Up cost=2
+  north -> realm_0/lower_crypt:1,0: blocked terrain terrain=Crypt Wall
+  northeast -> realm_0/lower_crypt:2,0: blocked terrain terrain=Crypt Wall
+  east -> realm_0/lower_crypt:2,1: walkable terrain=Crypt Flagstone cost=1
+  southeast -> realm_0/lower_crypt:2,2: walkable terrain=Crypt Flagstone cost=1
+  south -> realm_0/lower_crypt:1,2: walkable terrain=Crypt Flagstone cost=1
+  southwest -> realm_0/lower_crypt:0,2: blocked terrain terrain=Crypt Wall
+  west -> realm_0/lower_crypt:0,1: blocked terrain terrain=Crypt Wall
+  northwest -> realm_0/lower_crypt:0,0: blocked terrain terrain=Crypt Wall
+  nearby east: monster Mireling at (2,1) hp=7
+readiness scheduled: Delver cost=0 ready_at=3
+
+player ready: Delver at 3
+Delver intent at 3: traverse stairs_up
+--- Delver uses up stairs: realm_0/lower_crypt:1,1 -> realm_0/entrance_hall:1,2 ---
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Kobold at 4
+Kobold intent: hold
+readiness scheduled: Kobold cost=1 ready_at=5
+monster ready: Mireling at 4
+Mireling intent: watch
+readiness scheduled: Mireling cost=1 ready_at=5
+monster ready: Cave Troll at 4
+Cave Troll intent: watch
+readiness scheduled: Cave Troll cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: inspect
+Delver inspected at realm_0/entrance_hall:1,2: tile=Stone Stairs Down
+  current tile: terrain=Stone Stairs Down cost=2
+  north -> realm_0/entrance_hall:1,1: walkable terrain=Flagstone cost=1
+  northeast -> realm_0/entrance_hall:2,1: door (closed; opens on movement) -> realm_0/guard_post:0,1 terrain=Oak Door cost=1
+  east -> realm_0/entrance_hall:2,2: walkable terrain=Flagstone cost=1
+  southeast -> realm_0/entrance_hall:2,3: walkable terrain=Flagstone cost=1
+  south -> realm_0/entrance_hall:1,3: walkable terrain=Flagstone cost=1
+  southwest -> realm_0/entrance_hall:0,3: blocked terrain terrain=Stone Wall
+  west -> realm_0/entrance_hall:0,2: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/entrance_hall:0,1: blocked terrain terrain=Stone Wall
+readiness scheduled: Delver cost=0 ready_at=4
+
+final state
+Delver at realm_0/entrance_hall:1,2 hp=12 alive
+Kobold at realm_0/guard_post:2,1 hp=7 alive
+Mireling at realm_0/lower_crypt:2,1 hp=7 alive
+Cave Troll at realm_0/troll_den:2,2 hp=15 alive

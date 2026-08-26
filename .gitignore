@@ -1,0 +1,30 @@
+# The Mortal Estate — ignored roots.
+#
+# .boundary/ carries the PRIVATE data the public-boundary checks read: the real
+# banned-term denylist. The mechanism ships in tracked code and is proven by a
+# tracked synthetic fixture; the terms themselves must never enter this tree's
+# history. tools/check_clean_room.py asserts this root is genuinely ignored.
+.boundary/
+
+# Predecessor-private roots. This project is clean-room and has neither. They
+# are ignored anyway so that a stray copy can never be committed by accident;
+# tools/check_clean_room.py asserts both are ignored AND absent from disk.
+Research/
+placeholders/
+
+# Workbench session state. Sessions are disposable working files — selection
+# packets, masks, and the operation log — written by tools/workbench. They are
+# never tracked, never runtime input, and never an authority; the tracked proof
+# for the Workbench uses synthetic fixtures under tests/fixtures/workbench/ and
+# the tracked authoring fixture, so a clean clone proves the tool without this
+# root existing at all. Delete it whenever; nothing references it.
+.workbench/
+
+# Python bytecode from running the checks and their tests.
+__pycache__/
+*.py[cod]
+
+# Cargo build output. This is not merely untidy to carry: the boundary checks
+# scan every file git carries OR WOULD carry, so an unignored target/ puts tens
+# of thousands of build artifacts inside the boundary's own scan set.
+/target/

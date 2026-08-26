@@ -1,0 +1,82 @@
+The Mortal Estate local simulation
+scenario: spell_readiness
+seed: 7
+
+loaded "Spell Readiness" realms=[realm_0] levels=[realm_0/room_0]
+player Wiz (Wizard) at realm_0/room_0:1,1 hp=10
+monster Watcher at realm_0/room_0:3,1 hp=6
+
+player ready: Wiz at 1
+Wiz intent at 1: cast spark on watcher
+Wiz casts Spark at watcher (lane: wizard_magic) [stubbed]
+Wiz's Spark practice on wizard_magic: raw=3 reason=eligible_successful_cast
+Wiz gained 3 wizard_magic practice points (pool: 3)
+Wiz's wizard_magic skill advanced to level 1, critique 1
+readiness scheduled: Wiz cost=1 ready_at=2
+Wiz regenerated 1 Mp (19/20, Active, time 2)
+time 2
+monster ready: Watcher at 2
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=3
+
+player ready: Wiz at 2
+Wiz intent at 2: cast mend on self
+Wiz casts Mend at self (lane: wizard_magic) [stubbed]
+Wiz's Mend practice on wizard_magic: raw=3 reason=eligible_successful_cast
+Wiz gained 3 wizard_magic practice points (pool: 3)
+Wiz's wizard_magic skill advanced to level 1, critique 2
+readiness scheduled: Wiz cost=1 ready_at=3
+time 3
+monster ready: Watcher at 3
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=4
+
+player ready: Wiz at 3
+Wiz intent at 3: cast ward
+Wiz casts Ward (lane: wizard_magic) [stubbed]
+Wiz's Ward practice on wizard_magic: raw=2 reason=eligible_successful_cast
+Wiz gained 2 wizard_magic practice points (pool: 2)
+readiness scheduled: Wiz cost=1 ready_at=4
+Wiz regenerated 1 Mp (17/20, Active, time 4)
+time 4
+monster ready: Watcher at 4
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=5
+
+player ready: Wiz at 4
+Wiz intent at 4: warm_spell charged_spark
+Wiz warms Charged Spark (ready at time 5)
+readiness scheduled: Wiz cost=1 ready_at=5
+Wiz's Charged Spark is ready
+time 5
+monster ready: Watcher at 5
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=6
+
+player ready: Wiz at 5
+Wiz intent at 5: wait
+readiness scheduled: Wiz cost=1 ready_at=6
+Wiz regenerated 1 Mp (18/20, Inactive, time 6)
+Wiz regenerated 1 Stamina (19/20, Inactive, time 6)
+time 6
+monster ready: Watcher at 6
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=7
+
+player ready: Wiz at 6
+Wiz intent at 6: cast_warmed_spell on watcher
+Wiz casts warmed Charged Spark
+Wiz casts Charged Spark at watcher (lane: wizard_magic) [stubbed]
+Wiz's Charged Spark practice on wizard_magic: raw=5 reason=eligible_successful_cast
+Wiz gained 5 wizard_magic practice points (pool: 7)
+Wiz's wizard_magic skill advanced to level 1, critique 3
+Wiz's wizard_magic skill advanced to level 1, critique 4
+readiness scheduled: Wiz cost=1 ready_at=7
+time 7
+monster ready: Watcher at 7
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=8
+
+final state
+Wiz (Wizard) at realm_0/room_0:1,1 hp=10 alive
+Watcher at realm_0/room_0:3,1 hp=6 alive

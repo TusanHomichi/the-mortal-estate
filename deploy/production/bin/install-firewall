@@ -1,0 +1,52 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+load_environment
+[ "${TME_FIREWALL_CONFIRM-}" = install-default-deny ] || \
+    fail 'set TME_FIREWALL_CONFIRM=install-default-deny'
+
+case "$TME_OPERATOR_SSH_CIDR" in
+    *:*) operator_rule="ip6 saddr $TME_OPERATOR_SSH_CIDR tcp dport 22 accept" ;;
+    *.*/*) operator_rule="ip saddr $TME_OPERATOR_SSH_CIDR tcp dport 22 accept" ;;
+    *) fail 'operator SSH CIDR must be canonical IPv4 or IPv6 CIDR' ;;
+esac
+
+temporary=$(mktemp /etc/.nftables.conf.XXXXXX)
+trap 'rm -f "$temporary"' EXIT HUP INT TERM
+cat >"$temporary" <<EOF
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet tme_filter {
+    chain input {
+        type filter hook input priority filter; policy drop;
+        ct state invalid drop
+        ct state established,related accept
+        iifname "lo" accept
+        $operator_rule
+        tcp dport { 80, 443 } accept
+        ip protocol icmp accept
+        ip6 nexthdr ipv6-icmp accept
+    }
+
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+    }
+}
+EOF
+chmod 0644 "$temporary"
+nft --check --file "$temporary"
+install -o root -g root -m 0644 "$temporary" /etc/nftables.conf
+rm -f "$temporary"
+trap - EXIT HUP INT TERM
+systemctl enable --now nftables.service
+nft list ruleset >/dev/null
+printf '%s\n' 'install-firewall: default-deny policy active'

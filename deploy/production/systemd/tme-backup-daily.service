@@ -1,0 +1,19 @@
+[Unit]
+Description=TME daily incremental backup
+
+[Service]
+Type=oneshot
+User=postgres
+ExecStart=/opt/tme/operations/bin/backup incr
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/tme/operations /var/lib/postgresql /var/log/pgbackrest /var/spool/pgbackrest

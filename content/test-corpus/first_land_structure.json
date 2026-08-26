@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "first_land_structure",
+  "name": "First Land Structure Walk",
+  "description": "Doctrine-migrated first-land load and South Dock inspection smoke; reciprocal topology and scene contracts are validated structurally.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project Slice FM route, placements, interactions, and structural proof with no source coordinates or fidelity claim.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/first_land_structure.provenance.md"
+    ]
+  },
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/first_land_structure",
+  "world_template": "world_templates/first_land_structure.json",
+  "simulation_seed": "simulation_seeds/first_land_structure.json",
+  "rng_seed": 7,
+  "script": [
+    {
+      "inspect": true
+    }
+  ]
+}

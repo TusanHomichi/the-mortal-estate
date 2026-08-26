@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "summons_created_creature_lifecycle",
+  "name": "Summons Created Creature Lifecycle",
+  "description": "Clean fixture proving summon creation, ally hostility, and expiration lifecycle in the local simulation harness.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project Slice BW fixture for summon lifecycle coverage.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/summons_created_creature_lifecycle.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/summons_created_creature_lifecycle",
+  "world_template": "world_templates/summons_created_creature_lifecycle.json",
+  "simulation_seed": "simulation_seeds/summons_created_creature_lifecycle.json",
+  "script": [
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "call_echo",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "start",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "wait": true
+    },
+    {
+      "wait": true
+    }
+  ]
+}

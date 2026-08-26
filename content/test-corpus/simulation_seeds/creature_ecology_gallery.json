@@ -1,0 +1,56 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "creature_ecology_gallery",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/creature_ecology_gallery/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": { "x": 2, "y": 1 }
+      },
+      "npc": null,
+      "carried": {
+        "items": [
+          { "item_instance_id": "gallery_club", "position": "right_hand" }
+        ],
+        "gold": { "left_hand": 0, "right_hand": 0, "sack": 0 }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "gallery_club": {
+      "definition_id": "oak_club",
+      "binding": { "state": "unrestricted" }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": [
+    {
+      "id": "gallery_pack",
+      "source": { "kind": "spawn_group", "spawn_group_id": "gallery_pack" },
+      "member_locations": {
+        "runner": {
+          "realm": "realm_0", "level": "room_0", "position": { "x": 2, "y": 1 }
+        },
+        "keeper": {
+          "realm": "realm_0", "level": "room_0", "position": { "x": 2, "y": 1 }
+        }
+      }
+    },
+    {
+      "id": "gallery_lair",
+      "source": { "kind": "lair", "lair_definition_id": "gallery_cinder_lair" },
+      "member_locations": {
+        "burrower": {
+          "realm": "realm_0", "level": "room_0", "position": { "x": 2, "y": 1 }
+        }
+      }
+    }
+  ]
+}

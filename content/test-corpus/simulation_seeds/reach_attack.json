@@ -1,0 +1,68 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "reach_attack",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/reach_attack/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "ash_polearm",
+            "position": "right_hand"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "reedling",
+      "actor_definition_id": "actor/reach_attack/reedling",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "ash_polearm": {
+      "definition_id": "ash_polearm",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

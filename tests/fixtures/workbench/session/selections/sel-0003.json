@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "kind": "workbench_selection_packet",
+  "workbench_version": "v0",
+  "selection_id": "sel-0003",
+  "created_at": "2026-08-19T00:00:00Z",
+  "author": "owner",
+  "source": {
+    "repository_revision": "0000000000000000000000000000000000000000",
+    "revision_binding": "advisory",
+    "digest_binding": "fail_closed",
+    "digests": [
+      {
+        "role": "master",
+        "path": "sources/synthetic-master.json",
+        "sha256": "dec9be168f737bd14ae654a6630213a0ab474c726b63483ff447fe4a25831fed"
+      },
+      {
+        "role": "companion",
+        "path": "sources/synthetic-companion.json",
+        "sha256": "7aa8fd467fd3ea4ea1d2c054e46484c4211d7d77779c48b36b673f05a16b2af6"
+      },
+      {
+        "role": "receipt",
+        "path": "sources/synthetic-receipt.json",
+        "sha256": "51332511aff718f81cefc934ca5084b60acaacf9e52fd4c62130ef2e8172e63d"
+      },
+      {
+        "role": "runtime_projection",
+        "path": "sources/synthetic-runtime-projection.json",
+        "sha256": "cc67ff1f5c10ffa05d4c8358d2a9f804c4ac94a813036fbf6bb16bdeb9996995"
+      },
+      {
+        "role": "logical_projection",
+        "path": "projection/synthetic-logical-projection.json",
+        "sha256": "c5ea477296d9da6dc05db83d165f8231352699466c38f5419b8e9b5a342f12ec"
+      }
+    ]
+  },
+  "view": "logical",
+  "scene": {
+    "land_id": "synthetic_fixture_land",
+    "realm_id": "synthetic_realm",
+    "member": "synthetic_surface",
+    "frame_generation": null
+  },
+  "camera": null,
+  "screen_region": {
+    "gesture": "lasso",
+    "space": "authored_cell_lattice",
+    "geometry": {
+      "polygon": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 2.0,
+          "y": 0.0
+        },
+        {
+          "x": 2.0,
+          "y": 2.0
+        },
+        {
+          "x": 0.0,
+          "y": 2.0
+        }
+      ]
+    },
+    "canvas_rect": {
+      "x": 0,
+      "y": 0,
+      "width": 64,
+      "height": 48
+    },
+    "cell_bounds": {
+      "min_x": 0,
+      "min_y": 0,
+      "max_x": 1,
+      "max_y": 1,
+      "width": 2,
+      "height": 2
+    },
+    "mask": {
+      "path": "session/masks/sel-0003.pbm",
+      "sha256": "8d1039936950c1692c42ead136eb717f157e982c0e86ab402588df5859019076",
+      "format": "pbm_p1_over_cell_bounds"
+    }
+  },
+  "cells": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 1,
+      "y": 0
+    },
+    {
+      "x": 0,
+      "y": 1
+    },
+    {
+      "x": 1,
+      "y": 1
+    }
+  ],
+  "world": {
+    "frame": "authored_cell_lattice",
+    "member": "synthetic_surface",
+    "tile_size_px": 16,
+    "cell_bounds": {
+      "min_x": 0,
+      "min_y": 0,
+      "max_x": 1,
+      "max_y": 1,
+      "width": 2,
+      "height": 2
+    },
+    "pixel_bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    "layer_band": null
+  },
+  "semantic": [
+    {
+      "rank": 1,
+      "kind": "cell_terrain",
+      "identity": "terrain:synthetic_surface:synthetic_ground",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 1,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 4,
+        "selection_cells": 4,
+        "identity_cells": 10,
+        "selection_coverage": 1.0,
+        "identity_coverage": 0.4
+      },
+      "detail": {
+        "terrain_class": "synthetic_ground",
+        "authored_layer": "base_terrain",
+        "passable_cells": 4
+      }
+    },
+    {
+      "rank": 2,
+      "kind": "layer",
+      "identity": "layer:synthetic_surface:base_terrain",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 1,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 4,
+        "selection_cells": 4,
+        "identity_cells": 12,
+        "selection_coverage": 1.0,
+        "identity_coverage": 0.333333
+      },
+      "detail": {
+        "authored_layer": "base_terrain",
+        "member": "synthetic_surface"
+      }
+    },
+    {
+      "rank": 3,
+      "kind": "route",
+      "identity": "route:synthetic_surface",
+      "cells": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 2,
+        "selection_cells": 4,
+        "identity_cells": 2,
+        "selection_coverage": 0.5,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "member": "synthetic_surface",
+        "route_cells_in_member": 2
+      }
+    },
+    {
+      "rank": 4,
+      "kind": "cell_terrain",
+      "identity": "terrain:synthetic_surface:synthetic_route",
+      "cells": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 2,
+        "selection_cells": 4,
+        "identity_cells": 2,
+        "selection_coverage": 0.5,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "terrain_class": "synthetic_route",
+        "authored_layer": "routes",
+        "passable_cells": 2
+      }
+    },
+    {
+      "rank": 5,
+      "kind": "layer",
+      "identity": "layer:synthetic_surface:routes",
+      "cells": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 2,
+        "selection_cells": 4,
+        "identity_cells": 2,
+        "selection_coverage": 0.5,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "authored_layer": "routes",
+        "member": "synthetic_surface"
+      }
+    },
+    {
+      "rank": 6,
+      "kind": "landmark",
+      "identity": "landmark:synthetic_surface:synthetic_landing",
+      "cells": [
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 1,
+        "selection_cells": 4,
+        "identity_cells": 1,
+        "selection_coverage": 0.25,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "landmark_id": "synthetic_landing",
+        "role": "arrival",
+        "at": {
+          "x": 1,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "rank": 1,
+      "kind": "cell_terrain",
+      "identity": "terrain:synthetic_surface:synthetic_ground",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 1,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 4,
+        "selection_cells": 4,
+        "identity_cells": 10,
+        "selection_coverage": 1.0,
+        "identity_coverage": 0.4
+      },
+      "detail": {
+        "terrain_class": "synthetic_ground",
+        "authored_layer": "base_terrain",
+        "passable_cells": 4
+      }
+    },
+    {
+      "rank": 2,
+      "kind": "layer",
+      "identity": "layer:synthetic_surface:base_terrain",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 1,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 4,
+        "selection_cells": 4,
+        "identity_cells": 12,
+        "selection_coverage": 1.0,
+        "identity_coverage": 0.333333
+      },
+      "detail": {
+        "authored_layer": "base_terrain",
+        "member": "synthetic_surface"
+      }
+    },
+    {
+      "rank": 3,
+      "kind": "route",
+      "identity": "route:synthetic_surface",
+      "cells": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 2,
+        "selection_cells": 4,
+        "identity_cells": 2,
+        "selection_coverage": 0.5,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "member": "synthetic_surface",
+        "route_cells_in_member": 2
+      }
+    },
+    {
+      "rank": 4,
+      "kind": "cell_terrain",
+      "identity": "terrain:synthetic_surface:synthetic_route",
+      "cells": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 2,
+        "selection_cells": 4,
+        "identity_cells": 2,
+        "selection_coverage": 0.5,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "terrain_class": "synthetic_route",
+        "authored_layer": "routes",
+        "passable_cells": 2
+      }
+    },
+    {
+      "rank": 5,
+      "kind": "layer",
+      "identity": "layer:synthetic_surface:routes",
+      "cells": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 2,
+        "selection_cells": 4,
+        "identity_cells": 2,
+        "selection_coverage": 0.5,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "authored_layer": "routes",
+        "member": "synthetic_surface"
+      }
+    },
+    {
+      "rank": 6,
+      "kind": "landmark",
+      "identity": "landmark:synthetic_surface:synthetic_landing",
+      "cells": [
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "coverage": {
+        "covered_cells": 1,
+        "selection_cells": 4,
+        "identity_cells": 1,
+        "selection_coverage": 0.25,
+        "identity_coverage": 1.0
+      },
+      "detail": {
+        "landmark_id": "synthetic_landing",
+        "role": "arrival",
+        "at": {
+          "x": 1,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "ambiguous": true,
+  "observed": [],
+  "context_image": null,
+  "commit_mask": null,
+  "comment": "the north-west quarter"
+}

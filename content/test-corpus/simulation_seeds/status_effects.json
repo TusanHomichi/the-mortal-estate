@@ -1,0 +1,88 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "status_effects",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/status_effects/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "steady_charm",
+            "position": "neck"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": [
+        {
+          "instance_id": "rooted_1",
+          "effect_id": "generic_root",
+          "source": {
+            "kind": "fixture",
+            "id": "status_effects"
+          },
+          "kind": "control_status",
+          "tags": [
+            "stun"
+          ],
+          "potency": 0,
+          "remaining_rounds": 2,
+          "stacking": "replace_same_kind",
+          "start_delay_rounds": 0,
+          "tick_interval_rounds": 1,
+          "suppresses_action": true,
+          "resistance_boosts": []
+        }
+      ]
+    },
+    {
+      "id": "watcher",
+      "actor_definition_id": "actor/status_effects/watcher",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "steady_charm": {
+      "definition_id": "steady_charm",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

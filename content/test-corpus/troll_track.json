@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "troll_track",
+  "name": "Troll Track",
+  "description": "A clean project-authored prototype fixture for a relentless territorial brute chase and hp race.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project troll track fixture. Creature names are common fantasy vocabulary; behavior rules, layout, stats, and script are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/troll_track.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/troll_track",
+  "world_template": "world_templates/troll_track.json",
+  "simulation_seed": "simulation_seeds/troll_track.json",
+  "script": [
+    {
+      "wait": true
+    },
+    {
+      "wait": true
+    },
+    {
+      "wait": true
+    },
+    {
+      "wait": true
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "troll",
+        "authorization": "safe"
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "troll",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

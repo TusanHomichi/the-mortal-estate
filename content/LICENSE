@@ -1,0 +1,19 @@
+The Mortal Estate — Original Game Content License
+
+Copyright (c) 2026 ConaryLabs. All rights reserved.
+
+The original game content in this repository — including but not limited to
+world design, lore, place and character names, quest and encounter design,
+game text, maps, artwork, audio, and content data files — is NOT covered by
+the repository's code license (AGPL-3.0). It is proprietary and may not be
+copied, modified, distributed, or used to operate a derivative or competing
+game service without explicit written permission from the copyright holder.
+
+Third-party material included in this repository is not claimed by this
+notice: it remains under its own license, preserved alongside the material
+together with its required attribution and provenance records.
+
+Building and running the game from source for personal, non-commercial use
+is permitted to the extent the code license requires source availability;
+this notice does not restrict rights the code license grants over the CODE,
+and nothing in the code license grants rights over this CONTENT.

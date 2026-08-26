@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "kind": "workbench_logical_projection",
+  "land_id": "synthetic_fixture_land",
+  "realm_id": "synthetic_realm",
+  "candidate_member": "synthetic_surface",
+  "tile_size_px": 16,
+  "sources": [
+    {
+      "role": "master",
+      "path": "sources/synthetic-master.json",
+      "sha256": "dec9be168f737bd14ae654a6630213a0ab474c726b63483ff447fe4a25831fed"
+    },
+    {
+      "role": "companion",
+      "path": "sources/synthetic-companion.json",
+      "sha256": "7aa8fd467fd3ea4ea1d2c054e46484c4211d7d77779c48b36b673f05a16b2af6"
+    },
+    {
+      "role": "receipt",
+      "path": "sources/synthetic-receipt.json",
+      "sha256": "51332511aff718f81cefc934ca5084b60acaacf9e52fd4c62130ef2e8172e63d"
+    },
+    {
+      "role": "runtime_projection",
+      "path": "sources/synthetic-runtime-projection.json",
+      "sha256": "cc67ff1f5c10ffa05d4c8358d2a9f804c4ac94a813036fbf6bb16bdeb9996995"
+    }
+  ],
+  "members": [
+    {
+      "member": "synthetic_surface",
+      "width": 4,
+      "height": 3,
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "synthetic_mark",
+              "layer": "landmark_marks"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "synthetic_route",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "synthetic_route",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "synthetic_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "synthetic_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "synthetic_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "synthetic_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "structures": [
+        {
+          "id": "synthetic_hall",
+          "purpose": "synthetic_purpose",
+          "scope": "clustered",
+          "x": 2,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "access": {
+            "x": 2,
+            "y": 2
+          },
+          "facade_door": {
+            "x": 2,
+            "y": 1
+          }
+        }
+      ],
+      "landmarks": [
+        {
+          "id": "synthetic_landing",
+          "role": "arrival",
+          "at": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "id": "synthetic_descent",
+          "member": "synthetic_surface",
+          "target_member": "synthetic_interior",
+          "paired_transition": "synthetic_ascent",
+          "direction": "down",
+          "marker": {
+            "x": 2,
+            "y": 0
+          },
+          "access": {
+            "x": 3,
+            "y": 0
+          }
+        }
+      ]
+    },
+    {
+      "member": "synthetic_interior",
+      "width": 2,
+      "height": 2,
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "synthetic_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "synthetic_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        }
+      ],
+      "routes": [],
+      "structures": [],
+      "landmarks": [],
+      "transitions": [
+        {
+          "id": "synthetic_ascent",
+          "member": "synthetic_interior",
+          "target_member": "synthetic_surface",
+          "paired_transition": "synthetic_descent",
+          "direction": "up",
+          "marker": {
+            "x": 1,
+            "y": 0
+          },
+          "access": {
+            "x": 1,
+            "y": 1
+          }
+        }
+      ]
+    }
+  ],
+  "connectivity": {
+    "edges": [
+      {
+        "id": "route/synthetic_ascent",
+        "from_member": "synthetic_interior",
+        "from": {
+          "x": 1,
+          "y": 1
+        },
+        "to_member": "synthetic_surface",
+        "to": {
+          "x": 3,
+          "y": 0
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/synthetic_descent",
+        "from_member": "synthetic_surface",
+        "from": {
+          "x": 3,
+          "y": 0
+        },
+        "to_member": "synthetic_interior",
+        "to": {
+          "x": 1,
+          "y": 1
+        },
+        "direction": "down"
+      }
+    ]
+  }
+}

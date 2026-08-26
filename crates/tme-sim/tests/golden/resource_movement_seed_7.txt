@@ -1,0 +1,221 @@
+The Mortal Estate local simulation
+scenario: resource_movement
+seed: 7
+
+loaded "Resource Movement Gallery" realms=[realm_0] levels=[realm_0/practice_hall]
+player Tavia (Fighter) at realm_0/practice_hall:1,1 hp=4
+monster Sparring Post at realm_0/practice_hall:2,1 hp=40
+
+player ready: Tavia at 1
+Tavia intent at 1: inspect
+Tavia inspected at realm_0/practice_hall:1,1: tile=Practice Floor
+  current tile: terrain=Practice Floor cost=1
+  north -> realm_0/practice_hall:1,0: blocked terrain terrain=Hall Wall
+  northeast -> realm_0/practice_hall:2,0: blocked terrain terrain=Hall Wall
+  east -> realm_0/practice_hall:2,1: walkable terrain=Loose Matting cost=2
+  southeast -> realm_0/practice_hall:2,2: walkable terrain=Practice Floor cost=1
+  south -> realm_0/practice_hall:1,2: walkable terrain=Practice Floor cost=1
+  southwest -> realm_0/practice_hall:0,2: blocked terrain terrain=Hall Wall
+  west -> realm_0/practice_hall:0,1: blocked terrain terrain=Hall Wall
+  northwest -> realm_0/practice_hall:0,0: blocked terrain terrain=Hall Wall
+  nearby east: monster Sparring Post at (2,1) hp=40
+  ground here: Reed Bundle at (1,1)
+  ground here: Clay Weight at (1,1)
+  ground here: Rope Coil at (1,1)
+readiness scheduled: Tavia cost=0 ready_at=1
+
+player ready: Tavia at 1
+Tavia intent at 1: show_sack
+Tavia's sack:
+  gold: 2
+readiness scheduled: Tavia cost=0 ready_at=1
+
+player ready: Tavia at 1
+Tavia intent at 1: wait
+readiness scheduled: Tavia cost=1 ready_at=2
+Tavia regenerated 2 Hp (6/12, Inactive, time 2)
+Tavia regenerated 1 Mp (3/8, Inactive, time 2)
+time 2
+monster ready: Sparring Post at 2
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=3
+
+player ready: Tavia at 2
+Tavia intent at 2: sprint south,east,east
+Tavia sprint: requested=3 accepted=3 points=3 burden=Some(LightlyLoaded) exertion=Rapid stamina_cost=Some(2) stop=FullPathAccepted
+  Tavia step south -> (1,2): terrain=Practice Floor cost=1 remaining=2
+Tavia moved from (1,1) to (1,2)
+  Tavia step east -> (2,2): terrain=Practice Floor cost=1 remaining=1
+Tavia moved from (1,2) to (2,2)
+  Tavia step east -> (3,2): terrain=Practice Floor cost=1 remaining=0
+Tavia moved from (2,2) to (3,2)
+Tavia spent 2 stamina (sprint Rapid): 6/12
+readiness scheduled: Tavia cost=1 ready_at=3
+time 3
+monster ready: Sparring Post at 3
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=4
+
+player ready: Tavia at 3
+Tavia intent at 3: sprint west,west,north
+Tavia sprint: requested=3 accepted=3 points=3 burden=Some(LightlyLoaded) exertion=Rapid stamina_cost=Some(2) stop=FullPathAccepted
+  Tavia step west -> (2,2): terrain=Practice Floor cost=1 remaining=2
+Tavia moved from (3,2) to (2,2)
+  Tavia step west -> (1,2): terrain=Practice Floor cost=1 remaining=1
+Tavia moved from (2,2) to (1,2)
+  Tavia step north -> (1,1): terrain=Practice Floor cost=1 remaining=0
+Tavia moved from (1,2) to (1,1)
+Tavia spent 2 stamina (sprint Rapid): 4/12
+readiness scheduled: Tavia cost=1 ready_at=4
+Tavia regenerated 1 Hp (7/12, Active, time 4)
+Tavia regenerated 1 Mp (4/8, Active, time 4)
+time 4
+monster ready: Sparring Post at 4
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=5
+
+player ready: Tavia at 4
+Tavia intent at 4: move_item reed_bundle to sack_item_1
+Tavia moved Reed Bundle from (1,1) to sack_item_1
+readiness scheduled: Tavia cost=1 ready_at=5
+time 5
+monster ready: Sparring Post at 5
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=6
+
+player ready: Tavia at 5
+Tavia intent at 5: run south,east
+Tavia run: requested=2 accepted=2 points=3 burden=Some(ModeratelyLoaded) exertion=Normal stamina_cost=Some(1) stop=FullPathAccepted
+  Tavia step south -> (1,2): terrain=Practice Floor cost=1 remaining=2
+Tavia moved from (1,1) to (1,2)
+  Tavia step east -> (2,2): terrain=Practice Floor cost=1 remaining=1
+Tavia moved from (1,2) to (2,2)
+Tavia spent 1 stamina (run Normal): 3/12
+readiness scheduled: Tavia cost=1 ready_at=6
+Tavia regenerated 1 Hp (8/12, Active, time 6)
+Tavia regenerated 1 Mp (5/8, Active, time 6)
+time 6
+monster ready: Sparring Post at 6
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=7
+
+player ready: Tavia at 6
+Tavia intent at 6: run west,north
+Tavia run: requested=2 accepted=2 points=3 burden=Some(ModeratelyLoaded) exertion=Normal stamina_cost=Some(1) stop=FullPathAccepted
+  Tavia step west -> (1,2): terrain=Practice Floor cost=1 remaining=2
+Tavia moved from (2,2) to (1,2)
+  Tavia step north -> (1,1): terrain=Practice Floor cost=1 remaining=1
+Tavia moved from (1,2) to (1,1)
+Tavia spent 1 stamina (run Normal): 2/12
+readiness scheduled: Tavia cost=1 ready_at=7
+time 7
+monster ready: Sparring Post at 7
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=8
+
+player ready: Tavia at 7
+Tavia intent at 7: move_item clay_weight to sack_item_2
+Tavia moved Clay Weight from (1,1) to sack_item_2
+readiness scheduled: Tavia cost=1 ready_at=8
+Tavia regenerated 1 Hp (9/12, Active, time 8)
+Tavia regenerated 1 Mp (6/8, Active, time 8)
+time 8
+monster ready: Sparring Post at 8
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=9
+
+player ready: Tavia at 8
+Tavia intent at 8: walk east
+Tavia walk: requested=1 accepted=1 points=3 burden=Some(HeavilyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Tavia step east -> (2,1): terrain=Loose Matting cost=2 remaining=1
+Tavia moved from (1,1) to (2,1)
+readiness scheduled: Tavia cost=1 ready_at=9
+time 9
+monster ready: Sparring Post at 9
+Sparring Post intent: fight Tavia
+Sparring Post missed Tavia: roll=11 attack_score=0 defense_score=13
+readiness scheduled: Sparring Post cost=1 ready_at=10
+
+player ready: Tavia at 9
+Tavia intent at 9: walk west
+Tavia walk: requested=1 accepted=1 points=3 burden=Some(HeavilyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Tavia step west -> (1,1): terrain=Practice Floor cost=1 remaining=2
+Tavia moved from (2,1) to (1,1)
+readiness scheduled: Tavia cost=1 ready_at=10
+Tavia regenerated 1 Hp (10/12, Active, time 10)
+Tavia regenerated 1 Mp (7/8, Active, time 10)
+time 10
+monster ready: Sparring Post at 10
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=11
+
+player ready: Tavia at 10
+Tavia intent at 10: move_item rope_coil to sack_item_3
+Tavia moved Rope Coil from (1,1) to sack_item_3
+readiness scheduled: Tavia cost=1 ready_at=11
+time 11
+monster ready: Sparring Post at 11
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=12
+
+player ready: Tavia at 11
+Tavia intent at 11: walk east
+Tavia walk: requested=1 accepted=1 points=3 burden=Some(VeryHeavilyLoaded) exertion=Normal stamina_cost=Some(1) stop=FullPathAccepted
+  Tavia step east -> (2,1): terrain=Loose Matting cost=2 remaining=1
+Tavia moved from (1,1) to (2,1)
+Tavia spent 1 stamina (walk Normal): 1/12
+readiness scheduled: Tavia cost=1 ready_at=12
+Tavia regenerated 1 Hp (11/12, Active, time 12)
+Tavia regenerated 1 Mp (8/8, Active, time 12)
+time 12
+monster ready: Sparring Post at 12
+Sparring Post intent: fight Tavia
+Sparring Post missed Tavia: roll=2 attack_score=0 defense_score=13
+readiness scheduled: Sparring Post cost=1 ready_at=13
+
+player ready: Tavia at 12
+Tavia intent at 12: fight sparring_post
+Tavia missed Sparring Post: roll=9 attack_score=1 defense_score=13
+Tavia's fight miss practice on hand: risk=practice raw=1
+Tavia gained 1 hand practice point (pool: 1)
+Tavia's hand skill advanced to level 1, critique 1
+readiness scheduled: Tavia cost=1 ready_at=13
+time 13
+monster ready: Sparring Post at 13
+Sparring Post intent: fight Tavia
+Sparring Post missed Tavia: roll=8 attack_score=0 defense_score=13
+readiness scheduled: Sparring Post cost=1 ready_at=14
+
+player ready: Tavia at 13
+Tavia intent at 13: walk west
+Tavia walk: requested=1 accepted=1 points=3 burden=Some(VeryHeavilyLoaded) exertion=Normal stamina_cost=Some(1) stop=FullPathAccepted
+  Tavia step west -> (1,1): terrain=Practice Floor cost=1 remaining=2
+Tavia moved from (2,1) to (1,1)
+Tavia spent 1 stamina (walk Normal): 0/12
+readiness scheduled: Tavia cost=1 ready_at=14
+Tavia regenerated 1 Hp (12/12, Active, time 14)
+time 14
+monster ready: Sparring Post at 14
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=15
+
+player ready: Tavia at 14
+Tavia intent at 14: wait
+readiness scheduled: Tavia cost=1 ready_at=15
+time 15
+monster ready: Sparring Post at 15
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=16
+
+player ready: Tavia at 15
+Tavia intent at 15: wait
+readiness scheduled: Tavia cost=1 ready_at=16
+Tavia regenerated 1 Stamina (1/12, Inactive, time 16)
+time 16
+monster ready: Sparring Post at 16
+Sparring Post intent: hold
+readiness scheduled: Sparring Post cost=1 ready_at=17
+
+final state
+Tavia (Fighter) at realm_0/practice_hall:1,1 hp=12 alive
+Sparring Post at realm_0/practice_hall:2,1 hp=40 alive

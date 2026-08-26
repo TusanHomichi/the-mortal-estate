@@ -1,0 +1,856 @@
+{
+  "arrivals": {
+    "far_arrival": {
+      "level": "far_side",
+      "position": {
+        "x": 1,
+        "y": 1
+      },
+      "realm": "realm_1"
+    },
+    "return_arrival": {
+      "level": "return_hall",
+      "position": {
+        "x": 1,
+        "y": 1
+      },
+      "realm": "realm_0"
+    }
+  },
+  "id": "world_topology_gallery",
+  "kind": "world_template",
+  "realms": {
+    "realm_0": {
+      "levels": {
+        "door_hall": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 1,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 4,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "hidden_room": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 1,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 3,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "lower": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 1,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 3,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "overlook": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 2,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 4,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "pit_landing": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 2,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 4,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "return_hall": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 2,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 4,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "vault": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor",
+                null,
+                "topology_shallows",
+                null
+              ],
+              [
+                "topology_floor",
+                null
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "workroom": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor",
+                null
+              ],
+              [
+                "topology_floor",
+                "topology_mist"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 4,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 6,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Topology Gallery"
+    },
+    "realm_1": {
+      "levels": {
+        "far_side": {
+          "cells": [
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_floor"
+              ],
+              [
+                "topology_wall"
+              ]
+            ],
+            [
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ],
+              [
+                "topology_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 2,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 4,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Far Gallery"
+    }
+  },
+  "schema_version": 3,
+  "topology": {
+    "edge/far_side/portal": {
+      "at": {
+        "level": "far_side",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_1"
+      },
+      "hidden": false,
+      "kind": {
+        "kind": "portal"
+      },
+      "target": {
+        "arrival_id": "return_arrival",
+        "kind": "arrival"
+      }
+    },
+    "edge/lower/climb_up": {
+      "at": {
+        "level": "lower",
+        "position": {
+          "x": 1,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "up",
+        "kind": "climb"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "overlook",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/overlook/pit": {
+      "at": {
+        "level": "overlook",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "kind": "pit"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "pit_landing",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/pit_landing/passage": {
+      "at": {
+        "level": "pit_landing",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "kind": "passage"
+      },
+      "target": {
+        "arrival_id": "far_arrival",
+        "kind": "arrival"
+      }
+    },
+    "edge/return_hall/door": {
+      "at": {
+        "level": "return_hall",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/return_hall/door",
+        "endpoint_id": "edge/return_hall/door",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/return_hall/door/reciprocal"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "door_hall",
+          "position": {
+            "x": 2,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/return_hall/door/reciprocal": {
+      "at": {
+        "level": "door_hall",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/return_hall/door",
+        "endpoint_id": "edge/return_hall/door/reciprocal",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/return_hall/door"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "return_hall",
+          "position": {
+            "x": 2,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/vault/stairs_down": {
+      "at": {
+        "level": "vault",
+        "position": {
+          "x": 3,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "down",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "lower",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/workroom/door": {
+      "at": {
+        "level": "workroom",
+        "position": {
+          "x": 4,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/workroom/door",
+        "endpoint_id": "edge/workroom/door",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/workroom/door/reciprocal"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "door_hall",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/workroom/door/reciprocal": {
+      "at": {
+        "level": "door_hall",
+        "position": {
+          "x": 1,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/workroom/door",
+        "endpoint_id": "edge/workroom/door/reciprocal",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/workroom/door"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "workroom",
+          "position": {
+            "x": 4,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/workroom/hidden_passage": {
+      "at": {
+        "level": "workroom",
+        "position": {
+          "x": 3,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": true,
+      "kind": {
+        "kind": "passage"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "hidden_room",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    }
+  },
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+}

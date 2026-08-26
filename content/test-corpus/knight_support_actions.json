@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "knight_support_actions",
+  "name": "Knight Support Actions",
+  "description": "Clean fixture proving Knight support spell coverage without stubbed casts.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project Slice BX fixture for Knight support spell coverage.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/knight_support_actions.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/knight_support_actions",
+  "world_template": "world_templates/knight_support_actions.json",
+  "simulation_seed": "simulation_seeds/knight_support_actions.json",
+  "script": [
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "blessed_edge",
+        "target": {
+          "item": {
+            "item_instance_id": "oath_blade",
+            "location": "active_equipment"
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "valor",
+        "target": "self_target"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "cleanse",
+        "target": "self_target"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "beacon",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 1,
+                "y": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "poke",
+        "target_actor_id": "training_dummy",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

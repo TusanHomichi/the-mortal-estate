@@ -1,0 +1,110 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "world_topology_gallery",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/world_topology_gallery/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "workroom",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:world_topology_gallery:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "wizard",
+          "current_class_id": "wizard",
+          "display_class": "Wizard",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 10,
+          "dexterity": 10,
+          "constitution": 10,
+          "intelligence": 14,
+          "wisdom": 12,
+          "charisma": 10
+        },
+        "resources": {
+          "hp": 20,
+          "max_hp": 20,
+          "peak_hp": 20,
+          "mp": 40,
+          "max_mp": 40,
+          "stamina": 20,
+          "max_stamina": 20
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "skill_ledger": [
+          {
+            "track_id": "wizard_magic",
+            "level": 1,
+            "critique_rank": 0,
+            "practice_points": 0,
+            "learning_rate": 1
+          }
+        ],
+        "known_spells": [
+          {
+            "spell_id": "blue_gate",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          }
+        ]
+      },
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "sentinel",
+      "actor_definition_id": "actor/world_topology_gallery/sentinel",
+      "location": {
+        "realm": "realm_0",
+        "level": "hidden_room",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {},
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

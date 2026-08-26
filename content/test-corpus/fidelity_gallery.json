@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "fidelity_gallery",
+  "name": "Runtime Fidelity Gallery",
+  "description": "Comprehensive gallery fixture proving all BA-BL umbrella systems: HP sync, equip/unequip, skill routing, hit/miss/armor, HP/MP growth, stamina drain/recovery, trainer services, promotion gate, and spell casting. Original project names and layout.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, text, and layout. Gallery fixture for umbrella verification.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/fidelity_gallery.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/fidelity_gallery",
+  "world_template": "world_templates/fidelity_gallery.json",
+  "simulation_seed": "simulation_seeds/fidelity_gallery.json",
+  "script": [
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "move_item": {
+        "item_instance_id": "training_sword",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_1"
+        }
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "leather_armor",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_2"
+        }
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "wooden_shield",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_3"
+        }
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "healing_balm",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_4"
+        }
+      }
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "dummy",
+        "authorization": "safe"
+      }
+    },
+    {
+      "wait": true
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

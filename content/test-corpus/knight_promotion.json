@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "knight_promotion",
+  "name": "Knight Promotion V1",
+  "description": "Prototype fixture validating Fighter-to-Knight promotion gate at level 8 with a promotion service and required items.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/knight_promotion.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/knight_promotion",
+  "world_template": "world_templates/knight_promotion.json",
+  "simulation_seed": "simulation_seeds/knight_promotion.json",
+  "script": [
+    {
+      "promote": "knight"
+    },
+    {
+      "move_item": {
+        "item_instance_id": "oath_ring:knight_promotion:primary",
+        "destination": {
+          "kind": "carried",
+          "position": "left_finger_1"
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "valor",
+        "target": "self_target"
+      }
+    }
+  ]
+}

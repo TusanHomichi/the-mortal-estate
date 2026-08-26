@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "authored_land_compile_report",
+  "land_id": "identity_proof",
+  "member_digests": {
+    "content/lands/identity-proof/settlement.tmj": "320ecf5553a110ca349272db2ddbb3de005021f648b8b397d8d6bbf9f98b0b0a"
+  },
+  "members": [
+    {
+      "member": "settlement",
+      "width": 48,
+      "height": 32,
+      "passable_cells": 1242,
+      "route_cells": 62,
+      "structure_footprint_cells": 16,
+      "structures": [
+        "proof_common_hall",
+        "proof_keeper_hall",
+        "proof_waymark_shelter"
+      ],
+      "landmarks": [
+        "settlement_arrival",
+        "settlement_ruin_mouth"
+      ],
+      "transitions": [],
+      "arrival": {
+        "x": 3,
+        "y": 16
+      }
+    }
+  ],
+  "connectivity": {
+    "edges": []
+  },
+  "world_template_sha256": "a2932c57dcb381c5b6dbe18d0820b331955e3874fd8447a3f5a97236c31aad64",
+  "terrain_registry_catalog": "content/test-corpus/catalogs/prototype_catalog_v6.json",
+  "terrain_registry_profile": "profile/first_land_structure"
+}

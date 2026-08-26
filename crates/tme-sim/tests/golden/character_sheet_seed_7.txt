@@ -1,0 +1,38 @@
+The Mortal Estate local simulation
+scenario: character_sheet
+seed: 7
+
+loaded "Character Sheet V1" realms=[realm_0] levels=[realm_0/room_0]
+player Delver (Fighter) at realm_0/room_0:1,1 hp=12
+monster Mireling at realm_0/room_0:3,1 hp=7
+
+player ready: Delver at 1
+Delver intent at 1: run east,east
+Delver run: requested=2 accepted=2 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+  Delver step east -> (3,1): terrain=Flagstone cost=1 remaining=1
+Delver moved from (2,1) to (3,1)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Mireling at 2
+Mireling intent: fight Delver
+Mireling missed Delver: roll=11 attack_score=1 defense_score=14
+readiness scheduled: Mireling cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: fight mireling
+Delver missed Mireling: roll=9 attack_score=3 defense_score=13
+Delver's fight miss practice on dagger: risk=practice raw=1
+Delver gained 1 dagger practice point (pool: 1)
+Delver's dagger skill advanced to level 1, critique 1
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Mireling at 3
+Mireling intent: fight Delver
+Mireling missed Delver: roll=8 attack_score=1 defense_score=14
+readiness scheduled: Mireling cost=1 ready_at=4
+
+final state
+Delver (Fighter) at realm_0/room_0:3,1 hp=12 alive
+Mireling at realm_0/room_0:3,1 hp=7 alive

@@ -1,0 +1,7 @@
+debian_release=13.6
+architecture=amd64
+systemd_series=257
+caddy_version=2.11.4
+postgresql_version=18.4
+postgresql_major=18
+pgbackrest_version=2.58.0

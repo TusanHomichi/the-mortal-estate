@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "npc_quest_interactions",
+  "name": "Harbor Watch Escort",
+  "description": "Original project proof for typed NPC speech, exact-item delivery, following, directed stairs, escort completion, and per-character quest state.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, prose, layout, rewards, and provisional timing. The fixture proves reusable interaction mechanics without copying commercial quest content.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/npc_quest_interactions.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/npc_quest_interactions",
+  "world_template": "world_templates/npc_quest_interactions.json",
+  "simulation_seed": "simulation_seeds/npc_quest_interactions.json",
+  "script": [
+    {
+      "interact_with_npc": {
+        "npc_actor_id": "wayfinder",
+        "interaction_id": "ask_about_crossing",
+        "item_instance_id": null
+      }
+    },
+    {
+      "interact_with_npc": {
+        "npc_actor_id": "wayfinder",
+        "interaction_id": "offer_signal_token",
+        "item_instance_id": "player_signal_token"
+      }
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "interact_with_npc": {
+        "npc_actor_id": "wayfinder",
+        "interaction_id": "climb_to_watch",
+        "item_instance_id": null
+      }
+    },
+    {
+      "traverse": "stairs_up"
+    },
+    {
+      "interact_with_npc": {
+        "npc_actor_id": "watchkeeper",
+        "interaction_id": "complete_harbor_escort",
+        "item_instance_id": null
+      }
+    }
+  ]
+}

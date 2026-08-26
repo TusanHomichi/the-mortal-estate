@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "gold_bank_locker_storage",
+  "name": "Gold Bank and Locker Storage Gallery",
+  "description": "Original clean fixture proving positioned-gold split and drop, shared bank branches, ground-pile withdrawal, and shared locker-vault access.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, layout, service IDs, item row, bank cap, locker capacity, amounts, and script. This fixture proves normalized behavior without reproducing target world placement or art.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/gold_bank_locker_storage.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/gold_bank_locker_storage",
+  "world_template": "world_templates/gold_bank_locker_storage.json",
+  "simulation_seed": "simulation_seeds/gold_bank_locker_storage.json",
+  "script": [
+    {
+      "move_gold": {
+        "source": {
+          "kind": "carried",
+          "position": "sack"
+        },
+        "destination": {
+          "kind": "carried",
+          "position": "left_hand"
+        },
+        "quantity": {
+          "kind": "exact",
+          "amount": 50
+        }
+      }
+    },
+    {
+      "move_gold": {
+        "source": {
+          "kind": "carried",
+          "position": "left_hand"
+        },
+        "destination": {
+          "kind": "ground_here"
+        },
+        "quantity": {
+          "kind": "exact",
+          "amount": 30
+        }
+      }
+    },
+    {
+      "deposit_bank_gold": {
+        "service_id": "west_counter",
+        "capability_id": "bank_access",
+        "gold_pile_id": "gold:1"
+      }
+    },
+    {
+      "withdraw_bank_gold": {
+        "service_id": "east_counter",
+        "capability_id": "bank_access",
+        "amount": 18
+      }
+    },
+    {
+      "move_gold": {
+        "source": {
+          "kind": "ground",
+          "gold_pile_id": "gold:2"
+        },
+        "destination": {
+          "kind": "carried",
+          "position": "sack"
+        },
+        "quantity": {
+          "kind": "all"
+        }
+      }
+    },
+    {
+      "deposit_locker_item": {
+        "service_id": "west_counter",
+        "capability_id": "locker_access",
+        "item_instance_id": "field_case"
+      }
+    },
+    {
+      "withdraw_locker_item": {
+        "service_id": "east_counter",
+        "capability_id": "locker_access",
+        "item_instance_id": "field_case",
+        "destination": "sack_item_1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "knight_social_consequence",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/knight_social_consequence/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "civic_court",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:knight_social_consequence:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "knight",
+          "display_class": "Knight",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 14,
+          "dexterity": 12,
+          "constitution": 14,
+          "intelligence": 10,
+          "wisdom": 11,
+          "charisma": 10
+        },
+        "resources": {
+          "hp": 60,
+          "max_hp": 60,
+          "peak_hp": 60,
+          "mp": 18,
+          "max_mp": 18,
+          "stamina": 40,
+          "max_stamina": 40
+        },
+        "progression": {
+          "level": 8,
+          "experience": 2800
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "promotion_history": [
+          {
+            "from_class_id": "fighter",
+            "to_class_id": "knight",
+            "level": 8
+          }
+        ],
+        "skill_ledger": [],
+        "known_spells": [
+          {
+            "spell_id": "civic_beacon",
+            "lane": "knight_magic",
+            "learned_at_level": 8
+          },
+          {
+            "spell_id": "steadfast_heart",
+            "lane": "knight_magic",
+            "learned_at_level": 8
+          }
+        ]
+      },
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "cedar_oath_ring",
+            "position": "left_finger_1"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "meadow_hare",
+      "actor_definition_id": "actor/knight_social_consequence/meadow_hare",
+      "location": {
+        "realm": "realm_0",
+        "level": "civic_court",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "quiet_witness",
+      "actor_definition_id": "actor/knight_social_consequence/quiet_witness",
+      "location": {
+        "realm": "realm_0",
+        "level": "civic_court",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "cedar_oath_ring": {
+      "definition_id": "cedar_oath_ring",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

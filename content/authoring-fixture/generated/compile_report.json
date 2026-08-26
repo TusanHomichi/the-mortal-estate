@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kind": "authored_land_compile_report",
+  "land_id": "authoring_fixture",
+  "member_digests": {
+    "content/authoring-fixture/fixture-interior.tmj": "37ccf7f7cf91d5327def88724f34e80364395de8371976d946c2f276b343e48d",
+    "content/authoring-fixture/fixture-surface.tmj": "3ffd01beec1db6df3218c0fb5870335dffe42128ec53cbbdfe8fdb832b5925da"
+  },
+  "members": [
+    {
+      "member": "surface",
+      "width": 24,
+      "height": 16,
+      "passable_cells": 281,
+      "route_cells": 38,
+      "structure_footprint_cells": 12,
+      "structures": [
+        "fixture_structure_north",
+        "fixture_structure_outland",
+        "fixture_structure_south"
+      ],
+      "landmarks": [
+        "fixture_dock_arrival",
+        "fixture_ruin_marker"
+      ],
+      "transitions": [
+        "fixture_descent"
+      ],
+      "arrival": {
+        "x": 12,
+        "y": 14
+      }
+    },
+    {
+      "member": "interior",
+      "width": 10,
+      "height": 8,
+      "passable_cells": 38,
+      "route_cells": 0,
+      "structure_footprint_cells": 0,
+      "structures": [],
+      "landmarks": [],
+      "transitions": [
+        "fixture_ascent"
+      ],
+      "arrival": null
+    }
+  ],
+  "connectivity": {
+    "edges": [
+      {
+        "id": "route/fixture_ascent",
+        "from_member": "interior",
+        "from": {
+          "x": 7,
+          "y": 3
+        },
+        "to_member": "surface",
+        "to": {
+          "x": 18,
+          "y": 8
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/fixture_descent",
+        "from_member": "surface",
+        "from": {
+          "x": 18,
+          "y": 8
+        },
+        "to_member": "interior",
+        "to": {
+          "x": 7,
+          "y": 3
+        },
+        "direction": "down"
+      }
+    ]
+  },
+  "world_template_sha256": "a97f0ed944cd46386099edc669b7d7e2a179d25a2c8a8a7e7dc2850aaeea4ff9",
+  "terrain_registry_catalog": "content/test-corpus/catalogs/prototype_catalog_v6.json",
+  "terrain_registry_profile": "profile/first_land_structure"
+}

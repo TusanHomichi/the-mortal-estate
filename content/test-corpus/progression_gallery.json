@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "progression_gallery",
+  "name": "Progression Gallery V1",
+  "description": "Gallery fixture demonstrating the full character/progression loop: class identity, kill XP, level-up, combat adds, skill practice, promotion, and a permanent Sword learning-rate purchase.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names and visible deterministic tuning. Training rate, gold, XP, and threshold values are clean-fixture proof inputs rather than commercial 1.11 constants.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/progression_gallery.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/progression_gallery",
+  "world_template": "world_templates/progression_gallery.json",
+  "simulation_seed": "simulation_seeds/progression_gallery.json",
+  "script": [
+    {
+      "move_path": [
+        "south"
+      ]
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "warden",
+        "authorization": "safe"
+      }
+    },
+    {
+      "wait": true
+    },
+    {
+      "move_item": {
+        "item_instance_id": "steel_sword",
+        "destination": {
+          "kind": "carried",
+          "position": "belt_1"
+        }
+      }
+    },
+    {
+      "promote": "knight"
+    },
+    {
+      "move_item": {
+        "item_instance_id": "oath_ring:progression_gallery:primary",
+        "destination": {
+          "kind": "carried",
+          "position": "left_finger_1"
+        }
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "steel_sword",
+        "destination": {
+          "kind": "carried",
+          "position": "right_hand"
+        }
+      }
+    },
+    {
+      "wait": true
+    },
+    {
+      "train": {
+        "service_id": "gallery_trainer",
+        "offered_gold": 20
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "undercroft_loop",
+  "name": "Undercroft Loop",
+  "description": "A clean project-authored reciprocal-door and stairs fixture with a deterministic two-level traversal smoke.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project multi-room fixture. Room names, creature names, layout, and tuning are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/undercroft_loop.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/undercroft_loop",
+  "world_template": "world_templates/undercroft_loop.json",
+  "simulation_seed": "simulation_seeds/undercroft_loop.json",
+  "script": [
+    {
+      "inspect": true
+    },
+    {
+      "move_path": [
+        "south"
+      ]
+    },
+    {
+      "traverse": "stairs_down"
+    },
+    {
+      "inspect": true
+    },
+    {
+      "traverse": "stairs_up"
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

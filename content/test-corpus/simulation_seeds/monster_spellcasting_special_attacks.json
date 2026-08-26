@@ -1,0 +1,103 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "monster_spellcasting_special_attacks",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/monster_spellcasting_special_attacks/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": [
+        {
+          "instance_id": "fixture_poison_ward",
+          "effect_id": "poison_ward",
+          "source": {
+            "kind": "fixture",
+            "id": "monster_spellcasting_special_attacks"
+          },
+          "kind": "protection",
+          "tags": [
+            "poison"
+          ],
+          "potency": 0,
+          "remaining_rounds": 4,
+          "stacking": "refresh_duration",
+          "start_delay_rounds": 0,
+          "tick_interval_rounds": 1,
+          "suppresses_action": false,
+          "resistance_boosts": [
+            {
+              "tag": "poison",
+              "bonus_twentieths": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ember_imp",
+      "actor_definition_id": "actor/monster_spellcasting_special_attacks/ember_imp",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 5,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "viperling",
+      "actor_definition_id": "actor/monster_spellcasting_special_attacks/viperling",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 5,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {},
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

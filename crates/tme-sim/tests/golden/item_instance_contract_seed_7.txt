@@ -1,0 +1,61 @@
+The Mortal Estate local simulation
+scenario: item_instance_contract
+seed: 7
+
+loaded "Item Instance Contract" realms=[realm_0] levels=[realm_0/room_0]
+player Delver (Fighter) at realm_0/room_0:1,1 hp=12
+monster Watcher at realm_0/room_0:3,1 hp=8
+
+player ready: Delver at 1
+Delver intent at 1: move_item tonic_a to sack_item_1
+Delver moved Restorative Tonic from (1,1) to sack_item_1
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Watcher at 2
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: show_sack
+Delver's sack:
+  sack_item_1: Restorative Tonic
+  gold: 5
+readiness scheduled: Delver cost=0 ready_at=2
+
+player ready: Delver at 2
+Delver intent at 2: drink tonic_a
+Delver drinks the Restorative Tonic and the empty bottle shatters
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Watcher at 3
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: show_sack
+Delver's sack:
+  sack_item_1: Restorative Tonic
+  gold: 5
+readiness scheduled: Delver cost=0 ready_at=3
+
+player ready: Delver at 3
+Delver intent at 3: move_item tonic_b to sack_item_2
+Delver moved Restorative Tonic from (1,1) to sack_item_2
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Watcher at 4
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: move_item tonic_b to ground_here
+Delver moved Restorative Tonic from sack_item_2 to (1,1)
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+monster ready: Watcher at 5
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=6
+
+final state
+Delver (Fighter) at realm_0/room_0:1,1 hp=12 alive
+Watcher at realm_0/room_0:3,1 hp=8 alive

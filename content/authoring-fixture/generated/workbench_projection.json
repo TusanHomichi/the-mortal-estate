@@ -1,0 +1,5640 @@
+{
+  "schema_version": 1,
+  "kind": "workbench_logical_projection",
+  "land_id": "authoring_fixture",
+  "realm_id": "testland",
+  "candidate_member": "surface",
+  "tile_size_px": 16,
+  "sources": [
+    {
+      "role": "master",
+      "path": "content/authoring-fixture/fixture-surface.tmj",
+      "sha256": "3ffd01beec1db6df3218c0fb5870335dffe42128ec53cbbdfe8fdb832b5925da"
+    },
+    {
+      "role": "companion",
+      "path": "content/authoring-fixture/fixture-interior.tmj",
+      "sha256": "37ccf7f7cf91d5327def88724f34e80364395de8371976d946c2f276b343e48d"
+    },
+    {
+      "role": "receipt",
+      "path": "content/authoring-fixture/promotion.json",
+      "sha256": "8373c8c4f9015c822ebad13935822dc4c05807d164423f2d756474459f2cb70a"
+    },
+    {
+      "role": "runtime_projection",
+      "path": "content/authoring-fixture/generated/world_template.json",
+      "sha256": "a97f0ed944cd46386099edc669b7d7e2a179d25a2c8a8a7e7dc2850aaeea4ff9"
+    }
+  ],
+  "members": [
+    {
+      "member": "surface",
+      "width": 24,
+      "height": 16,
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 1,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_marsh",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_marsh",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_marsh",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_marsh",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_marsh",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_marsh",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_bridge",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_bridge",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_bridge",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_forest",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 4,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_structure_footprint",
+              "layer": "structure_footprints"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_shaft",
+              "layer": "landmark_marks"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 7,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 8,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 8,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 9,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 9,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 9,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_town_ground",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 10,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 10,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 11,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_ruin_ground",
+              "layer": "landmark_marks"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 11,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 11,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 12,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 12,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_rock_coast",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 12,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_rock_coast",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 12,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_rock_coast",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 12,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 12,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 13,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 13,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_rock_coast",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 13,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_rock_coast",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 13,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_rock_coast",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 13,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 13,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            },
+            {
+              "class": "testland_path",
+              "layer": "routes"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 14,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_grass",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 14,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 10,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 11,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 12,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 13,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 14,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 15,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 16,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 17,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 18,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 19,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 20,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 21,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 22,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 23,
+          "y": 15,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_deep_water",
+              "layer": "base_terrain"
+            }
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "x": 2,
+          "y": 4
+        },
+        {
+          "x": 3,
+          "y": 4
+        },
+        {
+          "x": 4,
+          "y": 4
+        },
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 6,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 9
+        },
+        {
+          "x": 8,
+          "y": 4
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 4
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 10,
+          "y": 4
+        },
+        {
+          "x": 10,
+          "y": 9
+        },
+        {
+          "x": 11,
+          "y": 4
+        },
+        {
+          "x": 11,
+          "y": 9
+        },
+        {
+          "x": 12,
+          "y": 4
+        },
+        {
+          "x": 12,
+          "y": 5
+        },
+        {
+          "x": 12,
+          "y": 6
+        },
+        {
+          "x": 12,
+          "y": 7
+        },
+        {
+          "x": 12,
+          "y": 8
+        },
+        {
+          "x": 12,
+          "y": 9
+        },
+        {
+          "x": 12,
+          "y": 10
+        },
+        {
+          "x": 12,
+          "y": 11
+        },
+        {
+          "x": 12,
+          "y": 12
+        },
+        {
+          "x": 12,
+          "y": 13
+        },
+        {
+          "x": 12,
+          "y": 14
+        },
+        {
+          "x": 13,
+          "y": 4
+        },
+        {
+          "x": 13,
+          "y": 9
+        },
+        {
+          "x": 14,
+          "y": 4
+        },
+        {
+          "x": 14,
+          "y": 9
+        },
+        {
+          "x": 15,
+          "y": 4
+        },
+        {
+          "x": 15,
+          "y": 9
+        },
+        {
+          "x": 16,
+          "y": 4
+        },
+        {
+          "x": 16,
+          "y": 9
+        },
+        {
+          "x": 17,
+          "y": 4
+        },
+        {
+          "x": 18,
+          "y": 4
+        },
+        {
+          "x": 19,
+          "y": 4
+        },
+        {
+          "x": 20,
+          "y": 4
+        }
+      ],
+      "structures": [
+        {
+          "id": "fixture_structure_north",
+          "purpose": "fixture_workshop",
+          "scope": "clustered",
+          "x": 8,
+          "y": 6,
+          "width": 2,
+          "height": 2,
+          "access": {
+            "x": 8,
+            "y": 8
+          },
+          "facade_door": {
+            "x": 8,
+            "y": 7
+          }
+        },
+        {
+          "id": "fixture_structure_outland",
+          "purpose": "fixture_shelter",
+          "scope": "isolated",
+          "x": 19,
+          "y": 5,
+          "width": 2,
+          "height": 2,
+          "access": {
+            "x": 19,
+            "y": 4
+          },
+          "facade_door": {
+            "x": 19,
+            "y": 5
+          }
+        },
+        {
+          "id": "fixture_structure_south",
+          "purpose": "fixture_store",
+          "scope": "clustered",
+          "x": 13,
+          "y": 6,
+          "width": 2,
+          "height": 2,
+          "access": {
+            "x": 13,
+            "y": 8
+          },
+          "facade_door": {
+            "x": 13,
+            "y": 7
+          }
+        }
+      ],
+      "landmarks": [
+        {
+          "id": "fixture_dock_arrival",
+          "role": "arrival",
+          "at": {
+            "x": 12,
+            "y": 14
+          }
+        },
+        {
+          "id": "fixture_ruin_marker",
+          "role": "ruin",
+          "at": {
+            "x": 5,
+            "y": 11
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "id": "fixture_descent",
+          "member": "surface",
+          "target_member": "interior",
+          "paired_transition": "fixture_ascent",
+          "direction": "down",
+          "marker": {
+            "x": 18,
+            "y": 7
+          },
+          "access": {
+            "x": 18,
+            "y": 8
+          }
+        }
+      ]
+    },
+    {
+      "member": "interior",
+      "width": 10,
+      "height": 8,
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 0,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 1,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_stairs_up",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 2,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 2,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 3,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 4,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 4,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 4,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 5,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 6,
+          "passable": true,
+          "terrain": [
+            {
+              "class": "testland_dungeon_floor",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 6,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 0,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 1,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 2,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 3,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 4,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 5,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 6,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 7,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 8,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        },
+        {
+          "x": 9,
+          "y": 7,
+          "passable": false,
+          "terrain": [
+            {
+              "class": "testland_wall",
+              "layer": "base_terrain"
+            }
+          ]
+        }
+      ],
+      "routes": [],
+      "structures": [],
+      "landmarks": [],
+      "transitions": [
+        {
+          "id": "fixture_ascent",
+          "member": "interior",
+          "target_member": "surface",
+          "paired_transition": "fixture_descent",
+          "direction": "up",
+          "marker": {
+            "x": 7,
+            "y": 2
+          },
+          "access": {
+            "x": 7,
+            "y": 3
+          }
+        }
+      ]
+    }
+  ],
+  "connectivity": {
+    "edges": [
+      {
+        "id": "route/fixture_ascent",
+        "from_member": "interior",
+        "from": {
+          "x": 7,
+          "y": 3
+        },
+        "to_member": "surface",
+        "to": {
+          "x": 18,
+          "y": 8
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/fixture_descent",
+        "from_member": "surface",
+        "from": {
+          "x": 18,
+          "y": 8
+        },
+        "to_member": "interior",
+        "to": {
+          "x": 7,
+          "y": 3
+        },
+        "direction": "down"
+      }
+    ]
+  }
+}

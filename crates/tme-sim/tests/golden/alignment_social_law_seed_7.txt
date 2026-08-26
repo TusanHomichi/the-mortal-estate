@@ -1,0 +1,172 @@
+The Mortal Estate local simulation
+scenario: alignment_social_law
+seed: 7
+
+loaded "Alignment Social Law" realms=[realm_0] levels=[realm_0/annex, realm_0/lantern_court]
+player Greyfoot (Thief) at realm_0/lantern_court:1,1 hp=80
+npc Harbor Warden at realm_0/lantern_court:1,1 hp=1000
+npc Oath Watch at realm_0/lantern_court:1,1 hp=50
+monster White Hare at realm_0/lantern_court:1,1 hp=1
+monster Quiet Hermit at realm_0/lantern_court:1,1 hp=1
+monster Storm Shade at realm_0/lantern_court:1,1 hp=30
+monster Ember Wight at realm_0/annex:1,1 hp=30
+
+player ready: Greyfoot at 1
+Greyfoot intent at 1: cast lantern_wash on realm_0/lantern_court:1,1
+tile effect applied: lantern_wash at realm_0/lantern_court:1,1 passability=none sight=clear hazard=none cost=none remaining=1
+Greyfoot's Lantern Wash practice on thief_magic: raw=2 reason=eligible_successful_cast
+Greyfoot gained 2 thief_magic practice points (pool: 2)
+readiness scheduled: Greyfoot cost=1 ready_at=2
+Greyfoot regenerated 1 Mp (12/12, Active, time 2)
+time 2
+npc ready: Harbor Warden at 2
+Harbor Warden intent: hold
+readiness scheduled: Harbor Warden cost=1 ready_at=3
+npc ready: Oath Watch at 2
+Oath Watch intent: fight Greyfoot
+Oath Watch missed Greyfoot: roll=11 attack_score=0 defense_score=24
+readiness scheduled: Oath Watch cost=1 ready_at=3
+monster ready: White Hare at 2
+White Hare intent: hold
+readiness scheduled: White Hare cost=1 ready_at=3
+monster ready: Quiet Hermit at 2
+Quiet Hermit intent: hold
+readiness scheduled: Quiet Hermit cost=1 ready_at=3
+monster ready: Storm Shade at 2
+Storm Shade intent: fight Greyfoot
+Storm Shade missed Greyfoot: roll=2 attack_score=0 defense_score=24
+readiness scheduled: Storm Shade cost=1 ready_at=3
+monster ready: Ember Wight at 2
+Ember Wight intent: hold
+readiness scheduled: Ember Wight cost=1 ready_at=3
+
+player ready: Greyfoot at 2
+Greyfoot intent at 2: inspect
+Greyfoot inspected at realm_0/lantern_court:1,1: tile=Flagstone + lantern_wash
+  current tile: terrain=Flagstone + lantern_wash cost=1
+  north -> realm_0/lantern_court:1,0: blocked terrain terrain=Stone Wall
+  northeast -> realm_0/lantern_court:2,0: blocked terrain terrain=Stone Wall
+  east -> realm_0/lantern_court:2,1: blocked terrain terrain=Stone Wall
+  southeast -> realm_0/lantern_court:2,2: blocked terrain terrain=Stone Wall
+  south -> realm_0/lantern_court:1,2: blocked terrain terrain=Stone Wall
+  southwest -> realm_0/lantern_court:0,2: blocked terrain terrain=Stone Wall
+  west -> realm_0/lantern_court:0,1: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/lantern_court:0,0: blocked terrain terrain=Stone Wall
+readiness scheduled: Greyfoot cost=0 ready_at=2
+
+player ready: Greyfoot at 2
+Greyfoot intent at 2: kick --unsafe harbor_warden
+harbor_warden now retaliates against player
+Greyfoot attacked Harbor Warden: roll=9 damage=100 label=light hp=900
+contribution to harbor_warden: character=Some(CharacterId("character:alignment_social_law:primary")) class=Some(Physical) damage=100
+Greyfoot's kick damaging_hit practice on hand: risk=practice raw=1
+Greyfoot gained 1 hand practice point (pool: 1)
+Greyfoot's hand skill advanced to level 1, critique 1
+readiness scheduled: Greyfoot cost=1 ready_at=3
+tile effect ticked: lantern_wash at realm_0/lantern_court:1,1 remaining=0
+tile effect expired: lantern_wash at realm_0/lantern_court:1,1
+time 3
+npc ready: Harbor Warden at 3
+Harbor Warden intent: fight Greyfoot
+Harbor Warden missed Greyfoot: roll=8 attack_score=0 defense_score=24
+readiness scheduled: Harbor Warden cost=1 ready_at=4
+npc ready: Oath Watch at 3
+Oath Watch intent: fight Greyfoot
+Oath Watch missed Greyfoot: roll=11 attack_score=0 defense_score=24
+readiness scheduled: Oath Watch cost=1 ready_at=4
+monster ready: White Hare at 3
+White Hare intent: hold
+readiness scheduled: White Hare cost=1 ready_at=4
+monster ready: Quiet Hermit at 3
+Quiet Hermit intent: hold
+readiness scheduled: Quiet Hermit cost=1 ready_at=4
+monster ready: Storm Shade at 3
+Storm Shade intent: fight Greyfoot
+Storm Shade missed Greyfoot: roll=2 attack_score=0 defense_score=24
+readiness scheduled: Storm Shade cost=1 ready_at=4
+monster ready: Ember Wight at 3
+Ember Wight intent: hold
+readiness scheduled: Ember Wight cost=1 ready_at=4
+
+player ready: Greyfoot at 3
+Greyfoot intent at 3: kick --unsafe white_hare
+Greyfoot attacked White Hare: roll=9 damage=100 label=fatal hp=0
+contribution to white_hare: character=Some(CharacterId("character:alignment_social_law:primary")) class=Some(Physical) damage=1
+White Hare was defeated: cause=physical claim=character:alignment_social_law:primary/killing_blow
+White Hare life state: alive -> dead
+shared defeat reward for White Hare: available=0 awarded=0 reason=zero_authored_experience
+Greyfoot's kick fatal_blow practice on hand: risk=practice raw=2
+Greyfoot gained 2 hand practice points (pool: 2)
+readiness scheduled: Greyfoot cost=1 ready_at=4
+time 4
+npc ready: Harbor Warden at 4
+Harbor Warden intent: fight Greyfoot
+Harbor Warden missed Greyfoot: roll=16 attack_score=0 defense_score=24
+readiness scheduled: Harbor Warden cost=1 ready_at=5
+npc ready: Oath Watch at 4
+Oath Watch intent: fight Greyfoot
+Oath Watch missed Greyfoot: roll=19 attack_score=0 defense_score=24
+readiness scheduled: Oath Watch cost=1 ready_at=5
+monster ready: Quiet Hermit at 4
+Quiet Hermit intent: hold
+readiness scheduled: Quiet Hermit cost=1 ready_at=5
+monster ready: Storm Shade at 4
+Storm Shade intent: fight Greyfoot
+Storm Shade missed Greyfoot: roll=14 attack_score=0 defense_score=24
+readiness scheduled: Storm Shade cost=1 ready_at=5
+monster ready: Ember Wight at 4
+Ember Wight intent: hold
+readiness scheduled: Ember Wight cost=1 ready_at=5
+
+player ready: Greyfoot at 4
+Greyfoot intent at 4: kick --unsafe quiet_hermit
+Greyfoot attacked Quiet Hermit: roll=17 damage=102 label=fatal hp=0
+contribution to quiet_hermit: character=Some(CharacterId("character:alignment_social_law:primary")) class=Some(Physical) damage=1
+player alignment: neutral -> evil
+player karma: 3 -> 4
+Quiet Hermit was defeated: cause=physical claim=character:alignment_social_law:primary/killing_blow
+Quiet Hermit life state: alive -> dead
+shared defeat reward for Quiet Hermit: available=0 awarded=0 reason=zero_authored_experience
+Greyfoot's kick fatal_blow practice on hand: risk=practice raw=2
+Greyfoot gained 2 hand practice points (pool: 4)
+Greyfoot's hand skill advanced to level 1, critique 2
+readiness scheduled: Greyfoot cost=1 ready_at=5
+time 5
+npc ready: Harbor Warden at 5
+Harbor Warden intent: fight Greyfoot
+Harbor Warden missed Greyfoot: roll=16 attack_score=0 defense_score=24
+readiness scheduled: Harbor Warden cost=1 ready_at=6
+npc ready: Oath Watch at 5
+Oath Watch intent: fight Greyfoot
+Oath Watch missed Greyfoot: roll=15 attack_score=0 defense_score=24
+readiness scheduled: Oath Watch cost=1 ready_at=6
+monster ready: Storm Shade at 5
+Storm Shade intent: fight Greyfoot
+Storm Shade missed Greyfoot: roll=10 attack_score=0 defense_score=24
+readiness scheduled: Storm Shade cost=1 ready_at=6
+monster ready: Ember Wight at 5
+Ember Wight intent: hold
+readiness scheduled: Ember Wight cost=1 ready_at=6
+
+player ready: Greyfoot at 5
+Greyfoot intent at 5: inspect
+Greyfoot inspected at realm_0/lantern_court:1,1: tile=Flagstone
+  current tile: terrain=Flagstone cost=1
+  north -> realm_0/lantern_court:1,0: blocked terrain terrain=Stone Wall
+  northeast -> realm_0/lantern_court:2,0: blocked terrain terrain=Stone Wall
+  east -> realm_0/lantern_court:2,1: blocked terrain terrain=Stone Wall
+  southeast -> realm_0/lantern_court:2,2: blocked terrain terrain=Stone Wall
+  south -> realm_0/lantern_court:1,2: blocked terrain terrain=Stone Wall
+  southwest -> realm_0/lantern_court:0,2: blocked terrain terrain=Stone Wall
+  west -> realm_0/lantern_court:0,1: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/lantern_court:0,0: blocked terrain terrain=Stone Wall
+readiness scheduled: Greyfoot cost=0 ready_at=5
+
+final state
+Greyfoot (Thief) at realm_0/lantern_court:1,1 hp=80 alive
+Harbor Warden at realm_0/lantern_court:1,1 hp=900 alive
+Oath Watch at realm_0/lantern_court:1,1 hp=50 alive
+White Hare at realm_0/lantern_court:1,1 hp=0 dead
+Quiet Hermit at realm_0/lantern_court:1,1 hp=0 dead
+Storm Shade at realm_0/lantern_court:1,1 hp=30 alive
+Ember Wight at realm_0/annex:1,1 hp=30 alive

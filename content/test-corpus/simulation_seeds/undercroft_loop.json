@@ -1,0 +1,112 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "undercroft_loop",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/undercroft_loop/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "entrance_hall",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "training_knife",
+            "position": "right_hand"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "kobold",
+      "actor_definition_id": "actor/undercroft_loop/kobold",
+      "location": {
+        "realm": "realm_0",
+        "level": "guard_post",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "mireling",
+      "actor_definition_id": "actor/undercroft_loop/mireling",
+      "location": {
+        "realm": "realm_0",
+        "level": "lower_crypt",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "troll",
+      "actor_definition_id": "actor/undercroft_loop/troll",
+      "location": {
+        "realm": "realm_0",
+        "level": "troll_den",
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "training_knife": {
+      "definition_id": "training_knife",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

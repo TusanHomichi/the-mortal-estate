@@ -1,0 +1,248 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_command curl
+require_command jq
+load_environment
+state_directory=${TME_ALERT_STATE_ROOT:-/var/lib/tme/alerts}
+install -d -m 0750 "$state_directory"
+host_role=${TME_HOST_ROLE:-single-authoritative}
+now=$(date +%s)
+
+webhook_path=${CREDENTIALS_DIRECTORY:-$CREDENTIAL_ROOT}/webhook-url
+[ -s "$webhook_path" ] || fail 'webhook credential is unavailable'
+webhook=$(sed -n '1p' "$webhook_path")
+[ "$(wc -l <"$webhook_path")" -le 1 ] || fail 'webhook credential is malformed'
+case "$webhook" in
+    https://*) ;;
+    http://127.0.0.1:*|http://localhost:*)
+        [ "${TME_ALLOW_HTTP_WEBHOOK-}" = 1 ] || fail 'webhook must use https'
+        ;;
+    *) fail 'webhook destination is invalid' ;;
+esac
+
+emit_alert() {
+    severity=$1
+    condition=$2
+    runbook=$3
+    state=$state_directory/$condition
+    first_seen=$now
+    last_sent=0
+    if [ -f "$state" ]; then
+        first_seen=$(sed -n '1p' "$state")
+        last_sent=$(sed -n '2p' "$state")
+    fi
+    if [ $((now - last_sent)) -lt 14400 ]; then
+        printf '%s\n%s\n' "$first_seen" "$last_sent" >"$state"
+        return
+    fi
+    payload=$(jq -cn \
+        --arg service tme \
+        --arg host_role "$host_role" \
+        --arg severity "$severity" \
+        --arg condition "$condition" \
+        --arg first_seen "$(date -u -d "@$first_seen" +'%Y-%m-%dT%H:%M:%SZ')" \
+        --arg last_seen "$(date -u -d "@$now" +'%Y-%m-%dT%H:%M:%SZ')" \
+        --arg runbook_key "$runbook" \
+        '{service:$service,host_role:$host_role,severity:$severity,condition:$condition,first_seen:$first_seen,last_seen:$last_seen,runbook_key:$runbook_key}')
+    {
+        printf 'url = "%s"\n' "$webhook"
+        printf 'request = "POST"\n'
+        printf 'header = "Content-Type: application/json"\n'
+        printf 'data = "%s"\n' "$(printf '%s' "$payload" | sed 's/"/\\"/g')"
+        printf 'fail\nshow-error\nsilent\nmax-time = 10\n'
+    } | curl --config - >/dev/null
+    printf '%s\n%s\n' "$first_seen" "$now" >"$state"
+}
+
+clear_alert() {
+    rm -f "$state_directory/$1"
+}
+
+status_file=$state_directory/status.json
+if curl --fail --silent --show-error --max-time 5 \
+    http://127.0.0.1:9090/internal/status >"$status_file.tmp" && \
+    jq -e '.gameplay_ready == true' "$status_file.tmp" >/dev/null
+then
+    mv -f "$status_file.tmp" "$status_file"
+    rm -f "$state_directory/not-ready-since"
+    clear_alert service_not_ready
+else
+    rm -f "$status_file.tmp"
+    if [ ! -f "$state_directory/not-ready-since" ]; then
+        printf '%s\n' "$now" >"$state_directory/not-ready-since"
+    elif [ $((now - $(sed -n '1p' "$state_directory/not-ready-since"))) -ge 120 ]; then
+        emit_alert critical service_not_ready incident
+    fi
+fi
+
+metrics_file=$state_directory/metrics.prom
+if curl --fail --silent --show-error --max-time 5 \
+    http://127.0.0.1:9090/internal/metrics >"$metrics_file.tmp"
+then
+    mv -f "$metrics_file.tmp" "$metrics_file"
+    mailbox_depth=$(awk '$1=="tme_mailbox_maximum_depth" {print $2}' "$metrics_file")
+    mailbox_capacity=$(awk '$1=="tme_mailbox_capacity" {print $2}' "$metrics_file")
+    case "$mailbox_depth:$mailbox_capacity" in
+        *[!0-9:]*|:|*:0) rm -f "$state_directory/mailbox-high-intervals" ;;
+        *)
+            if [ $((mailbox_depth * 100)) -gt $((mailbox_capacity * 80)) ]; then
+                intervals=1
+                [ ! -f "$state_directory/mailbox-high-intervals" ] || \
+                    intervals=$(( $(sed -n '1p' "$state_directory/mailbox-high-intervals") + 1 ))
+                printf '%s\n' "$intervals" >"$state_directory/mailbox-high-intervals"
+                [ "$intervals" -lt 2 ] || emit_alert warning mailbox_above_80_percent incident
+            else
+                rm -f "$state_directory/mailbox-high-intervals"
+                clear_alert mailbox_above_80_percent
+            fi
+            ;;
+    esac
+
+    check_counter_increase() {
+        metric=$1
+        severity=$2
+        condition=$3
+        current=$(awk -v metric="$metric" '$1==metric {print $2; exit}' "$metrics_file")
+        case "$current" in
+            *[!0-9]*|'')
+                rm -f "$state_directory/counter-$condition"
+                return
+                ;;
+        esac
+        previous=0
+        [ ! -f "$state_directory/counter-$condition" ] || \
+            previous=$(sed -n '1p' "$state_directory/counter-$condition")
+        case "$previous" in *[!0-9]*|'') previous=0 ;; esac
+        if [ "$current" -gt "$previous" ]; then
+            emit_alert "$severity" "$condition" incident
+        else
+            clear_alert "$condition"
+        fi
+        printf '%s\n' "$current" >"$state_directory/counter-$condition"
+    }
+
+    check_counter_increase tme_facet_task_panics_total critical facet_task_panic
+    check_counter_increase tme_command_commit_failures_total critical command_commit_failure
+    check_counter_increase tme_system_commit_failures_total critical system_commit_failure
+    check_counter_increase tme_database_failures_total critical database_failure
+    check_counter_increase tme_scheduler_skips_total warning scheduler_lag_skip
+else
+    rm -f "$metrics_file.tmp"
+fi
+
+restarts=$(systemctl show tme-server.service -p NRestarts --value 2>/dev/null || printf '0')
+case "$restarts" in *[!0-9]*|'') restarts=0 ;; esac
+if [ "$restarts" -ge 3 ]; then emit_alert critical restart_loop incident; else clear_alert restart_loop; fi
+
+filesystem_percent=$(df -P "$STATE_ROOT" | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
+if [ "$filesystem_percent" -ge 85 ]; then
+    emit_alert critical filesystem_critical incident
+elif [ "$filesystem_percent" -ge 70 ]; then
+    emit_alert warning filesystem_warning incident
+else
+    clear_alert filesystem_critical
+    clear_alert filesystem_warning
+fi
+
+postgres_status=$STATE_ROOT/operations/postgres-status.json
+status_valid=false
+if [ -r "$postgres_status" ] && jq -e '
+    keys == ["archive_age_seconds","archive_backlog","archive_failed_count",
+             "collected_at_epoch","latest_backup_epoch","latest_full_epoch",
+             "repository_status_code"] and
+    all(.[]; type == "number" and . >= 0)
+' "$postgres_status" >/dev/null 2>&1
+then
+    collected_at=$(jq -r '.collected_at_epoch' "$postgres_status")
+    [ $((now - collected_at)) -gt 600 ] || status_valid=true
+fi
+
+if [ "$status_valid" = true ]; then
+    archive_age=$(jq -r '.archive_age_seconds' "$postgres_status")
+    archive_failures=$(jq -r '.archive_failed_count' "$postgres_status")
+    archive_backlog=$(jq -r '.archive_backlog' "$postgres_status")
+    repository_status=$(jq -r '.repository_status_code' "$postgres_status")
+    latest_backup=$(jq -r '.latest_backup_epoch' "$postgres_status")
+    latest_full=$(jq -r '.latest_full_epoch' "$postgres_status")
+    clear_alert wal_archiver_unavailable
+    if [ "$archive_age" -gt 900 ]; then
+        emit_alert critical wal_archive_age_15m backup-restore
+    elif [ "$archive_age" -gt 600 ]; then
+        emit_alert warning wal_archive_age_10m backup-restore
+    else
+        clear_alert wal_archive_age_15m
+        clear_alert wal_archive_age_10m
+    fi
+    previous_failures=0
+    [ ! -f "$state_directory/archive-failed-count" ] || \
+        previous_failures=$(sed -n '1p' "$state_directory/archive-failed-count")
+    if [ "$archive_failures" -gt "$previous_failures" ]; then
+        emit_alert critical wal_archiver_failure backup-restore
+    else
+        clear_alert wal_archiver_failure
+    fi
+    printf '%s\n' "$archive_failures" >"$state_directory/archive-failed-count"
+    previous_backlog=0
+    [ ! -f "$state_directory/archive-backlog" ] || \
+        previous_backlog=$(sed -n '1p' "$state_directory/archive-backlog")
+    if [ "$archive_backlog" -gt 0 ] && [ "$archive_backlog" -gt "$previous_backlog" ]; then
+        emit_alert warning wal_archive_backlog_growing backup-restore
+    else
+        clear_alert wal_archive_backlog_growing
+    fi
+    printf '%s\n' "$archive_backlog" >"$state_directory/archive-backlog"
+
+    if [ "$repository_status" -eq 0 ]; then
+        clear_alert backup_check_failed
+    else
+        emit_alert critical backup_check_failed backup-restore
+    fi
+    if [ $((now - latest_backup)) -gt 93600 ]; then
+        emit_alert critical backup_daily_stale backup-restore
+    else
+        clear_alert backup_daily_stale
+    fi
+    if [ $((now - latest_full)) -gt 3024000 ]; then
+        emit_alert critical backup_monthly_full_stale backup-restore
+    else
+        clear_alert backup_monthly_full_stale
+    fi
+else
+    emit_alert critical wal_archiver_unavailable backup-restore
+    emit_alert critical backup_check_failed backup-restore
+fi
+
+restore_marker=$STATE_ROOT/operations/restore-drill
+if [ ! -f "$restore_marker" ] || [ $((now - $(stat -c %Y "$restore_marker"))) -gt 3024000 ]; then
+    emit_alert warning restore_drill_stale backup-restore
+else
+    clear_alert restore_drill_stale
+fi
+
+certificate_end=$(printf '' | openssl s_client -connect "$TME_PUBLIC_HOST:443" \
+    -servername "$TME_PUBLIC_HOST" 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2 || true)
+if [ -z "$certificate_end" ]; then
+    emit_alert critical caddy_tls_failure incident
+else
+    clear_alert caddy_tls_failure
+    certificate_epoch=$(date -d "$certificate_end" +%s)
+    remaining=$((certificate_epoch - now))
+    case "${TME_ACME_PROFILE:-shortlived}" in
+        shortlived) certificate_critical=86400; certificate_warning=172800 ;;
+        classic|tlsserver) certificate_critical=604800; certificate_warning=1814400 ;;
+        *) certificate_critical=604800; certificate_warning=1814400 ;;
+    esac
+    if [ "$remaining" -lt "$certificate_critical" ]; then
+        emit_alert critical certificate_expiry_critical incident
+    elif [ "$remaining" -lt "$certificate_warning" ]; then
+        emit_alert warning certificate_expiry_warning incident
+    else
+        clear_alert certificate_expiry_critical
+        clear_alert certificate_expiry_warning
+    fi
+fi
+
+printf '%s\n' 'alert-check: complete'

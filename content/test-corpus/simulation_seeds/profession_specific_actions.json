@@ -1,0 +1,110 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "profession_specific_actions",
+  "actors": [
+    {
+      "id": "player0",
+      "actor_definition_id": "actor/profession_specific_actions/player0",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:profession_specific_actions:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "thief",
+          "current_class_id": "thief",
+          "display_class": "Thief",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 10,
+          "dexterity": 12,
+          "constitution": 10,
+          "intelligence": 10,
+          "wisdom": 10,
+          "charisma": 10
+        },
+        "resources": {
+          "hp": 12,
+          "max_hp": 12,
+          "peak_hp": 12,
+          "mp": 10,
+          "max_mp": 10,
+          "stamina": 10,
+          "max_stamina": 10
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "skill_ledger": [
+          {
+            "track_id": "thief_magic",
+            "level": 1,
+            "critique_rank": 0,
+            "practice_points": 0,
+            "learning_rate": 1
+          }
+        ],
+        "known_spells": [
+          {
+            "spell_id": "shadow_veil",
+            "lane": "thief_magic",
+            "learned_at_level": 1
+          }
+        ]
+      },
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "watcher",
+      "actor_definition_id": "actor/profession_specific_actions/watcher",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 4,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {},
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

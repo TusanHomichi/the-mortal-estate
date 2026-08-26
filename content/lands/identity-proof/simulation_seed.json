@@ -1,0 +1,159 @@
+{
+  "actors": [
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/player",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 10,
+          "constitution": 10,
+          "dexterity": 10,
+          "intelligence": 14,
+          "strength": 10,
+          "wisdom": 12
+        },
+        "identity": {
+          "base_class_id": "wizard",
+          "current_class_id": "wizard",
+          "display_class": "Wizard",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [
+          {
+            "lane": "wizard_magic",
+            "learned_at_level": 1,
+            "spell_id": "sense_secret"
+          }
+        ],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 20,
+          "max_hp": 20,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 20,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "wizard_magic"
+          }
+        ]
+      },
+      "character_id": "character:identity_proof:primary",
+      "id": "player",
+      "location": {
+        "level": "settlement",
+        "position": {
+          "x": 12,
+          "y": 15
+        },
+        "realm": "identity_proof"
+      },
+      "npc": null
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/identity_proof/threshold_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "threshold_keeper",
+      "location": {
+        "level": "settlement",
+        "position": {
+          "x": 11,
+          "y": 13
+        },
+        "realm": "identity_proof"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Bring back what the road takes, and I will do what I can with it.",
+            "transaction": {
+              "costs": [],
+              "id": "ask_about_the_rite",
+              "label": "Ask about the rite",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "ecology_sites": [
+    {
+      "id": "ruin_mouth_lair",
+      "member_locations": {
+        "great_bear": {
+          "level": "settlement",
+          "position": {
+            "x": 44,
+            "y": 16
+          },
+          "realm": "identity_proof"
+        }
+      },
+      "source": {
+        "kind": "lair",
+        "lair_definition_id": "lair/testland/surface_great_bear"
+      }
+    }
+  ],
+  "ground_items": [],
+  "id": "identity_proof",
+  "item_instances": {},
+  "kind": "simulation_seed",
+  "merchant_inventories": [],
+  "schema_version": 3,
+  "service_instances": [
+    {
+      "id": "keeper_rite",
+      "location": {
+        "level": "settlement",
+        "position": {
+          "x": 11,
+          "y": 13
+        },
+        "realm": "identity_proof"
+      },
+      "service_definition_id": "threshold_keeper"
+    }
+  ]
+}

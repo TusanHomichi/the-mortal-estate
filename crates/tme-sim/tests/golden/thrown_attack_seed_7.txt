@@ -1,0 +1,76 @@
+The Mortal Estate local simulation
+scenario: thrown_attack
+seed: 7
+
+loaded "Thrown Attack" realms=[realm_0] levels=[realm_0/room_0]
+player Delver at realm_0/room_0:1,1 hp=12
+monster Burr Hound at realm_0/room_0:4,1 hp=9
+
+player ready: Delver at 1
+Delver intent at 1: throw burr_hound
+Delver missed Burr Hound: roll=2 attack_score=3 defense_score=13
+Oak Javelin lands at (4,1)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Burr Hound at 2
+Burr Hound intent: move west
+Burr Hound walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Burr Hound step west -> (3,1): terrain=Clear Floor cost=1 remaining=0
+Burr Hound moved from (4,1) to (3,1)
+readiness scheduled: Burr Hound cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Clear Floor cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Burr Hound at 3
+Burr Hound intent: move west
+Burr Hound walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Burr Hound step west -> (2,1): terrain=Clear Floor cost=1 remaining=0
+Burr Hound moved from (3,1) to (2,1)
+readiness scheduled: Burr Hound cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: run east,east
+Delver run: requested=2 accepted=2 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step east -> (3,1): terrain=Clear Floor cost=1 remaining=2
+Delver moved from (2,1) to (3,1)
+  Delver step east -> (4,1): terrain=Clear Floor cost=1 remaining=1
+Delver moved from (3,1) to (4,1)
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Burr Hound at 4
+Burr Hound intent: move east
+Burr Hound walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Burr Hound step east -> (3,1): terrain=Clear Floor cost=1 remaining=0
+Burr Hound moved from (2,1) to (3,1)
+readiness scheduled: Burr Hound cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: move_item oak_javelin to right_hand
+Delver moved Oak Javelin from (4,1) to right_hand
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+monster ready: Burr Hound at 5
+Burr Hound intent: move east
+Burr Hound walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Burr Hound step east -> (4,1): terrain=Clear Floor cost=1 remaining=0
+Burr Hound moved from (3,1) to (4,1)
+readiness scheduled: Burr Hound cost=1 ready_at=6
+
+player ready: Delver at 5
+Delver intent at 5: fight burr_hound
+Delver missed Burr Hound: roll=8 attack_score=3 defense_score=13
+readiness scheduled: Delver cost=1 ready_at=6
+time 6
+monster ready: Burr Hound at 6
+Burr Hound intent: fight Delver
+Burr Hound missed Delver: roll=11 attack_score=1 defense_score=13
+readiness scheduled: Burr Hound cost=1 ready_at=7
+
+final state
+Delver at realm_0/room_0:4,1 hp=12 alive
+Burr Hound at realm_0/room_0:4,1 hp=9 alive

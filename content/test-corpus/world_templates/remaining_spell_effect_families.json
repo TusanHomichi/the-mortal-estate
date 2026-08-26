@@ -1,0 +1,230 @@
+{
+  "arrivals": {},
+  "id": "remaining_spell_effect_families",
+  "kind": "world_template",
+  "realms": {
+    "realm_0": {
+      "levels": {
+        "room_0": {
+          "cells": [
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "bronze_door"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ]
+          ],
+          "height": 5,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "vault": {
+          "cells": [
+            [
+              [
+                "vault_wall"
+              ],
+              [
+                "vault_wall"
+              ],
+              [
+                "vault_wall"
+              ]
+            ],
+            [
+              [
+                "vault_wall"
+              ],
+              [
+                "vault_floor"
+              ],
+              [
+                "vault_wall"
+              ]
+            ],
+            [
+              [
+                "vault_wall"
+              ],
+              [
+                "vault_wall"
+              ],
+              [
+                "vault_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 1,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 3,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Remaining Spell Effect Families"
+    }
+  },
+  "schema_version": 3,
+  "topology": {
+    "edge/room_0/2/1": {
+      "at": {
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/room_0/2/1",
+        "endpoint_id": "edge/room_0/2/1",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/room_0/2/1/reciprocal"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "vault",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/room_0/2/1/reciprocal": {
+      "at": {
+        "level": "vault",
+        "position": {
+          "x": 1,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/room_0/2/1",
+        "endpoint_id": "edge/room_0/2/1/reciprocal",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/room_0/2/1"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "realm": "realm_0"
+        }
+      }
+    }
+  },
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+}

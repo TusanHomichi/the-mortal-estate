@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "town_adventure_loop_gallery",
+  "name": "Waystation Circuit",
+  "description": "Original clean integration gallery proving one deterministic adventure, recovery, town-service, character-progression, storage, and return-to-danger loop through existing Scenario-26 owners.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "All names, room layout, dialogue, quest text, instances, stock, prices, rewards, service placement, numeric tuning, and the 27-step script are original project proof inputs. Completed tracked evaluations are cited only as mechanic precedents; no recovered commercial row, formula, placement, prose, or private artifact is used.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/town_adventure_loop_gallery.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/town_adventure_loop_gallery",
+  "world_template": "world_templates/town_adventure_loop_gallery.json",
+  "simulation_seed": "simulation_seeds/town_adventure_loop_gallery.json",
+  "script": [
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "road_scavenger",
+        "authorization": "safe"
+      }
+    },
+    {
+      "search_corpse": "corpse:1"
+    },
+    {
+      "move_item": {
+        "item_instance_id": "waystone_token",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_2"
+        }
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "trade_charm",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_3"
+        }
+      }
+    },
+    {
+      "move_gold": {
+        "source": {
+          "kind": "ground",
+          "gold_pile_id": "gold:1"
+        },
+        "destination": {
+          "kind": "carried",
+          "position": "sack"
+        },
+        "quantity": {
+          "kind": "all"
+        }
+      }
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "traverse": "stairs_up"
+    },
+    {
+      "interact_with_npc": {
+        "npc_actor_id": "route_keeper",
+        "interaction_id": "ask_about_waystone",
+        "item_instance_id": null
+      }
+    },
+    {
+      "interact_with_npc": {
+        "npc_actor_id": "route_keeper",
+        "interaction_id": "return_waystone",
+        "item_instance_id": "waystone_token"
+      }
+    },
+    {
+      "use_item_service": {
+        "service_id": "waystation_counter",
+        "capability_id": "appraisal",
+        "operation": "appraise",
+        "item_instance_id": "trade_charm"
+      }
+    },
+    {
+      "sell_to_merchant": {
+        "service_id": "waystation_counter",
+        "capability_id": "trail_wares",
+        "item_instance_id": "trade_charm"
+      }
+    },
+    {
+      "move_gold": {
+        "source": {
+          "kind": "carried",
+          "position": "sack"
+        },
+        "destination": {
+          "kind": "ground_here"
+        },
+        "quantity": {
+          "kind": "exact",
+          "amount": 15
+        }
+      }
+    },
+    {
+      "deposit_bank_gold": {
+        "service_id": "waystation_counter",
+        "capability_id": "bank_access",
+        "gold_pile_id": "gold:2"
+      }
+    },
+    {
+      "deposit_locker_item": {
+        "service_id": "waystation_counter",
+        "capability_id": "locker_access",
+        "item_instance_id": "weathered_staff"
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "field_spell_book",
+        "destination": {
+          "kind": "carried",
+          "position": "right_hand"
+        }
+      }
+    },
+    {
+      "critique": {
+        "service_id": "waystation_counter",
+        "track_id": "wizard_magic"
+      }
+    },
+    {
+      "train": {
+        "service_id": "waystation_counter",
+        "offered_gold": 7
+      }
+    },
+    {
+      "learn_spell": "ember_bolt"
+    },
+    {
+      "move_item": {
+        "item_instance_id": "field_spell_book",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_1"
+        }
+      }
+    },
+    {
+      "buy_from_merchant": {
+        "service_id": "waystation_counter",
+        "capability_id": "trail_wares",
+        "item_instance_ids": [
+          "bright_staff_stock"
+        ]
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "bright_staff_stock",
+        "destination": {
+          "kind": "carried",
+          "position": "right_hand"
+        }
+      }
+    },
+    {
+      "use_restoration_service": {
+        "service_id": "waystation_counter",
+        "capability_id": "restoration",
+        "operation_id": "restore_hit_points",
+        "item_instance_id": null,
+        "corpse_id": null
+      }
+    },
+    {
+      "use_restoration_service": {
+        "service_id": "waystation_counter",
+        "capability_id": "restoration",
+        "operation_id": "restore_magic_points",
+        "item_instance_id": null,
+        "corpse_id": null
+      }
+    },
+    {
+      "traverse": "stairs_down"
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "return_sentinel",
+        "authorization": "safe"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "ember_bolt",
+        "target": {
+          "actor": {
+            "actor_id": "return_sentinel"
+          }
+        }
+      }
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

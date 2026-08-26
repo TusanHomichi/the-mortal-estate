@@ -1,0 +1,147 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "control_poison_protection",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/control_poison_protection/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:control_poison_protection:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "wizard",
+          "current_class_id": "wizard",
+          "display_class": "Wizard",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 10,
+          "dexterity": 10,
+          "constitution": 10,
+          "intelligence": 14,
+          "wisdom": 12,
+          "charisma": 10
+        },
+        "resources": {
+          "hp": 8,
+          "max_hp": 10,
+          "peak_hp": 10,
+          "mp": 30,
+          "max_mp": 30,
+          "stamina": 20,
+          "max_stamina": 20
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "skill_ledger": [
+          {
+            "track_id": "wizard_magic",
+            "level": 1,
+            "critique_rank": 0,
+            "practice_points": 0,
+            "learning_rate": 1
+          }
+        ],
+        "known_spells": [
+          {
+            "spell_id": "ember_skin",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "flame",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "venom",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "neutralize",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "toxin_ward",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "self_hold",
+            "lane": "wizard_magic",
+            "learned_at_level": 1
+          }
+        ]
+      },
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "ember_brooch",
+            "position": "neck"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "target",
+      "actor_definition_id": "actor/control_poison_protection/target",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "ember_brooch": {
+      "definition_id": "ember_brooch",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

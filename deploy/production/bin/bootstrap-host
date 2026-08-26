@@ -1,0 +1,96 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+load_environment
+[ "${TME_BOOTSTRAP_CONFIRM-}" = 'fresh-disposable-debian-13' ] || \
+    fail 'set TME_BOOTSTRAP_CONFIRM=fresh-disposable-debian-13'
+"$PRODUCTION_ROOT/bin/host-preflight"
+
+package_root=${TME_PACKAGE_ROOT:-/var/tmp/tme-packages}
+[ -f "$package_root/SHA256SUMS" ] || fail 'reviewed package SHA256SUMS is unavailable'
+[ -f "$package_root/PACKAGE-VERSIONS" ] || fail 'reviewed PACKAGE-VERSIONS receipt is unavailable'
+(cd "$package_root" && sha256sum -c SHA256SUMS)
+
+require_upstream_package() {
+    package=$1
+    expected=$2
+    actual=$(awk -F '\t' -v package="$package" '$1 == package { print $2 }' \
+        "$package_root/PACKAGE-VERSIONS")
+    [ -n "$actual" ] || fail "reviewed package is absent: $package"
+    case "$actual" in
+        "$expected"|"$expected"[-+~]*) ;;
+        *) fail "reviewed $package package does not match upstream $expected" ;;
+    esac
+}
+
+require_upstream_package caddy "$(locked_value caddy_version)"
+require_upstream_package postgresql-18 "$(locked_value postgresql_version)"
+require_upstream_package postgresql-client-18 "$(locked_value postgresql_version)"
+require_upstream_package pgbackrest "$(locked_value pgbackrest_version)"
+
+export DEBIAN_FRONTEND=noninteractive
+policy_rc=/usr/sbin/policy-rc.d
+[ ! -e "$policy_rc" ] || fail 'existing policy-rc.d requires explicit operator review'
+trap 'rm -f "$policy_rc"' EXIT HUP INT TERM
+{
+    printf '%s\n' '#!/bin/sh'
+    printf '%s\n' 'exit 101'
+} >"$policy_rc"
+chmod 0755 "$policy_rc"
+set -- "$package_root"/*.deb
+[ -e "$1" ] || fail 'reviewed package directory contains no Debian packages'
+apt-get install -y --no-download --no-install-recommends "$@"
+rm -f "$policy_rc"
+trap - EXIT HUP INT TERM
+
+[ "$(caddy version | awk '{sub(/^v/, "", $1); print $1}')" = "$(locked_value caddy_version)" ] || \
+    fail 'installed Caddy differs from versions.lock'
+[ "$(psql --version | awk '{print $3}')" = "$(locked_value postgresql_version)" ] || \
+    fail 'installed PostgreSQL client differs from versions.lock'
+[ "$(pgbackrest version | awk '{print $2}')" = "$(locked_value pgbackrest_version)" ] || \
+    fail 'installed pgBackRest differs from versions.lock'
+
+getent group tme >/dev/null || addgroup --system tme
+getent passwd tme >/dev/null || adduser --system --ingroup tme --home /var/lib/tme --no-create-home tme
+getent group tme-monitor >/dev/null || addgroup --system tme-monitor
+getent passwd tme-monitor >/dev/null || adduser --system --ingroup tme-monitor --home /var/lib/tme/alerts --no-create-home tme-monitor
+getent group tme-deploy >/dev/null || addgroup --system tme-deploy
+getent passwd tme-deploy >/dev/null || adduser --system --ingroup tme-deploy --home /nonexistent --no-create-home tme-deploy
+install -d -o root -g root -m 0755 /opt/tme "$RELEASE_ROOT"
+install -d -o root -g root -m 0755 /etc/tme
+install -d -o root -g root -m 0700 "$CREDENTIAL_ROOT"
+install -d -o root -g root -m 0711 "$STATE_ROOT"
+initialize_operation_lock
+install -d -o tme-monitor -g tme-monitor -m 0750 "$STATE_ROOT/alerts"
+install -d -o postgres -g tme-monitor -m 0750 "$STATE_ROOT/operations"
+install -d -o postgres -g postgres -m 0700 "$STATE_ROOT/restore-drill"
+install -d -o root -g root -m 0755 "$ADMISSION_ROOT"
+install -d -o root -g root -m 0750 "$RELEASE_OPERATIONS_ROOT"
+install -d -o root -g root -m 0711 "$CREDENTIAL_PROJECTION_ROOT"
+install -d -o root -g root -m 0700 "$RESTORE_QUARANTINE_ROOT"
+initial_marker=$(mktemp "$ADMISSION_ROOT/.closed.XXXXXX")
+printf '%s\n' '{"schema_version":1,"operation":"bootstrap","state":"closed"}' >"$initial_marker"
+chmod 0644 "$initial_marker"
+mv -Tf "$initial_marker" "$ADMISSION_MARKER"
+sync -f "$ADMISSION_ROOT"
+
+operations_bundle=$(install_operations_bundle)
+install -o root -g root -m 0644 "$operations_bundle/systemd/"*.service \
+    "$operations_bundle/systemd/"*.timer /etc/systemd/system/
+install -o root -g root -m 0644 "$operations_bundle/caddy/Caddyfile" /etc/caddy/Caddyfile
+install -d -o root -g root -m 0755 /etc/systemd/system/caddy.service.d
+{
+    printf '%s\n' '[Service]'
+    printf '%s\n' 'EnvironmentFile=/etc/tme/server.env'
+    printf '%s\n' 'ExecStart='
+    printf '%s\n' 'ExecStart=/usr/bin/caddy run --config /etc/caddy/Caddyfile --adapter caddyfile'
+} >/etc/systemd/system/caddy.service.d/tme.conf
+chmod 0644 /etc/systemd/system/caddy.service.d/tme.conf
+systemctl daemon-reload
+systemctl enable tme-server.service tme-alert-check.timer tme-backup-daily.timer \
+    tme-backup-weekly.timer tme-backup-monthly.timer tme-restore-drill.timer
+
+printf '%s\n' 'bootstrap-host: host structure installed; apply the PostgreSQL and firewall runbook before deployment'

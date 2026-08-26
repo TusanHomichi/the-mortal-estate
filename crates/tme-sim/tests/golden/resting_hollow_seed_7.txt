@@ -1,0 +1,137 @@
+The Mortal Estate local simulation
+scenario: resting_hollow
+seed: 7
+
+loaded "Resting Hollow" realms=[realm_0] levels=[realm_0/room_0]
+player Delver (Fighter) at realm_0/room_0:1,2 hp=12
+monster Stone Warden at realm_0/room_0:3,2 hp=20
+
+player ready: Delver at 1
+Delver intent at 1: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step east -> (2,2): terrain=Flagstone cost=1 remaining=2
+Delver moved from (1,2) to (2,2)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Stone Warden at 2
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step east -> (3,2): terrain=Flagstone cost=1 remaining=2
+Delver moved from (2,2) to (3,2)
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Stone Warden at 3
+Stone Warden intent: fight Delver
+Stone Warden missed Delver: roll=11 attack_score=1 defense_score=13
+readiness scheduled: Stone Warden cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: wait
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Stone Warden at 4
+Stone Warden intent: fight Delver
+Stone Warden missed Delver: roll=2 attack_score=1 defense_score=13
+readiness scheduled: Stone Warden cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: walk west
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step west -> (2,2): terrain=Flagstone cost=1 remaining=2
+Delver moved from (3,2) to (2,2)
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+monster ready: Stone Warden at 5
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=6
+
+player ready: Delver at 5
+Delver intent at 5: walk west
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step west -> (1,2): terrain=Flagstone cost=1 remaining=2
+Delver moved from (2,2) to (1,2)
+readiness scheduled: Delver cost=1 ready_at=6
+time 6
+monster ready: Stone Warden at 6
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=7
+
+player ready: Delver at 6
+Delver intent at 6: wait
+readiness scheduled: Delver cost=1 ready_at=7
+time 7
+monster ready: Stone Warden at 7
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=8
+
+player ready: Delver at 7
+Delver intent at 7: wait
+readiness scheduled: Delver cost=1 ready_at=8
+time 8
+monster ready: Stone Warden at 8
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=9
+
+player ready: Delver at 8
+Delver intent at 8: wait
+readiness scheduled: Delver cost=1 ready_at=9
+time 9
+monster ready: Stone Warden at 9
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=10
+
+player ready: Delver at 9
+Delver intent at 9: wait
+readiness scheduled: Delver cost=1 ready_at=10
+time 10
+monster ready: Stone Warden at 10
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=11
+
+player ready: Delver at 10
+Delver intent at 10: wait
+readiness scheduled: Delver cost=1 ready_at=11
+time 11
+monster ready: Stone Warden at 11
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=12
+
+player ready: Delver at 11
+Delver intent at 11: wait
+readiness scheduled: Delver cost=1 ready_at=12
+time 12
+monster ready: Stone Warden at 12
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=13
+
+player ready: Delver at 12
+Delver intent at 12: wait
+readiness scheduled: Delver cost=1 ready_at=13
+time 13
+monster ready: Stone Warden at 13
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=14
+
+player ready: Delver at 13
+Delver intent at 13: wait
+readiness scheduled: Delver cost=1 ready_at=14
+time 14
+monster ready: Stone Warden at 14
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=15
+
+player ready: Delver at 14
+Delver intent at 14: wait
+readiness scheduled: Delver cost=1 ready_at=15
+time 15
+monster ready: Stone Warden at 15
+Stone Warden intent: hold
+readiness scheduled: Stone Warden cost=1 ready_at=16
+
+final state
+Delver (Fighter) at realm_0/room_0:1,2 hp=12 alive
+Stone Warden at realm_0/room_0:3,2 hp=20 alive

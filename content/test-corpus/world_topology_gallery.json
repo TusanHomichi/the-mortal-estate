@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "world_topology_gallery",
+  "name": "World Topology Gallery",
+  "description": "Clean deterministic proof of catalog-backed layered terrain and unified authored and dynamic navigation.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, topology, layout, and tuning. This fixture proves generic runtime mechanics and makes no source-game route or placement claim.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/world_topology_gallery.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/world_topology_gallery",
+  "world_template": "world_templates/world_topology_gallery.json",
+  "simulation_seed": "simulation_seeds/world_topology_gallery.json",
+  "script": [
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "blue_gate",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "workroom",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "move_path": [
+        "east",
+        "east"
+      ]
+    },
+    {
+      "traverse": "stairs_down"
+    },
+    {
+      "traverse": "climb_up"
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    }
+  ]
+}

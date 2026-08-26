@@ -1,0 +1,22 @@
+# CI-only synthetic fixture for tools/check_boundary_terms.py.
+#
+# This file exists ONLY so .github/workflows/verify.yml can exercise the
+# banned-terms check's real MECHANISM (loading, word-ish matching, separator
+# tolerance, path + content scanning, fail-closed behavior) in CI, using a
+# tracked file. It is invented nonsense — every term below is a fake proper
+# noun that appears nowhere else in this repository, verified by grep at the
+# time this file was created.
+#
+# This is NOT the real denylist. The real list is private and lives in the
+# git-ignored .boundary/banned-terms.txt, which only exists on an owner's
+# machine and is never carried by this repository. Running the check against
+# the REAL list is a local/owner check, not something CI can ever do — CI
+# proves the check still works, not that the private list is clean.
+#
+# Same format as the real file: one term per line, '#' starts a comment.
+
+quibberholt
+fenwrackle
+tholvaster
+brindlemoor
+grendaliss

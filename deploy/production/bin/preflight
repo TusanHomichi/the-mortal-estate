@@ -1,0 +1,88 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/release-operation"
+
+[ "$#" -le 1 ] || fail 'usage: preflight [candidate-server-binary]'
+require_root
+load_environment
+"$PRODUCTION_ROOT/bin/host-preflight"
+server_binary=${1:-"$CURRENT_LINK/bin/tme-server"}
+[ -x "$server_binary" ] || fail 'preflight server binary is unavailable'
+
+[ "$TME_BACKUP_REPOSITORY_KIND" = s3 ] || fail 'production backup repository must be s3'
+[ "$TME_RECOVERY_KEY_ESCROW_ACK" = acknowledged ] || fail 'recovery-key escrow is not acknowledged'
+case "$TME_PUBLIC_ORIGIN" in https://*) ;; *) fail 'public origin must use https' ;; esac
+acme_profile=${TME_ACME_PROFILE:-shortlived}
+case "$acme_profile" in shortlived|classic|tlsserver) ;; *) fail 'ACME certificate profile is invalid' ;; esac
+case "$TME_OPERATOR_SSH_CIDR" in */*) ;; *) fail 'operator SSH CIDR is invalid' ;; esac
+require_loopback_address TME_PUBLIC_LISTEN "$TME_PUBLIC_LISTEN"
+require_loopback_address TME_OPS_LISTEN "$TME_OPS_LISTEN"
+[ "$TME_PUBLIC_LISTEN" != "$TME_OPS_LISTEN" ] || fail 'public and operations listeners collide'
+[ -f "$TME_BOOTSTRAP_MANIFEST" ] || fail 'bootstrap manifest is unavailable'
+# The content boundary denylist is private operator data, never a release file.
+# The server fails closed without it, so every content-loading invocation must
+# be told where it lives; the shell that sources server.env does not export it.
+[ -f "$TME_BANNED_TERMS_FILE" ] && [ ! -L "$TME_BANNED_TERMS_FILE" ] || \
+    fail 'content boundary denylist is unavailable or unsafe'
+[ -s "$TME_BANNED_TERMS_FILE" ] || fail 'content boundary denylist is empty'
+case "$(stat -c '%u:%a:%h' "$TME_BANNED_TERMS_FILE")" in
+    0:444:1|0:440:1) ;;
+    *) fail 'content boundary denylist ownership, mode, or link count is invalid' ;;
+esac
+TME_BANNED_TERMS_FILE=$TME_BANNED_TERMS_FILE \
+    "$server_binary" bootstrap verify "$TME_BOOTSTRAP_MANIFEST" >/dev/null
+
+for command in awk caddy curl df env findmnt flock grep jq openssl pg_dump pg_isready \
+    pgbackrest psql python3 readlink runuser sed sha256sum stat systemctl timedatectl timeout
+do
+    require_command "$command"
+done
+credential_file database-url >/dev/null
+credential_file auth-database-url >/dev/null
+credential_file migrator-database-url >/dev/null
+credential_file migrator-pgpass >/dev/null
+credential_file monitor-pgpass >/dev/null
+credential_file smoke-username-one >/dev/null
+credential_file smoke-password-one >/dev/null
+credential_file smoke-username-two >/dev/null
+credential_file smoke-password-two >/dev/null
+credential_file webhook-url >/dev/null
+validate_production_database_credentials
+canonical_owned_directory 'release root' "$RELEASE_ROOT" >/dev/null
+initialize_release_operation_roots
+
+postgres_version=$(psql --version | awk '{print $3}')
+[ "$postgres_version" = "$(locked_value postgresql_version)" ] || fail 'PostgreSQL client differs from versions.lock'
+[ "$(caddy version | awk '{sub(/^v/, "", $1); print $1}')" = "$(locked_value caddy_version)" ] || fail 'Caddy differs from versions.lock'
+[ "$(pgbackrest version | awk '{print $2}')" = "$(locked_value pgbackrest_version)" ] || fail 'pgBackRest differs from versions.lock'
+
+timedatectl show -p NTPSynchronized --value | grep -qx yes || fail 'host clock is not synchronized'
+available_kib=$(df -Pk "$STATE_ROOT" | awk 'NR==2 {print $4}')
+[ "$available_kib" -ge 4194304 ] || fail 'less than 4 GiB is available for The Mortal Estate state'
+findmnt --target /var/lib/postgresql -n -o SOURCE >/dev/null || \
+    fail 'PostgreSQL data filesystem is unavailable'
+case "$TME_BACKUP_REPOSITORY" in
+    localhost*|127.*|/var/lib/postgresql*|/var/lib/tme*)
+        fail 'backup repository shares the application failure domain'
+        ;;
+esac
+
+TME_PUBLIC_HOST=$TME_PUBLIC_HOST TME_ACME_PROFILE=$acme_profile \
+    caddy validate --config "$PRODUCTION_ROOT/caddy/Caddyfile" --adapter caddyfile >/dev/null
+pg_isready -q --host="$PRODUCTION_DATABASE_SOCKET" --port="$PRODUCTION_DATABASE_PORT" \
+    --dbname="$TME_DATABASE_NAME" || fail 'PostgreSQL is not ready'
+run_as_postgres pgbackrest --stanza=tme check >/dev/null
+run_as_postgres pgbackrest --stanza=tme --output=json info | \
+    jq -e 'length == 1 and .[0].status.code == 0' >/dev/null || \
+    fail 'pgBackRest stanza or encrypted repository is not healthy'
+monitor_pgpass=$(credential_file monitor-pgpass)
+archive_healthy=$(PGPASSFILE=$monitor_pgpass \
+    psql --host="$PRODUCTION_DATABASE_SOCKET" --port="$PRODUCTION_DATABASE_PORT" \
+    --dbname="$TME_DATABASE_NAME" \
+    --username=tme_monitor --no-align --tuples-only --command="SELECT \
+        last_archived_time IS NOT NULL AND \
+        (last_failed_time IS NULL OR last_archived_time >= last_failed_time) \
+        FROM pg_stat_archiver")
+[ "$archive_healthy" = t ] || fail 'continuous WAL archiving has not produced a healthy archive result'
+printf '%s\n' 'preflight: ok'

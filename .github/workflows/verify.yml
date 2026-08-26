@@ -1,0 +1,136 @@
+name: verify
+
+# Standing CI, and it runs the same thing an owner runs locally.
+#
+# There is exactly one source of truth for what verification means:
+# `tools/run_verification.py`. This workflow does not list steps, does not
+# restate commands, and cannot drift from the local baseline — it names lanes
+# and the runner resolves them. To see what those lanes are, in this
+# repository, at this commit:
+#
+#     python3 tools/run_verification.py --list --scope full
+#
+# `--allow-unavailable` is CI declaring, out loud, that it cannot supply three
+# capabilities: the pinned Godot binary, a PostgreSQL superuser URL, and the
+# private banned-term denylist. The runner reports each as UNAVAILABLE (or, for
+# the denylist, DEGRADED onto the tracked synthetic fixture) and prints an
+# INCOMPLETE verdict. That is a stated limit, not a silent skip: a step that
+# fails still turns this red, and a broken synthetic fixture still exits 3 from
+# the check itself.
+#
+# WHY TWO JOBS. The complete lane builds this workspace twice — once in the
+# checkout, once inside the clean-clone proof's copy — and on 2026-08-20 that
+# pair filled a GitHub-hosted runner and killed run 32438837232 with `No space
+# left on device`, on both attempts, twelve minutes in, before a single step's
+# log survived. Measured with the disposable-build profile below: a workspace
+# build, clippy over all targets, and the test suite leave 5,910 MiB behind and
+# PEAK at 6,831 MiB while running. Two of those on one runner is 13.3 GiB of
+# build output before the toolchain, the registry, and the checkout, which does
+# not clear a ~14 GB budget at all. One runner per cold build does, with roughly
+# 7 GiB spare each, and the two finish in parallel.
+#
+# The jobs below are `full`, partitioned. `tests/test_ci_workflow.py` resolves
+# what each one names and asserts the union is `full` exactly, with no step
+# paid for twice — so a dropped lane is a red suite, not a merge gate that
+# quietly stopped running. The arithmetic and the measurements are in
+# docs/agent-workflow.md, "The disk budget".
+#
+# Branch protection requiring both jobs is an owner action and is not
+# configured here.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  # The current pins are verified, not assumed. The workspace was originally
+  # proven on Rust 1.96.0 and Python 3.14 on 2026-08-19; issue #25 raised the
+  # Rust baseline on 2026-08-26. The workflow pin, rust-toolchain.toml, and the
+  # workspace rust-version are held together by tests/test_ci_workflow.py.
+  RUST_TOOLCHAIN_VERSION: "1.98.0"
+  PYTHON_VERSION: "3.14"
+
+  # The disposable-build profile. A proof build has no next build to make fast
+  # and no debugger to attach, so incremental state is pure cost and full DWARF
+  # buys nothing a backtrace needs. It is set HERE and in the clean-clone proof
+  # rather than in Cargo.toml on purpose: the tracked profile is the developer's
+  # build, and paying for CI out of everybody's tooling is not a saving.
+  #
+  # `tools/verification/footprint.py` decides these values;
+  # `tests/test_ci_workflow.py` asserts this block still agrees with it, so the
+  # copy below cannot drift into a second source of truth.
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
+  CARGO_PROFILE_TEST_DEBUG: "line-tables-only"
+  # Named, not merely defaulted, so every log line that measures it and every
+  # step that spends it are talking about the same directory.
+  CARGO_TARGET_DIR: "${{ github.workspace }}/target"
+
+jobs:
+  verify:
+    name: the complete lane, except the clean-clone proof
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The markdown link check and the boundary checks ask git what the
+          # tree carries. A shallow checkout is fine; a detached blobless one
+          # is not, so keep the default full-content fetch.
+          fetch-depth: 1
+
+      # First thing after the checkout, so nothing has spent disk before the
+      # log says how much there was.
+      - name: disk budget
+        run: bash .github/disk-budget.sh
+
+      - name: install the pinned Rust toolchain
+        run: bash .github/install-rust.sh
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      # What is about to run, printed before it runs, so a failed job's log
+      # opens with the plan rather than only the wreckage.
+      - name: resolved plan
+        run: python3 tools/run_verification.py --list --scope portable --scope client --scope gated
+
+      # No TME_* variable is set here, deliberately. `.cargo/config.toml`
+      # supplies TME_BANNED_TERMS_FILE (force = false) pointing at the tracked
+      # synthetic fixture, so the content validator's boundary scanner
+      # exercises its real mechanism against synthetic data. The
+      # PostgreSQL-gated tests are #[ignore]d and are skipped by cargo itself,
+      # not merely by an absent variable — and the `gated` lane, which does run
+      # them, reports UNAVAILABLE here rather than passing vacuously.
+      - name: the lanes this checkout can prove
+        run: python3 tools/run_verification.py --scope portable --scope client --scope gated --allow-unavailable --report-disk
+
+  cleanclone:
+    name: a clean copy builds and tests with no private root
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: disk budget
+        run: bash .github/disk-budget.sh
+
+      - name: install the pinned Rust toolchain
+        run: bash .github/install-rust.sh
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: resolved plan
+        run: python3 tools/run_verification.py --list --scope cleanclone
+
+      # The second cold build, on its own disk. The proof sets its own
+      # CARGO_TARGET_DIR beside the copy it makes, prints that directory's peak
+      # size, and removes it in `finally` — so this job's own target directory,
+      # measured by --report-disk, stays empty and the two numbers in the log
+      # do not have to be untangled from each other.
+      - name: the clean-clone proof
+        run: python3 tools/run_verification.py --scope cleanclone --allow-unavailable --report-disk

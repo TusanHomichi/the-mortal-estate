@@ -1,0 +1,371 @@
+#!/bin/sh
+set -eu
+
+umask 027
+export PATH='/usr/local/sbin:/usr/local/bin:/usr/lib/postgresql/18/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+PRODUCTION_ROOT=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
+VERSIONS_FILE=${TME_VERSIONS_FILE:-"$PRODUCTION_ROOT/versions.lock"}
+ENV_FILE=${TME_ENV_FILE:-/etc/tme/server.env}
+CREDENTIAL_ROOT=${TME_CREDENTIAL_ROOT:-/etc/tme/credentials}
+# Consumed by scripts that source this file.
+# shellcheck disable=SC2034
+RELEASE_ROOT=${TME_RELEASE_ROOT:-/opt/tme/releases}
+# Consumed by scripts that source this file.
+# shellcheck disable=SC2034
+CURRENT_LINK=${TME_CURRENT_LINK:-/opt/tme/current}
+STATE_ROOT=${TME_STATE_ROOT:-/var/lib/tme}
+PRODUCTION_DATABASE_SOCKET=/var/run/postgresql
+PRODUCTION_DATABASE_PORT=5432
+OPERATIONS_BUNDLE_ROOT=${TME_OPERATIONS_BUNDLE_ROOT:-/opt/tme/operations}
+OPERATION_LOCK=${TME_OPERATION_LOCK:-"$STATE_ROOT/operations.lock"}
+ADMISSION_ROOT=${TME_ADMISSION_ROOT:-"$STATE_ROOT/admission"}
+# Consumed by release and recovery scripts that source this file.
+# shellcheck disable=SC2034
+ADMISSION_MARKER=$ADMISSION_ROOT/closed
+OPERATIONS_ROOT=${TME_OPERATIONS_ROOT:-"$STATE_ROOT/operations"}
+# Consumed by release and recovery scripts that source this file.
+# shellcheck disable=SC2034
+RELEASE_OPERATIONS_ROOT=${TME_RELEASE_OPERATIONS_ROOT:-"$STATE_ROOT/release-operations"}
+# Consumed by release and recovery scripts that source this file.
+# shellcheck disable=SC2034
+CREDENTIAL_PROJECTION_ROOT=${TME_CREDENTIAL_PROJECTION_ROOT:-"$STATE_ROOT/credential-projections"}
+# Consumed by recovery scripts that source this file.
+# shellcheck disable=SC2034
+RESTORE_QUARANTINE_ROOT=${TME_RESTORE_QUARANTINE_ROOT:-"$STATE_ROOT/restore-quarantine"}
+
+fail() {
+    printf '%s\n' "error: $1" >&2
+    exit 1
+}
+
+require_command() {
+    command -v "$1" >/dev/null 2>&1 || fail "required command is unavailable: $1"
+}
+
+canonical_directory() {
+    cd_label=$1
+    cd_value=$2
+    case "$cd_value" in /*) ;; *) fail "$cd_label must be absolute" ;; esac
+    [ -d "$cd_value" ] || fail "$cd_label is unavailable"
+    [ ! -L "$cd_value" ] || fail "$cd_label may not be a symbolic link"
+    cd_canonical=$(readlink -e -- "$cd_value") || fail "$cd_label cannot be canonicalized"
+    [ "$cd_canonical" = "$cd_value" ] || fail "$cd_label must be a canonical path"
+    printf '%s\n' "$cd_canonical"
+}
+
+validate_component() {
+    vc_label=$1
+    vc_value=$2
+    [ -n "$vc_value" ] || fail "$vc_label is empty"
+    [ "${#vc_value}" -le 64 ] || fail "$vc_label is too long"
+    case "$vc_value" in *[!A-Za-z0-9._-]*) fail "$vc_label is invalid" ;; esac
+    case "$vc_value" in [A-Za-z0-9]*) ;; *) fail "$vc_label is invalid" ;; esac
+}
+
+canonical_direct_child() {
+    cdc_label=$1
+    cdc_root=$2
+    cdc_child=$3
+    cdc_canonical_root=$(canonical_directory "$cdc_label root" "$cdc_root")
+    validate_component "$cdc_label name" "$cdc_child"
+    cdc_path=$cdc_canonical_root/$cdc_child
+    [ -e "$cdc_path" ] || fail "$cdc_label is unavailable"
+    [ ! -L "$cdc_path" ] || fail "$cdc_label may not be a symbolic link"
+    cdc_canonical=$(readlink -e -- "$cdc_path") || fail "$cdc_label cannot be canonicalized"
+    [ "$cdc_canonical" = "$cdc_path" ] || fail "$cdc_label must be a canonical direct child"
+    [ "$(dirname -- "$cdc_canonical")" = "$cdc_canonical_root" ] || \
+        fail "$cdc_label is outside its owned root"
+    printf '%s\n' "$cdc_canonical"
+}
+
+release_directory() {
+    rd_release_id=$1
+    validate_component 'release ID' "$rd_release_id"
+    canonical_direct_child 'release' "$RELEASE_ROOT" "$rd_release_id"
+}
+
+current_release() {
+    [ -L "$CURRENT_LINK" ] || return 1
+    cr_target=$(readlink -e -- "$CURRENT_LINK") || fail 'current release link is dangling'
+    cr_root=$(canonical_directory 'release root' "$RELEASE_ROOT")
+    [ "$(dirname -- "$cr_target")" = "$cr_root" ] || fail 'current release is outside release root'
+    [ -d "$cr_target" ] && [ ! -L "$cr_target" ] || fail 'current release is invalid'
+    printf '%s\n' "$cr_target"
+}
+
+canonical_owned_directory() {
+    cod_label=$1
+    cod_value=$(canonical_directory "$cod_label" "$2")
+    cod_identity=$(stat -c '%u:%a' "$cod_value")
+    cod_owner=${cod_identity%%:*}
+    cod_mode=${cod_identity#*:}
+    [ "$cod_owner" -eq 0 ] || fail "$cod_label must be root-owned"
+    case "$cod_mode" in
+        *[2367][0-7]|*[0-7][2367]) fail "$cod_label may not be group- or world-writable" ;;
+    esac
+    printf '%s\n' "$cod_value"
+}
+
+install_operations_bundle() {
+    iob_source=$(canonical_directory 'operations bundle source' "$PRODUCTION_ROOT")
+    iob_parent=$(canonical_owned_directory \
+        'operations bundle parent' "$(dirname -- "$OPERATIONS_BUNDLE_ROOT")")
+    iob_name=$(basename -- "$OPERATIONS_BUNDLE_ROOT")
+    validate_component 'operations bundle name' "$iob_name"
+    [ "$OPERATIONS_BUNDLE_ROOT" = "$iob_parent/$iob_name" ] || \
+        fail 'operations bundle destination must be a canonical direct child'
+    if [ -e "$OPERATIONS_BUNDLE_ROOT" ] || [ -L "$OPERATIONS_BUNDLE_ROOT" ]; then
+        iob_existing=$(canonical_direct_child \
+            'installed operations bundle' "$iob_parent" "$iob_name")
+        [ "$iob_existing" = "$iob_source" ] || \
+            fail 'an independently installed operations bundle already exists'
+        printf '%s\n' "$iob_existing"
+        return 0
+    fi
+    iob_smoke_source=$iob_source/tools/run_production_smoke.py
+    if [ ! -f "$iob_smoke_source" ]; then
+        iob_smoke_source=$iob_source/../../tools/run_production_smoke.py
+    fi
+    [ -f "$iob_smoke_source" ] && [ ! -L "$iob_smoke_source" ] || \
+        fail 'operations bundle smoke runner is unavailable'
+    iob_staging=$iob_parent/.operations-stage-$$
+    [ ! -e "$iob_staging" ] && [ ! -L "$iob_staging" ] || \
+        fail 'operations bundle staging path already exists'
+    (
+        iob_complete=false
+        # Invoked by the subshell EXIT trap below.
+        # shellcheck disable=SC2329
+        iob_cleanup() {
+            iob_status=$?
+            trap - 0 1 2 15
+            if [ "$iob_complete" = false ]; then rm -rf -- "$iob_staging"; fi
+            exit "$iob_status"
+        }
+        # Invoked by the signal traps below.
+        # shellcheck disable=SC2329
+        iob_signal() {
+            iob_signal_number=$1
+            trap - 1 2 15
+            exit $((128 + iob_signal_number))
+        }
+        trap iob_cleanup 0
+        trap 'iob_signal 1' 1
+        trap 'iob_signal 2' 2
+        trap 'iob_signal 15' 15
+        install -d -o root -g root -m 0755 "$iob_staging"
+        cp -a "$iob_source"/. "$iob_staging"/
+        install -d -o root -g root -m 0755 "$iob_staging/tools"
+        install -o root -g root -m 0644 \
+            "$iob_smoke_source" "$iob_staging/tools/run_production_smoke.py"
+        if find "$iob_staging" -type l -print | grep -q .; then
+            fail 'operations bundle contains a symbolic link'
+        fi
+        if find "$iob_staging" ! -type d ! -type f -print | grep -q .; then
+            fail 'operations bundle contains a special filesystem object'
+        fi
+        chown -R root:root "$iob_staging"
+        find "$iob_staging" -type d -exec chmod 0755 {} +
+        find "$iob_staging" -type f -exec chmod 0644 {} +
+        chmod 0755 "$iob_staging/bin/"*
+        sync -f "$iob_staging"
+        mv -T "$iob_staging" "$OPERATIONS_BUNDLE_ROOT"
+        sync -f "$iob_parent"
+        iob_complete=true
+    )
+    canonical_direct_child 'installed operations bundle' "$iob_parent" "$iob_name"
+}
+
+initialize_operation_lock() {
+    state=$(canonical_owned_directory 'state root' "$STATE_ROOT")
+    [ "$OPERATION_LOCK" = "$state/operations.lock" ] || \
+        fail 'operation lock override differs from the canonical state root'
+    if [ ! -e "$OPERATION_LOCK" ] && [ ! -L "$OPERATION_LOCK" ]; then
+        install -o root -g postgres -m 0660 /dev/null "$OPERATION_LOCK"
+    fi
+    require_operation_lock
+}
+
+require_operation_lock() {
+    state=$(canonical_owned_directory 'state root' "$STATE_ROOT")
+    [ "$OPERATION_LOCK" = "$state/operations.lock" ] || \
+        fail 'operation lock override differs from the canonical state root'
+    [ -f "$OPERATION_LOCK" ] && [ ! -L "$OPERATION_LOCK" ] || \
+        fail 'shared operation lock is unavailable or unsafe'
+    operation_lock_group=$(id -g postgres) || fail 'postgres group identity is unavailable'
+    [ "$(stat -c '%u:%g:%a:%h' "$OPERATION_LOCK")" = "0:$operation_lock_group:660:1" ] || \
+        fail 'shared operation lock metadata is unsafe'
+}
+
+require_root() {
+    [ "$(id -u)" -eq 0 ] || fail 'this operation requires root'
+}
+
+run_as_postgres() {
+    if [ "$(id -u)" -eq 0 ]; then
+        runuser -u postgres -- "$@"
+    elif [ "$(id -un)" = postgres ]; then
+        "$@"
+    else
+        fail 'operation must run as root or postgres'
+    fi
+}
+
+load_environment() {
+    if [ -r "$ENV_FILE" ]; then
+        [ -f "$ENV_FILE" ] && [ ! -L "$ENV_FILE" ] || \
+            fail 'production environment file is unavailable or unsafe'
+        env_identity=$(stat -c '%u:%g:%a:%h' "$ENV_FILE")
+        case "$env_identity" in 0:0:400:1|0:0:600:1|0:0:640:1) ;; \
+            *) fail 'production environment file metadata is unsafe' ;; esac
+        env_canonical=$(readlink -e -- "$ENV_FILE") || \
+            fail 'production environment file cannot be canonicalized'
+        [ "$env_canonical" = "$ENV_FILE" ] || \
+            fail 'production environment file must use a canonical path'
+        # shellcheck disable=SC1090
+        . "$ENV_FILE"
+    fi
+    for name in \
+        TME_PUBLIC_HOST TME_PUBLIC_ORIGIN TME_OPERATOR_SSH_CIDR \
+        TME_BACKUP_REPOSITORY TME_BACKUP_REPOSITORY_KIND \
+        TME_RELEASE_ID TME_PUBLIC_LISTEN TME_OPS_LISTEN \
+        TME_DATABASE_NAME TME_BOOTSTRAP_MANIFEST TME_BANNED_TERMS_FILE \
+        TME_RECOVERY_KEY_ESCROW_ACK
+    do
+        case "$name" in
+            TME_PUBLIC_HOST) value=${TME_PUBLIC_HOST-} ;;
+            TME_PUBLIC_ORIGIN) value=${TME_PUBLIC_ORIGIN-} ;;
+            TME_OPERATOR_SSH_CIDR) value=${TME_OPERATOR_SSH_CIDR-} ;;
+            TME_BACKUP_REPOSITORY) value=${TME_BACKUP_REPOSITORY-} ;;
+            TME_BACKUP_REPOSITORY_KIND) value=${TME_BACKUP_REPOSITORY_KIND-} ;;
+            TME_RELEASE_ID) value=${TME_RELEASE_ID-} ;;
+            TME_PUBLIC_LISTEN) value=${TME_PUBLIC_LISTEN-} ;;
+            TME_OPS_LISTEN) value=${TME_OPS_LISTEN-} ;;
+            TME_DATABASE_NAME) value=${TME_DATABASE_NAME-} ;;
+            TME_BOOTSTRAP_MANIFEST) value=${TME_BOOTSTRAP_MANIFEST-} ;;
+            TME_BANNED_TERMS_FILE) value=${TME_BANNED_TERMS_FILE-} ;;
+            TME_RECOVERY_KEY_ESCROW_ACK) value=${TME_RECOVERY_KEY_ESCROW_ACK-} ;;
+            *) fail 'internal required-input registry is invalid' ;;
+        esac
+        [ -n "$value" ] || fail "required production input is absent: $name"
+        case "$value" in
+            REQUIRED*) fail "required production input is unresolved: $name" ;;
+        esac
+    done
+}
+
+credential_file() {
+    cf_name=$1
+    case "$cf_name" in
+        database-url|auth-database-url|migrator-database-url|smoke-username-one|smoke-password-one|smoke-username-two|smoke-password-two|webhook-url)
+            cf_expected_mode=400
+            ;;
+        migrator-pgpass|monitor-pgpass)
+            cf_expected_mode=600
+            ;;
+        *) fail "credential name is not registered: $cf_name" ;;
+    esac
+    cf_root=$(canonical_owned_directory 'credential root' "$CREDENTIAL_ROOT")
+    cf_path=$cf_root/$cf_name
+    [ -e "$cf_path" ] && [ ! -L "$cf_path" ] && [ -f "$cf_path" ] || \
+        fail "required credential is unavailable or unsafe: $cf_name"
+    cf_canonical=$(readlink -e -- "$cf_path") || fail "credential cannot be canonicalized: $cf_name"
+    [ "$cf_canonical" = "$cf_path" ] || fail "credential is not a canonical direct child: $cf_name"
+    [ -s "$cf_path" ] || fail "required credential is empty: $cf_name"
+    cf_identity=$(stat -c '%u:%g:%a:%h' "$cf_path")
+    [ "$cf_identity" = "0:0:$cf_expected_mode:1" ] || \
+        fail "credential ownership, mode, or link count is invalid: $cf_name"
+    cf_size=$(wc -c <"$cf_path")
+    [ "$cf_size" -le 8192 ] || fail "credential is too large: $cf_name"
+    cf_without_nul=$(tr -d '\000' <"$cf_path" | wc -c)
+    [ "$cf_without_nul" -eq "$cf_size" ] || fail "credential contains a NUL byte: $cf_name"
+    [ "$(tail -c 1 "$cf_path" | od -An -t u1 | tr -d ' ')" = 10 ] || \
+        fail "credential must end in exactly one newline: $cf_name"
+    [ "$(awk 'END { print NR }' "$cf_path")" -eq 1 ] || \
+        fail "credential must contain exactly one line: $cf_name"
+    cf_value=$(sed -n '1p' "$cf_path")
+    [ -n "$cf_value" ] || fail "required credential is empty: $cf_name"
+    case "$cf_value" in *"$(printf '\r')"*) fail "credential contains a carriage return: $cf_name" ;; esac
+    cf_upper=$(printf '%s' "$cf_value" | tr '[:lower:]' '[:upper:]')
+    case "$cf_upper" in
+        *REQUIRED*|*PLACEHOLDER*|*CHANGEME*|*TODO*)
+            fail "credential contains an unresolved placeholder: $cf_name"
+            ;;
+    esac
+    case "$cf_name" in
+        smoke-username-one|smoke-username-two)
+            case "$cf_value" in
+                *[!a-z0-9_]*|_[a-z0-9_]*|*[a-z0-9_]_)
+                    fail "smoke username credential is not canonical: $cf_name"
+                    ;;
+            esac
+            [ "${#cf_value}" -ge 3 ] && [ "${#cf_value}" -le 32 ] || \
+                fail "smoke username credential is not canonical: $cf_name"
+            ;;
+    esac
+    printf '%s\n' "$cf_path"
+}
+
+validate_database_url_credential() {
+    vduc_name=$1
+    vduc_role=$2
+    vduc_options=${3-}
+    case "$TME_DATABASE_NAME" in
+        ''|*[!A-Za-z0-9_]*) fail 'database name is unsafe for credential validation' ;;
+    esac
+    vduc_path=$(credential_file "$vduc_name")
+    vduc_value=$(sed -n '1p' "$vduc_path")
+    vduc_prefix=postgresql://$vduc_role:
+    vduc_suffix=@%2Fvar%2Frun%2Fpostgresql/$TME_DATABASE_NAME$vduc_options
+    case "$vduc_value" in "$vduc_prefix"*"$vduc_suffix") ;; \
+        *) fail "database credential target is invalid: $vduc_name" ;; esac
+    vduc_password=${vduc_value#"$vduc_prefix"}
+    vduc_password=${vduc_password%"$vduc_suffix"}
+    case "$vduc_password" in ''|*[!0-9a-f]*) \
+        fail "database credential password encoding is invalid: $vduc_name" ;; esac
+    [ "${#vduc_password}" -eq 64 ] || \
+        fail "database credential password length is invalid: $vduc_name"
+}
+
+validate_production_database_credentials() {
+    require_production_database_target
+    validate_database_url_credential database-url tme_runtime
+    validate_database_url_credential auth-database-url tme_auth
+    validate_database_url_credential migrator-database-url tme_migrator \
+        '?options=-c%20role%3Dtme_owner'
+}
+
+require_production_database_target() {
+    [ "${TME_DATABASE_SOCKET:-$PRODUCTION_DATABASE_SOCKET}" = \
+        "$PRODUCTION_DATABASE_SOCKET" ] || \
+        fail 'database socket override differs from the locked PostgreSQL 18 socket'
+    [ "${TME_DATABASE_PORT:-$PRODUCTION_DATABASE_PORT}" = \
+        "$PRODUCTION_DATABASE_PORT" ] || \
+        fail 'database port override differs from the locked PostgreSQL 18 port'
+}
+
+locked_value() {
+    key=$1
+    value=$(sed -n "s/^${key}=//p" "$VERSIONS_FILE")
+    [ -n "$value" ] || fail "version lock is missing: $key"
+    printf '%s\n' "$value"
+}
+
+require_loopback_address() {
+    name=$1
+    value=$2
+    case "$value" in
+        127.0.0.1:*|'[::1]':*) ;;
+        *) fail "$name must be loopback-only" ;;
+    esac
+}
+
+record_success() {
+    name=$1
+    directory=$OPERATIONS_ROOT
+    install -d -m 0750 "$directory"
+    temporary=$(mktemp "$directory/.$name.XXXXXX") || fail 'success temporary could not be created'
+    date -u +'%Y-%m-%dT%H:%M:%SZ' >"$temporary"
+    chmod 0640 "$temporary"
+    mv -f "$temporary" "$directory/$name"
+}

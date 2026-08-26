@@ -1,0 +1,179 @@
+{
+  "arrivals": {},
+  "id": "resource_movement",
+  "kind": "world_template",
+  "realms": {
+    "realm_0": {
+      "levels": {
+        "practice_hall": {
+          "cells": [
+            [
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ]
+            ],
+            [
+              [
+                "hall_wall"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "loose_matting"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "hall_wall"
+              ]
+            ],
+            [
+              [
+                "hall_wall"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "hall_wall"
+              ]
+            ],
+            [
+              [
+                "hall_wall"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "practice_floor"
+              ],
+              [
+                "hall_wall"
+              ]
+            ],
+            [
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ],
+              [
+                "hall_wall"
+              ]
+            ]
+          ],
+          "height": 5,
+          "law_zone": "none",
+          "maximum_clear_sightline": 7,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 9,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Resource Movement"
+    }
+  },
+  "schema_version": 3,
+  "topology": {},
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+}

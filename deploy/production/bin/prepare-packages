@@ -1,0 +1,105 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+"$PRODUCTION_ROOT/bin/host-preflight"
+
+package_root=${TME_PACKAGE_ROOT:-/var/tmp/tme-packages}
+[ ! -e "$package_root" ] || fail 'package directory already exists; review and remove it explicitly'
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y ca-certificates curl gnupg
+
+temporary=$(mktemp -d)
+trap 'rm -rf "$temporary"' EXIT HUP INT TERM
+
+pgdg_key=$temporary/apt.postgresql.org.asc
+caddy_key=$temporary/caddy.gpg.key
+curl --fail --proto '=https' --tlsv1.2 --silent --show-error \
+    --output "$pgdg_key" https://www.postgresql.org/media/keys/ACCC4CF8.asc
+curl --fail --proto '=https' --tlsv1.2 --silent --show-error \
+    --output "$caddy_key" https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+
+primary_fingerprint() {
+    gpg --show-keys --with-colons --fingerprint "$1" 2>/dev/null | \
+        awk -F: '$1 == "fpr" { print $10; exit }'
+}
+
+[ "$(primary_fingerprint "$pgdg_key")" = \
+    B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 ] || \
+    fail 'PostgreSQL Apt repository key fingerprint differs'
+[ "$(primary_fingerprint "$caddy_key")" = \
+    65760C51EDEA2017CEA2CA15155B6D79CA56EA34 ] || \
+    fail 'Caddy repository key fingerprint differs'
+
+install -d -o root -g root -m 0755 /usr/share/postgresql-common/pgdg \
+    /usr/share/keyrings
+install -o root -g root -m 0644 "$pgdg_key" \
+    /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+gpg --dearmor --batch --yes \
+    --output /usr/share/keyrings/caddy-stable-archive-keyring.gpg "$caddy_key"
+chmod 0644 /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+
+cat >/etc/apt/sources.list.d/pgdg.sources <<'EOF'
+Types: deb
+URIs: https://apt.postgresql.org/pub/repos/apt
+Suites: trixie-pgdg
+Architectures: amd64
+Components: main
+Signed-By: /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+EOF
+cat >/etc/apt/sources.list.d/caddy-stable.list <<'EOF'
+deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
+EOF
+chmod 0644 /etc/apt/sources.list.d/pgdg.sources \
+    /etc/apt/sources.list.d/caddy-stable.list
+apt-get update
+
+select_version() {
+    package=$1
+    expected=$2
+    apt-cache madison "$package" | awk -v expected="$expected" '
+        $3 == expected || index($3, expected "-") == 1 ||
+        index($3, expected "+") == 1 || index($3, expected "~") == 1 {
+            print $3
+            exit
+        }
+    '
+}
+
+caddy_package=$(select_version caddy "$(locked_value caddy_version)")
+postgres_package=$(select_version postgresql-18 "$(locked_value postgresql_version)")
+postgres_client_package=$(select_version postgresql-client-18 \
+    "$(locked_value postgresql_version)")
+pgbackrest_package=$(select_version pgbackrest "$(locked_value pgbackrest_version)")
+for selection in "$caddy_package" "$postgres_package" \
+    "$postgres_client_package" "$pgbackrest_package"
+do
+    [ -n "$selection" ] || fail 'one or more pinned packages are unavailable'
+done
+
+apt-get clean
+apt-get install -y --download-only --no-install-recommends \
+    "caddy=$caddy_package" \
+    "postgresql-18=$postgres_package" \
+    "postgresql-client-18=$postgres_client_package" \
+    "pgbackrest=$pgbackrest_package" \
+    jq nftables python3
+
+install -d -o root -g root -m 0755 "$package_root"
+cp /var/cache/apt/archives/*.deb "$package_root"/
+(
+    cd "$package_root"
+    for package in ./*.deb; do
+        # dpkg-deb expands these package-field expressions, not the shell.
+        # shellcheck disable=SC2016
+        dpkg-deb --show --showformat='${Package}\t${Version}\t${Architecture}\n' \
+            "$package"
+    done | LC_ALL=C sort >PACKAGE-VERSIONS
+    sha256sum ./*.deb PACKAGE-VERSIONS >SHA256SUMS
+    sha256sum -c SHA256SUMS
+)
+printf '%s\n' "prepare-packages: reviewed package closure written to $package_root"

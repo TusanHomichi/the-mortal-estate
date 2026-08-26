@@ -1,0 +1,219 @@
+The Mortal Estate local simulation
+scenario: first_land_structure
+seed: 7
+
+loaded "First Land Structure Walk" realms=[testland] levels=[testland/bank_interior, testland/lake_level, testland/lower_halls, testland/old_temple, testland/surface, testland/upper_halls]
+player Edda (Wizard) at testland/surface:25,62 hp=20
+npc Sera at testland/surface:23,51 hp=20
+npc Oren at testland/surface:16,43 hp=20
+npc Maelin at testland/surface:18,43 hp=20
+npc Elian Voss at testland/bank_interior:7,4 hp=20
+npc Tamsin at testland/surface:36,31 hp=20
+npc Isolde at testland/surface:142,31 hp=20
+ecology site lake_level_causeway_guard spawned gargoyle as ecology:lake_level_causeway_guard:gargoyle:0 generation 0 at testland/lake_level:25,21
+ecology site lake_level_east_galleries spawned scrounger_a as ecology:lake_level_east_galleries:scrounger_a:0 generation 0 at testland/lake_level:39,3
+ecology site lake_level_east_galleries spawned scrounger_b as ecology:lake_level_east_galleries:scrounger_b:0 generation 0 at testland/lake_level:41,5
+ecology site lake_level_east_galleries spawned veteran as ecology:lake_level_east_galleries:veteran:0 generation 0 at testland/lake_level:43,4
+ecology site lake_level_fringe spawned salamander as ecology:lake_level_fringe:salamander:0 generation 0 at testland/lake_level:33,15
+ecology site lake_level_fringe spawned wight as ecology:lake_level_fringe:wight:0 generation 0 at testland/lake_level:35,14
+ecology site lake_level_kobold_strays spawned forager_a as ecology:lake_level_kobold_strays:forager_a:0 generation 0 at testland/lake_level:21,3
+ecology site lake_level_kobold_strays spawned forager_b as ecology:lake_level_kobold_strays:forager_b:0 generation 0 at testland/lake_level:21,5
+ecology site lake_level_northwest_landing spawned veteran as ecology:lake_level_northwest_landing:veteran:0 generation 0 at testland/lake_level:3,4
+ecology site lake_level_northwest_landing spawned archer as ecology:lake_level_northwest_landing:archer:0 generation 0 at testland/lake_level:5,4
+ecology site lake_level_surface_landing spawned troll as ecology:lake_level_surface_landing:troll:0 generation 0 at testland/lake_level:8,14
+ecology site lake_level_surface_landing spawned gargoyle as ecology:lake_level_surface_landing:gargoyle:0 generation 0 at testland/lake_level:7,15
+ecology site lake_level_temple_approach spawned wraith as ecology:lake_level_temple_approach:wraith:0 generation 0 at testland/lake_level:28,32
+ecology site lake_level_temple_approach spawned troll as ecology:lake_level_temple_approach:troll:0 generation 0 at testland/lake_level:30,33
+ecology site lake_level_temple_approach spawned archer_a as ecology:lake_level_temple_approach:archer_a:0 generation 0 at testland/lake_level:32,33
+ecology site lake_level_temple_approach spawned archer_b as ecology:lake_level_temple_approach:archer_b:0 generation 0 at testland/lake_level:34,33
+ecology site lower_halls_lair_approach spawned troll_a as ecology:lower_halls_lair_approach:troll_a:0 generation 0 at testland/lower_halls:43,23
+ecology site lower_halls_lair_approach spawned troll_b as ecology:lower_halls_lair_approach:troll_b:0 generation 0 at testland/lower_halls:45,23
+ecology site lower_halls_lair_approach spawned spider as ecology:lower_halls_lair_approach:spider:0 generation 0 at testland/lower_halls:47,23
+ecology site lower_halls_pit_ambush spawned spider_a as ecology:lower_halls_pit_ambush:spider_a:0 generation 0 at testland/lower_halls:16,21
+ecology site lower_halls_pit_ambush spawned spider_b as ecology:lower_halls_pit_ambush:spider_b:0 generation 0 at testland/lower_halls:21,21
+ecology site lower_halls_pit_ambush spawned spider_c as ecology:lower_halls_pit_ambush:spider_c:0 generation 0 at testland/lower_halls:22,21
+ecology site lower_halls_portal_watch spawned archer_a as ecology:lower_halls_portal_watch:archer_a:0 generation 0 at testland/lower_halls:39,33
+ecology site lower_halls_portal_watch spawned archer_b as ecology:lower_halls_portal_watch:archer_b:0 generation 0 at testland/lower_halls:42,33
+ecology site lower_halls_portal_watch spawned gargoyle as ecology:lower_halls_portal_watch:gargoyle:0 generation 0 at testland/lower_halls:44,32
+ecology site lower_halls_portal_watch spawned wraith as ecology:lower_halls_portal_watch:wraith:0 generation 0 at testland/lower_halls:43,33
+ecology site lower_halls_shrine_watch spawned wight as ecology:lower_halls_shrine_watch:wight:0 generation 0 at testland/lower_halls:19,23
+ecology site lower_halls_shrine_watch spawned watch_a as ecology:lower_halls_shrine_watch:watch_a:0 generation 0 at testland/lower_halls:21,30
+ecology site lower_halls_shrine_watch spawned watch_b as ecology:lower_halls_shrine_watch:watch_b:0 generation 0 at testland/lower_halls:23,30
+ecology site lower_halls_upper_landing spawned scrounger_a as ecology:lower_halls_upper_landing:scrounger_a:0 generation 0 at testland/lower_halls:13,6
+ecology site lower_halls_upper_landing spawned scrounger_b as ecology:lower_halls_upper_landing:scrounger_b:0 generation 0 at testland/lower_halls:15,6
+ecology site lower_halls_upper_landing spawned raider as ecology:lower_halls_upper_landing:raider:0 generation 0 at testland/lower_halls:19,5
+ecology site lower_halls_west_galleries spawned raider_a as ecology:lower_halls_west_galleries:raider_a:0 generation 0 at testland/lower_halls:3,21
+ecology site lower_halls_west_galleries spawned raider_b as ecology:lower_halls_west_galleries:raider_b:0 generation 0 at testland/lower_halls:5,20
+ecology site lower_halls_west_galleries spawned raider_c as ecology:lower_halls_west_galleries:raider_c:0 generation 0 at testland/lower_halls:4,22
+ecology site old_temple_crypt_lair spawned crypt_wraith as ecology:old_temple_crypt_lair:crypt_wraith:0 generation 0 at testland/old_temple:23,33
+ecology site old_temple_crypt_lair spawned ghoul as ecology:old_temple_crypt_lair:ghoul:0 generation 0 at testland/old_temple:26,32
+ecology site old_temple_crypt_lair spawned wraith as ecology:old_temple_crypt_lair:wraith:0 generation 0 at testland/old_temple:28,32
+ecology site old_temple_dark_hall spawned ghoul_a as ecology:old_temple_dark_hall:ghoul_a:0 generation 0 at testland/old_temple:3,32
+ecology site old_temple_dark_hall spawned ghoul_b as ecology:old_temple_dark_hall:ghoul_b:0 generation 0 at testland/old_temple:5,33
+ecology site old_temple_dark_hall spawned ghoul_c as ecology:old_temple_dark_hall:ghoul_c:0 generation 0 at testland/old_temple:9,32
+ecology site old_temple_lake_landing spawned veteran_a as ecology:old_temple_lake_landing:veteran_a:0 generation 0 at testland/old_temple:3,6
+ecology site old_temple_lake_landing spawned veteran_b as ecology:old_temple_lake_landing:veteran_b:0 generation 0 at testland/old_temple:5,6
+ecology site old_temple_lake_landing spawned archer as ecology:old_temple_lake_landing:archer:0 generation 0 at testland/old_temple:13,6
+ecology site old_temple_sanctuary_watch spawned gargoyle as ecology:old_temple_sanctuary_watch:gargoyle:0 generation 0 at testland/old_temple:23,3
+ecology site old_temple_sanctuary_watch spawned wight_a as ecology:old_temple_sanctuary_watch:wight_a:0 generation 0 at testland/old_temple:30,3
+ecology site old_temple_sanctuary_watch spawned wight_b as ecology:old_temple_sanctuary_watch:wight_b:0 generation 0 at testland/old_temple:24,5
+ecology site old_temple_sanctuary_watch spawned troll as ecology:old_temple_sanctuary_watch:troll:0 generation 0 at testland/old_temple:28,5
+ecology site old_temple_spectral_passage spawned wraith as ecology:old_temple_spectral_passage:wraith:0 generation 0 at testland/old_temple:15,15
+ecology site old_temple_spectral_passage spawned specter_a as ecology:old_temple_spectral_passage:specter_a:0 generation 0 at testland/old_temple:16,21
+ecology site old_temple_spectral_passage spawned specter_b as ecology:old_temple_spectral_passage:specter_b:0 generation 0 at testland/old_temple:21,21
+ecology site old_temple_summoning_approach spawned minotaur as ecology:old_temple_summoning_approach:minotaur:0 generation 0 at testland/old_temple:39,15
+ecology site old_temple_summoning_approach spawned salamander as ecology:old_temple_summoning_approach:salamander:0 generation 0 at testland/old_temple:42,21
+ecology site old_temple_summoning_lair spawned dragon as ecology:old_temple_summoning_lair:dragon:0 generation 0 at testland/old_temple:50,14
+ecology site old_temple_summoning_lair spawned salamander as ecology:old_temple_summoning_lair:salamander:0 generation 0 at testland/old_temple:51,15
+ecology site surface_dock_crocodile spawned crocodile as ecology:surface_dock_crocodile:crocodile:0 generation 0 at testland/surface:29,57
+ecology site surface_east_bowguards spawned bowguard_a as ecology:surface_east_bowguards:bowguard_a:0 generation 0 at testland/surface:86,19
+ecology site surface_east_bowguards spawned bowguard_b as ecology:surface_east_bowguards:bowguard_b:0 generation 0 at testland/surface:94,26
+ecology site surface_east_portal_magus spawned magus as ecology:surface_east_portal_magus:magus:0 generation 0 at testland/surface:151,32
+ecology site surface_forge_approach spawned archer as ecology:surface_forge_approach:archer:0 generation 0 at testland/surface:68,39
+ecology site surface_forge_approach spawned wraith as ecology:surface_forge_approach:wraith:0 generation 0 at testland/surface:70,41
+ecology site surface_gate_boars spawned boar_a as ecology:surface_gate_boars:boar_a:0 generation 0 at testland/surface:49,34
+ecology site surface_gate_boars spawned boar_b as ecology:surface_gate_boars:boar_b:0 generation 0 at testland/surface:51,36
+ecology site surface_great_bear spawned great_bear as ecology:surface_great_bear:great_bear:0 generation 0 at testland/surface:146,19
+ecology site surface_low_road_wolves spawned wolf_a as ecology:surface_low_road_wolves:wolf_a:0 generation 0 at testland/surface:58,22
+ecology site surface_low_road_wolves spawned wolf_b as ecology:surface_low_road_wolves:wolf_b:0 generation 0 at testland/surface:65,31
+ecology site surface_low_road_wolves spawned wolf_c as ecology:surface_low_road_wolves:wolf_c:0 generation 0 at testland/surface:72,24
+ecology site surface_pit_guard spawned troll as ecology:surface_pit_guard:troll:0 generation 0 at testland/surface:70,45
+ecology site surface_pit_guard spawned gargoyle as ecology:surface_pit_guard:gargoyle:0 generation 0 at testland/surface:75,46
+ecology site surface_shrine_approach spawned raptor as ecology:surface_shrine_approach:raptor:0 generation 0 at testland/surface:131,27
+ecology site surface_shrine_approach spawned bear as ecology:surface_shrine_approach:bear:0 generation 0 at testland/surface:134,33
+ecology site surface_tiger_run spawned tiger as ecology:surface_tiger_run:tiger:0 generation 0 at testland/surface:118,45
+ecology site surface_town_hounds spawned hound_a as ecology:surface_town_hounds:hound_a:0 generation 0 at testland/surface:36,37
+ecology site surface_town_hounds spawned hound_b as ecology:surface_town_hounds:hound_b:0 generation 0 at testland/surface:38,39
+ecology site upper_halls_deep_warren spawned forager_a as ecology:upper_halls_deep_warren:forager_a:0 generation 0 at testland/upper_halls:13,30
+ecology site upper_halls_deep_warren spawned forager_b as ecology:upper_halls_deep_warren:forager_b:0 generation 0 at testland/upper_halls:15,30
+ecology site upper_halls_deep_warren spawned forager_c as ecology:upper_halls_deep_warren:forager_c:0 generation 0 at testland/upper_halls:15,31
+ecology site upper_halls_foragers spawned forager_a as ecology:upper_halls_foragers:forager_a:0 generation 0 at testland/upper_halls:28,6
+ecology site upper_halls_foragers spawned forager_b as ecology:upper_halls_foragers:forager_b:0 generation 0 at testland/upper_halls:31,6
+ecology site upper_halls_foragers spawned forager_c as ecology:upper_halls_foragers:forager_c:0 generation 0 at testland/upper_halls:31,5
+ecology site upper_halls_hidden_lair spawned lair_troll as ecology:upper_halls_hidden_lair:lair_troll:0 generation 0 at testland/upper_halls:47,3
+ecology site upper_halls_hidden_lair spawned troll as ecology:upper_halls_hidden_lair:troll:0 generation 0 at testland/upper_halls:47,5
+ecology site upper_halls_lower_guard spawned raider_a as ecology:upper_halls_lower_guard:raider_a:0 generation 0 at testland/upper_halls:28,33
+ecology site upper_halls_lower_guard spawned raider_b as ecology:upper_halls_lower_guard:raider_b:0 generation 0 at testland/upper_halls:30,33
+ecology site upper_halls_lower_guard spawned watch as ecology:upper_halls_lower_guard:watch:0 generation 0 at testland/upper_halls:29,33
+ecology site upper_halls_raiders spawned raider_a as ecology:upper_halls_raiders:raider_a:0 generation 0 at testland/upper_halls:18,23
+ecology site upper_halls_raiders spawned raider_b as ecology:upper_halls_raiders:raider_b:0 generation 0 at testland/upper_halls:21,23
+ecology site upper_halls_raiders spawned forager as ecology:upper_halls_raiders:forager:0 generation 0 at testland/upper_halls:21,24
+ecology site upper_halls_watch spawned watch_a as ecology:upper_halls_watch:watch_a:0 generation 0 at testland/upper_halls:39,14
+ecology site upper_halls_watch spawned watch_b as ecology:upper_halls_watch:watch_b:0 generation 0 at testland/upper_halls:44,15
+ecology site upper_halls_west_bones spawned watch_a as ecology:upper_halls_west_bones:watch_a:0 generation 0 at testland/upper_halls:13,6
+ecology site upper_halls_west_bones spawned watch_b as ecology:upper_halls_west_bones:watch_b:0 generation 0 at testland/upper_halls:15,6
+
+player ready: Edda at 1
+Edda intent at 1: inspect
+Edda inspected at testland/surface:25,62: tile=Testland Bridge + South Dock
+  current tile: terrain=Testland Bridge + South Dock cost=1
+  north -> testland/surface:25,61: walkable terrain=Testland Bridge cost=1
+  northeast -> testland/surface:26,61: walkable terrain=Testland Bridge cost=1
+  east -> testland/surface:26,62: walkable terrain=Testland Bridge cost=1
+  southeast -> testland/surface:26,63: blocked terrain terrain=Deep Coastal Water
+  south -> testland/surface:25,63: walkable terrain=Testland Bridge cost=1
+  southwest -> testland/surface:24,63: blocked terrain terrain=Deep Coastal Water
+  west -> testland/surface:24,62: walkable terrain=Testland Bridge cost=1
+  northwest -> testland/surface:24,61: walkable terrain=Testland Bridge cost=1
+readiness scheduled: Edda cost=0 ready_at=1
+
+final state
+Edda (Wizard) at testland/surface:25,62 hp=20 alive
+Sera at testland/surface:23,51 hp=20 alive
+Oren at testland/surface:16,43 hp=20 alive
+Maelin at testland/surface:18,43 hp=20 alive
+Elian Voss at testland/bank_interior:7,4 hp=20 alive
+Tamsin at testland/surface:36,31 hp=20 alive
+Isolde at testland/surface:142,31 hp=20 alive
+a gargoyle [ecology:lake_level_causeway_guard:gargoyle:0] at testland/lake_level:25,21 hp=28 alive
+a goblin [ecology:lake_level_east_galleries:scrounger_a:0] at testland/lake_level:39,3 hp=14 alive
+a goblin [ecology:lake_level_east_galleries:scrounger_b:0] at testland/lake_level:41,5 hp=14 alive
+an orc [ecology:lake_level_east_galleries:veteran:0] at testland/lake_level:43,4 hp=34 alive
+a salamander [ecology:lake_level_fringe:salamander:0] at testland/lake_level:33,15 hp=38 alive
+a wight [ecology:lake_level_fringe:wight:0] at testland/lake_level:35,14 hp=36 alive
+a kobold [ecology:lake_level_kobold_strays:forager_a:0] at testland/lake_level:21,3 hp=8 alive
+a kobold [ecology:lake_level_kobold_strays:forager_b:0] at testland/lake_level:21,5 hp=8 alive
+an orc [ecology:lake_level_northwest_landing:veteran:0] at testland/lake_level:3,4 hp=34 alive
+a hobgoblin [ecology:lake_level_northwest_landing:archer:0] at testland/lake_level:5,4 hp=20 alive
+a troll [ecology:lake_level_surface_landing:troll:0] at testland/lake_level:8,14 hp=38 alive
+a gargoyle [ecology:lake_level_surface_landing:gargoyle:0] at testland/lake_level:7,15 hp=28 alive
+a wraith [ecology:lake_level_temple_approach:wraith:0] at testland/lake_level:28,32 hp=30 alive
+a troll [ecology:lake_level_temple_approach:troll:0] at testland/lake_level:30,33 hp=38 alive
+a hobgoblin [ecology:lake_level_temple_approach:archer_a:0] at testland/lake_level:32,33 hp=20 alive
+a hobgoblin [ecology:lake_level_temple_approach:archer_b:0] at testland/lake_level:34,33 hp=20 alive
+a troll [ecology:lower_halls_lair_approach:troll_a:0] at testland/lower_halls:43,23 hp=38 alive
+a troll [ecology:lower_halls_lair_approach:troll_b:0] at testland/lower_halls:45,23 hp=38 alive
+a giant spider [ecology:lower_halls_lair_approach:spider:0] at testland/lower_halls:47,23 hp=18 alive
+a giant spider [ecology:lower_halls_pit_ambush:spider_a:0] at testland/lower_halls:16,21 hp=18 alive
+a giant spider [ecology:lower_halls_pit_ambush:spider_b:0] at testland/lower_halls:21,21 hp=18 alive
+a giant spider [ecology:lower_halls_pit_ambush:spider_c:0] at testland/lower_halls:22,21 hp=18 alive
+a hobgoblin [ecology:lower_halls_portal_watch:archer_a:0] at testland/lower_halls:39,33 hp=20 alive
+a hobgoblin [ecology:lower_halls_portal_watch:archer_b:0] at testland/lower_halls:42,33 hp=20 alive
+a gargoyle [ecology:lower_halls_portal_watch:gargoyle:0] at testland/lower_halls:44,32 hp=28 alive
+a wraith [ecology:lower_halls_portal_watch:wraith:0] at testland/lower_halls:43,33 hp=30 alive
+a wight [ecology:lower_halls_shrine_watch:wight:0] at testland/lower_halls:19,23 hp=36 alive
+a skeleton [ecology:lower_halls_shrine_watch:watch_a:0] at testland/lower_halls:21,30 hp=10 alive
+a skeleton [ecology:lower_halls_shrine_watch:watch_b:0] at testland/lower_halls:23,30 hp=10 alive
+a goblin [ecology:lower_halls_upper_landing:scrounger_a:0] at testland/lower_halls:13,6 hp=14 alive
+a goblin [ecology:lower_halls_upper_landing:scrounger_b:0] at testland/lower_halls:15,6 hp=14 alive
+an orc [ecology:lower_halls_upper_landing:raider:0] at testland/lower_halls:19,5 hp=12 alive
+an orc [ecology:lower_halls_west_galleries:raider_a:0] at testland/lower_halls:3,21 hp=12 alive
+an orc [ecology:lower_halls_west_galleries:raider_b:0] at testland/lower_halls:5,20 hp=12 alive
+an orc [ecology:lower_halls_west_galleries:raider_c:0] at testland/lower_halls:4,22 hp=12 alive
+a wraith [ecology:old_temple_crypt_lair:crypt_wraith:0] at testland/old_temple:23,33 hp=220 alive
+a ghoul [ecology:old_temple_crypt_lair:ghoul:0] at testland/old_temple:26,32 hp=42 alive
+a wraith [ecology:old_temple_crypt_lair:wraith:0] at testland/old_temple:28,32 hp=30 alive
+a ghoul [ecology:old_temple_dark_hall:ghoul_a:0] at testland/old_temple:3,32 hp=42 alive
+a ghoul [ecology:old_temple_dark_hall:ghoul_b:0] at testland/old_temple:5,33 hp=42 alive
+a ghoul [ecology:old_temple_dark_hall:ghoul_c:0] at testland/old_temple:9,32 hp=42 alive
+an orc [ecology:old_temple_lake_landing:veteran_a:0] at testland/old_temple:3,6 hp=34 alive
+an orc [ecology:old_temple_lake_landing:veteran_b:0] at testland/old_temple:5,6 hp=34 alive
+a hobgoblin [ecology:old_temple_lake_landing:archer:0] at testland/old_temple:13,6 hp=20 alive
+a gargoyle [ecology:old_temple_sanctuary_watch:gargoyle:0] at testland/old_temple:23,3 hp=28 alive
+a wight [ecology:old_temple_sanctuary_watch:wight_a:0] at testland/old_temple:30,3 hp=36 alive
+a wight [ecology:old_temple_sanctuary_watch:wight_b:0] at testland/old_temple:24,5 hp=36 alive
+a troll [ecology:old_temple_sanctuary_watch:troll:0] at testland/old_temple:28,5 hp=38 alive
+a wraith [ecology:old_temple_spectral_passage:wraith:0] at testland/old_temple:15,15 hp=30 alive
+a specter [ecology:old_temple_spectral_passage:specter_a:0] at testland/old_temple:16,21 hp=44 alive
+a specter [ecology:old_temple_spectral_passage:specter_b:0] at testland/old_temple:21,21 hp=44 alive
+a minotaur [ecology:old_temple_summoning_approach:minotaur:0] at testland/old_temple:39,15 hp=60 alive
+a salamander [ecology:old_temple_summoning_approach:salamander:0] at testland/old_temple:42,21 hp=38 alive
+a red dragon [ecology:old_temple_summoning_lair:dragon:0] at testland/old_temple:50,14 hp=260 alive
+a salamander [ecology:old_temple_summoning_lair:salamander:0] at testland/old_temple:51,15 hp=38 alive
+a crocodile [ecology:surface_dock_crocodile:crocodile:0] at testland/surface:29,57 hp=14 alive
+a centaur [ecology:surface_east_bowguards:bowguard_a:0] at testland/surface:86,19 hp=12 alive
+a centaur [ecology:surface_east_bowguards:bowguard_b:0] at testland/surface:94,26 hp=12 alive
+Istran [ecology:surface_east_portal_magus:magus:0] at testland/surface:151,32 hp=100 alive
+a hobgoblin [ecology:surface_forge_approach:archer:0] at testland/surface:68,39 hp=20 alive
+a wraith [ecology:surface_forge_approach:wraith:0] at testland/surface:70,41 hp=30 alive
+a boar [ecology:surface_gate_boars:boar_a:0] at testland/surface:49,34 hp=10 alive
+a boar [ecology:surface_gate_boars:boar_b:0] at testland/surface:51,36 hp=10 alive
+a great bear [ecology:surface_great_bear:great_bear:0] at testland/surface:146,19 hp=120 alive
+a wolf [ecology:surface_low_road_wolves:wolf_a:0] at testland/surface:58,22 hp=8 alive
+a wolf [ecology:surface_low_road_wolves:wolf_b:0] at testland/surface:65,31 hp=8 alive
+a wolf [ecology:surface_low_road_wolves:wolf_c:0] at testland/surface:72,24 hp=8 alive
+a troll [ecology:surface_pit_guard:troll:0] at testland/surface:70,45 hp=38 alive
+a gargoyle [ecology:surface_pit_guard:gargoyle:0] at testland/surface:75,46 hp=28 alive
+a raptor [ecology:surface_shrine_approach:raptor:0] at testland/surface:131,27 hp=14 alive
+a brown bear [ecology:surface_shrine_approach:bear:0] at testland/surface:134,33 hp=14 alive
+a tiger [ecology:surface_tiger_run:tiger:0] at testland/surface:118,45 hp=12 alive
+a hound [ecology:surface_town_hounds:hound_a:0] at testland/surface:36,37 hp=10 alive
+a hound [ecology:surface_town_hounds:hound_b:0] at testland/surface:38,39 hp=10 alive
+a kobold [ecology:upper_halls_deep_warren:forager_a:0] at testland/upper_halls:13,30 hp=8 alive
+a kobold [ecology:upper_halls_deep_warren:forager_b:0] at testland/upper_halls:15,30 hp=8 alive
+a kobold [ecology:upper_halls_deep_warren:forager_c:0] at testland/upper_halls:15,31 hp=8 alive
+a kobold [ecology:upper_halls_foragers:forager_a:0] at testland/upper_halls:28,6 hp=8 alive
+a kobold [ecology:upper_halls_foragers:forager_b:0] at testland/upper_halls:31,6 hp=8 alive
+a kobold [ecology:upper_halls_foragers:forager_c:0] at testland/upper_halls:31,5 hp=8 alive
+a troll [ecology:upper_halls_hidden_lair:lair_troll:0] at testland/upper_halls:47,3 hp=140 alive
+a troll [ecology:upper_halls_hidden_lair:troll:0] at testland/upper_halls:47,5 hp=38 alive
+an orc [ecology:upper_halls_lower_guard:raider_a:0] at testland/upper_halls:28,33 hp=12 alive
+an orc [ecology:upper_halls_lower_guard:raider_b:0] at testland/upper_halls:30,33 hp=12 alive
+a skeleton [ecology:upper_halls_lower_guard:watch:0] at testland/upper_halls:29,33 hp=10 alive
+an orc [ecology:upper_halls_raiders:raider_a:0] at testland/upper_halls:18,23 hp=12 alive
+an orc [ecology:upper_halls_raiders:raider_b:0] at testland/upper_halls:21,23 hp=12 alive
+a kobold [ecology:upper_halls_raiders:forager:0] at testland/upper_halls:21,24 hp=8 alive
+a skeleton [ecology:upper_halls_watch:watch_a:0] at testland/upper_halls:39,14 hp=10 alive
+a skeleton [ecology:upper_halls_watch:watch_b:0] at testland/upper_halls:44,15 hp=10 alive
+a skeleton [ecology:upper_halls_west_bones:watch_a:0] at testland/upper_halls:13,6 hp=10 alive
+a skeleton [ecology:upper_halls_west_bones:watch_b:0] at testland/upper_halls:15,6 hp=10 alive

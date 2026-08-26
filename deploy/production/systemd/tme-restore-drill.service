@@ -1,0 +1,19 @@
+[Unit]
+Description=TME isolated restore drill
+
+[Service]
+Type=oneshot
+User=postgres
+ExecStart=/opt/tme/operations/bin/restore-drill
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/tme/operations.lock /var/lib/tme/operations /var/lib/tme/restore-drill /var/log/pgbackrest /var/spool/pgbackrest

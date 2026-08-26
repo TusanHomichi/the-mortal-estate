@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "reach_attack",
+  "name": "Reach Attack",
+  "description": "A clean project-authored prototype fixture for neighboring-hex reach attacks.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project reach-attack fixture. Weapon profile, terrain labels, actor names, script, and numeric tuning are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/reach_attack.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/reach_attack",
+  "world_template": "world_templates/reach_attack.json",
+  "simulation_seed": "simulation_seeds/reach_attack.json",
+  "script": [
+    {
+      "physical_attack": {
+        "mode": "poke",
+        "target_actor_id": "reedling",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

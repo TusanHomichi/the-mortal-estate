@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "restoration_services",
+  "name": "Restoration Services",
+  "description": "Original clean healer and temple proof for shared restoration transactions.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, layout, items, prices, and resource values. This fixture proves restoration ownership and transaction flow without claiming unresolved target tuning or provider placement.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/restoration_services.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/restoration_services",
+  "world_template": "world_templates/restoration_services.json",
+  "simulation_seed": "simulation_seeds/restoration_services.json",
+  "script": [
+    {
+      "use_restoration_service": {
+        "service_id": "tme_healer",
+        "capability_id": "healer_restoration",
+        "operation_id": "restore_hit_points",
+        "item_instance_id": null,
+        "corpse_id": null
+      }
+    },
+    {
+      "use_restoration_service": {
+        "service_id": "tme_healer",
+        "capability_id": "healer_restoration",
+        "operation_id": "restore_magic_points",
+        "item_instance_id": null,
+        "corpse_id": null
+      }
+    },
+    {
+      "use_restoration_service": {
+        "service_id": "tme_healer",
+        "capability_id": "healer_restoration",
+        "operation_id": "restore_stamina",
+        "item_instance_id": null,
+        "corpse_id": null
+      }
+    },
+    {
+      "use_restoration_service": {
+        "service_id": "tme_healer",
+        "capability_id": "healer_restoration",
+        "operation_id": "cure_blindness_for_token",
+        "item_instance_id": "clearwater_token",
+        "corpse_id": null
+      }
+    },
+    {
+      "use_restoration_service": {
+        "service_id": "tme_healer",
+        "capability_id": "healer_restoration",
+        "operation_id": "cure_poison",
+        "item_instance_id": null,
+        "corpse_id": null
+      }
+    },
+    {
+      "show_sack": true
+    },
+    {
+      "move_path": [
+        "east",
+        "east"
+      ]
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

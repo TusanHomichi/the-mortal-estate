@@ -1,0 +1,127 @@
+extern crate self as tme_rules;
+
+pub mod combat;
+pub mod content;
+pub mod engine;
+pub mod events;
+pub mod model;
+pub mod rng;
+pub mod view;
+
+pub use combat::{
+    CombatAttackModeRules, CombatBlockRules, CombatDamageRules, CombatFumbleRules, CombatHitRules,
+    CombatJumpkickRules, CombatKickRules, CombatPracticeRules, CombatRules, CombatTuningStatus,
+    CombatWoundRules, DamageLabel,
+};
+pub use content::*;
+pub use engine::{
+    CheckpointError, ContentIdentityV1, Engine, FACET_CHECKPOINT_SCHEMA_VERSION, FacetCheckpointV4,
+    GameDefinition, PLAYER_OBSERVATION_RADIUS, RulesOutcomeV1, StepError, ValidatedWorldSeed,
+};
+pub use events::{
+    AccountMarkAssessmentReasonV1, ActorSummary, AlignmentChangeReasonV1, AutomaticActorDecisionV1,
+    AutomaticMovementPurposeV1, AutomaticWaitReasonV1, BanishResultReasonV1,
+    BankBalanceChangeReasonV1, ClassDemotionReasonV1, EcologyLifecyclePolicyV1, Event,
+    GoldLocationViewV1, GoldRelocationReason, InspectActor, InspectExit, InspectExitStatus,
+    InspectGroundItem, ItemConsumptionReason, ItemLocationViewV1, ItemOfferCompletionReasonV1,
+    ItemRelocationReason, KarmaChangeReasonV1, NpcFollowDecisionV1, NpcFollowWaitReasonV1,
+    NpcGrudgeReasonV1, PromotionSpellGrantViewV1, RaiseDeadResultReasonV1,
+    SelfDefenseChangeReasonV1, SelfDefenseChangedEventV1, SocialConsequenceSourceV1,
+    SpellCastFailure, SpellFizzleCause, SpellPathFailureReason, TransactionCostReceiptV1,
+    TransactionRewardReceiptV1, TransactionSourceV1, TransitionConcealmentRemovalReasonV1,
+};
+pub use model::{
+    AccountMarkAssessment, AccountMarkAssessmentReason, ActionCost, ActorAiBehavior, ActorAiState,
+    ActorAwarenessPolicy, ActorAwarenessState, ActorId, ActorKind, ActorLifeState,
+    ActorMagicResistanceState, ActorResourceActivity, ActorState, ActorTimingState,
+    AlignmentConsequenceReason, AttackRelationPlan, AttackSafety, AttackSafetyAssessment, BankId,
+    BankState, BlockSourceKind, BowReadiness, BowReadinessChangeReason, BurdenRules, BurdenTier,
+    CarriedGold, CarriedGoldPosition, CarriedLayout, CarriedPosition, CharacterAlignment,
+    CharacterAlignmentState, CharacterAttributes, CharacterId, CharacterIdentity,
+    CharacterPresenceState, CharacterProgression, CharacterResources, CharacterSheetV1,
+    CommunicationPreferences, ConcealedTransitionState, Coord, CorpseDisposition, CorpseId,
+    CorpseState, CreatureTrait, DeathCause, DefeatContributionKey, DefeatContributionLedger,
+    DefeatRewardClass, DefeatRewardUnitContribution, DefeatRewardUnitId, Direction, DoorState,
+    DurableGameplayEffectV1, EcologyMemberSlotState, ExplicitTraversalKind,
+    GROUP_DISCONNECT_GRACE_UNITS, GROUP_INVITATION_LIFETIME_UNITS, GoldMoveDestination,
+    GoldMoveQuantity, GoldMoveSource, GoldPileId, GroundGoldPile, GroundItem, GroupId,
+    GroupInvitationState, GroupInviteId, GroupMemberState, GroupMembershipKey, GroupState,
+    GrowthAttribute, GrowthRule, HostilityAssessment, HostilityAuthorization, HostilityReason,
+    ItemBindingState, ItemHolderId, ItemInstanceState, ItemKnowledgeState, ItemLocation,
+    ItemMoveDestination, ItemOfferState, ItemOperationSource, ItemPlacementKind,
+    ItemServiceCapability, ItemServiceOperation, ItemServiceOperationKind, KnownSpell, LawZone,
+    LethalSocialConsequencePlan, LevelThreshold, LockerVaultId, LockerVaultState, LogicalTime,
+    LootClaim, LootClaimBasis, LootOwnerId, MAX_BLOCKED_CHARACTERS, MAX_CONTROLLED_PATH_STEPS,
+    MAX_CRITIQUE_RANK, MAX_GROUP_MEMBERS, MAX_INCOMING_GROUP_INVITATIONS,
+    MAX_OUTGOING_GROUP_INVITATIONS, MAX_SKILL_LEVEL, MagicArithmeticRounding,
+    MagicPrimaryAttribute, MagicRuleEvidenceState, MagicRules, MagicSaveComparison,
+    MatchingResistanceBoostPolicy, MerchantCapability, MerchantInventoryId, MerchantInventoryState,
+    MerchantListingOrigin, MerchantListingState, MovementExertion, MovementPace, MovementRules,
+    MovementStopReason, NavigationDef, NavigationKind, NpcGrudgeRelation, NpcGrudgeRelationPlan,
+    NpcInteraction, NpcInteractionOutcome, NpcState, PerceivedSocialIdentity, PhysicalAttackMode,
+    PhysicalAttackOutcome, PhysicalAttributeAdds, PhysicalDamageKind, PlayerIntent,
+    PlayerKillAssessmentV1, PlayerKillConsequenceV1, PlayerSalesPolicy, ProgressionGrowthProfile,
+    ProgressionRules, PromotionEntry, QuestDefinition, QuestId, QuestStage, QuestStageId,
+    QuestStateLedger, RememberedHostile, ResistanceBoostSourceKind, ResourceActivity, ResourceKind,
+    ResourceRules, RestorationCapability, RestorationOperation, RestorationOutcome,
+    RestorationStatusKind, ResurrectionMethod, ResurrectionRequest, SelfDefenseRelationPlan,
+    SelfDefenseRightV1, ServiceCapability, SkillEntry, SocialAlignmentSource, SocialBehavior,
+    SocialBroadcastScope, SocialContactKind, SocialIntent, SocialNature, SocialOwnerRelation,
+    SocialProfile, SocialRelationLedger, SpellCastClass, SpellCastingMethod, SpellCatalogEntry,
+    SpellCatalogState, SpellDamageCredit, SpellDamageRewardClass, SpellDamageRounding,
+    SpellDurationPolicy, SpellEffectFamily, SpellItemLocation, SpellResistanceBoost,
+    SpellResistanceMitigation, SpellResistanceMitigationMode, SpellResistanceRules,
+    SpellSocialProfile, SpellTarget, SpellTargetKind, Stats, TownLawClassification,
+    TownLawConsequencePlan, Transaction, TransactionCost, TransactionRequirement,
+    TransactionReward, VerticalDirection, WarmedSpellState, WarmedSpellStatus, WeaponFumbleReason,
+    WeaponFumbleResult, WeaponHandedness, World, WorldPosition, WorldRules, WorldSite,
+    WorldTimingState, WoundState,
+};
+pub use rng::DeterministicRng;
+pub use view::{
+    ACTION_CONTEXT_CONTRACT_VERSION, ActionOptionV1, COMMAND_CONTRACT_VERSION,
+    EVENT_CONTRACT_VERSION, MAX_FEEDBACK_TEXT_BYTES, MAX_FEEDBACK_TEXT_SCALARS,
+    MAX_FEEDBACK_TRANSACTION_COSTS, MAX_FEEDBACK_TRANSACTION_REWARDS, MAX_OBSERVED_EVENTS,
+    MAX_OBSERVER_ACTION_OPTIONS, MAX_OBSERVER_ACTORS, MAX_OBSERVER_CORPSES,
+    MAX_OBSERVER_GOLD_PILES, MAX_OBSERVER_GROUND_ITEMS, MAX_STATIC_SCENE_PROPS,
+    MAX_STATIC_SCENE_TILES, MAX_STATIC_TRANSITION_APERTURES, OBSERVED_SNAPSHOT_CONTRACT_VERSION,
+    OBSERVER_PROJECTION_CONTRACT_VERSION, ObservedEventV1, ObserverActorV1, ObserverCorpseChangeV1,
+    ObserverCorpseV1, ObserverEffectChangeV1, ObserverFeedbackActorV1, ObserverFeedbackCueV1,
+    ObserverFrameV1, ObserverGoldPileV1, ObserverGroundItemV1, ObserverGroupInvitationV2,
+    ObserverGroupMemberV2, ObserverGroupV2, ObserverInspectActorV1, ObserverInspectExitStatusV1,
+    ObserverInspectExitV1, ObserverInspectGroundItemV1, ObserverItemBindingV1, ObserverItemV1,
+    ObserverLifeStateV1, ObserverPhysicalOutcomeV1, ObserverProjectionV1, ObserverResourceReasonV1,
+    ObserverSocialV2, ObserverSpellFailureReasonV1, ObserverSpellFizzleReasonV1,
+    ObserverSpellImpactOutcomeV1, ObserverSpellLifecycleStateV1, ObserverTileV1,
+    ObserverTransactionCostV1, ObserverTransactionRewardV1, ObserverTransactionSourceV1,
+    PATH_PREVIEW_CONTRACT_VERSION, PlayerCommandStatusV1, PlayerCommandV1, PlayerIntentPayloadV1,
+    PlayerObservedFrameV1, SNAPSHOT_CONTRACT_VERSION, STATIC_SCENE_CONTEXT_CONTRACT_VERSION,
+    StaticPresentationModeV1, StaticSceneBoundsV1, StaticSceneContextV1, StaticScenePropV1,
+    StaticSceneRoleV1, StaticSceneSiteV1, StaticSceneTileV1, StaticTransitionApertureV1,
+    TRACE_CONTRACT_VERSION, TRACE_V2_CONTRACT_VERSION,
+};
+pub use view::{
+    ActionBlockedReasonV1, ActionExitV1, ActionExitV2, ActionTargetV1, ActionTargetV2,
+    ActiveEffectSourceViewV1, ActiveEffectViewV1, ActorLifeStateViewV1, ActorViewV1,
+    AutomaticActorAwarenessPolicyViewV1, AutomaticActorRememberedHostileViewV1,
+    AutomaticActorViewV1, BurdenViewV1, CarriedLayoutViewV1, CharacterQuestStateViewV1,
+    CharacterSheetViewV1, CombatBlockRulesViewV1, CombatDamageRulesViewV1, CombatFumbleRulesViewV1,
+    CombatHitRulesViewV1, CombatPracticeRulesViewV1, CombatRulesViewV1, CombatTuningStatusViewV1,
+    CorpseActionV1, CorpseViewV1, DamageInterruptionComparisonViewV1, DoorActionV1,
+    DoorStateViewV1, EcologyMemberSlotViewV1, EcologySiteViewV1, GroundGoldPileViewV1,
+    GroundItemViewV1, ItemBindingViewV1, ItemCapabilityViewV1, ItemInstanceViewV1, ItemOfferViewV1,
+    ItemServiceOperationViewV1, LevelSnapshotV1, LevelSnapshotV2, LootClaimViewV1,
+    MagicResistanceBoostViewV1, MagicResistanceViewV1, MagicRuleEvidenceStateViewV1,
+    MagicRulesViewV1, MerchantListingOriginViewV1, MerchantListingViewV1, MovementRulesViewV1,
+    NpcActorStateViewV1, NpcInteractionViewV1, NpcViewV1, PathPreviewBlockedReasonV1,
+    PathPreviewStepOutcomeV1, PathPreviewStepV1, PathPreviewV1, PhysicalBlockCandidateViewV1,
+    PhysicalWeaponViewV1, PlayerActionContextV1, PlayerActionContextV2, PositionedItemViewV1,
+    QuestStateViewV1, RealmSnapshotV1, RealmSnapshotV2, RestorationOperationViewV1,
+    RestorationOutcomeViewV1, ServiceCapabilityViewV1, ServiceTransactionViewV1, ServiceViewV1,
+    SnapshotScopeV1, SpellActionStateV1, SpellActionV1, SpellDamageInterruptionRulesViewV1,
+    SpellResistanceRulesViewV1, SpellTownLawViewV1, SpellWarmupRulesViewV1, TileEffectViewV1,
+    TileObservationV1, TileSnapshotV1, TileSnapshotV2, TraceFinalV1, TraceFinalV2, TraceHeaderV1,
+    TraceHeaderV2, TraceStepV1, TraceStepV2, TraceV1, TraceV2, TransactionCostViewV1,
+    TransactionRequirementViewV1, TransactionRewardViewV1, TransitionKindViewV1, TransitionViewV1,
+    TraversalActionV1, UsableItemActionV1, WarmedSpellViewV1, WorldSnapshotV1, WorldSnapshotV2,
+};

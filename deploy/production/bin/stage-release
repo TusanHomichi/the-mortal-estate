@@ -1,0 +1,74 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+[ "$#" -eq 3 ] || fail 'usage: stage-release <source-directory> <release-id> <SHA256SUMS>'
+source_directory=$1
+release_id=$2
+manifest=$3
+validate_component 'release ID' "$release_id"
+source_directory=$(canonical_directory 'release source directory' "$source_directory")
+[ -f "$manifest" ] && [ ! -L "$manifest" ] || fail 'release manifest is unavailable or unsafe'
+release_root=$(canonical_owned_directory 'release root' "$RELEASE_ROOT")
+destination=$release_root/$release_id
+[ ! -e "$destination" ] || fail 'immutable release already exists'
+
+temporary=$release_root/.stage-$release_id-$$
+trap 'rm -rf "$temporary"' EXIT HUP INT TERM
+install -d -o root -g root -m 0755 "$temporary"
+cp -a "$source_directory"/. "$temporary"/
+cp "$manifest" "$temporary/SHA256SUMS"
+find "$temporary" -type l -print | grep -q . && fail 'release contains a symbolic link'
+find "$temporary" ! -type d ! -type f -print | grep -q . && \
+    fail 'release contains a special filesystem object'
+awk '
+    length($1) != 64 || $1 !~ /^[0-9a-f]+$/ || substr($0,65,2) != "  " { exit 1 }
+    {
+        path=substr($0,67)
+        if (path == "" || path ~ /^\// || path !~ /^[A-Za-z0-9._\/-]+$/ ||
+            path ~ /(^|\/)\.\.?($|\/)/ || path == "SHA256SUMS" || seen[path]++) exit 1
+    }
+    END { if (NR == 0) exit 1 }
+' "$temporary/SHA256SUMS" || fail 'release manifest contains an unsafe or malformed row'
+find "$temporary" -type f ! -name SHA256SUMS -print | while IFS= read -r staged_path
+do
+    staged_relative=${staged_path#"$temporary"/}
+    awk -v target="$staged_relative" '
+        substr($0,67) == target { matches++ }
+        END { exit matches == 1 ? 0 : 1 }
+    ' "$temporary/SHA256SUMS" || exit 1
+done || fail 'release manifest does not cover every release file exactly once'
+(cd "$temporary" && sha256sum -c --strict --quiet SHA256SUMS) || \
+    fail 'release manifest verification failed'
+[ -x "$temporary/bin/tme-server" ] || fail 'release server binary is absent'
+[ -d "$temporary/migrations" ] || fail 'release migrations are absent'
+[ -d "$temporary/content" ] || fail 'release content is absent'
+[ -d "$temporary/deploy/production" ] || fail 'release deployment bundle is absent'
+[ -f "$temporary/tools/run_production_smoke.py" ] || fail 'release smoke runner is absent'
+[ -f "$temporary/contract-versions.json" ] || fail 'release contract receipt is absent'
+[ -f "$temporary/source-revision" ] || fail 'release source revision receipt is absent'
+jq -e '
+    keys == ["catalog","checkpoint","control_api","postgres_schema","protocol","receipt"] and
+    .postgres_schema.min <= 3 and .postgres_schema.max >= 3 and
+    .catalog.min <= 5 and .catalog.max >= 5 and
+    .checkpoint.min <= 3 and .checkpoint.max >= 3 and
+    .receipt.min <= 3 and .receipt.max >= 3 and
+    .protocol.min <= 3 and .protocol.max >= 3 and
+    .control_api.min <= 2 and .control_api.max >= 2
+' "$temporary/contract-versions.json" >/dev/null || fail 'release contract receipt is incompatible or malformed'
+revision=$(sed -n '1p' "$temporary/source-revision")
+[ "$(wc -c <"$temporary/source-revision")" -eq 41 ] || \
+    fail 'source revision receipt must be one full Git SHA-1 plus newline'
+case "$revision" in
+    *[!0-9a-f]*|'') fail 'source revision receipt is malformed' ;;
+esac
+[ "${#revision}" -eq 40 ] || fail 'source revision receipt must be one full Git SHA-1'
+chown -R root:root "$temporary"
+find "$temporary" -type d -exec chmod 0755 {} +
+find "$temporary" -type f -exec chmod u=rw,go=r {} +
+chmod 0755 "$temporary/bin/tme-server" "$temporary/deploy/production/bin/"*
+mv "$temporary" "$destination"
+trap - EXIT HUP INT TERM
+printf '%s\n' "stage-release: $release_id verified"

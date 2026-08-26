@@ -1,0 +1,180 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "fidelity_gallery",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/fidelity_gallery/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:fidelity_gallery:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "fighter",
+          "display_class": "Fighter",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 14,
+          "dexterity": 12,
+          "constitution": 13,
+          "intelligence": 9,
+          "wisdom": 10,
+          "charisma": 8
+        },
+        "resources": {
+          "hp": 12,
+          "max_hp": 12,
+          "peak_hp": 12,
+          "mp": 0,
+          "max_mp": 0,
+          "stamina": 15,
+          "max_stamina": 15
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "promotion_history": [],
+        "skill_ledger": [],
+        "known_spells": []
+      },
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 500
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "dummy",
+      "actor_definition_id": "actor/fidelity_gallery/dummy",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "training_sword": {
+      "definition_id": "training_sword",
+      "binding": {
+        "state": "unrestricted"
+      }
+    },
+    "leather_armor": {
+      "definition_id": "leather_armor",
+      "binding": {
+        "state": "unrestricted"
+      }
+    },
+    "wooden_shield": {
+      "definition_id": "wooden_shield",
+      "binding": {
+        "state": "unrestricted"
+      }
+    },
+    "healing_balm": {
+      "definition_id": "healing_balm",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [
+    {
+      "item_instance_id": "training_sword",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      }
+    },
+    {
+      "item_instance_id": "leather_armor",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      }
+    },
+    {
+      "item_instance_id": "wooden_shield",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      }
+    },
+    {
+      "item_instance_id": "healing_balm",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "service_instances": [
+    {
+      "id": "sword_trainer",
+      "service_definition_id": "sword_trainer",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 6,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

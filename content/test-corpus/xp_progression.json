@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "xp_progression",
+  "name": "XP Progression",
+  "description": "Prototype fixture validating banked kill XP, ordered gated level application, seeded resource growth, and the selected content-owned two-speed combat-add schedule. The level-1 character earns 600 XP and applies levels 2 through 4.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, text, layout, XP values, thresholds, and resource-growth tuning. Combat-add cadence is a successor-owned selected class-separated schedule, encoded as sparse per-level deltas rather than cumulative totals.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/xp_progression.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/xp_progression",
+  "world_template": "world_templates/xp_progression.json",
+  "simulation_seed": "simulation_seeds/xp_progression.json",
+  "script": [
+    {
+      "move_path": [
+        "east",
+        "east"
+      ]
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "mireling",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

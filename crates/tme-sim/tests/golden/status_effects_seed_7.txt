@@ -1,0 +1,43 @@
+The Mortal Estate local simulation
+scenario: status_effects
+seed: 7
+
+loaded "Status Effects" realms=[realm_0] levels=[realm_0/room_0]
+player Delver at realm_0/room_0:1,1 hp=10
+monster Watcher at realm_0/room_0:3,1 hp=8
+Delver gains generic_root (control_status) for 2 rounds.
+
+player ready: Delver at 1
+Delver intent at 1: walk east
+Delver's walk east is suppressed by generic_root.
+readiness scheduled: Delver cost=1 ready_at=2
+generic_root ticks on Delver (1 rounds remain).
+time 2
+monster ready: Watcher at 2
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: wait
+readiness scheduled: Delver cost=1 ready_at=3
+generic_root ticks on Delver (0 rounds remain).
+generic_root expires on Delver.
+time 3
+monster ready: Watcher at 3
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Watcher at 4
+Watcher intent: hold
+readiness scheduled: Watcher cost=1 ready_at=5
+
+final state
+Delver at realm_0/room_0:2,1 hp=10 alive
+Watcher at realm_0/room_0:3,1 hp=8 alive

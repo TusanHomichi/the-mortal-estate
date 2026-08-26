@@ -1,0 +1,698 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+RELEASE_SUCCESS_RECEIPT=$RELEASE_OPERATIONS_ROOT/last-success.json
+RELEASE_OPERATION_ACTIVE=false
+RELEASE_OPERATION_NAME=''
+RELEASE_OPERATION_RELEASE=''
+RELEASE_OPERATION_PREVIOUS=''
+RELEASE_OPERATION_PROJECTION=''
+RELEASE_OPERATION_ID=''
+RELEASE_OPERATION_PHASE=''
+RELEASE_OPERATION_SERVICE_STOPPED=false
+RELEASE_OPERATION_SWITCHED=false
+RELEASE_OPERATION_ADMISSION_CLOSED=false
+RELEASE_PRIOR_SUCCESS_SHA256=''
+RELEASE_VERIFIED_MANIFEST_SHA256=''
+RELEASE_VERIFIED_CONTRACT_SHA256=''
+RELEASE_VERIFIED_SOURCE_REVISION=''
+RELEASE_VERIFIED_MIGRATION_SHA256=''
+RELEASE_VERIFIED_ADMISSION_STATUS=''
+RELEASE_VERIFIED_GAMEPLAY_READY=''
+RELEASE_VERIFIED_CONTROL_API_VERSION=''
+RELEASE_VERIFIED_PROTOCOL_MINOR=''
+RELEASE_VERIFIED_SMOKE=''
+RELEASE_VERIFIED_SMOKE_SHA256=''
+RELEASE_RECOVERY_TARGET=''
+RELEASE_RECOVERY_FAILED_DATA=''
+RELEASE_RECOVERY_SYSTEM_IDENTIFIER=''
+RELEASE_RECOVERY_DATABASE_OID=''
+RELEASE_RECOVERY_FENCE_EPOCH_BEFORE=''
+RELEASE_RECOVERY_FENCE_EPOCH_AFTER=''
+
+initialize_release_operation_roots() {
+    state=$(canonical_owned_directory 'state root' "$STATE_ROOT")
+    [ "$ADMISSION_ROOT" = "$state/admission" ] || \
+        fail 'admission root override differs from the canonical state root'
+    [ "$RELEASE_OPERATIONS_ROOT" = "$state/release-operations" ] || \
+        fail 'release operation root override differs from the canonical state root'
+    [ "$CREDENTIAL_PROJECTION_ROOT" = "$state/credential-projections" ] || \
+        fail 'credential projection root override differs from the canonical state root'
+    install -d -o root -g root -m 0755 "$ADMISSION_ROOT"
+    install -d -o root -g root -m 0750 "$RELEASE_OPERATIONS_ROOT"
+    install -d -o root -g root -m 0711 "$CREDENTIAL_PROJECTION_ROOT"
+    admission=$(canonical_owned_directory 'admission root' "$ADMISSION_ROOT")
+    receipts=$(canonical_owned_directory 'release operation root' "$RELEASE_OPERATIONS_ROOT")
+    canonical_owned_directory 'credential projection root' "$CREDENTIAL_PROJECTION_ROOT" >/dev/null
+    [ "$(stat -c '%d' "$admission")" = "$(stat -c '%d' "$receipts")" ] || \
+        fail 'admission marker and release receipt must share one filesystem'
+}
+
+close_admission() {
+    operation=$1
+    release_id=$2
+    [ -n "$RELEASE_OPERATION_ID" ] || \
+        RELEASE_OPERATION_ID=$(date -u +'%Y%m%dT%H%M%SZ')-$$
+    initialize_release_operation_roots
+    if [ -e "$ADMISSION_MARKER" ]; then
+        [ -f "$ADMISSION_MARKER" ] && [ ! -L "$ADMISSION_MARKER" ] || \
+            fail 'admission marker is unsafe'
+        [ "$(stat -c '%u:%g:%a:%h' "$ADMISSION_MARKER")" = '0:0:644:1' ] || \
+            fail 'admission marker metadata is unsafe'
+        jq -e '.schema_version == 1 and .operation == "bootstrap" and .state == "closed"' \
+            "$ADMISSION_MARKER" >/dev/null || \
+            fail 'an unfinished admission-closed operation requires explicit recovery'
+    fi
+    temporary=$(mktemp "$ADMISSION_ROOT/.closed.XXXXXX") || \
+        fail 'admission temporary could not be created'
+    previous_release_id=''
+    [ -z "$RELEASE_OPERATION_PREVIOUS" ] || \
+        previous_release_id=$(basename -- "$RELEASE_OPERATION_PREVIOUS")
+    jq -cn --arg operation "$operation" --arg operation_id "$RELEASE_OPERATION_ID" \
+        --arg release_id "$release_id" --arg previous_release_id "$previous_release_id" \
+        --arg prior_success_sha256 "$RELEASE_PRIOR_SUCCESS_SHA256" \
+        --arg source_revision "$RELEASE_VERIFIED_SOURCE_REVISION" \
+        --arg contract_sha256 "$RELEASE_VERIFIED_CONTRACT_SHA256" \
+        --arg manifest_sha256 "$RELEASE_VERIFIED_MANIFEST_SHA256" \
+        --arg updated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" '
+        {
+            schema_version:2,
+            operation:$operation,
+            operation_id:$operation_id,
+            release_id:$release_id,
+            previous_release_id:(if $previous_release_id == "" then null else $previous_release_id end),
+            prior_success_receipt_sha256:(if $prior_success_sha256 == "" then null else $prior_success_sha256 end),
+            release:{source_revision:$source_revision,contract_sha256:$contract_sha256,manifest_sha256:$manifest_sha256},
+            state:"in_progress",
+            phase:"admission_closing",
+            updated_at:$updated_at
+        }' \
+        >"$temporary"
+    chmod 0644 "$temporary"
+    sync -f "$temporary"
+    mv -Tf "$temporary" "$ADMISSION_MARKER"
+    RELEASE_OPERATION_ADMISSION_CLOSED=true
+    sync -f "$ADMISSION_ROOT"
+    RELEASE_OPERATION_PHASE=admission_closing
+}
+
+update_operation_phase() {
+    phase=$1
+    validate_component 'release operation phase' "$phase"
+    [ -f "$ADMISSION_MARKER" ] && [ ! -L "$ADMISSION_MARKER" ] || \
+        fail 'admission marker is unavailable for phase update'
+    temporary=$(mktemp "$ADMISSION_ROOT/.phase.XXXXXX") || \
+        fail 'operation phase temporary could not be created'
+    jq --arg phase "$phase" --arg updated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+        '.phase=$phase | .updated_at=$updated_at' "$ADMISSION_MARKER" >"$temporary" || {
+            rm -f -- "$temporary"
+            fail 'operation journal is malformed'
+        }
+    chmod 0644 "$temporary"
+    sync -f "$temporary"
+    mv -Tf "$temporary" "$ADMISSION_MARKER"
+    sync -f "$ADMISSION_ROOT"
+    RELEASE_OPERATION_PHASE=$phase
+}
+
+create_credential_projection() {
+    label=$1
+    shift
+    validate_component 'credential projection label' "$label"
+    [ "$#" -gt 0 ] || fail 'credential projection is empty'
+    for name in "$@"; do credential_file "$name" >/dev/null; done
+    initialize_release_operation_roots
+    projection=$(mktemp -d "$CREDENTIAL_PROJECTION_ROOT/$label.XXXXXX") || \
+        fail 'credential projection could not be created'
+    chown tme-deploy:tme-deploy "$projection"
+    chmod 0700 "$projection"
+    for name in "$@"
+    do
+        source=$(credential_file "$name")
+        install -o tme-deploy -g tme-deploy -m 0400 "$source" "$projection/$name"
+    done
+    printf '%s\n' "$projection"
+}
+
+destroy_credential_projection() {
+    projection=$1
+    [ -n "$projection" ] || return 0
+    root=$(canonical_owned_directory 'credential projection root' "$CREDENTIAL_PROJECTION_ROOT")
+    name=$(basename -- "$projection")
+    path=$(canonical_direct_child 'credential projection' "$root" "$name")
+    [ "$path" = "$projection" ] || fail 'credential projection path changed'
+    rm -rf -- "$path"
+}
+
+run_as_deploy() {
+    runuser -u tme-deploy -- "$@"
+}
+
+restore_fence_outcome() {
+    rfo_observed=$1
+    rfo_before=$2
+    case "$rfo_observed:$rfo_before" in *[!0-9:]*) fail 'restore fence epochs are malformed' ;; esac
+    if [ "$rfo_observed" -eq "$rfo_before" ]; then
+        printf '%s\n' pending
+    elif [ "$rfo_observed" -eq $((rfo_before + 1)) ]; then
+        printf '%s\n' committed
+    else
+        fail 'restore fence outcome cannot be reconciled without risking a repeated fence'
+    fi
+}
+
+verify_release_integrity() {
+    vri_release=$1
+    vri_release=$(canonical_owned_directory 'release' "$vri_release")
+    vri_manifest=$vri_release/SHA256SUMS
+    vri_contract=$vri_release/contract-versions.json
+    vri_revision=$vri_release/source-revision
+    for vri_required in "$vri_manifest" "$vri_contract" "$vri_revision"
+    do
+        [ -f "$vri_required" ] && [ ! -L "$vri_required" ] || \
+            fail 'release integrity receipt is missing or unsafe'
+    done
+    if find "$vri_release" -type l -print | grep -q .; then
+        fail 'release contains a symbolic link'
+    fi
+    if find "$vri_release" ! -type d ! -type f -print | grep -q .; then
+        fail 'release contains a special filesystem object'
+    fi
+    find "$vri_release" -type d -print | while IFS= read -r vri_path
+    do
+        vri_identity=$(stat -c '%u:%g:%a' "$vri_path")
+        case "$vri_identity" in
+            0:0:*) ;;
+            *) fail 'release directory ownership is invalid' ;;
+        esac
+        vri_mode=${vri_identity##*:}
+        case "$vri_mode" in
+            *[2367][0-7]|*[0-7][2367]) fail 'release directory is writable outside root' ;;
+        esac
+    done || fail 'release directory metadata verification failed'
+    find "$vri_release" -type f -print | while IFS= read -r vri_path
+    do
+        vri_identity=$(stat -c '%u:%g:%a:%h' "$vri_path")
+        case "$vri_identity" in
+            0:0:*:1) ;;
+            *) fail 'release file ownership, mode, or link count is invalid' ;;
+        esac
+        vri_mode=$(printf '%s\n' "$vri_identity" | cut -d: -f3)
+        case "$vri_mode" in
+            *[2367][0-7]|*[0-7][2367]) fail 'release file is writable outside root' ;;
+        esac
+    done || fail 'release file metadata verification failed'
+    awk '
+        length($1) != 64 || $1 !~ /^[0-9a-f]+$/ || substr($0,65,2) != "  " { exit 1 }
+        {
+            path=substr($0,67)
+            if (path == "" || path ~ /^\// || path !~ /^[A-Za-z0-9._\/-]+$/ ||
+                path ~ /(^|\/)\.\.?($|\/)/ || path == "SHA256SUMS" || seen[path]++) exit 1
+        }
+        END { if (NR == 0) exit 1 }
+    ' "$vri_manifest" || fail 'release SHA256SUMS contains an unsafe or malformed row'
+    find "$vri_release" -type f ! -path "$vri_manifest" -print | while IFS= read -r vri_path
+    do
+        vri_relative=${vri_path#"$vri_release"/}
+        awk -v target="$vri_relative" '
+            substr($0,67) == target { matches++ }
+            END { exit matches == 1 ? 0 : 1 }
+        ' "$vri_manifest" || exit 1
+    done || fail 'release SHA256SUMS does not cover every release file exactly once'
+    (cd "$vri_release" && sha256sum -c --strict --quiet SHA256SUMS) || \
+        fail 'release SHA256SUMS verification failed'
+    [ "$(wc -c <"$vri_revision")" -eq 41 ] || \
+        fail 'source revision receipt must be one full Git SHA-1 plus newline'
+    vri_source_revision=$(sed -n '1p' "$vri_revision")
+    case "$vri_source_revision" in *[!0-9a-f]*|'') fail 'source revision receipt is malformed' ;; esac
+    [ "${#vri_source_revision}" -eq 40 ] || fail 'source revision receipt is malformed'
+    release_accepts_current_contract "$vri_release" || \
+        fail 'release contract is missing, malformed, or incompatible'
+    sha256sum "$vri_manifest" | awk '{print $1}'
+}
+
+verify_success_receipt_for_release() {
+    vsr_release=$1
+    [ -f "$RELEASE_SUCCESS_RECEIPT" ] && [ ! -L "$RELEASE_SUCCESS_RECEIPT" ] || \
+        fail 'prior success receipt is missing or unsafe'
+    [ "$(stat -c '%u:%g:%a:%h' "$RELEASE_SUCCESS_RECEIPT")" = '0:0:640:1' ] || \
+        fail 'prior success receipt metadata is unsafe'
+    vsr_release_id=$(basename -- "$vsr_release")
+    vsr_revision=$(sed -n '1p' "$vsr_release/source-revision")
+    vsr_contract_sha256=$(sha256sum "$vsr_release/contract-versions.json" | awk '{print $1}')
+    vsr_manifest_sha256=$(sha256sum "$vsr_release/SHA256SUMS" | awk '{print $1}')
+    jq -e --arg release_id "$vsr_release_id" --arg revision "$vsr_revision" \
+        --arg contract_sha256 "$vsr_contract_sha256" --arg manifest_sha256 "$vsr_manifest_sha256" \
+        --slurpfile contract "$vsr_release/contract-versions.json" '
+        keys == ["admission","authenticated_smoke","completed_at","database","operation",
+                 "operation_id","previous_release_id","prior_success_receipt_sha256","readiness",
+                 "recovery","recovery_target","release_contract","release_contract_sha256",
+                 "release_id","release_manifest_sha256","schema_version","source_revision","state"] and
+        .schema_version == 2 and .state == "committed" and
+        (.operation == "deploy" or .operation == "rollback" or
+         .operation == "operations-upgrade" or .operation == "destructive-recovery") and
+        (.operation_id | type == "string" and test("^[A-Za-z0-9._-]+$") and length <= 96) and
+        (.completed_at | type == "string" and
+         test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")) and
+        ($contract | length == 1) and
+        .release_id == $release_id and .source_revision == $revision and
+        .release_contract == $contract[0] and
+        .release_contract_sha256 == $contract_sha256 and
+        .release_manifest_sha256 == $manifest_sha256 and
+        ((.previous_release_id == null) or
+         (.previous_release_id | type == "string" and test("^[A-Za-z0-9][A-Za-z0-9._-]*$"))) and
+        ((.prior_success_receipt_sha256 == null) or
+         (.prior_success_receipt_sha256 | test("^[0-9a-f]{64}$"))) and
+        (.database | keys == ["grants_verified","migration_set_sha256","store_verify"]) and
+        .database.store_verify == true and .database.grants_verified == true and
+        (.database.migration_set_sha256 | test("^[0-9a-f]{64}$")) and
+        (.admission | keys == ["closed_http_status","loopback_tls_smoke"]) and
+        .admission.closed_http_status == 503 and .admission.loopback_tls_smoke == true and
+        (.readiness | keys == ["control_api_version","gameplay_ready","protocol_minor"]) and
+        .readiness.gameplay_ready == true and .readiness.control_api_version == 3 and
+        .readiness.protocol_minor == 8 and
+        (.authenticated_smoke | keys == ["profile","result","result_sha256"]) and
+        .authenticated_smoke.profile == "admission" and
+        .authenticated_smoke.result == "passed" and
+        (.authenticated_smoke.result_sha256 | test("^[0-9a-f]{64}$")) and
+        (if .operation == "destructive-recovery" then
+            (.recovery_target | type == "string" and length > 0) and
+            (.recovery | keys == ["database_oid","failed_data","fence_epoch_after",
+                                  "fence_epoch_before","system_identifier","target"]) and
+            .recovery.target == .recovery_target and
+            (.recovery.failed_data | type == "string" and startswith("/var/lib/postgresql/18/")) and
+            (.recovery.system_identifier | test("^[0-9]+$")) and
+            (.recovery.database_oid | test("^[0-9]+$")) and
+            (.recovery.fence_epoch_before | type == "number") and
+            (.recovery.fence_epoch_after == (.recovery.fence_epoch_before + 1))
+         else .recovery_target == null and .recovery == null end)
+    ' "$RELEASE_SUCCESS_RECEIPT" >/dev/null || fail 'prior success receipt is malformed or does not match the active release'
+    sha256sum "$RELEASE_SUCCESS_RECEIPT" | awk '{print $1}'
+}
+
+release_accepts_current_contract() {
+    racc_release=$1
+    racc_receipt=$racc_release/contract-versions.json
+    [ -f "$racc_receipt" ] && [ ! -L "$racc_receipt" ] || return 1
+    jq -e -s '
+        length == 1 and (.[0] |
+        keys == ["catalog","checkpoint","control_api","postgres_schema","protocol","receipt"] and
+        .postgres_schema.min <= 3 and .postgres_schema.max >= 3 and
+        .catalog.min <= 5 and .catalog.max >= 5 and
+        .checkpoint.min <= 3 and .checkpoint.max >= 3 and
+        .receipt.min <= 3 and .receipt.max >= 3 and
+        .protocol.min <= 3 and .protocol.max >= 3 and
+        .control_api.min <= 2 and .control_api.max >= 2)
+    ' "$racc_receipt" >/dev/null 2>&1
+}
+
+verify_database_contract() {
+    release=$1
+    require_production_database_target
+    database_socket=$PRODUCTION_DATABASE_SOCKET
+    database_port=$PRODUCTION_DATABASE_PORT
+    projection=$(create_credential_projection database-contract migrator-database-url)
+    RELEASE_OPERATION_PROJECTION=$projection
+    run_as_deploy env CREDENTIALS_DIRECTORY="$projection" \
+        "$release/bin/tme-server" store verify >/dev/null || \
+        fail 'candidate store verification failed'
+    grants_ok=$(PGPASSFILE=$(credential_file migrator-pgpass) \
+        PGOPTIONS='-c role=tme_owner' \
+        psql --host="$database_socket" --port="$database_port" \
+        --dbname="$TME_DATABASE_NAME" --username=tme_migrator \
+        --no-align --tuples-only --set=ON_ERROR_STOP=on --command="SELECT
+            has_schema_privilege('tme_runtime','tme','USAGE') AND
+            has_schema_privilege('tme_auth','tme','USAGE') AND
+            has_table_privilege('tme_runtime','tme.facets','SELECT,INSERT,UPDATE,DELETE') AND
+            NOT has_table_privilege('tme_runtime','tme.account_credentials','SELECT') AND
+            NOT has_table_privilege('tme_runtime','tme.account_credentials','INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AND
+            has_table_privilege('tme_auth','tme.account_credentials','SELECT,UPDATE') AND
+            has_table_privilege('tme_auth','tme.sessions','SELECT,INSERT') AND
+            NOT has_table_privilege('tme_auth','tme.sessions','UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AND
+            has_table_privilege('tme_monitor','tme.store_state','SELECT') AND
+            NOT has_table_privilege('tme_monitor','tme.store_state','INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AND
+            (SELECT count(*)=6 AND bool_and(
+                NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND
+                NOT rolbypassrls AND rolinherit AND
+                rolcanlogin=(rolname<>'tme_owner') AND
+                rolreplication=(rolname='tme_backup'))
+             FROM pg_roles WHERE rolname IN
+                ('tme_owner','tme_migrator','tme_runtime','tme_auth','tme_backup','tme_monitor')) AND
+            pg_has_role('tme_migrator','tme_owner','MEMBER') AND
+            NOT pg_has_role('tme_runtime','tme_owner','MEMBER') AND
+            NOT pg_has_role('tme_auth','tme_owner','MEMBER')")
+    [ "$grants_ok" = t ] || fail 'database schema or least-privilege grants are invalid'
+    migration_rows=$(PGPASSFILE=$(credential_file migrator-pgpass) \
+        PGOPTIONS='-c role=tme_owner' \
+        psql --host="$database_socket" --port="$database_port" \
+        --dbname="$TME_DATABASE_NAME" --username=tme_migrator \
+        --no-align --tuples-only --set=ON_ERROR_STOP=on --command="SELECT
+            version::text || ':' || encode(checksum,'hex') || ':' || success::text
+            FROM public._sqlx_migrations ORDER BY version")
+    [ -n "$migration_rows" ] || fail 'database migration receipt is empty'
+    RELEASE_VERIFIED_MIGRATION_SHA256=$(printf '%s\n' "$migration_rows" | \
+        sha256sum | awk '{print $1}')
+    destroy_credential_projection "$projection"
+    RELEASE_OPERATION_PROJECTION=''
+}
+
+verify_public_admission_closed() {
+    admission_status=$(curl --silent --show-error --output /dev/null --max-time 10 \
+        --write-out '%{http_code}' "https://$TME_PUBLIC_HOST/health/ready") || \
+        fail 'public admission closure probe failed'
+    [ "$admission_status" = 503 ] || \
+        fail 'public admission was not closed with HTTP 503'
+    RELEASE_VERIFIED_ADMISSION_STATUS=$admission_status
+}
+
+wait_private_readiness() {
+    deadline=$(( $(date +%s) + 120 ))
+    while :
+    do
+        readiness=$(curl --fail --silent --show-error --max-time 5 \
+            http://127.0.0.1:9090/internal/status 2>/dev/null || true)
+        if printf '%s\n' "$readiness" | \
+            jq -e '.gameplay_ready == true and .control_api_version == 3 and .protocol_minor == 8' \
+                >/dev/null 2>&1
+        then
+            RELEASE_VERIFIED_GAMEPLAY_READY=$(printf '%s\n' "$readiness" | jq -r '.gameplay_ready')
+            RELEASE_VERIFIED_CONTROL_API_VERSION=$(printf '%s\n' "$readiness" | jq -r '.control_api_version')
+            RELEASE_VERIFIED_PROTOCOL_MINOR=$(printf '%s\n' "$readiness" | jq -r '.protocol_minor')
+            return 0
+        fi
+        [ "$(date +%s)" -lt "$deadline" ] || return 1
+        sleep 2
+    done
+}
+
+run_authenticated_admission_smoke() {
+    release=$1
+    runner=${TME_SMOKE_RUNNER-}
+    if [ -z "$runner" ]; then
+        runner=$PRODUCTION_ROOT/tools/run_production_smoke.py
+        [ -f "$runner" ] || runner=$release/tools/run_production_smoke.py
+    fi
+    case "$runner" in /*) ;; *) fail 'production smoke runner must be absolute' ;; esac
+    [ -f "$runner" ] && [ ! -L "$runner" ] || fail 'production smoke runner is unavailable'
+    case "$(stat -c '%u:%g:%a:%h' "$runner")" in
+        0:0:644:1|0:0:755:1) ;;
+        *) fail 'production smoke runner metadata is unsafe' ;;
+    esac
+    projection=$(create_credential_projection admission-smoke \
+        smoke-username-one smoke-password-one smoke-username-two smoke-password-two)
+    RELEASE_OPERATION_PROJECTION=$projection
+    verify_public_admission_closed
+    smoke_result=$(mktemp "$RELEASE_OPERATIONS_ROOT/.smoke-result.XXXXXX") || \
+        fail 'smoke result temporary could not be created'
+    if ! run_as_deploy timeout 120s python3 "$runner" \
+            --host "$TME_PUBLIC_HOST" --connect-host 127.0.0.1 \
+            --username-one-file "$projection/smoke-username-one" \
+            --password-one-file "$projection/smoke-password-one" \
+            --username-two-file "$projection/smoke-username-two" \
+            --password-two-file "$projection/smoke-password-two" \
+            --profile admission >"$smoke_result"
+    then
+        rm -f -- "$smoke_result"
+        fail 'authenticated admission smoke failed'
+    fi
+    RELEASE_VERIFIED_SMOKE_SHA256=$(sha256sum "$smoke_result" | awk '{print $1}')
+    rm -f -- "$smoke_result"
+    RELEASE_VERIFIED_SMOKE=admission
+    destroy_credential_projection "$projection"
+    RELEASE_OPERATION_PROJECTION=''
+}
+
+switch_release() {
+    release=$1
+    temporary=$CURRENT_LINK.new
+    rm -f -- "$temporary"
+    ln -s "$release" "$temporary" || fail 'temporary current release link could not be created'
+    mv -Tf "$temporary" "$CURRENT_LINK" || fail 'current release link could not be switched'
+}
+
+release_operation_marker_matches_active() {
+    [ -n "$RELEASE_OPERATION_NAME" ] && [ -n "$RELEASE_OPERATION_ID" ] && \
+        [ -n "$RELEASE_OPERATION_RELEASE" ] || return 1
+    [ -f "$ADMISSION_MARKER" ] && [ ! -L "$ADMISSION_MARKER" ] || return 1
+    [ "$(stat -c '%u:%g:%a:%h' "$ADMISSION_MARKER" 2>/dev/null)" = '0:0:644:1' ] || \
+        return 1
+    marker_release_id=$(basename -- "$RELEASE_OPERATION_RELEASE")
+    jq -e --arg operation "$RELEASE_OPERATION_NAME" \
+        --arg operation_id "$RELEASE_OPERATION_ID" \
+        --arg release_id "$marker_release_id" '
+        .schema_version == 2 and .state == "in_progress" and
+        .operation == $operation and .operation_id == $operation_id and
+        .release_id == $release_id
+    ' "$ADMISSION_MARKER" >/dev/null 2>&1
+}
+
+release_operation_is_committed() {
+    [ -n "$RELEASE_OPERATION_RELEASE" ] || return 1
+    [ ! -e "$ADMISSION_MARKER" ] && [ -f "$RELEASE_SUCCESS_RECEIPT" ] && \
+        (verify_success_receipt_for_release "$RELEASE_OPERATION_RELEASE" \
+            >/dev/null 2>&1) && \
+        jq -e --arg operation "$RELEASE_OPERATION_NAME" \
+            --arg operation_id "$RELEASE_OPERATION_ID" \
+            --arg release_id "$(basename -- "$RELEASE_OPERATION_RELEASE")" '
+            .schema_version == 2 and .state == "committed" and
+            .operation == $operation and .operation_id == $operation_id and
+            .release_id == $release_id
+        ' "$RELEASE_SUCCESS_RECEIPT" >/dev/null 2>&1 || return 1
+    if ! sync -f "$ADMISSION_ROOT" || ! sync -f "$RELEASE_OPERATIONS_ROOT"; then
+        printf '%s\n' 'error: committed release receipt required a filesystem-wide durability fallback' >&2
+        sync || true
+    fi
+    return 0
+}
+
+ensure_tme_server_stopped() {
+    systemctl stop tme-server.service >/dev/null 2>&1 || true
+    if active_state=$(systemctl show --property=ActiveState --value \
+        tme-server.service 2>/dev/null)
+    then
+        case "$active_state" in inactive|failed) return 0 ;; esac
+    fi
+    systemctl kill --kill-whom=all --signal=SIGKILL tme-server.service \
+        >/dev/null 2>&1 || true
+    systemctl stop tme-server.service >/dev/null 2>&1 || true
+    active_state=$(systemctl show --property=ActiveState --value \
+        tme-server.service 2>/dev/null) || return 1
+    case "$active_state" in
+        inactive|failed) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+release_operation_failure() {
+    status=$1
+    [ "$status" -ne 0 ] || status=1
+    trap - 0 1 2 15
+    [ "$RELEASE_OPERATION_ACTIVE" = true ] || exit "$status"
+    if release_operation_is_committed; then
+        RELEASE_OPERATION_ACTIVE=false
+        exit "$status"
+    fi
+    if [ -n "$RELEASE_OPERATION_PROJECTION" ]; then
+        (destroy_credential_projection "$RELEASE_OPERATION_PROJECTION") || true
+        RELEASE_OPERATION_PROJECTION=''
+    fi
+    if [ "$RELEASE_OPERATION_ADMISSION_CLOSED" = false ] && \
+        release_operation_marker_matches_active
+    then
+        RELEASE_OPERATION_ADMISSION_CLOSED=true
+    fi
+    if [ "$RELEASE_OPERATION_ADMISSION_CLOSED" = false ]; then
+        printf '%s\n' 'error: operation failed before admission changed; the running service and prior receipt are unchanged' >&2
+        exit "$status"
+    fi
+    failed_phase=$RELEASE_OPERATION_PHASE
+    update_operation_phase failure_recovery >/dev/null 2>&1 || true
+    if [ -z "$RELEASE_OPERATION_PREVIOUS" ]; then
+        if [ "$RELEASE_OPERATION_SERVICE_STOPPED" = false ]; then
+            if ! ensure_tme_server_stopped; then
+                printf '%s\n' 'error: failed candidate could not be stopped; admission remains closed because no prior release exists' >&2
+                exit "$status"
+            fi
+            RELEASE_OPERATION_SERVICE_STOPPED=true
+        fi
+        if [ "$RELEASE_OPERATION_SWITCHED" = true ] || [ -L "$CURRENT_LINK" ]; then
+            failed_current=$(readlink -e -- "$CURRENT_LINK" 2>/dev/null || true)
+            if [ "$failed_current" = "$RELEASE_OPERATION_RELEASE" ]; then
+                rm -f -- "$CURRENT_LINK"
+            fi
+        fi
+        printf '%s\n' 'error: operation failed; admission remains closed because no prior release exists' >&2
+        exit "$status"
+    fi
+    if [ "$RELEASE_OPERATION_SERVICE_STOPPED" = false ] || \
+        [ "$failed_phase" = service_stopping ]; then
+        if ! ensure_tme_server_stopped; then
+            printf '%s\n' 'error: failed candidate could not be stopped; admission remains closed and the prior receipt is unchanged' >&2
+            exit "$status"
+        fi
+    fi
+    RELEASE_OPERATION_SERVICE_STOPPED=true
+    if (
+        # Invoked by the subshell EXIT trap below.
+        # shellcheck disable=SC2329
+        fallback_cleanup() {
+            if [ -n "$RELEASE_OPERATION_PROJECTION" ]; then
+                (destroy_credential_projection "$RELEASE_OPERATION_PROJECTION") || true
+            fi
+        }
+        trap fallback_cleanup 0
+        previous_id=$(basename -- "$RELEASE_OPERATION_PREVIOUS")
+        previous=$(release_directory "$previous_id")
+        [ "$previous" = "$RELEASE_OPERATION_PREVIOUS" ] || \
+            fail 'prior release path changed during fallback'
+        verify_release_integrity "$previous" >/dev/null
+        verify_database_contract "$previous"
+        switch_release "$previous"
+        systemctl start tme-server.service || fail 'prior release could not be started'
+        wait_private_readiness || fail 'prior release did not become ready during fallback'
+        run_authenticated_admission_smoke "$previous"
+    )
+    then
+        :
+    else
+        ensure_tme_server_stopped || true
+        printf '%s\n' 'error: prior release fallback could not be proven; admission remains closed and the prior receipt is unchanged' >&2
+        exit "$status"
+    fi
+    rm -f -- "$ADMISSION_MARKER"
+    sync -f "$ADMISSION_ROOT"
+    RELEASE_OPERATION_ADMISSION_CLOSED=false
+    printf '%s\n' 'error: requested operation failed; prior release passed fallback and admission reopened' >&2
+    exit "$status"
+}
+
+release_operation_signal() {
+    signal_number=$1
+    trap - 1 2 15
+    exit $((128 + signal_number))
+}
+
+begin_release_operation() {
+    operation=$1
+    release=$2
+    release_id=$(basename -- "$release")
+    previous=''
+    if current=$(current_release); then previous=$current; fi
+    RELEASE_VERIFIED_MANIFEST_SHA256=$(verify_release_integrity "$release") || \
+        fail 'requested release integrity verification failed'
+    RELEASE_VERIFIED_SOURCE_REVISION=$(sed -n '1p' "$release/source-revision")
+    RELEASE_VERIFIED_CONTRACT_SHA256=$(sha256sum "$release/contract-versions.json" | awk '{print $1}')
+    if [ -n "$previous" ]; then
+        if ! prior_manifest_sha256=$(verify_release_integrity "$previous"); then
+            fail 'prior release integrity verification failed'
+        fi
+        [ -n "$prior_manifest_sha256" ] || fail 'prior release manifest digest is absent'
+        RELEASE_PRIOR_SUCCESS_SHA256=$(verify_success_receipt_for_release "$previous") || \
+            fail 'prior success receipt verification failed'
+    fi
+    RELEASE_OPERATION_NAME=$operation
+    RELEASE_OPERATION_RELEASE=$release
+    RELEASE_OPERATION_PREVIOUS=$previous
+    RELEASE_OPERATION_ID=$(date -u +'%Y%m%dT%H%M%SZ')-$$
+    RELEASE_OPERATION_ACTIVE=true
+    trap 'release_operation_failure $?' 0
+    trap 'release_operation_signal 1' 1
+    trap 'release_operation_signal 2' 2
+    trap 'release_operation_signal 15' 15
+    close_admission "$operation" "$release_id"
+    verify_public_admission_closed
+    update_operation_phase admission_closed
+}
+
+commit_release_operation() {
+    release_id=$(basename -- "$RELEASE_OPERATION_RELEASE")
+    previous_id=''
+    [ -z "$RELEASE_OPERATION_PREVIOUS" ] || \
+        previous_id=$(basename -- "$RELEASE_OPERATION_PREVIOUS")
+    revision=$RELEASE_VERIFIED_SOURCE_REVISION
+    contract_sha256=$RELEASE_VERIFIED_CONTRACT_SHA256
+    manifest_sha256=$RELEASE_VERIFIED_MANIFEST_SHA256
+    case "$revision" in *[!0-9a-f]*|'') fail 'verified source revision is absent' ;; esac
+    [ "${#revision}" -eq 40 ] || fail 'verified source revision is absent'
+    case "$contract_sha256:$manifest_sha256:$RELEASE_VERIFIED_SMOKE_SHA256" in
+        *[!0-9a-f:]*) fail 'verified release or smoke digest is malformed' ;;
+    esac
+    [ "${#contract_sha256}" -eq 64 ] && [ "${#manifest_sha256}" -eq 64 ] && \
+        [ "${#RELEASE_VERIFIED_SMOKE_SHA256}" -eq 64 ] || \
+        fail 'verified release or smoke digest is absent'
+    [ -n "$RELEASE_VERIFIED_MIGRATION_SHA256" ] || fail 'verified migration result is absent'
+    [ "$RELEASE_VERIFIED_ADMISSION_STATUS" = 503 ] || fail 'verified admission result is absent'
+    [ "$RELEASE_VERIFIED_GAMEPLAY_READY" = true ] || fail 'verified readiness result is absent'
+    [ "$RELEASE_VERIFIED_CONTROL_API_VERSION" = 3 ] || fail 'verified control API result is absent'
+    [ "$RELEASE_VERIFIED_PROTOCOL_MINOR" = 8 ] || fail 'verified protocol result is absent'
+    [ "$RELEASE_VERIFIED_SMOKE" = admission ] || fail 'verified authenticated smoke result is absent'
+    prepared=$(mktemp "$RELEASE_OPERATIONS_ROOT/.success.XXXXXX") || \
+        fail 'release receipt temporary could not be created'
+    jq -n --arg operation "$RELEASE_OPERATION_NAME" \
+        --arg operation_id "$RELEASE_OPERATION_ID" \
+        --arg release_id "$release_id" --arg previous_release_id "$previous_id" \
+        --arg source_revision "$revision" \
+        --arg contract_sha256 "$contract_sha256" \
+        --arg manifest_sha256 "$manifest_sha256" \
+        --arg migration_sha256 "$RELEASE_VERIFIED_MIGRATION_SHA256" \
+        --arg admission_status "$RELEASE_VERIFIED_ADMISSION_STATUS" \
+        --argjson gameplay_ready "$RELEASE_VERIFIED_GAMEPLAY_READY" \
+        --argjson control_api_version "$RELEASE_VERIFIED_CONTROL_API_VERSION" \
+        --argjson protocol_minor "$RELEASE_VERIFIED_PROTOCOL_MINOR" \
+        --arg smoke_profile "$RELEASE_VERIFIED_SMOKE" \
+        --arg smoke_sha256 "$RELEASE_VERIFIED_SMOKE_SHA256" \
+        --arg prior_success_sha256 "$RELEASE_PRIOR_SUCCESS_SHA256" \
+        --arg recovery_target "$RELEASE_RECOVERY_TARGET" \
+        --arg recovery_failed_data "$RELEASE_RECOVERY_FAILED_DATA" \
+        --arg recovery_system_identifier "$RELEASE_RECOVERY_SYSTEM_IDENTIFIER" \
+        --arg recovery_database_oid "$RELEASE_RECOVERY_DATABASE_OID" \
+        --arg recovery_fence_before "$RELEASE_RECOVERY_FENCE_EPOCH_BEFORE" \
+        --arg recovery_fence_after "$RELEASE_RECOVERY_FENCE_EPOCH_AFTER" \
+        --slurpfile contract "$RELEASE_OPERATION_RELEASE/contract-versions.json" \
+        --arg completed_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" '
+        {
+            schema_version:2,
+            operation:$operation,
+            operation_id:$operation_id,
+            state:"committed",
+            release_id:$release_id,
+            previous_release_id:(if $previous_release_id == "" then null else $previous_release_id end),
+            source_revision:$source_revision,
+            completed_at:$completed_at,
+            release_contract:$contract[0],
+            release_contract_sha256:$contract_sha256,
+            release_manifest_sha256:$manifest_sha256,
+            prior_success_receipt_sha256:(if $prior_success_sha256 == "" then null else $prior_success_sha256 end),
+            database:{migration_set_sha256:$migration_sha256,store_verify:true,grants_verified:true},
+            admission:{closed_http_status:($admission_status|tonumber),loopback_tls_smoke:true},
+            readiness:{gameplay_ready:$gameplay_ready,control_api_version:$control_api_version,protocol_minor:$protocol_minor},
+            authenticated_smoke:{profile:$smoke_profile,result:"passed",result_sha256:$smoke_sha256},
+            recovery_target:(if $recovery_target == "" then null else $recovery_target end),
+            recovery:(if $recovery_target == "" then null else {
+                target:$recovery_target,
+                failed_data:$recovery_failed_data,
+                system_identifier:$recovery_system_identifier,
+                database_oid:$recovery_database_oid,
+                fence_epoch_before:($recovery_fence_before|tonumber),
+                fence_epoch_after:($recovery_fence_after|tonumber)
+            } end)
+        }
+    ' >"$prepared"
+    chmod 0640 "$prepared"
+    sync -f "$prepared"
+    update_operation_phase receipt_prepared
+    [ -f "$ADMISSION_MARKER" ] && [ ! -L "$ADMISSION_MARKER" ] || \
+        fail 'admission marker is absent at commit'
+    [ "$(stat -c '%d' "$prepared")" = "$(stat -c '%d' "$ADMISSION_MARKER")" ] || \
+        fail 'prepared receipt and admission marker are on different filesystems'
+    mv -Tf "$prepared" "$ADMISSION_MARKER"
+    sync -f "$ADMISSION_ROOT"
+    mv -Tf "$ADMISSION_MARKER" "$RELEASE_SUCCESS_RECEIPT"
+    sync -f "$ADMISSION_ROOT"
+    sync -f "$RELEASE_OPERATIONS_ROOT"
+    RELEASE_OPERATION_ACTIVE=false
+    RELEASE_OPERATION_ADMISSION_CLOSED=false
+    trap - 0 1 2 15
+}

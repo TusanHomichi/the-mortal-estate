@@ -1,0 +1,90 @@
+The Mortal Estate local simulation
+scenario: combat_labels
+seed: 7
+
+loaded "Combat Labels" realms=[realm_0] levels=[realm_0/room_0]
+player Delver at realm_0/room_0:1,1 hp=20
+monster Mireling at realm_0/room_0:3,1 hp=20
+
+player ready: Delver at 1
+Delver intent at 1: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Mireling at 2
+Mireling intent: move west
+Mireling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Mireling step west -> (2,1): terrain=Flagstone cost=1 remaining=0
+Mireling moved from (3,1) to (2,1)
+readiness scheduled: Mireling cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: fight mireling
+Delver missed Mireling: roll=11 attack_score=1 defense_score=13
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Mireling at 3
+Mireling intent: fight Delver
+Mireling missed Delver: roll=2 attack_score=1 defense_score=13
+readiness scheduled: Mireling cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: fight mireling
+Delver missed Mireling: roll=9 attack_score=1 defense_score=13
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Mireling at 4
+Mireling intent: fight Delver
+Mireling missed Delver: roll=8 attack_score=1 defense_score=13
+readiness scheduled: Mireling cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: fight mireling
+Delver missed Mireling: roll=11 attack_score=1 defense_score=13
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+monster ready: Mireling at 5
+Mireling intent: fight Delver
+Mireling missed Delver: roll=2 attack_score=1 defense_score=13
+readiness scheduled: Mireling cost=1 ready_at=6
+
+player ready: Delver at 5
+Delver intent at 5: fight mireling
+Delver missed Mireling: roll=9 attack_score=1 defense_score=13
+readiness scheduled: Delver cost=1 ready_at=6
+time 6
+monster ready: Mireling at 6
+Mireling intent: fight Delver
+Mireling attacked Delver: roll=16 damage=3 label=light hp=17
+contribution to player: character=None class=None damage=3
+readiness scheduled: Mireling cost=1 ready_at=7
+
+player ready: Delver at 6
+Delver intent at 6: fight mireling
+Delver attacked Mireling: roll=19 damage=3 label=light hp=17
+contribution to mireling: character=None class=None damage=3
+readiness scheduled: Delver cost=1 ready_at=7
+time 7
+monster ready: Mireling at 7
+Mireling intent: fight Delver
+Mireling attacked Delver: roll=14 damage=4 label=moderate hp=13
+contribution to player: character=None class=None damage=4
+readiness scheduled: Mireling cost=1 ready_at=8
+
+player ready: Delver at 7
+Delver intent at 7: fight mireling
+Delver attacked Mireling: roll=17 damage=4 label=moderate hp=13
+contribution to mireling: character=None class=None damage=4
+readiness scheduled: Delver cost=1 ready_at=8
+time 8
+monster ready: Mireling at 8
+Mireling intent: fight Delver
+Mireling attacked Delver: roll=16 damage=3 label=moderate hp=10
+contribution to player: character=None class=None damage=3
+readiness scheduled: Mireling cost=1 ready_at=9
+
+final state
+Delver at realm_0/room_0:2,1 hp=10 alive
+Mireling at realm_0/room_0:2,1 hp=13 alive

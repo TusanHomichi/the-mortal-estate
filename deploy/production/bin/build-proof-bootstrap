@@ -1,0 +1,115 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+[ "$#" -eq 5 ] || fail 'usage: build-proof-bootstrap <source-content> <runtime-content> <account-one-uuid> <account-two-uuid> <destination>'
+source_content=$1
+runtime_content=$2
+account_one=$3
+account_two=$4
+destination=$5
+
+uuid_pattern='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+printf '%s\n' "$account_one" | grep -Eq "$uuid_pattern" || \
+    fail 'account one is not a canonical UUID'
+printf '%s\n' "$account_two" | grep -Eq "$uuid_pattern" || \
+    fail 'account two is not a canonical UUID'
+[ "$account_one" != "$account_two" ] || fail 'proof accounts must be distinct'
+
+catalog=$source_content/catalogs/prototype_catalog_v6.json
+template=$source_content/world_templates/alignment_social_law.json
+source_seed=$source_content/simulation_seeds/alignment_social_law.json
+for path in "$catalog" "$template" "$source_seed"; do
+    [ -f "$path" ] || fail "proof content input is unavailable: $path"
+done
+[ "$(jq '[.actors[] | select(.id == "player")] | length' "$source_seed")" -eq 1 ] || \
+    fail 'proof seed must contain exactly one source player'
+
+install -d -o root -g tme -m 0750 "$destination"
+temporary=$(mktemp -d "$destination/.build.XXXXXX")
+trap 'rm -rf "$temporary"' EXIT HUP INT TERM
+
+jq '
+    .id = "eu_multiplayer_proof" |
+    (.actors[] | select(.id != "player") | .location) = {
+        realm: "realm_0",
+        level: "annex",
+        position: {x: 1, y: 1}
+    } |
+    (.actors[] | select(.id == "player") | .character_id) =
+        "character:eu-proof:one" |
+    (.actors[] | select(.id == "player") |
+        .character.physical_attribute_adds.strength_adds) = 100 |
+    (.actors[] | select(.id == "player") |
+        .character.physical_attribute_adds.dexterity_adds) = 100 |
+    .actors += [
+        (.actors[] | select(.id == "player") |
+            .id = "player_two" |
+            .character_id = "character:eu-proof:two" |
+            .character.resources.hp = 1 |
+            .character.resources.max_hp = 1 |
+            .character.resources.peak_hp = 1 |
+            .character.physical_attribute_adds.strength_adds = 0 |
+            .character.physical_attribute_adds.dexterity_adds = 0 |
+            .location.position.x += 1)
+    ]
+' "$source_seed" >"$temporary/simulation-seed.json"
+
+jq '
+    .id = "eu_multiplayer_proof" |
+    .realms.realm_0.levels.lantern_court.cells[1][2] = ["flagstone"] |
+    .arrivals.eu_proof_arrival = {
+        realm: "realm_0",
+        level: "lantern_court",
+        position: {x: 1, y: 1}
+    }
+' "$template" >"$temporary/world-template.json"
+
+jq -n \
+    --arg catalog "$runtime_content/catalogs/prototype_catalog_v6.json" \
+    --arg template "$destination/world-template.json" \
+    --arg seed "$destination/simulation-seed.json" \
+    --arg account_one "$account_one" \
+    --arg account_two "$account_two" \
+    '{
+        schema_version: 1,
+        catalog: $catalog,
+        catalog_profile: "profile/alignment_social_law",
+        world_template: $template,
+        world: {
+            facet_id: "019d25d7-0000-7000-8000-000000000001",
+            key: "eu-proof-world",
+            simulation_seed: $seed,
+            rng_seed: 7
+        },
+        characters: [
+            {
+                account_id: $account_one,
+                character_id: "019d25d7-1000-7000-8000-000000000001",
+                slot: 1,
+                display_name: "Proof One",
+                actor_id: "player"
+            },
+            {
+                account_id: $account_two,
+                character_id: "019d25d7-1000-7000-8000-000000000002",
+                slot: 1,
+                display_name: "Proof Two",
+                actor_id: "player_two"
+            }
+        ]
+    }
+' >"$temporary/bootstrap.json"
+
+chmod 0640 "$temporary/simulation-seed.json" "$temporary/world-template.json" \
+    "$temporary/bootstrap.json"
+chown root:tme "$temporary/simulation-seed.json" "$temporary/world-template.json" \
+    "$temporary/bootstrap.json"
+mv -f "$temporary/simulation-seed.json" "$destination/simulation-seed.json"
+mv -f "$temporary/world-template.json" "$destination/world-template.json"
+mv -f "$temporary/bootstrap.json" "$destination/bootstrap.json"
+rm -rf "$temporary"
+trap - EXIT HUP INT TERM
+printf '%s\n' "build-proof-bootstrap: $destination/bootstrap.json"

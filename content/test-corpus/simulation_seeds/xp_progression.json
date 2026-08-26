@@ -1,0 +1,108 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "xp_progression",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/xp_progression/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:xp_progression:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "fighter",
+          "display_class": "Fighter",
+          "nationality_id": "aldland",
+          "sex_or_gender_display": "male"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 15,
+          "dexterity": 12,
+          "constitution": 13,
+          "intelligence": 9,
+          "wisdom": 10,
+          "charisma": 8
+        },
+        "resources": {
+          "hp": 20,
+          "max_hp": 20,
+          "peak_hp": 20,
+          "mp": 0,
+          "max_mp": 0,
+          "stamina": 10,
+          "max_stamina": 10
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "promotion_history": []
+      },
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "training_knife",
+            "position": "right_hand"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "mireling",
+      "actor_definition_id": "actor/xp_progression/mireling",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "training_knife": {
+      "definition_id": "training_knife",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

@@ -1,0 +1,23 @@
+# Workspace cargo configuration.
+#
+# TME_BANNED_TERMS_FILE names the data file the content validator's boundary
+# scanner loads its denylist from (crates/tme-rules/src/content/validation/
+# boundary/terms.rs). The scanner FAILS CLOSED when the file is missing,
+# unreadable, or empty after parsing: it never scans with an empty policy.
+#
+# This entry points cargo-run processes at the tracked synthetic fixture, whose
+# terms are invented nonsense. That is what lets a clean clone build and test
+# with the private .boundary/ root absent, and it is why the tracked tree can
+# prove the rejection MECHANISM without carrying a single real term.
+#
+# `force = false` means a value already present in the environment wins. The
+# runtime and CI validation path exports the real list:
+#
+#     TME_BANNED_TERMS_FILE=.boundary/banned-terms.txt cargo run -p tme-sim ...
+#
+# Repository-wide enforcement against the real list is not this scanner's job.
+# That is tools/check_boundary_terms.py, which scans every carried file and
+# fails closed the same way. This scanner guards content at LOAD time, including
+# content that never enters the tree.
+[env]
+TME_BANNED_TERMS_FILE = { value = "tests/fixtures/synthetic-terms.txt", relative = true, force = false }

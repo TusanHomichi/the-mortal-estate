@@ -1,0 +1,75 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_root
+load_environment
+[ "${TME_POSTGRES_CONFIRM-}" = configure-fresh-postgresql-18 ] || \
+    fail 'set TME_POSTGRES_CONFIRM=configure-fresh-postgresql-18'
+role_password_file=${TME_ROLE_PASSWORD_FILE:-/run/tme-role-passwords.env}
+[ -f "$role_password_file" ] || fail 'root-owned role-password input is unavailable'
+[ "$(stat -c '%U' "$role_password_file")" = root ] || fail 'role-password input must be root-owned'
+case "$(stat -c '%a' "$role_password_file")" in 400|600) ;; *) fail 'role-password input permissions are too broad' ;; esac
+[ "$(wc -l <"$role_password_file")" -eq 5 ] || fail 'role-password input must contain exactly five rows'
+
+password_value() {
+    name=$1
+    value=$(sed -n "s/^${name}=//p" "$role_password_file")
+    [ -n "$value" ] || fail "role-password input is missing $name"
+    case "$value" in *[!0-9a-f]*|'') fail "role-password input is invalid: $name" ;; esac
+    [ "${#value}" -eq 64 ] || fail "role-password input length is invalid: $name"
+    printf '%s\n' "$value"
+}
+
+migrator_password=$(password_value TME_MIGRATOR_PASSWORD)
+runtime_password=$(password_value TME_RUNTIME_PASSWORD)
+auth_password=$(password_value TME_AUTH_PASSWORD)
+backup_password=$(password_value TME_BACKUP_PASSWORD)
+monitor_password=$(password_value TME_MONITOR_PASSWORD)
+
+cluster_config=/etc/postgresql/18/main
+[ -d "$cluster_config" ] || fail 'PostgreSQL 18 main cluster is unavailable'
+grep -Eq "^[[:space:]]*include_dir[[:space:]]*=[[:space:]]*'conf.d'" \
+    "$cluster_config/postgresql.conf" || fail 'Debian PostgreSQL conf.d include is unavailable'
+install -d -o postgres -g postgres -m 0750 "$cluster_config/conf.d"
+install -o postgres -g postgres -m 0640 \
+    "$PRODUCTION_ROOT/postgres/18/postgresql.conf.fragment" \
+    "$cluster_config/conf.d/90-tme.conf"
+install -o postgres -g postgres -m 0640 \
+    "$PRODUCTION_ROOT/postgres/18/pg_hba.conf.fragment" \
+    "$cluster_config/pg_hba.conf"
+
+systemctl enable --now postgresql.service
+pg_isready -q || fail 'PostgreSQL did not become ready'
+if ! runuser -u postgres -- psql --dbname=postgres --no-align --tuples-only \
+    --command="SELECT 1 FROM pg_database WHERE datname = '$TME_DATABASE_NAME'" | grep -qx 1
+then
+    runuser -u postgres -- createdb "$TME_DATABASE_NAME"
+fi
+runuser -u postgres -- psql --dbname="$TME_DATABASE_NAME" --set=ON_ERROR_STOP=on \
+    <"$PRODUCTION_ROOT/postgres/18/roles.sql" >/dev/null
+runuser -u postgres -- psql --dbname=postgres --set=ON_ERROR_STOP=on \
+    --command="ALTER DATABASE $TME_DATABASE_NAME OWNER TO tme_owner" >/dev/null
+
+password_sql=$(mktemp /run/.tme-role-passwords.XXXXXX.sql)
+trap 'rm -f "$password_sql"' EXIT HUP INT TERM
+{
+    printf "ALTER ROLE tme_migrator PASSWORD '%s';\n" "$migrator_password"
+    printf "ALTER ROLE tme_runtime PASSWORD '%s';\n" "$runtime_password"
+    printf "ALTER ROLE tme_auth PASSWORD '%s';\n" "$auth_password"
+    printf "ALTER ROLE tme_backup PASSWORD '%s';\n" "$backup_password"
+    printf "ALTER ROLE tme_monitor PASSWORD '%s';\n" "$monitor_password"
+} >"$password_sql"
+chown postgres:postgres "$password_sql"
+chmod 0600 "$password_sql"
+runuser -u postgres -- psql --dbname="$TME_DATABASE_NAME" --set=ON_ERROR_STOP=on \
+    --file="$password_sql" >/dev/null
+rm -f "$password_sql"
+trap - EXIT HUP INT TERM
+
+runuser -u postgres -- pgbackrest --stanza=tme stanza-create
+runuser -u postgres -- psql --dbname="$TME_DATABASE_NAME" \
+    --command='SELECT pg_switch_wal()' >/dev/null
+runuser -u postgres -- pgbackrest --stanza=tme check
+printf '%s\n' 'configure-postgres: PostgreSQL roles and encrypted off-host WAL repository ready'

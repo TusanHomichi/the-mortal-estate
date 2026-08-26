@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "terrain_movement",
+  "name": "Terrain Movement",
+  "description": "A clean project-authored abstract fixture for terrain movement points.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Help-file evidence informed the mechanic category. Layout, terrain names, terrain costs, actor names, and monster budget are original project fixture choices.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/terrain_movement.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/terrain_movement",
+  "world_template": "world_templates/terrain_movement.json",
+  "simulation_seed": "simulation_seeds/terrain_movement.json",
+  "script": [
+    {
+      "inspect": true
+    },
+    {
+      "move_path": [
+        "east",
+        "southeast",
+        "south"
+      ]
+    },
+    {
+      "move_path": [
+        "northwest",
+        "north",
+        "east"
+      ]
+    },
+    {
+      "wait": true
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# TYPE  DATABASE  USER              ADDRESS  METHOD
+local   tme       tme_runtime              scram-sha-256
+local   tme       tme_auth                 scram-sha-256
+local   tme       tme_migrator             scram-sha-256
+local   tme       tme_backup               scram-sha-256
+local   tme       tme_monitor              scram-sha-256
+local   all       postgres                   peer
+host    all       all               0.0.0.0/0 reject
+host    all       all               ::/0      reject

@@ -1,0 +1,1415 @@
+{
+  "actors": [
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/player",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 10,
+          "constitution": 10,
+          "dexterity": 10,
+          "intelligence": 14,
+          "strength": 10,
+          "wisdom": 12
+        },
+        "identity": {
+          "base_class_id": "wizard",
+          "current_class_id": "wizard",
+          "display_class": "Wizard",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [
+          {
+            "lane": "wizard_magic",
+            "learned_at_level": 1,
+            "spell_id": "sense_secret"
+          }
+        ],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 20,
+          "max_hp": 20,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 20,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "wizard_magic"
+          }
+        ]
+      },
+      "character_id": "character:first_land_structure:primary",
+      "id": "player",
+      "location": {
+        "level": "surface",
+        "position": {
+          "x": 25,
+          "y": 62
+        },
+        "realm": "testland"
+      },
+      "npc": null
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/town_watch",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "town_watch",
+      "location": {
+        "level": "surface",
+        "position": {
+          "x": 23,
+          "y": 51
+        },
+        "realm": "testland"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "The town is safe. Beyond the east gate, the island is wild.",
+            "transaction": {
+              "costs": [],
+              "id": "ask_about_watch",
+              "label": "Ask about the watch",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/temple_priest",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "temple_priest",
+      "location": {
+        "level": "surface",
+        "position": {
+          "x": 16,
+          "y": 43
+        },
+        "realm": "testland"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Carry one honest light below, and leave the dark no promise it can collect.",
+            "transaction": {
+              "costs": [],
+              "id": "seek_counsel",
+              "label": "Seek counsel",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/temple_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "temple_keeper",
+      "location": {
+        "level": "surface",
+        "position": {
+          "x": 18,
+          "y": 43
+        },
+        "realm": "testland"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "The temple stair reaches the upper halls. The other stairs lead home too.",
+            "transaction": {
+              "costs": [],
+              "id": "ask_about_descent",
+              "label": "Ask about the descent",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/bank_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "bank_keeper",
+      "location": {
+        "level": "bank_interior",
+        "position": {
+          "x": 7,
+          "y": 4
+        },
+        "realm": "testland"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "The fixed vault holds every registered locker behind the counter.",
+            "transaction": {
+              "costs": [],
+              "id": "ask_about_vault",
+              "label": "Ask about the vault",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/forge_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "forge_keeper",
+      "location": {
+        "level": "surface",
+        "position": {
+          "x": 36,
+          "y": 31
+        },
+        "realm": "testland"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "The pit beside the forge falls to the lake. The rope still reaches the surface.",
+            "transaction": {
+              "costs": [],
+              "id": "ask_about_forge",
+              "label": "Ask about the forge",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_land_structure/shrine_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "shrine_keeper",
+      "location": {
+        "level": "surface",
+        "position": {
+          "x": 142,
+          "y": 31
+        },
+        "realm": "testland"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "The shrine is past the end of the road.",
+            "transaction": {
+              "costs": [],
+              "id": "ask_about_shrine",
+              "label": "Ask about the shrine",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "ecology_sites": [
+    {
+      "id": "upper_halls_foragers",
+      "member_locations": {
+        "forager_a": {
+          "level": "upper_halls",
+          "position": {
+            "x": 28,
+            "y": 6
+          },
+          "realm": "testland"
+        },
+        "forager_b": {
+          "level": "upper_halls",
+          "position": {
+            "x": 31,
+            "y": 6
+          },
+          "realm": "testland"
+        },
+        "forager_c": {
+          "level": "upper_halls",
+          "position": {
+            "x": 31,
+            "y": 5
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/upper_halls_foragers"
+      }
+    },
+    {
+      "id": "upper_halls_watch",
+      "member_locations": {
+        "watch_a": {
+          "level": "upper_halls",
+          "position": {
+            "x": 39,
+            "y": 14
+          },
+          "realm": "testland"
+        },
+        "watch_b": {
+          "level": "upper_halls",
+          "position": {
+            "x": 44,
+            "y": 15
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/upper_halls_watch"
+      }
+    },
+    {
+      "id": "upper_halls_raiders",
+      "member_locations": {
+        "forager": {
+          "level": "upper_halls",
+          "position": {
+            "x": 21,
+            "y": 24
+          },
+          "realm": "testland"
+        },
+        "raider_a": {
+          "level": "upper_halls",
+          "position": {
+            "x": 18,
+            "y": 23
+          },
+          "realm": "testland"
+        },
+        "raider_b": {
+          "level": "upper_halls",
+          "position": {
+            "x": 21,
+            "y": 23
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/upper_halls_raiders"
+      }
+    },
+    {
+      "id": "surface_town_hounds",
+      "member_locations": {
+        "hound_a": {
+          "level": "surface",
+          "position": {
+            "x": 36,
+            "y": 37
+          },
+          "realm": "testland"
+        },
+        "hound_b": {
+          "level": "surface",
+          "position": {
+            "x": 38,
+            "y": 39
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_town_hounds"
+      }
+    },
+    {
+      "id": "surface_dock_crocodile",
+      "member_locations": {
+        "crocodile": {
+          "level": "surface",
+          "position": {
+            "x": 29,
+            "y": 57
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_dock_crocodile"
+      }
+    },
+    {
+      "id": "surface_gate_boars",
+      "member_locations": {
+        "boar_a": {
+          "level": "surface",
+          "position": {
+            "x": 49,
+            "y": 34
+          },
+          "realm": "testland"
+        },
+        "boar_b": {
+          "level": "surface",
+          "position": {
+            "x": 51,
+            "y": 36
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_gate_boars"
+      }
+    },
+    {
+      "id": "surface_low_road_wolves",
+      "member_locations": {
+        "wolf_a": {
+          "level": "surface",
+          "position": {
+            "x": 58,
+            "y": 22
+          },
+          "realm": "testland"
+        },
+        "wolf_b": {
+          "level": "surface",
+          "position": {
+            "x": 65,
+            "y": 31
+          },
+          "realm": "testland"
+        },
+        "wolf_c": {
+          "level": "surface",
+          "position": {
+            "x": 72,
+            "y": 24
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_low_road_wolves"
+      }
+    },
+    {
+      "id": "surface_forge_approach",
+      "member_locations": {
+        "archer": {
+          "level": "surface",
+          "position": {
+            "x": 68,
+            "y": 39
+          },
+          "realm": "testland"
+        },
+        "wraith": {
+          "level": "surface",
+          "position": {
+            "x": 70,
+            "y": 41
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_forge_approach"
+      }
+    },
+    {
+      "id": "surface_pit_guard",
+      "member_locations": {
+        "gargoyle": {
+          "level": "surface",
+          "position": {
+            "x": 75,
+            "y": 46
+          },
+          "realm": "testland"
+        },
+        "troll": {
+          "level": "surface",
+          "position": {
+            "x": 70,
+            "y": 45
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_pit_guard"
+      }
+    },
+    {
+      "id": "surface_east_bowguards",
+      "member_locations": {
+        "bowguard_a": {
+          "level": "surface",
+          "position": {
+            "x": 86,
+            "y": 19
+          },
+          "realm": "testland"
+        },
+        "bowguard_b": {
+          "level": "surface",
+          "position": {
+            "x": 94,
+            "y": 26
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_east_bowguards"
+      }
+    },
+    {
+      "id": "surface_shrine_approach",
+      "member_locations": {
+        "bear": {
+          "level": "surface",
+          "position": {
+            "x": 134,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "raptor": {
+          "level": "surface",
+          "position": {
+            "x": 131,
+            "y": 27
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_shrine_approach"
+      }
+    },
+    {
+      "id": "surface_tiger_run",
+      "member_locations": {
+        "tiger": {
+          "level": "surface",
+          "position": {
+            "x": 118,
+            "y": 45
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/surface_tiger_run"
+      }
+    },
+    {
+      "id": "surface_great_bear",
+      "member_locations": {
+        "great_bear": {
+          "level": "surface",
+          "position": {
+            "x": 146,
+            "y": 19
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "lair",
+        "lair_definition_id": "lair/testland/surface_great_bear"
+      }
+    },
+    {
+      "id": "surface_east_portal_magus",
+      "member_locations": {
+        "magus": {
+          "level": "surface",
+          "position": {
+            "x": 151,
+            "y": 32
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "lair",
+        "lair_definition_id": "lair/testland/surface_east_portal_magus"
+      }
+    },
+    {
+      "id": "upper_halls_west_bones",
+      "member_locations": {
+        "watch_a": {
+          "level": "upper_halls",
+          "position": {
+            "x": 13,
+            "y": 6
+          },
+          "realm": "testland"
+        },
+        "watch_b": {
+          "level": "upper_halls",
+          "position": {
+            "x": 15,
+            "y": 6
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/upper_halls_west_bones"
+      }
+    },
+    {
+      "id": "upper_halls_deep_warren",
+      "member_locations": {
+        "forager_a": {
+          "level": "upper_halls",
+          "position": {
+            "x": 13,
+            "y": 30
+          },
+          "realm": "testland"
+        },
+        "forager_b": {
+          "level": "upper_halls",
+          "position": {
+            "x": 15,
+            "y": 30
+          },
+          "realm": "testland"
+        },
+        "forager_c": {
+          "level": "upper_halls",
+          "position": {
+            "x": 15,
+            "y": 31
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/upper_halls_deep_warren"
+      }
+    },
+    {
+      "id": "upper_halls_lower_guard",
+      "member_locations": {
+        "raider_a": {
+          "level": "upper_halls",
+          "position": {
+            "x": 28,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "raider_b": {
+          "level": "upper_halls",
+          "position": {
+            "x": 30,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "watch": {
+          "level": "upper_halls",
+          "position": {
+            "x": 29,
+            "y": 33
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/upper_halls_lower_guard"
+      }
+    },
+    {
+      "id": "upper_halls_hidden_lair",
+      "member_locations": {
+        "lair_troll": {
+          "level": "upper_halls",
+          "position": {
+            "x": 47,
+            "y": 3
+          },
+          "realm": "testland"
+        },
+        "troll": {
+          "level": "upper_halls",
+          "position": {
+            "x": 47,
+            "y": 5
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "lair",
+        "lair_definition_id": "lair/testland/upper_halls_hidden_lair"
+      }
+    },
+    {
+      "id": "lower_halls_upper_landing",
+      "member_locations": {
+        "raider": {
+          "level": "lower_halls",
+          "position": {
+            "x": 19,
+            "y": 5
+          },
+          "realm": "testland"
+        },
+        "scrounger_a": {
+          "level": "lower_halls",
+          "position": {
+            "x": 13,
+            "y": 6
+          },
+          "realm": "testland"
+        },
+        "scrounger_b": {
+          "level": "lower_halls",
+          "position": {
+            "x": 15,
+            "y": 6
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lower_halls_upper_landing"
+      }
+    },
+    {
+      "id": "lower_halls_west_galleries",
+      "member_locations": {
+        "raider_a": {
+          "level": "lower_halls",
+          "position": {
+            "x": 3,
+            "y": 21
+          },
+          "realm": "testland"
+        },
+        "raider_b": {
+          "level": "lower_halls",
+          "position": {
+            "x": 5,
+            "y": 20
+          },
+          "realm": "testland"
+        },
+        "raider_c": {
+          "level": "lower_halls",
+          "position": {
+            "x": 4,
+            "y": 22
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lower_halls_west_galleries"
+      }
+    },
+    {
+      "id": "lower_halls_shrine_watch",
+      "member_locations": {
+        "watch_a": {
+          "level": "lower_halls",
+          "position": {
+            "x": 21,
+            "y": 30
+          },
+          "realm": "testland"
+        },
+        "watch_b": {
+          "level": "lower_halls",
+          "position": {
+            "x": 23,
+            "y": 30
+          },
+          "realm": "testland"
+        },
+        "wight": {
+          "level": "lower_halls",
+          "position": {
+            "x": 19,
+            "y": 23
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lower_halls_shrine_watch"
+      }
+    },
+    {
+      "id": "lower_halls_portal_watch",
+      "member_locations": {
+        "archer_a": {
+          "level": "lower_halls",
+          "position": {
+            "x": 39,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "archer_b": {
+          "level": "lower_halls",
+          "position": {
+            "x": 42,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "gargoyle": {
+          "level": "lower_halls",
+          "position": {
+            "x": 44,
+            "y": 32
+          },
+          "realm": "testland"
+        },
+        "wraith": {
+          "level": "lower_halls",
+          "position": {
+            "x": 43,
+            "y": 33
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lower_halls_portal_watch"
+      }
+    },
+    {
+      "id": "lower_halls_pit_ambush",
+      "member_locations": {
+        "spider_a": {
+          "level": "lower_halls",
+          "position": {
+            "x": 16,
+            "y": 21
+          },
+          "realm": "testland"
+        },
+        "spider_b": {
+          "level": "lower_halls",
+          "position": {
+            "x": 21,
+            "y": 21
+          },
+          "realm": "testland"
+        },
+        "spider_c": {
+          "level": "lower_halls",
+          "position": {
+            "x": 22,
+            "y": 21
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lower_halls_pit_ambush"
+      }
+    },
+    {
+      "id": "lower_halls_lair_approach",
+      "member_locations": {
+        "spider": {
+          "level": "lower_halls",
+          "position": {
+            "x": 47,
+            "y": 23
+          },
+          "realm": "testland"
+        },
+        "troll_a": {
+          "level": "lower_halls",
+          "position": {
+            "x": 43,
+            "y": 23
+          },
+          "realm": "testland"
+        },
+        "troll_b": {
+          "level": "lower_halls",
+          "position": {
+            "x": 45,
+            "y": 23
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lower_halls_lair_approach"
+      }
+    },
+    {
+      "id": "lake_level_northwest_landing",
+      "member_locations": {
+        "archer": {
+          "level": "lake_level",
+          "position": {
+            "x": 5,
+            "y": 4
+          },
+          "realm": "testland"
+        },
+        "veteran": {
+          "level": "lake_level",
+          "position": {
+            "x": 3,
+            "y": 4
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_northwest_landing"
+      }
+    },
+    {
+      "id": "lake_level_surface_landing",
+      "member_locations": {
+        "gargoyle": {
+          "level": "lake_level",
+          "position": {
+            "x": 7,
+            "y": 15
+          },
+          "realm": "testland"
+        },
+        "troll": {
+          "level": "lake_level",
+          "position": {
+            "x": 8,
+            "y": 14
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_surface_landing"
+      }
+    },
+    {
+      "id": "lake_level_east_galleries",
+      "member_locations": {
+        "scrounger_a": {
+          "level": "lake_level",
+          "position": {
+            "x": 39,
+            "y": 3
+          },
+          "realm": "testland"
+        },
+        "scrounger_b": {
+          "level": "lake_level",
+          "position": {
+            "x": 41,
+            "y": 5
+          },
+          "realm": "testland"
+        },
+        "veteran": {
+          "level": "lake_level",
+          "position": {
+            "x": 43,
+            "y": 4
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_east_galleries"
+      }
+    },
+    {
+      "id": "lake_level_fringe",
+      "member_locations": {
+        "salamander": {
+          "level": "lake_level",
+          "position": {
+            "x": 33,
+            "y": 15
+          },
+          "realm": "testland"
+        },
+        "wight": {
+          "level": "lake_level",
+          "position": {
+            "x": 35,
+            "y": 14
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_fringe"
+      }
+    },
+    {
+      "id": "lake_level_causeway_guard",
+      "member_locations": {
+        "gargoyle": {
+          "level": "lake_level",
+          "position": {
+            "x": 25,
+            "y": 21
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_causeway_guard"
+      }
+    },
+    {
+      "id": "lake_level_temple_approach",
+      "member_locations": {
+        "archer_a": {
+          "level": "lake_level",
+          "position": {
+            "x": 32,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "archer_b": {
+          "level": "lake_level",
+          "position": {
+            "x": 34,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "troll": {
+          "level": "lake_level",
+          "position": {
+            "x": 30,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "wraith": {
+          "level": "lake_level",
+          "position": {
+            "x": 28,
+            "y": 32
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_temple_approach"
+      }
+    },
+    {
+      "id": "lake_level_kobold_strays",
+      "member_locations": {
+        "forager_a": {
+          "level": "lake_level",
+          "position": {
+            "x": 21,
+            "y": 3
+          },
+          "realm": "testland"
+        },
+        "forager_b": {
+          "level": "lake_level",
+          "position": {
+            "x": 21,
+            "y": 5
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/lake_level_kobold_strays"
+      }
+    },
+    {
+      "id": "old_temple_lake_landing",
+      "member_locations": {
+        "archer": {
+          "level": "old_temple",
+          "position": {
+            "x": 13,
+            "y": 6
+          },
+          "realm": "testland"
+        },
+        "veteran_a": {
+          "level": "old_temple",
+          "position": {
+            "x": 3,
+            "y": 6
+          },
+          "realm": "testland"
+        },
+        "veteran_b": {
+          "level": "old_temple",
+          "position": {
+            "x": 5,
+            "y": 6
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/old_temple_lake_landing"
+      }
+    },
+    {
+      "id": "old_temple_spectral_passage",
+      "member_locations": {
+        "specter_a": {
+          "level": "old_temple",
+          "position": {
+            "x": 16,
+            "y": 21
+          },
+          "realm": "testland"
+        },
+        "specter_b": {
+          "level": "old_temple",
+          "position": {
+            "x": 21,
+            "y": 21
+          },
+          "realm": "testland"
+        },
+        "wraith": {
+          "level": "old_temple",
+          "position": {
+            "x": 15,
+            "y": 15
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/old_temple_spectral_passage"
+      }
+    },
+    {
+      "id": "old_temple_dark_hall",
+      "member_locations": {
+        "ghoul_a": {
+          "level": "old_temple",
+          "position": {
+            "x": 3,
+            "y": 32
+          },
+          "realm": "testland"
+        },
+        "ghoul_b": {
+          "level": "old_temple",
+          "position": {
+            "x": 5,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "ghoul_c": {
+          "level": "old_temple",
+          "position": {
+            "x": 9,
+            "y": 32
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/old_temple_dark_hall"
+      }
+    },
+    {
+      "id": "old_temple_summoning_approach",
+      "member_locations": {
+        "minotaur": {
+          "level": "old_temple",
+          "position": {
+            "x": 39,
+            "y": 15
+          },
+          "realm": "testland"
+        },
+        "salamander": {
+          "level": "old_temple",
+          "position": {
+            "x": 42,
+            "y": 21
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/old_temple_summoning_approach"
+      }
+    },
+    {
+      "id": "old_temple_sanctuary_watch",
+      "member_locations": {
+        "gargoyle": {
+          "level": "old_temple",
+          "position": {
+            "x": 23,
+            "y": 3
+          },
+          "realm": "testland"
+        },
+        "troll": {
+          "level": "old_temple",
+          "position": {
+            "x": 28,
+            "y": 5
+          },
+          "realm": "testland"
+        },
+        "wight_a": {
+          "level": "old_temple",
+          "position": {
+            "x": 30,
+            "y": 3
+          },
+          "realm": "testland"
+        },
+        "wight_b": {
+          "level": "old_temple",
+          "position": {
+            "x": 24,
+            "y": 5
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "spawn_group",
+        "spawn_group_id": "spawn/testland/old_temple_sanctuary_watch"
+      }
+    },
+    {
+      "id": "old_temple_summoning_lair",
+      "member_locations": {
+        "dragon": {
+          "level": "old_temple",
+          "position": {
+            "x": 50,
+            "y": 14
+          },
+          "realm": "testland"
+        },
+        "salamander": {
+          "level": "old_temple",
+          "position": {
+            "x": 51,
+            "y": 15
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "lair",
+        "lair_definition_id": "lair/testland/old_temple_summoning_lair"
+      }
+    },
+    {
+      "id": "old_temple_crypt_lair",
+      "member_locations": {
+        "crypt_wraith": {
+          "level": "old_temple",
+          "position": {
+            "x": 23,
+            "y": 33
+          },
+          "realm": "testland"
+        },
+        "ghoul": {
+          "level": "old_temple",
+          "position": {
+            "x": 26,
+            "y": 32
+          },
+          "realm": "testland"
+        },
+        "wraith": {
+          "level": "old_temple",
+          "position": {
+            "x": 28,
+            "y": 32
+          },
+          "realm": "testland"
+        }
+      },
+      "source": {
+        "kind": "lair",
+        "lair_definition_id": "lair/testland/old_temple_crypt_lair"
+      }
+    }
+  ],
+  "ground_items": [],
+  "id": "first_land_structure",
+  "item_instances": {},
+  "kind": "simulation_seed",
+  "merchant_inventories": [],
+  "schema_version": 3,
+  "service_instances": [
+    {
+      "id": "bank",
+      "location": {
+        "level": "bank_interior",
+        "position": {
+          "x": 5,
+          "y": 5
+        },
+        "realm": "testland"
+      },
+      "service_definition_id": "bank"
+    }
+  ]
+}

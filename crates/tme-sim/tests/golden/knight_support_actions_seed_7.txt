@@ -1,0 +1,71 @@
+The Mortal Estate local simulation
+scenario: knight_support_actions
+seed: 7
+
+loaded "Knight Support Actions" realms=[realm_0] levels=[realm_0/room_0]
+player Oathbearer (Knight) at realm_0/room_0:1,1 hp=18
+monster Training Dummy at realm_0/room_0:2,1 hp=30
+Oathbearer gains venom_seed (poison) for 4 rounds.
+
+player ready: Oathbearer at 1
+Oathbearer intent at 1: cast blessed_edge on active_equipment:oath_blade
+oath_blade gains +4 combat add for 5 rounds
+Oathbearer's Blessed Edge practice on knight_magic: raw=0 reason=class_has_no_magic_practice
+readiness scheduled: Oathbearer cost=1 ready_at=2
+Oathbearer regenerated 1 Mp (10/12, Active, time 2)
+time 2
+monster ready: Training Dummy at 2
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=3
+
+player ready: Oathbearer at 2
+Oathbearer intent at 2: cast valor on self
+Oathbearer gains valor (attribute_buff) for 2 rounds.
+Oathbearer's Valor practice on knight_magic: raw=0 reason=class_has_no_magic_practice
+readiness scheduled: Oathbearer cost=1 ready_at=3
+time 3
+monster ready: Training Dummy at 3
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=4
+
+player ready: Oathbearer at 3
+Oathbearer intent at 3: cast cleanse on self
+venom_seed is removed from Oathbearer: poison_cure.
+Oathbearer's Cleanse practice on knight_magic: raw=0 reason=class_has_no_magic_practice
+readiness scheduled: Oathbearer cost=1 ready_at=4
+valor ticks on Oathbearer (1 rounds remain).
+Oathbearer regenerated 1 Mp (5/12, Active, time 4)
+time 4
+monster ready: Training Dummy at 4
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=5
+
+player ready: Oathbearer at 4
+Oathbearer intent at 4: cast beacon on realm_0/room_0:1,1
+tile effect applied: beacon at realm_0/room_0:1,1 passability=none sight=clear hazard=none cost=none remaining=1
+Oathbearer's Beacon practice on knight_magic: raw=0 reason=class_has_no_magic_practice
+readiness scheduled: Oathbearer cost=1 ready_at=5
+valor ticks on Oathbearer (0 rounds remain).
+valor expires on Oathbearer.
+time 5
+monster ready: Training Dummy at 5
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=6
+
+player ready: Oathbearer at 5
+Oathbearer intent at 5: poke training_dummy
+Oathbearer missed Training Dummy: roll=2 attack_score=8 defense_score=13
+Oathbearer's poke miss practice on sword: risk=practice raw=1
+Oathbearer gained 1 sword practice point (pool: 1)
+readiness scheduled: Oathbearer cost=1 ready_at=6
+tile effect ticked: beacon at realm_0/room_0:1,1 remaining=0
+tile effect expired: beacon at realm_0/room_0:1,1
+Oathbearer regenerated 1 Mp (3/12, Active, time 6)
+time 6
+monster ready: Training Dummy at 6
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=7
+
+final state
+Oathbearer (Knight) at realm_0/room_0:1,1 hp=18 alive
+Training Dummy at realm_0/room_0:2,1 hp=30 alive

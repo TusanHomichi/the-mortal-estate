@@ -1,0 +1,69 @@
+The Mortal Estate local simulation
+scenario: profession_specific_actions
+seed: 7
+
+loaded "Profession Specific Actions" realms=[realm_0] levels=[realm_0/room_0]
+player Shade Adept (Thief) at realm_0/room_0:1,1 hp=12
+monster Watcher at realm_0/room_0:4,1 hp=8
+
+player ready: Shade Adept at 1
+Shade Adept intent at 1: cast shadow_veil on realm_0/room_0:1,1
+tile effect applied: shadow_veil at realm_0/room_0:1,1 passability=none sight=obscured hazard=none cost=none remaining=3
+Shade Adept's Shadow Veil practice on thief_magic: raw=2 reason=eligible_successful_cast
+Shade Adept gained 2 thief_magic practice points (pool: 2)
+readiness scheduled: Shade Adept cost=1 ready_at=2
+Shade Adept regenerated 1 Mp (10/10, Active, time 2)
+time 2
+monster ready: Watcher at 2
+Watcher intent: move west
+Watcher walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Watcher step west -> (3,1): terrain=Flagstone cost=1 remaining=0
+Watcher moved from (4,1) to (3,1)
+readiness scheduled: Watcher cost=1 ready_at=3
+
+player ready: Shade Adept at 2
+Shade Adept intent at 2: hide
+Shade Adept melts into cover (hidden) for 3 rounds.
+readiness scheduled: Shade Adept cost=1 ready_at=3
+tile effect ticked: shadow_veil at realm_0/room_0:1,1 remaining=2
+time 3
+monster ready: Watcher at 3
+Watcher intent: search west
+Watcher walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Watcher step west -> (2,1): terrain=Flagstone cost=1 remaining=0
+Watcher moved from (3,1) to (2,1)
+readiness scheduled: Watcher cost=1 ready_at=4
+
+player ready: Shade Adept at 3
+Shade Adept intent at 3: wait
+readiness scheduled: Shade Adept cost=1 ready_at=4
+hidden ticks on Shade Adept (2 rounds remain).
+tile effect ticked: shadow_veil at realm_0/room_0:1,1 remaining=1
+time 4
+monster ready: Watcher at 4
+Watcher intent: search west
+Watcher walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Watcher step west -> (1,1): terrain=Flagstone + shadow_veil cost=1 remaining=0
+Watcher moved from (2,1) to (1,1)
+readiness scheduled: Watcher cost=1 ready_at=5
+
+player ready: Shade Adept at 4
+Shade Adept intent at 4: walk east
+Shade Adept walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Shade Adept step east -> (2,1): terrain=Flagstone cost=1 remaining=2
+Shade Adept moved from (1,1) to (2,1)
+Shade Adept is revealed: move.
+readiness scheduled: Shade Adept cost=1 ready_at=5
+tile effect ticked: shadow_veil at realm_0/room_0:1,1 remaining=0
+tile effect expired: shadow_veil at realm_0/room_0:1,1
+time 5
+monster ready: Watcher at 5
+Watcher intent: move east
+Watcher walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Watcher step east -> (2,1): terrain=Flagstone cost=1 remaining=0
+Watcher moved from (1,1) to (2,1)
+readiness scheduled: Watcher cost=1 ready_at=6
+
+final state
+Shade Adept (Thief) at realm_0/room_0:2,1 hp=12 alive
+Watcher at realm_0/room_0:2,1 hp=8 alive

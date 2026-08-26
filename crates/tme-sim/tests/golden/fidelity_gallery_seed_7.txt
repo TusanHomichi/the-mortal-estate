@@ -1,0 +1,106 @@
+The Mortal Estate local simulation
+scenario: fidelity_gallery
+seed: 7
+
+loaded "Runtime Fidelity Gallery" realms=[realm_0] levels=[realm_0/room_0]
+player Delver (Fighter) at realm_0/room_0:1,1 hp=12
+monster Training Dummy at realm_0/room_0:3,1 hp=99
+
+player ready: Delver at 1
+Delver intent at 1: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Training Dummy at 2
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: move_item training_sword to sack_item_1
+Delver moved Training Sword from (2,1) to sack_item_1
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Training Dummy at 3
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: move_item leather_armor to sack_item_2
+Delver moved Leather Armor from (2,1) to sack_item_2
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+monster ready: Training Dummy at 4
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: move_item wooden_shield to sack_item_3
+Delver moved Wooden Shield from (2,1) to sack_item_3
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+monster ready: Training Dummy at 5
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=6
+
+player ready: Delver at 5
+Delver intent at 5: move_item healing_balm to sack_item_4
+Delver moved Healing Balm from (2,1) to sack_item_4
+readiness scheduled: Delver cost=1 ready_at=6
+time 6
+monster ready: Training Dummy at 6
+Training Dummy intent: hold
+readiness scheduled: Training Dummy cost=1 ready_at=7
+
+player ready: Delver at 6
+Delver intent at 6: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step east -> (3,1): terrain=Flagstone cost=1 remaining=2
+Delver moved from (2,1) to (3,1)
+readiness scheduled: Delver cost=1 ready_at=7
+time 7
+monster ready: Training Dummy at 7
+Training Dummy intent: fight Delver
+Training Dummy missed Delver: roll=11 attack_score=1 defense_score=14
+readiness scheduled: Training Dummy cost=1 ready_at=8
+
+player ready: Delver at 7
+Delver intent at 7: fight dummy
+Delver missed Training Dummy: roll=2 attack_score=2 defense_score=13
+Delver's fight miss practice on hand: risk=life_and_death raw=2
+Delver gained 2 Hand practice points (pool: 2)
+Delver's Hand skill advanced to level 1, critique 1 (First Measure)
+readiness scheduled: Delver cost=1 ready_at=8
+time 8
+monster ready: Training Dummy at 8
+Training Dummy intent: fight Delver
+Training Dummy missed Delver: roll=9 attack_score=1 defense_score=14
+readiness scheduled: Training Dummy cost=1 ready_at=9
+
+player ready: Delver at 8
+Delver intent at 8: wait
+readiness scheduled: Delver cost=1 ready_at=9
+time 9
+monster ready: Training Dummy at 9
+Training Dummy intent: fight Delver
+Training Dummy missed Delver: roll=8 attack_score=1 defense_score=14
+readiness scheduled: Training Dummy cost=1 ready_at=10
+
+player ready: Delver at 9
+Delver intent at 9: inspect
+Delver inspected at realm_0/room_0:3,1: tile=Flagstone
+  current tile: terrain=Flagstone cost=1
+  north -> realm_0/room_0:3,0: blocked terrain terrain=Stone Wall
+  northeast -> realm_0/room_0:4,0: blocked terrain terrain=Stone Wall
+  east -> realm_0/room_0:4,1: walkable terrain=Flagstone cost=1
+  southeast -> realm_0/room_0:4,2: walkable terrain=Flagstone cost=1
+  south -> realm_0/room_0:3,2: walkable terrain=Flagstone cost=1
+  southwest -> realm_0/room_0:2,2: walkable terrain=Flagstone cost=1
+  west -> realm_0/room_0:2,1: walkable terrain=Flagstone cost=1
+  northwest -> realm_0/room_0:2,0: blocked terrain terrain=Stone Wall
+readiness scheduled: Delver cost=0 ready_at=9
+
+final state
+Delver (Fighter) at realm_0/room_0:3,1 hp=12 alive
+Training Dummy at realm_0/room_0:3,1 hp=99 alive

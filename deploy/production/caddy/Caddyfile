@@ -1,0 +1,45 @@
+{
+	admin 127.0.0.1:2019
+	persist_config off
+	default_sni {$TME_PUBLIC_HOST}
+}
+
+{$TME_PUBLIC_HOST} {
+	tls {
+		issuer acme {
+			profile {$TME_ACME_PROFILE:shortlived}
+		}
+	}
+
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip delete
+				request>remote_port delete
+				request>client_ip delete
+				request>headers>Authorization delete
+				request>headers>Cookie delete
+				request>uri delete
+			}
+		}
+	}
+
+	@internal path /internal/*
+	respond @internal 404
+
+	@admission_closed {
+		not remote_ip 127.0.0.1 ::1
+		file {
+			root /var/lib/tme/admission
+			try_files closed
+		}
+	}
+	respond @admission_closed 503
+
+	reverse_proxy 127.0.0.1:8080 {
+		stream_close_delay 5m
+		header_up Host {host}
+	}
+}

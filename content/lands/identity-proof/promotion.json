@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "authored_land_promotion",
+  "status": "owner_accepted_at_s1",
+  "attested_by": "peter",
+  "attested_on": "2026-08-21",
+  "master": {
+    "path": "content/lands/identity-proof/settlement.tmj",
+    "sha256": "320ecf5553a110ca349272db2ddbb3de005021f648b8b397d8d6bbf9f98b0b0a",
+    "byte_identical_to_reviewed_master": true
+  },
+  "companions": [],
+  "authority": {
+    "coordinates": true,
+    "terrain_and_passability": true,
+    "structures_and_landmarks": true,
+    "member_transition_endpoints": true,
+    "runtime_loads_authoring_source": true,
+    "presentation_art": false,
+    "gameplay_tuning": false,
+    "content_canon": false
+  },
+  "research_boundary": {
+    "review_refs": [
+      "docs/authoring-compiler.md",
+      "docs/plans/2026-08-21-identity-proof-packet.md",
+      "content/lands/identity-proof/README.md"
+    ]
+  }
+}

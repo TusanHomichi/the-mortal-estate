@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "client_audio_manifest",
+  "source": {
+    "schema_version": 1,
+    "sha256": "bb9e65612e1b3a7f7b3b9a31a312a5b03b5543bd1235953517ebbdf6b3905cea"
+  },
+  "cues": [
+    {
+      "id": "combat_swing_01",
+      "role": "combat_swing",
+      "path": "res://presentation/audio/assets/generated/combat_swing_01.ogg",
+      "sha256": "4cd96dc630bed9840c15f1dd2306da2cc56a4da26a5d3f1a03c5a7265ac5e54f",
+      "byte_length": 15532,
+      "gain_db": -14.0,
+      "pitch_min": 0.96,
+      "pitch_max": 1.04,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "combat_body_impact_01",
+      "role": "combat_body_impact",
+      "path": "res://presentation/audio/assets/generated/combat_body_impact_01.ogg",
+      "sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+      "byte_length": 11617,
+      "gain_db": -12.0,
+      "pitch_min": 0.97,
+      "pitch_max": 1.03,
+      "max_simultaneous_voices": 2,
+      "variant_group": "combat_body_impact_variants"
+    },
+    {
+      "id": "combat_body_impact_02",
+      "role": "combat_body_impact",
+      "path": "res://presentation/audio/assets/generated/combat_body_impact_02.ogg",
+      "sha256": "f92f5cb6ba4ff2766497292ffd90865654317eeca976f5652e0708dbdcdc0dd9",
+      "byte_length": 10861,
+      "gain_db": -12.0,
+      "pitch_min": 0.97,
+      "pitch_max": 1.03,
+      "max_simultaneous_voices": 2,
+      "variant_group": "combat_body_impact_variants"
+    },
+    {
+      "id": "combat_dry_result_01",
+      "role": "combat_dry_result",
+      "path": "res://presentation/audio/assets/generated/combat_dry_result_01.ogg",
+      "sha256": "9851a69d0c613e13bceef08060ecc4148f098ef487927cbebe270d642398a3b3",
+      "byte_length": 13615,
+      "gain_db": -18.0,
+      "pitch_min": 0.98,
+      "pitch_max": 1.02,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "bow_release_01",
+      "role": "bow_release",
+      "path": "res://presentation/audio/assets/generated/bow_release_01.ogg",
+      "sha256": "be97ec4893a02d6eccfb678daa76c83e34cb2583b834ec2593d2641def739fa4",
+      "byte_length": 6317,
+      "gain_db": -14.0,
+      "pitch_min": 0.98,
+      "pitch_max": 1.02,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "spell_chant_01",
+      "role": "spell_chant",
+      "path": "res://presentation/audio/assets/generated/spell_chant_01.wav",
+      "sha256": "2042752db95720f22ba66a20977266f732b6213c609a9986d08c5e420185e87c",
+      "byte_length": 417180,
+      "gain_db": -18.0,
+      "pitch_min": 0.98,
+      "pitch_max": 1.02,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "spell_release_01",
+      "role": "spell_release",
+      "path": "res://presentation/audio/assets/generated/spell_release_01.ogg",
+      "sha256": "c977fe249ff42d1c93a552b33abc13a8399df3879fa510475426e5c4bbac1da9",
+      "byte_length": 6941,
+      "gain_db": -14.0,
+      "pitch_min": 0.98,
+      "pitch_max": 1.02,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "spell_impact_01",
+      "role": "spell_impact",
+      "path": "res://presentation/audio/assets/generated/spell_impact_01.ogg",
+      "sha256": "94b8bb5f2d43ab65e4bcc32b28562416e9bc2c51d9fd4be1e333660ee52f977f",
+      "byte_length": 13915,
+      "gain_db": -14.0,
+      "pitch_min": 0.98,
+      "pitch_max": 1.02,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "loot_stow_01",
+      "role": "loot_stow",
+      "path": "res://presentation/audio/assets/generated/loot_stow_01.ogg",
+      "sha256": "a66f6db5918ad016c28a9f2768f127a7f39b5fa04481e5a3b4e78ebe2a1c282d",
+      "byte_length": 10028,
+      "gain_db": -3.0,
+      "pitch_min": 0.98,
+      "pitch_max": 1.02,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    },
+    {
+      "id": "ui_reject_01",
+      "role": "ui_reject",
+      "path": "res://presentation/audio/assets/generated/ui_reject_01.ogg",
+      "sha256": "0b574cea597d96507e782ae9764f88482ce49f46e931e57054bf7150047f2d69",
+      "byte_length": 6393,
+      "gain_db": -24.0,
+      "pitch_min": 1.0,
+      "pitch_max": 1.0,
+      "max_simultaneous_voices": 1,
+      "variant_group": null
+    }
+  ]
+}

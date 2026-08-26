@@ -1,0 +1,5 @@
+{
+  "synthetic": true,
+  "role": "runtime_projection",
+  "note": "A stand-in for an addressed source file. No authority, no meaning."
+}

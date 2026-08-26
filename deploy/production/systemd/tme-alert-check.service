@@ -1,0 +1,23 @@
+[Unit]
+Description=TME bounded production alert check
+
+[Service]
+Type=oneshot
+User=tme-monitor
+Group=tme-monitor
+ExecStartPre=+/opt/tme/operations/bin/collect-postgres-status
+ExecStart=/opt/tme/operations/bin/alert-check
+EnvironmentFile=/etc/tme/server.env
+LoadCredential=webhook-url:/etc/tme/credentials/webhook-url
+StateDirectory=tme/alerts
+ReadWritePaths=/var/lib/tme/operations
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes

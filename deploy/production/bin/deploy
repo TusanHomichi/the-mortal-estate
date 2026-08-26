@@ -1,0 +1,73 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/release-operation"
+
+require_root
+[ "$#" -eq 1 ] || fail 'usage: deploy <release-id>'
+release_id=$1
+release=$(release_directory "$release_id")
+if ! deployment_manifest_sha256=$(verify_release_integrity "$release"); then
+    fail 'deployment release integrity is missing, malformed, or incompatible'
+fi
+[ -n "$deployment_manifest_sha256" ] || fail 'deployment release manifest digest is absent'
+load_environment
+"$PRODUCTION_ROOT/bin/preflight" "$release/bin/tme-server"
+require_operation_lock
+exec 9>"$OPERATION_LOCK"
+flock -n 9 || fail 'another release operation is active'
+begin_release_operation deploy "$release"
+
+printf '%s\n' "$RELEASE_OPERATION_PREVIOUS" >"$STATE_ROOT/previous-release"
+update_operation_phase service_stopping
+systemctl stop tme-server.service
+RELEASE_OPERATION_SERVICE_STOPPED=true
+update_operation_phase service_stopped
+update_operation_phase backup_running
+"$PRODUCTION_ROOT/bin/backup" full
+update_operation_phase backup_complete
+dump_directory=$STATE_ROOT/pre-migration
+install -d -o root -g root -m 0700 "$dump_directory"
+dump_path=$dump_directory/$release_id.dump
+PGPASSFILE=$(credential_file migrator-pgpass) \
+    pg_dump --host="$PRODUCTION_DATABASE_SOCKET" --port="$PRODUCTION_DATABASE_PORT" \
+    --format=custom --file="$dump_path" --dbname="$TME_DATABASE_NAME" \
+    --username=tme_migrator --role=tme_owner \
+    --no-owner --no-privileges
+sha256sum "$dump_path" >"$dump_path.sha256"
+update_operation_phase logical_dump_complete
+
+migration_projection=$(create_credential_projection migration migrator-database-url)
+RELEASE_OPERATION_PROJECTION=$migration_projection
+update_operation_phase migration_attempted
+run_as_deploy env CREDENTIALS_DIRECTORY="$migration_projection" \
+    "$release/bin/tme-server" migrate
+destroy_credential_projection "$migration_projection"
+RELEASE_OPERATION_PROJECTION=''
+update_operation_phase grants_attempted
+PGPASSFILE=$(credential_file migrator-pgpass) \
+    PGOPTIONS='-c role=tme_owner' \
+    psql --host="$PRODUCTION_DATABASE_SOCKET" --port="$PRODUCTION_DATABASE_PORT" \
+    --dbname="$TME_DATABASE_NAME" --username=tme_migrator \
+    --set=ON_ERROR_STOP=on \
+    --file="$release/deploy/production/postgres/18/grants.sql" >/dev/null
+verify_database_contract "$release"
+update_operation_phase database_verified
+
+update_operation_phase release_switching
+switch_release "$release"
+# Referenced by the sourced release-operation failure handler.
+# shellcheck disable=SC2034
+RELEASE_OPERATION_SWITCHED=true
+update_operation_phase release_switched
+systemctl start tme-server.service
+# Referenced by the sourced release-operation failure handler.
+# shellcheck disable=SC2034
+RELEASE_OPERATION_SERVICE_STOPPED=false
+update_operation_phase service_started
+wait_private_readiness || fail 'new release did not become privately ready'
+update_operation_phase readiness_verified
+run_authenticated_admission_smoke "$release"
+update_operation_phase smoke_verified
+commit_release_operation
+printf '%s\n' "deploy: $release_id committed and admission opened"

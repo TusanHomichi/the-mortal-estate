@@ -1,0 +1,208 @@
+{
+  "arrivals": {},
+  "id": "npc_quest_interactions",
+  "kind": "world_template",
+  "realms": {
+    "realm_0": {
+      "levels": {
+        "crossing": {
+          "cells": [
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "crossing_stone"
+              ],
+              [
+                "watch_stairs_up"
+              ],
+              [
+                "crossing_stone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "watch": {
+          "cells": [
+            [
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ]
+            ],
+            [
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_floor"
+              ],
+              [
+                "crossing_stairs_down"
+              ],
+              [
+                "watch_floor"
+              ],
+              [
+                "watch_wall"
+              ]
+            ],
+            [
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ],
+              [
+                "watch_wall"
+              ]
+            ]
+          ],
+          "height": 3,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Npc Quest Interactions"
+    }
+  },
+  "schema_version": 3,
+  "topology": {
+    "edge/crossing/1/2": {
+      "at": {
+        "level": "crossing",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "up",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "watch",
+          "position": {
+            "x": 2,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/watch/1/2": {
+      "at": {
+        "level": "watch",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "down",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "crossing",
+          "position": {
+            "x": 2,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    }
+  },
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+}

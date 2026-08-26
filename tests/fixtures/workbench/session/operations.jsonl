@@ -1,0 +1,8 @@
+{"schema_version": 1, "kind": "selection_recorded", "record_id": "op-0001", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0001", "packet": "selections/sel-0001.json", "operation": null}
+{"schema_version": 1, "kind": "owner_comment", "record_id": "op-0002", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0001", "comment": "the landmark and the route both live here", "operation": null}
+{"schema_version": 1, "kind": "selection_recorded", "record_id": "op-0003", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0002", "packet": "selections/sel-0002.json", "operation": null}
+{"schema_version": 1, "kind": "owner_comment", "record_id": "op-0004", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0002", "comment": "the whole hall footprint", "operation": null}
+{"schema_version": 1, "kind": "selection_recorded", "record_id": "op-0005", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0003", "packet": "selections/sel-0003.json", "operation": null}
+{"schema_version": 1, "kind": "owner_comment", "record_id": "op-0006", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0003", "comment": "the north-west quarter", "operation": null}
+{"schema_version": 1, "kind": "selection_recorded", "record_id": "op-0007", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0004", "packet": "selections/sel-0004.json", "operation": null}
+{"schema_version": 1, "kind": "owner_comment", "record_id": "op-0008", "recorded_at": "2026-08-19T00:00:00Z", "author": "owner", "selection_id": "sel-0004", "comment": "the ground the hall opens onto", "operation": null}

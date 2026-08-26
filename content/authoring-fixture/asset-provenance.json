@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "authoring_fixture_asset_provenance",
+  "status": "lane_authored_synthetic_editable_master",
+  "authored_by": "lane",
+  "authored_on": "2026-08-20",
+  "assets": [
+    {
+      "path": "content/authoring-fixture/fixture-swatch.png",
+      "sha256": "6bf56220932fc0a3d56470d9519a5f38a7a5bbd4907086047ab8ddc151fcfb61",
+      "format": "png_rgba8_non_interlaced",
+      "width": 32,
+      "height": 24,
+      "palette": [
+        [26, 26, 26, 255],
+        [77, 77, 77, 255],
+        [140, 140, 140, 255],
+        [217, 217, 217, 255]
+      ],
+      "synthesis": "Three horizontal bands of eight rows each — shadow, midtone, light, top to bottom — with an eight-by-eight checker of ink and light in the top-left corner at a two-pixel cell. Written once by the project's own standard-library PNG encoder. It depicts nothing.",
+      "licensing_basis": "original synthetic work of this project; no third-party or generated-model input"
+    }
+  ],
+  "authority": {
+    "editable_master": true,
+    "presentation_art": false,
+    "accepted_visual_master": false,
+    "content_canon": false,
+    "runtime_consumable": false,
+    "promotion_granted": false
+  },
+  "research_boundary": {
+    "review_refs": [
+      "docs/workbench-v1.md",
+      "content/authoring-fixture/README.md"
+    ]
+  }
+}

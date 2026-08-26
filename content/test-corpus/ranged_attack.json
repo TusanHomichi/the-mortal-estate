@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "ranged_attack",
+  "name": "Ranged Attack",
+  "description": "A clean project-authored prototype fixture for range-limited attacks without retrieval.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project ranged-attack fixture. Weapon profile, range value, terrain labels, actor names, script, and numeric tuning are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/ranged_attack.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/ranged_attack",
+  "world_template": "world_templates/ranged_attack.json",
+  "simulation_seed": "simulation_seeds/ranged_attack.json",
+  "script": [
+    {
+      "nock": true
+    },
+    {
+      "physical_attack": {
+        "mode": "shoot",
+        "target_actor_id": "reedling",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

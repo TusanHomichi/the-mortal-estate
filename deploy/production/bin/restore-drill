@@ -1,0 +1,277 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+require_command pg_ctl
+require_command jq
+require_command psql
+require_command sha256sum
+state_root=$(canonical_directory 'state root' "$STATE_ROOT")
+locked_drill_root=$state_root/restore-drill
+[ "${TME_RESTORE_DRILL_ROOT:-$locked_drill_root}" = "$locked_drill_root" ] || \
+    fail 'restore drill root override differs from the locked state root'
+drill_root=$(canonical_direct_child 'restore drill root' "$state_root" restore-drill)
+[ "$OPERATIONS_ROOT" = "$state_root/operations" ] || \
+    fail 'operations root override differs from the locked state root'
+operations_root=$(canonical_direct_child 'operations root' "$state_root" operations)
+require_operation_lock
+exec 9>"$OPERATION_LOCK"
+flock -n 9 || fail 'another release, recovery, or restore operation is active'
+release=$(current_release) || fail 'current release is unavailable'
+data=$drill_root/pgdata
+socket=$drill_root/socket
+quarantine=$drill_root/quarantine
+artifact=$operations_root/restore-drill
+journal=$drill_root/in-progress.json
+operation_id=$(date -u +'%Y%m%dT%H%M%SZ')-$$
+configuration=$drill_root/postgresql.conf
+hba=$drill_root/pg_hba.conf
+ident=$drill_root/pg_ident.conf
+log=$drill_root/postgresql.log
+port=${TME_RESTORE_DRILL_PORT:-55432}
+case "$port" in *[!0-9]*|'') fail 'restore drill port is invalid' ;; esac
+[ "$port" -ge 1024 ] && [ "$port" -le 65535 ] || fail 'restore drill port is outside the unprivileged range'
+for child in pgdata socket quarantine postgresql.conf pg_hba.conf pg_ident.conf postgresql.log
+do
+    validate_component 'restore drill child' "$child"
+done
+
+remove_exact_child() {
+    path=$1
+    [ "$(dirname -- "$path")" = "$drill_root" ] || fail 'restore drill cleanup escaped its root'
+    [ ! -L "$path" ] || fail 'restore drill cleanup encountered a symbolic link'
+    [ ! -e "$path" ] || rm -rf -- "$path"
+}
+
+[ ! -L "$quarantine" ] || fail 'restore drill quarantine is a symbolic link'
+install -d -m 0700 "$quarantine"
+canonical_quarantine=$(canonical_direct_child 'restore drill quarantine' "$drill_root" quarantine)
+[ "$canonical_quarantine" = "$quarantine" ] || fail 'restore drill quarantine path changed'
+if [ -e "$data" ] || [ -L "$data" ]; then
+    [ -d "$data" ] && [ ! -L "$data" ] || fail 'prior restore drill data is unsafe'
+    prior_data=$quarantine/pgdata-prior-$(date -u +'%Y%m%dT%H%M%SZ')-$$
+    mv -- "$data" "$prior_data"
+    chmod 0500 "$prior_data"
+fi
+remove_exact_child "$socket"
+for path in "$configuration" "$hba" "$ident" "$log"
+do
+    [ ! -L "$path" ] || fail 'restore drill configuration path is a symbolic link'
+    rm -f -- "$path"
+done
+install -d -m 0700 "$socket"
+if [ -e "$journal" ] || [ -L "$journal" ]; then
+    [ -f "$journal" ] && [ ! -L "$journal" ] || \
+        fail 'prior restore drill journal is unsafe'
+    prior_journal=$quarantine/journal-prior-$(date -u +'%Y%m%dT%H%M%SZ')-$$.json
+    mv -- "$journal" "$prior_journal"
+    chmod 0400 "$prior_journal"
+fi
+[ "$(stat -c '%d' "$drill_root")" = "$(stat -c '%d' "$operations_root")" ] || \
+    fail 'restore drill journal and receipt must share one filesystem'
+backup_label=$(run_as_postgres pgbackrest --stanza=tme --output=json info | \
+    jq -er '.[0].backup | sort_by(.timestamp.stop) | last | .label') || \
+    fail 'latest pgBackRest backup identity is unavailable'
+
+write_drill_phase() {
+    drill_phase=$1
+    validate_component 'restore drill phase' "$drill_phase"
+    drill_temporary=$(mktemp "$drill_root/.journal.XXXXXX") || \
+        fail 'restore drill journal temporary could not be created'
+    if [ -f "$journal" ] && [ ! -L "$journal" ]; then
+        jq --arg phase "$drill_phase" --arg updated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            '.phase=$phase | .updated_at=$updated_at' "$journal" >"$drill_temporary" || {
+                rm -f -- "$drill_temporary"
+                fail 'restore drill journal is malformed'
+            }
+    else
+        jq -n --arg operation_id "$operation_id" --arg phase "$drill_phase" \
+            --arg updated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" '
+            {schema_version:2,operation:"restore-drill",operation_id:$operation_id,
+             state:"in_progress",phase:$phase,updated_at:$updated_at}' >"$drill_temporary"
+    fi
+    chmod 0600 "$drill_temporary"
+    sync -f "$drill_temporary"
+    mv -Tf "$drill_temporary" "$journal"
+    sync -f "$drill_root"
+}
+
+drill_receipt_is_committed() {
+    [ ! -e "$journal" ] && [ -f "$artifact" ] && [ ! -L "$artifact" ] && \
+        [ "$(stat -c '%u:%g:%a:%h' "$artifact" 2>/dev/null)" = \
+            "$(id -u):$(id -g):640:1" ] && \
+        jq -e --arg operation_id "$operation_id" '
+            keys == ["backup","completed_at","database","fence","operation","operation_id",
+                     "schema_version","state","target","verification"] and
+            .schema_version == 2 and .operation == "restore-drill" and
+            .operation_id == $operation_id and .state == "committed" and .target == "latest" and
+            (.completed_at | type == "string" and
+             test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")) and
+            (.backup | keys == ["label"]) and
+            (.backup.label | type == "string" and length > 0) and
+            (.database | keys == ["database_oid","migration_set_sha256","system_identifier"]) and
+            (.database.system_identifier | test("^[0-9]+$")) and
+            (.database.database_oid | test("^[0-9]+$")) and
+            (.database.migration_set_sha256 | test("^[0-9a-f]{64}$")) and
+            (.verification | keys == ["post_fence_checkpoint_set_sha256","post_fence_store_verify",
+                                      "pre_fence_checkpoint_set_sha256","pre_fence_store_verify"]) and
+            .verification.pre_fence_store_verify == true and
+            .verification.post_fence_store_verify == true and
+            (.verification.pre_fence_checkpoint_set_sha256 | test("^[0-9a-f]{64}$")) and
+            (.verification.post_fence_checkpoint_set_sha256 | test("^[0-9a-f]{64}$")) and
+            (.fence | keys == ["applied","epoch_after","epoch_before"]) and
+            .fence.applied == true and (.fence.epoch_before | type == "number") and
+            .fence.epoch_after == (.fence.epoch_before + 1)
+        ' "$artifact" >/dev/null 2>&1 || return 1
+    if ! sync -f "$drill_root" || ! sync -f "$operations_root"; then
+        printf '%s\n' 'error: committed restore-drill receipt required a filesystem-wide durability fallback' >&2
+        sync || true
+    fi
+    return 0
+}
+
+completed=false
+cleanup() {
+    cleanup_status=$?
+    trap - 0 1 2 15
+    if drill_receipt_is_committed; then
+        completed=true
+        exit "$cleanup_status"
+    fi
+    pg_ctl -D "$data" -m immediate stop >/dev/null 2>&1 || true
+    if [ "$completed" = false ] && [ -d "$data" ] && [ ! -L "$data" ] && \
+        [ "$(dirname -- "$data")" = "$drill_root" ]
+    then
+        quarantine_target=$quarantine/pgdata-$(date -u +'%Y%m%dT%H%M%SZ')-$$
+        if mv -- "$data" "$quarantine_target" 2>/dev/null; then
+            chmod 0500 "$quarantine_target" 2>/dev/null || true
+        else
+            chmod 0500 "$data" 2>/dev/null || true
+            printf '%s\n' 'error: failed drill data remains locked at its exact data path' >&2
+        fi
+    fi
+    if [ -f "$journal" ] && [ ! -L "$journal" ]; then
+        (write_drill_phase failed_quarantined) >/dev/null 2>&1 || true
+    fi
+    exit "$cleanup_status"
+}
+drill_signal() {
+    drill_signal_number=$1
+    trap - HUP INT TERM
+    exit $((128 + drill_signal_number))
+}
+trap cleanup EXIT
+trap 'drill_signal 1' HUP
+trap 'drill_signal 2' INT
+trap 'drill_signal 15' TERM
+write_drill_phase restore_starting
+"$PRODUCTION_ROOT/bin/restore" "$data" latest
+write_drill_phase files_restored
+
+{
+    printf "data_directory = '%s'\n" "$data"
+    printf "hba_file = '%s'\n" "$hba"
+    printf "ident_file = '%s'\n" "$ident"
+    printf "listen_addresses = ''\n"
+    printf "port = %s\n" "$port"
+    printf "unix_socket_directories = '%s'\n" "$socket"
+    printf "unix_socket_permissions = 0700\n"
+    printf "ssl = off\n"
+    printf "logging_collector = off\n"
+    printf "log_destination = 'stderr'\n"
+} >"$configuration"
+printf '%s\n' 'local all postgres peer' 'local all all reject' >"$hba"
+install -m 0600 /dev/null "$ident"
+chmod 0600 "$configuration" "$hba" "$ident"
+
+pg_ctl -D "$data" -o "-c config_file=$configuration" -l "$log" -w start >/dev/null
+write_drill_phase postgres_started
+database_url="postgresql://postgres@localhost/tme?host=$socket&port=$port"
+recovery_deadline=$(( $(date +%s) + 120 ))
+until psql "$database_url" -Atqc 'SELECT NOT pg_is_in_recovery()' | grep -qx t
+do
+    [ "$(date +%s)" -lt "$recovery_deadline" ] || fail 'isolated restore did not promote'
+    sleep 2
+done
+write_drill_phase promoted
+DATABASE_URL=$database_url "$release/bin/tme-server" store verify
+pre_fence_verified=true
+write_drill_phase pre_fence_verified
+system_identifier=$(psql "$database_url" -Atqc \
+    'SELECT system_identifier::text FROM pg_control_system()')
+database_oid=$(psql "$database_url" -Atqc \
+    "SELECT oid::text FROM pg_database WHERE datname=current_database()")
+pre_fence_epoch=$(psql "$database_url" -Atqc \
+    'SELECT restore_fence_epoch::text FROM tme.store_state WHERE singleton')
+migration_rows=$(psql "$database_url" -Atqc \
+    "SELECT version::text || ':' || encode(checksum,'hex') || ':' || success::text FROM public._sqlx_migrations ORDER BY version")
+[ -n "$migration_rows" ] || fail 'isolated restore migration identity is empty'
+migration_hash=$(printf '%s\n' "$migration_rows" | sha256sum | awk '{print $1}')
+pre_checkpoint_rows=$(psql "$database_url" -Atqc \
+    "SELECT facet_id::text || ':' || encode(checkpoint_sha256,'hex') FROM tme.facets ORDER BY facet_id")
+pre_checkpoint_hash=$(printf '%s\n' "$pre_checkpoint_rows" | sha256sum | awk '{print $1}')
+write_drill_phase fence_pending
+DATABASE_URL=$database_url "$release/bin/tme-server" \
+    store restore-fence --confirm-restored-database
+write_drill_phase fenced
+DATABASE_URL=$database_url "$release/bin/tme-server" store verify
+post_fence_verified=true
+write_drill_phase post_fence_verified
+post_fence_epoch=$(psql "$database_url" -Atqc \
+    'SELECT restore_fence_epoch::text FROM tme.store_state WHERE singleton')
+[ "$post_fence_epoch" -eq $((pre_fence_epoch + 1)) ] || \
+    fail 'isolated restore fence epoch did not advance exactly once'
+post_checkpoint_rows=$(psql "$database_url" -Atqc \
+    "SELECT facet_id::text || ':' || encode(checkpoint_sha256,'hex') FROM tme.facets ORDER BY facet_id")
+post_checkpoint_hash=$(printf '%s\n' "$post_checkpoint_rows" | sha256sum | awk '{print $1}')
+pg_ctl -D "$data" -m immediate stop >/dev/null
+remove_exact_child "$data"
+remove_exact_child "$socket"
+for path in "$configuration" "$hba" "$ident" "$log"
+do
+    [ ! -L "$path" ] || fail 'restore drill cleanup encountered a symbolic link'
+    rm -f -- "$path"
+done
+write_drill_phase data_cleaned
+
+temporary=$(mktemp "$drill_root/.receipt.XXXXXX") || \
+    fail 'restore drill receipt temporary could not be created'
+jq -n --arg operation_id "$operation_id" \
+    --arg completed_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --arg backup_label "$backup_label" --arg system_identifier "$system_identifier" \
+    --arg database_oid "$database_oid" --arg migration_hash "$migration_hash" \
+    --arg pre_checkpoint_hash "$pre_checkpoint_hash" \
+    --arg post_checkpoint_hash "$post_checkpoint_hash" \
+    --argjson pre_fence_epoch "$pre_fence_epoch" \
+    --argjson post_fence_epoch "$post_fence_epoch" \
+    --argjson pre_fence_verified "$pre_fence_verified" \
+    --argjson post_fence_verified "$post_fence_verified" '
+    {
+        schema_version:2,
+        operation:"restore-drill",
+        operation_id:$operation_id,
+        state:"committed",
+        target:"latest",
+        completed_at:$completed_at,
+        backup:{label:$backup_label},
+        database:{system_identifier:$system_identifier,database_oid:$database_oid,migration_set_sha256:$migration_hash},
+        verification:{
+            pre_fence_store_verify:$pre_fence_verified,
+            post_fence_store_verify:$post_fence_verified,
+            pre_fence_checkpoint_set_sha256:$pre_checkpoint_hash,
+            post_fence_checkpoint_set_sha256:$post_checkpoint_hash
+        },
+        fence:{applied:true,epoch_before:$pre_fence_epoch,epoch_after:$post_fence_epoch}
+    }' \
+    >"$temporary"
+chmod 0640 "$temporary"
+sync -f "$temporary"
+mv -Tf "$temporary" "$journal"
+sync -f "$drill_root"
+mv -Tf "$journal" "$artifact"
+sync -f "$drill_root"
+sync -f "$operations_root"
+completed=true
+trap - EXIT HUP INT TERM
+printf '%s\n' 'restore-drill: isolated restore verified and fenced'

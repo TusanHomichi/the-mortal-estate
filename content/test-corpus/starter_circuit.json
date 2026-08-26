@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "starter_circuit",
+  "name": "Starter Circuit",
+  "description": "A clean project-authored prototype fixture for the first tiny starter circuit.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project route-beat fixture. Layout, terrain names, actor names, script, and numeric tuning are authored for clean content and do not copy private geography or source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/starter_circuit.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/starter_circuit",
+  "world_template": "world_templates/starter_circuit.json",
+  "simulation_seed": "simulation_seeds/starter_circuit.json",
+  "script": [
+    {
+      "inspect": true
+    },
+    {
+      "move_path": [
+        "east",
+        "east",
+        "east"
+      ]
+    },
+    {
+      "move_path": [
+        "east",
+        "east",
+        "west"
+      ]
+    },
+    {
+      "move_path": [
+        "south",
+        "south",
+        "south"
+      ]
+    },
+    {
+      "move_path": [
+        "west"
+      ]
+    },
+    {
+      "move_path": [
+        "west"
+      ]
+    },
+    {
+      "move_path": [
+        "north"
+      ]
+    },
+    {
+      "physical_attack": {
+        "mode": "fight",
+        "target_actor_id": "thornling",
+        "authorization": "safe"
+      }
+    },
+    {
+      "move_path": [
+        "southwest",
+        "west"
+      ]
+    },
+    {
+      "move_path": [
+        "north",
+        "north",
+        "north"
+      ]
+    }
+  ]
+}

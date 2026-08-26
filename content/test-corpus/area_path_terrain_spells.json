@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "area_path_terrain_spells",
+  "name": "Area Path Terrain Spells",
+  "description": "Clean fixture proving area and coordinate tile-overlay spell effects in the local simulation harness.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project Slice BT fixture. Spell names, layout, targets, script, and numeric tuning are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/area_path_terrain_spells.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/area_path_terrain_spells",
+  "world_template": "world_templates/area_path_terrain_spells.json",
+  "simulation_seed": "simulation_seeds/area_path_terrain_spells.json",
+  "script": [
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "web_field",
+        "target": {
+          "area": {
+            "center": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "inspect": true
+    },
+    {
+      "move_path": [
+        "east"
+      ]
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "ember_cloud",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 3,
+                "y": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "wait": true
+    },
+    {
+      "wait": true
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "shadow_cloud",
+        "target": {
+          "area": {
+            "center": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "clear_sight",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

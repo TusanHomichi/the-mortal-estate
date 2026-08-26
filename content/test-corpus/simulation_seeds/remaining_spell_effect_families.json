@@ -1,0 +1,258 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "remaining_spell_effect_families",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/remaining_spell_effect_families/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:remaining_spell_effect_families:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "thaumaturge",
+          "current_class_id": "thaumaturge",
+          "display_class": "Thaumaturge",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 10,
+          "dexterity": 10,
+          "constitution": 10,
+          "intelligence": 14,
+          "wisdom": 12,
+          "charisma": 10
+        },
+        "resources": {
+          "hp": 50,
+          "max_hp": 50,
+          "peak_hp": 50,
+          "mp": 200,
+          "max_mp": 200,
+          "stamina": 50,
+          "max_stamina": 50
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "skill_ledger": [
+          {
+            "track_id": "thaumaturge_magic",
+            "level": 19,
+            "critique_rank": 10,
+            "practice_points": 0,
+            "learning_rate": 1
+          }
+        ],
+        "known_spells": [
+          {
+            "spell_id": "death",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "raise_dead",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "night_vision",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "feather_fall",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "speed",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "breathe_water",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "hide_in_shadows",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "hide_door",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "banish",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "turn_undead",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "shadow_cloud",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "call_demon",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "sense_secret",
+            "lane": "thaumaturge_magic",
+            "learned_at_level": 1
+          }
+        ]
+      },
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "fallen_ally",
+      "actor_definition_id": "actor/remaining_spell_effect_families/fallen_ally",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "warded_target",
+      "actor_definition_id": "actor/remaining_spell_effect_families/warded_target",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "foreign_demon",
+      "actor_definition_id": "actor/remaining_spell_effect_families/foreign_demon",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "mobile_undead",
+      "actor_definition_id": "actor/remaining_spell_effect_families/mobile_undead",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "cornered_undead",
+      "actor_definition_id": "actor/remaining_spell_effect_families/cornered_undead",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 3,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {},
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Workbench</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header>
+  <h1>Workbench <span class="version" id="version"></span></h1>
+  <p class="banner" id="banner-logical">
+    <strong>LOGICAL VIEW</strong> — the authoring compiler's own projection of the
+    compiled land. This is not a gameplay preview and it is not what the game
+    looks like. It shows what the compiler knows.
+  </p>
+  <p class="banner capture" id="banner-capture" hidden>
+    <strong>CAPTURE VIEW</strong> — a real client frame, photographed by the
+    shipped presenter, with the identity of every pixel recorded beside it. It is
+    not a preview and not a second renderer: it is what the client drew. The
+    current presenter draws flat colours and no art, and says so on its own
+    banner inside the picture.
+  </p>
+  <p class="banner candidate" id="banner-candidate" hidden>
+    <strong>CANDIDATE</strong> — an unattested document that exists only in this
+    session. It is what the staged operations produce when replayed against the
+    accepted master, nothing has promoted it, no tracked content carries it, and
+    the next preview replaces it. Outlined cells differ from the accepted
+    projection.
+  </p>
+</header>
+
+<div id="refusal" class="refusal" hidden></div>
+
+<main>
+  <section class="viewport">
+    <div class="toolbar">
+      <span class="group" id="views">
+        <button data-view="logical" class="active">logical</button>
+        <button data-view="capture">capture</button>
+        <button data-view="candidate" id="view-candidate" disabled>candidate</button>
+      </span>
+      <span class="group" id="members"></span>
+      <span class="group" id="captures" hidden></span>
+      <span class="group" id="tools">
+        <button data-tool="click" class="active">click</button>
+        <button data-tool="box">box</button>
+        <button data-tool="lasso">lasso</button>
+        <button data-tool="paint">paint</button>
+      </span>
+      <span class="group">
+        <button id="zoom-out">&minus;</button>
+        <button id="zoom-in">+</button>
+        <button id="reset">fit</button>
+      </span>
+      <span class="group" id="capture-actions" hidden>
+        <button id="take-capture">take a capture</button>
+        <span class="hint" id="capture-cost">runs the client &middot; seconds, not milliseconds</span>
+      </span>
+      <span class="hint">drag with the right button or hold space to pan &middot; wheel to zoom</span>
+    </div>
+    <canvas id="canvas" width="900" height="620"></canvas>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <aside class="panel">
+    <h2>Selection</h2>
+    <div id="summary" class="summary">Point at the surface.</div>
+    <h3>Identities</h3>
+    <ol id="identities" class="identities"></ol>
+    <h3 id="observed-heading" hidden>Observed in the frame</h3>
+    <p class="note" id="observed-note" hidden>
+      What the photographed frame showed under this gesture. Runtime facts about
+      one instant, recorded beside the address &mdash; never part of it.
+    </p>
+    <ul id="observed" class="observed"></ul>
+    <h3>Comment</h3>
+    <p class="note">Free text. It reaches the agent verbatim and is never parsed for facts.</p>
+    <textarea id="comment" rows="4" placeholder="what you mean by this selection"></textarea>
+    <button id="record" disabled>record selection packet</button>
+    <p class="note refuse-note" id="record-refusal" hidden>
+      No packet is written from the candidate view. A packet binds the exact
+      bytes it was taken against, and the next preview replaces a candidate's
+      bytes &mdash; so a packet bound to them would be stale by design. The
+      digests this answer stands on are listed below.
+    </p>
+    <h3 id="binds-heading" hidden>Bound to</h3>
+    <p class="note" id="binds-note" hidden>
+      The digests the candidate answer stands on, as the server listed them.
+    </p>
+    <ul id="binds" class="observed"></ul>
+
+    <h2>Staging</h2>
+    <p class="note">
+      A typed operation, derived from a selection packet. The vocabulary is the
+      compiler's; nothing here carries a verb table of its own.
+    </p>
+    <button id="vocabulary-load">load the operation vocabulary</button>
+    <p class="hint" id="vocabulary-cost">
+      runs the authoring compiler &middot; a moment, not milliseconds &middot;
+      fetched once and cached for this page
+    </p>
+    <div id="staging-body" hidden>
+      <p class="note ruling" id="dressing-ruling"></p>
+      <p class="note ruling" id="asset-limit"></p>
+      <h3>Verb</h3>
+      <select id="verb"></select>
+      <p class="note" id="verb-summary"></p>
+      <p class="note rejects" id="verb-rejects"></p>
+      <h3>Parameters</h3>
+      <div id="parameters"></div>
+      <h3>Derived from</h3>
+      <select id="stage-selection"></select>
+      <p class="note" id="stage-selection-note"></p>
+      <textarea id="stage-comment" rows="2" placeholder="what you mean by this operation"></textarea>
+      <button id="stage" disabled>stage from this selection</button>
+      <p class="note refuse-note" id="stage-reason">
+        No selection packet has been recorded in this session yet. An operation
+        is an act upon an address, and the packet is the address.
+      </p>
+    </div>
+    <h3>Staged</h3>
+    <p class="note" id="staged-count"></p>
+    <ol id="staged" class="staged"></ol>
+
+    <h2>Candidate</h2>
+    <button id="preview-candidate">preview candidate</button>
+    <p class="hint" id="candidate-cost">
+      replays the staged set through the authoring compiler &middot; a moment,
+      not milliseconds
+    </p>
+    <div id="candidate-outcome" class="summary"></div>
+    <pre id="candidate-detail" class="record"></pre>
+
+    <h2>Apply</h2>
+    <button id="apply">apply</button>
+    <p class="hint" id="apply-cost">
+      replays and judges the whole staged set &middot; a moment, not
+      milliseconds &middot; writes only inside this session directory
+    </p>
+    <div id="apply-outcome" class="summary"></div>
+    <pre id="apply-record" class="record"></pre>
+    <div id="accept-box" hidden>
+      <h3>Accept</h3>
+      <p class="note">
+        Acceptance records the owner's intent in this session's log. It grants no
+        promotion, writes no tracked content, re-signs no receipt, and changes no
+        digest constant. The ceremony that does those things is the owner's, and
+        it happens outside this tool.
+      </p>
+      <textarea id="accept-note" rows="2" placeholder="why you accept this candidate"></textarea>
+      <button id="accept">accept this candidate</button>
+      <pre id="accept-record" class="record"></pre>
+    </div>
+
+    <h3>Session</h3>
+    <div id="session" class="session"></div>
+    <ul id="packets" class="packets"></ul>
+  </aside>
+</main>
+
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>

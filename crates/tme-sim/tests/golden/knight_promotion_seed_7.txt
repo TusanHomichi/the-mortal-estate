@@ -1,0 +1,40 @@
+The Mortal Estate local simulation
+scenario: knight_promotion
+seed: 7
+
+loaded "Knight Promotion V1" realms=[realm_0] levels=[realm_0/room_0]
+player Delver (Fighter) at realm_0/room_0:1,1 hp=20
+monster Dummy at realm_0/room_0:1,2 hp=99
+
+player ready: Delver at 1
+Delver intent at 1: promote knight
+Delver promoted from Fighter to Knight, received Oath Ring in right_hand, and gained Blessed Edge, Valor, Cleanse, Beacon, Trail Sense!
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Dummy at 2
+Dummy intent: hold
+readiness scheduled: Dummy cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: move_item oath_ring:knight_promotion:primary to left_finger_1
+Delver moved Oath Ring from right_hand to left_finger_1
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+monster ready: Dummy at 3
+Dummy intent: hold
+readiness scheduled: Dummy cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: cast valor on self
+Delver gains valor (attribute_buff) for 2 rounds.
+Delver's Valor practice on knight_magic: raw=0 reason=class_has_no_magic_practice
+readiness scheduled: Delver cost=1 ready_at=4
+Delver regenerated 1 Mp (16/18, Active, time 4)
+time 4
+monster ready: Dummy at 4
+Dummy intent: hold
+readiness scheduled: Dummy cost=1 ready_at=5
+
+final state
+Delver (Knight) at realm_0/room_0:1,1 hp=20 alive
+Dummy at realm_0/room_0:1,2 hp=99 alive

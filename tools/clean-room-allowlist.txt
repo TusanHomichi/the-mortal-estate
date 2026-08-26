@@ -1,0 +1,16 @@
+# Files tools/check_clean_room.py permits to name a predecessor-private root.
+#
+# One repository-relative path per line; '#' starts a comment. Every entry
+# carries the reason it must name the roots. Nothing here reads or depends on a
+# private root — these files define, ignore, document, or prove the rule.
+#
+# An entry naming a file the tree does not carry is a violation: a stale
+# exemption is an exemption nobody is watching. A missing or entry-less copy of
+# this file makes the check FAIL CLOSED.
+
+.gitignore                        # must name the roots to make them uncommittable
+tools/check_clean_room.py         # defines the roots the rule bans
+tests/test_check_clean_room.py    # builds the mutants that prove the rule
+tests/boundary_test_support.py    # holds the temp-repo ignore rules the tests need
+docs/boundary-checks.md           # documents the rule and its semantics
+docs/working-root-policy.md       # names every ignored root to state the D6 policy

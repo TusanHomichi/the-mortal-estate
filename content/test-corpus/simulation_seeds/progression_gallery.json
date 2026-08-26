@@ -1,0 +1,141 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "progression_gallery",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/progression_gallery/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:progression_gallery:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "fighter",
+          "display_class": "Fighter",
+          "nationality_id": "illyria"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 16,
+          "dexterity": 14,
+          "constitution": 14,
+          "intelligence": 10,
+          "wisdom": 10,
+          "charisma": 8
+        },
+        "resources": {
+          "hp": 84,
+          "max_hp": 84,
+          "peak_hp": 84,
+          "mp": 0,
+          "max_mp": 0,
+          "stamina": 15,
+          "max_stamina": 15
+        },
+        "progression": {
+          "level": 7,
+          "experience": 2100
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 6,
+          "dexterity_adds": 6
+        },
+        "promotion_history": [],
+        "skill_ledger": [
+          {
+            "track_id": "sword",
+            "level": 1,
+            "critique_rank": 0,
+            "practice_points": 5,
+            "learning_rate": 1
+          }
+        ]
+      },
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "steel_sword",
+            "position": "right_hand"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 50000
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "warden",
+      "actor_definition_id": "actor/progression_gallery/warden",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "steel_sword": {
+      "definition_id": "steel_sword",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [
+    {
+      "id": "gallery_trainer",
+      "service_definition_id": "gallery_trainer",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      }
+    },
+    {
+      "id": "gallery_promoter",
+      "service_definition_id": "gallery_promoter",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      }
+    }
+  ],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

@@ -1,0 +1,89 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+[ "$#" -eq 2 ] || fail 'usage: restore <empty-destination> <latest|UTC-timestamp>'
+destination=$1
+target=$2
+drill_root=$STATE_ROOT/restore-drill
+[ "${TME_RESTORE_DRILL_ROOT:-$drill_root}" = "$drill_root" ] || \
+    fail 'restore drill root override differs from the locked state root'
+production_data=/var/lib/postgresql/18/main
+[ "${TME_POSTGRES_DATA_DIRECTORY:-$production_data}" = "$production_data" ] || \
+    fail 'production data directory override differs from the locked PostgreSQL 18 path'
+
+case "$destination" in /*) ;; *) fail 'restore destination must be absolute' ;; esac
+[ ! -L "$destination" ] || fail 'restore destination may not be a symbolic link'
+destination_parent=$(dirname -- "$destination")
+destination_name=$(basename -- "$destination")
+validate_component 'restore destination name' "$destination_name"
+canonical_parent=$(canonical_directory 'restore destination parent' "$destination_parent")
+[ "$destination" = "$canonical_parent/$destination_name" ] || \
+    fail 'restore destination must be canonical'
+
+if [ "$destination" = "$production_data" ]; then
+    require_root
+    [ "${TME_DESTRUCTIVE_RESTORE_CONFIRM-}" = 'destroy-disposable-tme-database' ] || \
+        fail 'production-path restore requires the exact destructive confirmation'
+    quarantine_target=$canonical_parent/main.failed-restore-$(date -u +'%Y%m%dT%H%M%SZ')-$$
+elif [ "$destination" = "$drill_root/pgdata" ]; then
+    state_root=$(canonical_directory 'state root' "$STATE_ROOT")
+    [ "$drill_root" = "$state_root/restore-drill" ] || fail 'state root is not canonical'
+    canonical_drill=$(canonical_direct_child 'restore drill root' "$state_root" restore-drill)
+    [ "$destination" = "$canonical_drill/pgdata" ] || fail 'restore drill root is not canonical'
+    quarantine_root=$(canonical_direct_child 'restore quarantine root' "$canonical_drill" quarantine)
+    quarantine_target=$quarantine_root/pgdata-$(date -u +'%Y%m%dT%H%M%SZ')-$$
+else
+    fail 'restore destination is outside an approved exact root'
+fi
+
+[ ! -e "$destination" ] && [ ! -L "$destination" ] || \
+    fail 'restore destination must be absent so restore creates it exactly once'
+[ ! -e "$quarantine_target" ] && [ ! -L "$quarantine_target" ] || \
+    fail 'restore quarantine destination already exists'
+restore_created=false
+restore_completed=false
+restore_cleanup() {
+    restore_status=$?
+    trap - EXIT HUP INT TERM
+    if [ "$restore_created" = true ] && [ "$restore_completed" = false ] && \
+        [ -d "$destination" ] && [ ! -L "$destination" ] && \
+        [ "$(dirname -- "$destination")" = "$canonical_parent" ]
+    then
+        mv -- "$destination" "$quarantine_target" 2>/dev/null || true
+        [ ! -d "$quarantine_target" ] || chmod 0500 "$quarantine_target" 2>/dev/null || true
+    fi
+    exit "$restore_status"
+}
+restore_signal() {
+    restore_signal_number=$1
+    trap - HUP INT TERM
+    exit $((128 + restore_signal_number))
+}
+trap restore_cleanup EXIT
+trap 'restore_signal 1' HUP
+trap 'restore_signal 2' INT
+trap 'restore_signal 15' TERM
+if [ "$(id -u)" -eq 0 ]; then
+    install -d -o postgres -g postgres -m 0700 "$destination"
+else
+    [ "$(id -un)" = postgres ] || fail 'restore must run as root or postgres'
+    install -d -m 0700 "$destination"
+fi
+restore_created=true
+
+if [ "$target" = latest ]; then
+    run_as_postgres pgbackrest --stanza=tme --pg1-path="$destination" restore
+else
+    case "$target" in ????-??-??T??:??:??Z) ;; *) fail 'restore target must be latest or a whole-second UTC timestamp' ;; esac
+    pgbackrest_target=$(date -u -d "$target" +'%Y-%m-%d %H:%M:%S+00') || \
+        fail 'restore target is not a real UTC timestamp'
+    [ "$(date -u -d "$pgbackrest_target" +'%Y-%m-%dT%H:%M:%SZ')" = "$target" ] || \
+        fail 'restore target did not round-trip as UTC'
+    run_as_postgres pgbackrest --stanza=tme --pg1-path="$destination" --type=time \
+        --target="$pgbackrest_target" --target-action=promote restore
+fi
+restore_completed=true
+trap - EXIT HUP INT TERM
+printf '%s\n' 'restore: files restored; keep admission closed until verification and restore fencing pass'

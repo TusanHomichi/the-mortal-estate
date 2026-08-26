@@ -1,0 +1,238 @@
+"""Acceptance criterion 3 — the identity sidecar is real and matching.
+
+"Real" means the sidecar describes the picture beside it rather than a picture
+in general: its viewport is the picture's own dimensions, read out of the PNG
+header, and its raster is the same size again. "Matching" means the three pieces
+are one fact told three ways — the target list, the raster, and the pointer
+resolution the presenter itself performs.
+
+The strongest of those is the raster, and it is proven by reconstruction: fill
+every target's rectangle in draw order and the bytes must equal the raster the
+presenter wrote. If they do, the raster is not an approximation of the target
+list, it is the target list.
+
+The other half of criterion 3 — that the target list is the presenter's own
+semantic-target list — is proven on the presenter's side, in
+`client/tests/test_grid_world_view.gd`, where both can be compared in one
+process. What is checked here is everything a consumer can check from the files
+alone, which is what a consumer actually has.
+"""
+
+from __future__ import annotations
+
+import json
+import unittest
+
+from workbench_test_support import (
+    FIXTURE_ROUTE,
+    LIVE_ROUTE,
+    REPO_ROOT,
+    fixture_route_capture,
+    live_route_capture,
+    recorded_frame,
+)
+
+from workbench import capture as capture_reader
+from workbench.projection import WorkbenchError
+
+
+def rebuild_raster(taken) -> bytes:
+    """The raster the target list implies: every rectangle, in draw order."""
+    width, height = taken.raster.width, taken.raster.height
+    samples = bytearray(width * height * 2)
+    for record in taken.targets:
+        index = int(record["index"])
+        shape = record["hit_shape"]
+        high, low = index >> 8, index & 0xFF
+        for y in range(shape["y"], min(height, shape["y"] + shape["height"])):
+            row = y * width
+            for x in range(shape["x"], min(width, shape["x"] + shape["width"])):
+                offset = (row + x) * 2
+                samples[offset] = high
+                samples[offset + 1] = low
+    return bytes(samples)
+
+
+class TheSidecarDescribesItsOwnPicture(unittest.TestCase):
+    def routes(self):
+        return (("fixture", fixture_route_capture()), ("live", live_route_capture()))
+
+    def test_the_viewport_the_sidecar_declares_is_the_pictures_own_size(self) -> None:
+        for name, taken in self.routes():
+            with self.subTest(route=name):
+                width, height = capture_reader.png_size(taken.image)
+                self.assertEqual(taken.viewport, {"width": width, "height": height})
+
+    def test_the_raster_is_the_same_resolution_as_the_picture(self) -> None:
+        for name, taken in self.routes():
+            with self.subTest(route=name):
+                self.assertEqual(
+                    (taken.raster.width, taken.raster.height),
+                    (taken.viewport["width"], taken.viewport["height"]),
+                )
+
+    def test_the_sidecar_names_the_bytes_of_the_files_beside_it(self) -> None:
+        """Loading already checks this; asserting it here says it is the contract."""
+        for name, taken in self.routes():
+            with self.subTest(route=name):
+                self.assertEqual(taken.image_digest, taken.document["image"]["sha256"])
+                self.assertEqual(
+                    taken.raster_digest, taken.document["identity_raster"]["sha256"]
+                )
+
+    def test_the_frame_generation_and_scene_are_the_recorded_frames(self) -> None:
+        document = recorded_frame()
+        taken = fixture_route_capture()
+        self.assertEqual(taken.frame_generation, document["frame_generation"])
+        self.assertEqual(taken.level, document["frame"]["observation_center"]["level"])
+        self.assertEqual(
+            taken.document["scene"]["observation_center"],
+            document["frame"]["observation_center"]["position"],
+        )
+
+    def test_the_camera_states_every_framing_constant_in_force(self) -> None:
+        for name, taken in self.routes():
+            with self.subTest(route=name):
+                camera = taken.camera
+                self.assertEqual(camera["kind"], "orthographic_square_lattice")
+                for field in ("square_pitch_px", "square_origin_px", "square_bounds"):
+                    self.assertIn(field, camera)
+                # The camera is complete: a square's rectangle follows from the
+                # pitch and the origin alone, and the target list agrees.
+                pitch = int(camera["square_pitch_px"])
+                origin = camera["square_origin_px"]
+                for record in taken.targets:
+                    if record["kind"] != "tile":
+                        continue
+                    square = record["coordinate"]
+                    self.assertEqual(
+                        record["hit_shape"],
+                        {
+                            "kind": "rect",
+                            "x": origin["x"] + int(square["x"]) * pitch,
+                            "y": origin["y"] + int(square["y"]) * pitch,
+                            "width": pitch,
+                            "height": pitch,
+                        },
+                    )
+
+
+class TheRasterAndTheTargetListAreOneFact(unittest.TestCase):
+    def test_the_raster_is_exactly_the_target_rectangles_in_draw_order(self) -> None:
+        for name, taken in (("fixture", fixture_route_capture()), ("live", live_route_capture())):
+            with self.subTest(route=name):
+                self.assertEqual(rebuild_raster(taken), taken.raster.samples)
+
+    def test_every_targets_anchor_pixel_names_that_target(self) -> None:
+        """An anchor a target does not own would be a wrong answer with a
+        confident shape, which is the failure mode this whole slice exists to
+        avoid."""
+        for name, taken in (("fixture", fixture_route_capture()), ("live", live_route_capture())):
+            with self.subTest(route=name):
+                for record in taken.targets:
+                    anchor = record["anchor"]
+                    self.assertEqual(
+                        taken.raster.index_at(int(anchor["x"]), int(anchor["y"])),
+                        int(record["index"]),
+                        f"{record['identity']} does not own its own anchor",
+                    )
+
+    def test_occupant_markers_own_their_pixels_over_the_square_beneath(self) -> None:
+        """Draw order is real: a marker overwrites the square it stands on."""
+        taken = fixture_route_capture()
+        occupants = [row for row in taken.targets if row["presentation_layer"] == "occupants"]
+        self.assertTrue(occupants, "the recorded frame shows at least one occupant")
+        for record in occupants:
+            shape = record["hit_shape"]
+            centre_x = shape["x"] + shape["width"] // 2
+            centre_y = shape["y"] + shape["height"] // 2
+            self.assertEqual(taken.raster.index_at(centre_x, centre_y), int(record["index"]))
+            square = [
+                row
+                for row in taken.targets
+                if row["kind"] == "tile" and row["coordinate"] == record["coordinate"]
+            ]
+            self.assertEqual(len(square), 1)
+            self.assertLess(
+                int(square[0]["index"]),
+                int(record["index"]),
+                "the square is drawn before what stands on it",
+            )
+
+    def test_a_pixel_no_target_covers_indexes_nothing(self) -> None:
+        taken = fixture_route_capture()
+        self.assertEqual(taken.raster.index_at(0, 0), 0)
+        self.assertEqual(
+            taken.raster.index_at(taken.viewport["width"] - 1, taken.viewport["height"] - 1), 0
+        )
+
+
+class ABrokenCaptureIsRefusedRatherThanRead(unittest.TestCase):
+    """Honest unavailability: a capture whose pieces disagree is not a surface."""
+
+    def setUp(self) -> None:
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+        self.staged = Path(tempfile.mkdtemp(prefix="tme-capture-")).resolve()
+        self.addCleanup(shutil.rmtree, self.staged, ignore_errors=True)
+        self.directory = self.staged / "capture"
+        shutil.copytree(REPO_ROOT / FIXTURE_ROUTE, self.directory)
+
+    def load(self):
+        return capture_reader.load(self.staged, self.directory)
+
+    def test_a_replaced_picture_is_refused(self) -> None:
+        payload = bytearray((self.directory / "capture.png").read_bytes())
+        payload[-1] ^= 0x01
+        (self.directory / "capture.png").write_bytes(bytes(payload))
+        with self.assertRaises(capture_reader.CaptureUnavailable) as refusal:
+            self.load()
+        self.assertIn("capture.png", str(refusal.exception))
+
+    def test_a_replaced_raster_is_refused(self) -> None:
+        payload = bytearray((self.directory / "capture.identity.pgm").read_bytes())
+        payload[-1] ^= 0x01
+        (self.directory / "capture.identity.pgm").write_bytes(bytes(payload))
+        with self.assertRaises(capture_reader.CaptureUnavailable) as refusal:
+            self.load()
+        self.assertIn("capture.identity.pgm", str(refusal.exception))
+
+    def test_a_sidecar_claiming_the_wrong_viewport_is_refused(self) -> None:
+        path = self.directory / "capture.sidecar.json"
+        document = json.loads(path.read_text(encoding="utf-8"))
+        document["viewport"]["width"] += 1
+        path.write_text(json.dumps(document), encoding="utf-8")
+        with self.assertRaises(capture_reader.CaptureUnavailable) as refusal:
+            self.load()
+        self.assertIn("viewport", str(refusal.exception))
+
+    def test_a_missing_piece_is_refused_by_name(self) -> None:
+        (self.directory / "capture.identity.pgm").unlink()
+        with self.assertRaises(capture_reader.CaptureUnavailable) as refusal:
+            self.load()
+        self.assertIn("incomplete", str(refusal.exception))
+
+    def test_a_sidecar_from_a_future_schema_is_refused_rather_than_guessed_at(self) -> None:
+        path = self.directory / "capture.sidecar.json"
+        document = json.loads(path.read_text(encoding="utf-8"))
+        document["schema_version"] = 99
+        path.write_text(json.dumps(document), encoding="utf-8")
+        with self.assertRaises(capture_reader.CaptureUnavailable) as refusal:
+            self.load()
+        self.assertIn("schema version", str(refusal.exception))
+
+    def test_a_raster_that_is_not_a_raster_is_refused(self) -> None:
+        with self.assertRaises(WorkbenchError):
+            capture_reader.read_raster(b"P2\n2 2\n255\n0 0 0 0\n")
+        with self.assertRaises(WorkbenchError):
+            capture_reader.read_raster(b"P5\n2 2\n255\n\x00\x00\x00\x00")
+
+    def test_something_that_is_not_a_png_is_refused(self) -> None:
+        with self.assertRaises(WorkbenchError):
+            capture_reader.png_size(b"not a picture at all, not even close to one")
+
+
+if __name__ == "__main__":
+    unittest.main()

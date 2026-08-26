@@ -1,0 +1,37 @@
+The Mortal Estate local simulation
+scenario: service_transactions
+seed: 7
+
+loaded "Shared Service Transaction" realms=[realm_0] levels=[realm_0/room_0]
+player Delver (Fighter) at realm_0/room_0:1,1 hp=12
+monster Dummy at realm_0/room_0:1,2 hp=99
+
+player ready: Delver at 1
+Delver intent at 1: commit_service_transaction waystation_clerk exchanges token_for_badge etched_token_stack
+Delver spent 5 gold
+Delver gained 25 experience points (total: 325)
+Delver completes service transaction token_for_badge.
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+monster ready: Dummy at 2
+Dummy intent: hold
+readiness scheduled: Dummy cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: inspect
+Delver inspected at realm_0/room_0:1,1: tile=Flagstone
+  current tile: terrain=Flagstone cost=1
+  north -> realm_0/room_0:1,0: blocked terrain terrain=Stone Wall
+  northeast -> realm_0/room_0:2,0: blocked terrain terrain=Stone Wall
+  east -> realm_0/room_0:2,1: blocked terrain terrain=Stone Wall
+  southeast -> realm_0/room_0:2,2: blocked terrain terrain=Stone Wall
+  south -> realm_0/room_0:1,2: walkable terrain=Flagstone cost=1
+  southwest -> realm_0/room_0:0,2: blocked terrain terrain=Stone Wall
+  west -> realm_0/room_0:0,1: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/room_0:0,0: blocked terrain terrain=Stone Wall
+  nearby south: monster Dummy at (1,2) hp=99
+readiness scheduled: Delver cost=0 ready_at=2
+
+final state
+Delver (Fighter) at realm_0/room_0:1,1 hp=12 alive
+Dummy at realm_0/room_0:1,2 hp=99 alive

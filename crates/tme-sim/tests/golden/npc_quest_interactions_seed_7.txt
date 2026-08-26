@@ -1,0 +1,129 @@
+The Mortal Estate local simulation
+scenario: npc_quest_interactions
+seed: 7
+
+loaded "Harbor Watch Escort" realms=[realm_0] levels=[realm_0/crossing, realm_0/watch]
+player Delver (Fighter) at realm_0/crossing:1,1 hp=12
+npc Wayfinder at realm_0/crossing:1,1 hp=8
+npc Watchkeeper at realm_0/watch:2,1 hp=8
+monster Watch Sentinel at realm_0/watch:3,1 hp=7
+
+player ready: Delver at 1
+Delver intent at 1: interact_with_npc wayfinder ask_about_crossing none
+Wayfinder [ask_about_crossing]: A steady hand can help us reach the watch.
+quest harbor_escort for character:harbor:primary: unstarted -> awaiting_token
+Delver completes NPC interaction ask_about_crossing with wayfinder.
+  costs: []
+  rewards: [{"kind":"npc_interaction","npc_actor_id":"wayfinder","interaction_id":"ask_about_crossing","outcome":{"kind":"speak"}},{"kind":"quest_stage","character_id":"character:harbor:primary","quest_id":"harbor_escort","before_stage_id":null,"after_stage_id":"awaiting_token"}]
+readiness scheduled: Delver cost=1 ready_at=2
+time 2
+npc ready: Wayfinder at 2
+Wayfinder intent: hold
+readiness scheduled: Wayfinder cost=1 ready_at=3
+npc ready: Watchkeeper at 2
+Watchkeeper intent: hold
+readiness scheduled: Watchkeeper cost=1 ready_at=3
+monster ready: Watch Sentinel at 2
+Watch Sentinel intent: watch
+readiness scheduled: Watch Sentinel cost=1 ready_at=3
+
+player ready: Delver at 2
+Delver intent at 2: interact_with_npc wayfinder offer_signal_token player_signal_token
+Wayfinder [offer_signal_token]: The signal is clear. I will follow.
+Wayfinder follow target: none -> character:harbor:primary
+quest harbor_escort for character:harbor:primary: awaiting_token -> escorting_guide
+Delver completes NPC interaction offer_signal_token with wayfinder.
+  costs: [{"kind":"selected_carried_item","item_instance_id":"player_signal_token","item_definition_id":"signal_token","consumed_quantity":1,"remaining_quantity":0}]
+  rewards: [{"kind":"npc_interaction","npc_actor_id":"wayfinder","interaction_id":"offer_signal_token","outcome":{"kind":"begin_follow"}},{"kind":"quest_stage","character_id":"character:harbor:primary","quest_id":"harbor_escort","before_stage_id":"awaiting_token","after_stage_id":"escorting_guide"}]
+readiness scheduled: Delver cost=1 ready_at=3
+time 3
+npc ready: Wayfinder at 3
+Wayfinder follow decision: wait at_target
+readiness scheduled: Wayfinder cost=1 ready_at=4
+npc ready: Watchkeeper at 3
+Watchkeeper intent: hold
+readiness scheduled: Watchkeeper cost=1 ready_at=4
+monster ready: Watch Sentinel at 3
+Watch Sentinel intent: watch
+readiness scheduled: Watch Sentinel cost=1 ready_at=4
+
+player ready: Delver at 3
+Delver intent at 3: walk east
+Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Delver step east -> (2,1): terrain=Watch Stairs Up cost=1 remaining=2
+Delver moved from (1,1) to (2,1)
+readiness scheduled: Delver cost=1 ready_at=4
+time 4
+npc ready: Wayfinder at 4
+Wayfinder follow decision: move east
+Wayfinder walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Wayfinder step east -> (2,1): terrain=Watch Stairs Up cost=1 remaining=0
+Wayfinder moved from (1,1) to (2,1)
+readiness scheduled: Wayfinder cost=1 ready_at=5
+npc ready: Watchkeeper at 4
+Watchkeeper intent: hold
+readiness scheduled: Watchkeeper cost=1 ready_at=5
+monster ready: Watch Sentinel at 4
+Watch Sentinel intent: watch
+readiness scheduled: Watch Sentinel cost=1 ready_at=5
+
+player ready: Delver at 4
+Delver intent at 4: interact_with_npc wayfinder climb_to_watch none
+Wayfinder [climb_to_watch]: I will take these stairs and wait above.
+--- Wayfinder uses up stairs: realm_0/crossing:2,1 -> realm_0/watch:2,1 ---
+Delver completes NPC interaction climb_to_watch with wayfinder.
+  costs: []
+  rewards: [{"kind":"npc_interaction","npc_actor_id":"wayfinder","interaction_id":"climb_to_watch","outcome":{"kind":"climb","direction":"up"}}]
+readiness scheduled: Delver cost=1 ready_at=5
+time 5
+npc ready: Wayfinder at 5
+Wayfinder follow decision: wait route_unavailable
+readiness scheduled: Wayfinder cost=1 ready_at=6
+npc ready: Watchkeeper at 5
+Watchkeeper intent: hold
+readiness scheduled: Watchkeeper cost=1 ready_at=6
+monster ready: Watch Sentinel at 5
+Watch Sentinel intent: watch
+readiness scheduled: Watch Sentinel cost=1 ready_at=6
+
+player ready: Delver at 5
+Delver intent at 5: traverse stairs_up
+--- Delver uses up stairs: realm_0/crossing:2,1 -> realm_0/watch:2,1 ---
+readiness scheduled: Delver cost=1 ready_at=6
+time 6
+npc ready: Wayfinder at 6
+Wayfinder follow decision: wait at_target
+readiness scheduled: Wayfinder cost=1 ready_at=7
+npc ready: Watchkeeper at 6
+Watchkeeper intent: hold
+readiness scheduled: Watchkeeper cost=1 ready_at=7
+monster ready: Watch Sentinel at 6
+Watch Sentinel intent: watch
+readiness scheduled: Watch Sentinel cost=1 ready_at=7
+
+player ready: Delver at 6
+Delver intent at 6: interact_with_npc watchkeeper complete_harbor_escort none
+Watchkeeper [complete_harbor_escort]: The watch is secure. Your escort is complete.
+Wayfinder follow target: character:harbor:primary -> none
+quest harbor_escort for character:harbor:primary: escorting_guide -> completed
+Delver gained 7 experience points (total: 7)
+Delver completes NPC interaction complete_harbor_escort with watchkeeper.
+  costs: []
+  rewards: [{"kind":"npc_interaction","npc_actor_id":"watchkeeper","interaction_id":"complete_harbor_escort","outcome":{"kind":"complete_escort","npc_actor_id":"wayfinder"}},{"kind":"quest_stage","character_id":"character:harbor:primary","quest_id":"harbor_escort","before_stage_id":"escorting_guide","after_stage_id":"completed"},{"kind":"experience","amount":7,"total_xp":7}]
+readiness scheduled: Delver cost=1 ready_at=7
+time 7
+npc ready: Wayfinder at 7
+Wayfinder intent: return blocked
+readiness scheduled: Wayfinder cost=1 ready_at=8
+npc ready: Watchkeeper at 7
+Watchkeeper intent: hold
+readiness scheduled: Watchkeeper cost=1 ready_at=8
+monster ready: Watch Sentinel at 7
+Watch Sentinel intent: watch
+readiness scheduled: Watch Sentinel cost=1 ready_at=8
+
+final state
+Delver (Fighter) at realm_0/watch:2,1 hp=12 alive
+Wayfinder at realm_0/watch:2,1 hp=8 alive
+Watchkeeper at realm_0/watch:2,1 hp=8 alive
+Watch Sentinel at realm_0/watch:3,1 hp=7 alive

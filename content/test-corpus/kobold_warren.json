@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "kobold_warren",
+  "name": "Kobold Warren",
+  "description": "A clean project-authored prototype fixture for pack forager pressure and flee behavior.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project kobold warren fixture. Creature names are common fantasy vocabulary; behavior rules, layout, stats, and script are authored for clean content and do not copy source data.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/kobold_warren.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/kobold_warren",
+  "world_template": "world_templates/kobold_warren.json",
+  "simulation_seed": "simulation_seeds/kobold_warren.json",
+  "script": [
+    {
+      "nock": true
+    },
+    {
+      "physical_attack": {
+        "mode": "shoot",
+        "target_actor_id": "kobold_scrounger",
+        "authorization": "safe"
+      }
+    },
+    {
+      "wait": true
+    },
+    {
+      "physical_attack": {
+        "mode": "kick",
+        "target_actor_id": "kobold_skulker",
+        "authorization": "safe"
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "kick",
+        "target_actor_id": "kobold_skulker",
+        "authorization": "safe"
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "kick",
+        "target_actor_id": "kobold_runt",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

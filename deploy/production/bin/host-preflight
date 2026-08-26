@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/common"
+
+# shellcheck disable=SC1091
+. /etc/os-release
+[ "${ID-}" = debian ] || fail 'native proof host is not Debian'
+point_release=${DEBIAN_VERSION_FULL-}
+if [ -z "$point_release" ] && [ -r /etc/debian_version ]; then
+    point_release=$(sed -n '1p' /etc/debian_version)
+fi
+[ "$point_release" = "$(locked_value debian_release)" ] || \
+    fail 'Debian point release differs from versions.lock'
+[ "$(dpkg --print-architecture)" = "$(locked_value architecture)" ] || \
+    fail 'host architecture differs from versions.lock'
+
+systemd_version=$(systemctl --version | awk 'NR == 1 { print $2 }')
+case "$systemd_version" in
+    "$(locked_value systemd_series)".*|"$(locked_value systemd_series)") ;;
+    *) fail 'systemd series differs from versions.lock' ;;
+esac
+
+timedatectl show -p NTPSynchronized --value | grep -qx yes || \
+    fail 'host clock is not synchronized'
+available_kib=$(df -Pk / | awk 'NR == 2 { print $4 }')
+[ "$available_kib" -ge 4194304 ] || fail 'less than 4 GiB is available on the host'
+
+latest_kernel=$(basename "$(readlink -f /vmlinuz)")
+latest_kernel=${latest_kernel#vmlinuz-}
+[ "$(uname -r)" = "$latest_kernel" ] || \
+    fail 'host must reboot into the newest installed kernel'
+
+printf '%s\n' "host-preflight: Debian $point_release amd64 systemd $systemd_version"

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "kind": "served_world",
+  "id": "identity_proof",
+  "catalog": "../../test-corpus/catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/first_land_structure",
+  "world_template": "generated/world_template.json",
+  "simulation_seed": "simulation_seed.json",
+  "controlled_actor": "player",
+  "rng_seed": 7,
+  "research_boundary": {
+    "review_refs": [
+      "docs/server-notes.md",
+      "content/lands/identity-proof/README.md"
+    ]
+  }
+}

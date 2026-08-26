@@ -1,0 +1,172 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "knight_support_actions",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/knight_support_actions/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:knight_support_actions:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "knight",
+          "current_class_id": "knight",
+          "display_class": "Knight",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 12,
+          "dexterity": 10,
+          "constitution": 12,
+          "intelligence": 10,
+          "wisdom": 10,
+          "charisma": 11
+        },
+        "resources": {
+          "hp": 18,
+          "max_hp": 18,
+          "peak_hp": 18,
+          "mp": 12,
+          "max_mp": 12,
+          "stamina": 12,
+          "max_stamina": 12
+        },
+        "progression": {
+          "level": 1,
+          "experience": 0
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "skill_ledger": [
+          {
+            "track_id": "sword",
+            "level": 1,
+            "critique_rank": 0,
+            "practice_points": 0,
+            "learning_rate": 1
+          }
+        ],
+        "known_spells": [
+          {
+            "spell_id": "blessed_edge",
+            "lane": "knight_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "valor",
+            "lane": "knight_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "cleanse",
+            "lane": "knight_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "beacon",
+            "lane": "knight_magic",
+            "learned_at_level": 1
+          },
+          {
+            "spell_id": "trail_sense",
+            "lane": "knight_magic",
+            "learned_at_level": 1
+          }
+        ]
+      },
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "oath_blade",
+            "position": "right_hand"
+          },
+          {
+            "item_instance_id": "oath_ring",
+            "position": "left_finger_1"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": [
+        {
+          "instance_id": "venom_seed",
+          "effect_id": "venom_seed",
+          "source": {
+            "kind": "fixture",
+            "id": "knight_support_actions"
+          },
+          "kind": "poison",
+          "tags": [
+            "poison"
+          ],
+          "potency": 1,
+          "remaining_rounds": 4,
+          "stacking": "replace_same_kind",
+          "start_delay_rounds": 4,
+          "tick_interval_rounds": 1,
+          "suppresses_action": false,
+          "resistance_boosts": []
+        }
+      ]
+    },
+    {
+      "id": "training_dummy",
+      "actor_definition_id": "actor/knight_support_actions/training_dummy",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "oath_blade": {
+      "definition_id": "oath_blade",
+      "binding": {
+        "state": "unrestricted"
+      }
+    },
+    "oath_ring": {
+      "definition_id": "oath_ring",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

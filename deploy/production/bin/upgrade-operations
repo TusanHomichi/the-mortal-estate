@@ -1,0 +1,204 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/release-operation"
+
+require_root
+[ "$#" -eq 0 ] || fail 'usage: upgrade-operations'
+[ "${TME_OPERATIONS_UPGRADE_CONFIRM-}" = 'preserve-existing-tme-state' ] || \
+    fail 'set TME_OPERATIONS_UPGRADE_CONFIRM=preserve-existing-tme-state'
+load_environment
+for command in caddy curl flock jq psql python3 runuser systemctl timeout
+do
+    require_command "$command"
+done
+release=$(current_release) || fail 'current release is unavailable'
+RELEASE_VERIFIED_MANIFEST_SHA256=$(verify_release_integrity "$release") || \
+    fail 'current release integrity is invalid'
+RELEASE_VERIFIED_SOURCE_REVISION=$(sed -n '1p' "$release/source-revision")
+RELEASE_VERIFIED_CONTRACT_SHA256=$(sha256sum "$release/contract-versions.json" | awk '{print $1}')
+if [ -n "${TME_SMOKE_RUNNER-}" ]; then
+    upgrade_runner=$TME_SMOKE_RUNNER
+elif [ -f "$PRODUCTION_ROOT/tools/run_production_smoke.py" ]; then
+    upgrade_runner=$PRODUCTION_ROOT/tools/run_production_smoke.py
+else
+    upgrade_runner_root=$(CDPATH='' cd -- "$PRODUCTION_ROOT/../.." && pwd -P) || \
+        fail 'operations upgrade smoke runner root cannot be canonicalized'
+    upgrade_runner=$upgrade_runner_root/tools/run_production_smoke.py
+fi
+case "$upgrade_runner" in /*) ;; *) fail 'operations upgrade smoke runner must be absolute' ;; esac
+upgrade_runner_canonical=$(readlink -e -- "$upgrade_runner") || \
+    fail 'operations upgrade smoke runner cannot be canonicalized'
+[ "$upgrade_runner_canonical" = "$upgrade_runner" ] || \
+    fail 'operations upgrade smoke runner must use a canonical path'
+[ -f "$upgrade_runner" ] && [ ! -L "$upgrade_runner" ] || \
+    fail 'validated operations-bundle smoke runner is absent'
+runner_identity=$(stat -c '%u:%g:%a:%h' "$upgrade_runner")
+case "$runner_identity" in 0:0:644:1|0:0:755:1) ;; *) fail 'operations upgrade smoke runner metadata is unsafe' ;; esac
+TME_SMOKE_RUNNER=$upgrade_runner
+for credential in migrator-database-url migrator-pgpass \
+    smoke-username-one smoke-password-one smoke-username-two smoke-password-two
+do
+    credential_file "$credential" >/dev/null
+done
+validate_production_database_credentials
+[ -f /etc/caddy/Caddyfile ] && [ ! -L /etc/caddy/Caddyfile ] || \
+    fail 'existing Caddy configuration is unavailable or unsafe'
+TME_PUBLIC_HOST=$TME_PUBLIC_HOST \
+    TME_ACME_PROFILE=${TME_ACME_PROFILE:-shortlived} \
+    caddy validate --config "$PRODUCTION_ROOT/caddy/Caddyfile" --adapter caddyfile >/dev/null
+
+exec 9>"$STATE_ROOT/deploy.lock"
+flock -n 9 || fail 'another release or recovery operation is active'
+getent group tme-deploy >/dev/null || addgroup --system tme-deploy
+getent passwd tme-deploy >/dev/null || \
+    adduser --system --ingroup tme-deploy --home /nonexistent --no-create-home tme-deploy
+run_as_deploy timeout 10s python3 "$upgrade_runner" --help >/dev/null 2>&1 || \
+    fail 'operations upgrade smoke runner must be readable through searchable parent directories by the deploy identity'
+install -d -o root -g root -m 0711 "$STATE_ROOT"
+initialize_operation_lock
+exec 8>"$OPERATION_LOCK"
+flock -n 8 || fail 'another EV operation is active'
+install -d -o root -g root -m 0755 "$ADMISSION_ROOT"
+install -d -o root -g root -m 0750 "$RELEASE_OPERATIONS_ROOT"
+install -d -o root -g root -m 0711 "$CREDENTIAL_PROJECTION_ROOT"
+RELEASE_OPERATION_NAME=operations-upgrade
+RELEASE_OPERATION_RELEASE=$release
+RELEASE_OPERATION_PREVIOUS=$release
+RELEASE_OPERATION_ID=$(date -u +'%Y%m%dT%H%M%SZ')-$$
+
+upgrade_committed=false
+upgrade_gate_active=false
+upgrade_service_stopped=false
+caddy_backup=''
+upgrade_caddy_replaced=false
+upgrade_prior_marker=''
+upgrade_had_prior_marker=false
+upgrade_failure() {
+    upgrade_status=$?
+    trap - 0 1 2 15
+    [ "$upgrade_committed" = false ] || exit "$upgrade_status"
+    if release_operation_is_committed; then
+        upgrade_committed=true
+        exit "$upgrade_status"
+    fi
+    if [ -n "$RELEASE_OPERATION_PROJECTION" ]; then
+        (destroy_credential_projection "$RELEASE_OPERATION_PROJECTION") || true
+    fi
+    if [ "$upgrade_gate_active" = false ]; then
+        upgrade_owns_marker=false
+        if release_operation_marker_matches_active; then
+            upgrade_owns_marker=true
+        fi
+        prior_caddy_active=true
+        if [ "$upgrade_caddy_replaced" = true ]; then
+            prior_caddy_active=false
+            if [ -n "$caddy_backup" ] && [ -f "$caddy_backup" ] && \
+                mv -Tf "$caddy_backup" /etc/caddy/Caddyfile && \
+                systemctl reload caddy.service >/dev/null 2>&1
+            then
+                prior_caddy_active=true
+            fi
+        fi
+        if [ "$prior_caddy_active" = true ] && [ "$upgrade_owns_marker" = true ]; then
+            if [ "$upgrade_had_prior_marker" = true ]; then
+                if [ -n "$upgrade_prior_marker" ] && \
+                    [ -f "$upgrade_prior_marker" ] && [ ! -L "$upgrade_prior_marker" ] && \
+                    [ "$(stat -c '%u:%g:%a:%h' "$upgrade_prior_marker")" = '0:0:644:1' ] && \
+                    mv -Tf "$upgrade_prior_marker" "$ADMISSION_MARKER" && \
+                    sync -f "$ADMISSION_ROOT"
+                then
+                    upgrade_prior_marker=''
+                    printf '%s\n' 'error: operations gate upgrade failed before activation; prior Caddy config and closed admission marker were restored' >&2
+                else
+                    printf '%s\n' 'error: operations gate upgrade failed before activation; admission remains closed because its prior marker could not be restored safely' >&2
+                fi
+            else
+                rm -f -- "$ADMISSION_MARKER"
+                sync -f "$ADMISSION_ROOT" || true
+                printf '%s\n' 'error: operations gate upgrade failed before activation; prior Caddy config and running The Mortal Estate service were preserved' >&2
+            fi
+        elif [ "$prior_caddy_active" = true ]; then
+            printf '%s\n' 'error: operations gate upgrade failed before owning the admission marker; the pre-existing marker and running services were left unchanged' >&2
+        else
+            printf '%s\n' 'error: operations gate upgrade failed while replacing Caddy; admission remains closed for explicit operator recovery' >&2
+        fi
+    else
+        if [ "$upgrade_service_stopped" = true ]; then
+            systemctl stop tme-server.service >/dev/null 2>&1 || true
+        fi
+        printf '%s\n' 'error: operations upgrade did not commit; admission remains closed and the existing database was not replaced' >&2
+    fi
+    [ "$upgrade_status" -ne 0 ] || upgrade_status=1
+    exit "$upgrade_status"
+}
+upgrade_signal() {
+    upgrade_signal_number=$1
+    trap - 1 2 15
+    exit $((128 + upgrade_signal_number))
+}
+trap upgrade_failure 0
+trap 'upgrade_signal 1' 1
+trap 'upgrade_signal 2' 2
+trap 'upgrade_signal 15' 15
+
+if [ -e "$ADMISSION_MARKER" ]; then
+    [ -f "$ADMISSION_MARKER" ] && [ ! -L "$ADMISSION_MARKER" ] || \
+        fail 'pre-existing admission marker is unsafe'
+    [ "$(stat -c '%u:%g:%a:%h' "$ADMISSION_MARKER")" = '0:0:644:1' ] || \
+        fail 'pre-existing admission marker metadata is unsafe'
+    jq -e '.schema_version == 1 and .operation == "bootstrap" and .state == "closed"' \
+        "$ADMISSION_MARKER" >/dev/null || \
+        fail 'pre-existing admission marker requires explicit recovery'
+    upgrade_prior_marker=$(mktemp "$ADMISSION_ROOT/.upgrade-prior-marker.XXXXXX") || \
+        fail 'pre-existing admission marker snapshot could not be created'
+    install -o root -g root -m 0644 "$ADMISSION_MARKER" "$upgrade_prior_marker"
+    sync -f "$upgrade_prior_marker"
+    sync -f "$ADMISSION_ROOT"
+    upgrade_had_prior_marker=true
+fi
+close_admission operations-upgrade "$(basename -- "$release")"
+caddy_backup=$(mktemp /etc/caddy/.Caddyfile.previous.XXXXXX)
+cp --preserve=mode,ownership /etc/caddy/Caddyfile "$caddy_backup"
+caddy_temporary=$(mktemp /etc/caddy/.Caddyfile.tme.XXXXXX)
+install -o root -g root -m 0644 "$PRODUCTION_ROOT/caddy/Caddyfile" "$caddy_temporary"
+upgrade_caddy_replaced=true
+mv -Tf "$caddy_temporary" /etc/caddy/Caddyfile
+systemctl reload caddy.service
+verify_public_admission_closed
+upgrade_gate_active=true
+if [ -n "$upgrade_prior_marker" ]; then
+    rm -f -- "$upgrade_prior_marker"
+    sync -f "$ADMISSION_ROOT"
+    upgrade_prior_marker=''
+fi
+update_operation_phase admission_closed
+rm -f -- "$caddy_backup"
+caddy_backup=''
+
+update_operation_phase service_stopping
+systemctl stop tme-server.service
+upgrade_service_stopped=true
+RELEASE_OPERATION_SERVICE_STOPPED=true
+update_operation_phase service_stopped
+install -d -o root -g root -m 0700 "$CREDENTIAL_ROOT"
+operations_bundle=$(install_operations_bundle)
+install -o root -g root -m 0644 "$operations_bundle/systemd/"*.service \
+    "$operations_bundle/systemd/"*.timer /etc/systemd/system/
+systemctl daemon-reload
+verify_database_contract "$release"
+update_operation_phase database_verified
+systemctl start tme-server.service
+upgrade_service_stopped=false
+# Referenced by the sourced release-operation state model.
+# shellcheck disable=SC2034
+RELEASE_OPERATION_SERVICE_STOPPED=false
+update_operation_phase service_started
+wait_private_readiness || fail 'existing release did not become ready after operations upgrade'
+update_operation_phase readiness_verified
+run_authenticated_admission_smoke "$release"
+update_operation_phase smoke_verified
+commit_release_operation
+upgrade_committed=true
+trap - 0 1 2 15
+printf '%s\n' 'upgrade-operations: gate, identities, roots, units, readiness, and authenticated smoke committed without replacing the existing database'

@@ -1,0 +1,112 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "kobold_warren",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/kobold_warren/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "yew_shortbow",
+            "position": "right_hand"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "kobold_scrounger",
+      "actor_definition_id": "actor/kobold_warren/kobold_scrounger",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 4,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "kobold_skulker",
+      "actor_definition_id": "actor/kobold_warren/kobold_skulker",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 4,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "kobold_runt",
+      "actor_definition_id": "actor/kobold_warren/kobold_runt",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 4,
+          "y": 3
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "yew_shortbow": {
+      "definition_id": "yew_shortbow",
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

@@ -1,0 +1,105 @@
+The Mortal Estate local simulation
+scenario: death_corpse
+seed: 7
+
+loaded "Ashen Court" realms=[realm_0] levels=[realm_0/room_0]
+player Wayfarer (Fighter) at realm_0/room_0:1,1 hp=6
+monster Courtyard Scavenger at realm_0/room_0:1,1 hp=1
+monster Silent Lookout at realm_0/room_0:1,1 hp=1
+monster Stonecourt Brute at realm_0/room_0:5,1 hp=20
+
+player ready: Wayfarer at 1
+Wayfarer intent at 1: fight scavenger
+Wayfarer attacked Courtyard Scavenger: roll=2 damage=43 label=fatal hp=0
+contribution to scavenger: character=Some(CharacterId("character:death_corpse:primary")) class=Some(Physical) damage=1
+Courtyard Scavenger was defeated: cause=physical claim=character:death_corpse:primary/killing_blow
+corpse corpse:1 created for Courtyard Scavenger at realm_0/room_0:1,1 claim=character:death_corpse:primary/killing_blow
+Courtyard Scavenger's Rusted Knife fell to the ground at (1,1)
+Courtyard Scavenger's Cloth Bundle was retained in corpse:1
+Courtyard Scavenger relocated 3 gold: carried:scavenger:sack -> corpse:1 reason=corpse_retention claim=character:death_corpse:primary/killing_blow
+Courtyard Scavenger life state: alive -> dead
+shared defeat reward for Courtyard Scavenger: available=0 awarded=0 reason=zero_authored_experience
+Wayfarer's fight fatal_blow practice on mace: risk=practice raw=2
+Wayfarer gained 2 mace practice points (pool: 2)
+Wayfarer's mace skill advanced to level 1, critique 1
+readiness scheduled: Wayfarer cost=1 ready_at=2
+time 2
+monster ready: Silent Lookout at 2
+Silent Lookout intent: fight Wayfarer
+Silent Lookout missed Wayfarer: roll=9 attack_score=0 defense_score=13
+readiness scheduled: Silent Lookout cost=1 ready_at=3
+monster ready: Stonecourt Brute at 2
+Stonecourt Brute intent: move west
+Stonecourt Brute walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Stonecourt Brute step west -> (4,1): terrain=Flagstone cost=1 remaining=0
+Stonecourt Brute moved from (5,1) to (4,1)
+readiness scheduled: Stonecourt Brute cost=1 ready_at=3
+
+player ready: Wayfarer at 2
+Wayfarer intent at 2: fight lookout
+Wayfarer attacked Silent Lookout: roll=11 damage=43 label=fatal hp=0
+contribution to lookout: character=Some(CharacterId("character:death_corpse:primary")) class=Some(Physical) damage=1
+Silent Lookout was defeated: cause=physical claim=character:death_corpse:primary/killing_blow
+corpse corpse:2 created for Silent Lookout at realm_0/room_0:1,1 claim=character:death_corpse:primary/killing_blow
+Silent Lookout life state: alive -> dead
+shared defeat reward for Silent Lookout: available=0 awarded=0 reason=zero_authored_experience
+Wayfarer's fight fatal_blow practice on mace: risk=practice raw=2
+Wayfarer gained 2 mace practice points (pool: 3)
+Wayfarer's mace skill advanced to level 1, critique 2
+readiness scheduled: Wayfarer cost=1 ready_at=3
+time 3
+monster ready: Stonecourt Brute at 3
+Stonecourt Brute intent: move west
+Stonecourt Brute walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Stonecourt Brute step west -> (3,1): terrain=Flagstone cost=1 remaining=0
+Stonecourt Brute moved from (4,1) to (3,1)
+readiness scheduled: Stonecourt Brute cost=1 ready_at=4
+
+player ready: Wayfarer at 3
+Wayfarer intent at 3: search corpse corpse:2
+Wayfarer searched corpse:2: items_released=0 gold_released=0
+readiness scheduled: Wayfarer cost=1 ready_at=4
+time 4
+monster ready: Stonecourt Brute at 4
+Stonecourt Brute intent: move west
+Stonecourt Brute walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Stonecourt Brute step west -> (2,1): terrain=Flagstone cost=1 remaining=0
+Stonecourt Brute moved from (3,1) to (2,1)
+readiness scheduled: Stonecourt Brute cost=1 ready_at=5
+
+player ready: Wayfarer at 4
+Wayfarer intent at 4: search corpse corpse:1
+Wayfarer released Cloth Bundle from corpse:1 at (1,1)
+Wayfarer relocated 3 gold: corpse:1 -> ground:gold:1@realm_0/room_0:1,1 reason=corpse_search claim=character:death_corpse:primary/killing_blow
+Wayfarer searched corpse:1: items_released=1 gold_released=3
+readiness scheduled: Wayfarer cost=1 ready_at=5
+time 5
+monster ready: Stonecourt Brute at 5
+Stonecourt Brute intent: move west
+Stonecourt Brute walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Stonecourt Brute step west -> (1,1): terrain=Flagstone cost=1 remaining=0
+Stonecourt Brute moved from (2,1) to (1,1)
+readiness scheduled: Stonecourt Brute cost=1 ready_at=6
+
+player ready: Wayfarer at 5
+Wayfarer intent at 5: wait
+readiness scheduled: Wayfarer cost=1 ready_at=6
+time 6
+monster ready: Stonecourt Brute at 6
+Stonecourt Brute intent: fight Wayfarer
+Stonecourt Brute attacked Wayfarer: roll=2 damage=42 label=fatal hp=0
+contribution to player: character=None class=None damage=6
+Wayfarer was defeated: cause=physical claim=character:death_corpse:primary/character_death_pile
+corpse corpse:3 created for Wayfarer at realm_0/room_0:1,1 claim=character:death_corpse:primary/character_death_pile
+Wayfarer's Oak Club fell to the ground at (1,1)
+Wayfarer's River Flint was retained in corpse:3
+Wayfarer relocated 2 gold: carried:player:sack -> corpse:3 reason=corpse_retention claim=character:death_corpse:primary/character_death_pile
+Wayfarer life state: alive -> ghost
+shared defeat reward for Wayfarer: available=0 awarded=0 reason=player_target
+readiness scheduled: Stonecourt Brute cost=1 ready_at=7
+
+final state
+Wayfarer (Fighter) at realm_0/room_0:1,1 hp=0 ghost
+Courtyard Scavenger at realm_0/room_0:1,1 hp=0 dead
+Silent Lookout at realm_0/room_0:1,1 hp=0 dead
+Stonecourt Brute at realm_0/room_0:1,1 hp=20 alive

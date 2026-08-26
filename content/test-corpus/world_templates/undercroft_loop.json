@@ -1,0 +1,600 @@
+{
+  "arrivals": {},
+  "id": "undercroft_loop",
+  "kind": "world_template",
+  "realms": {
+    "realm_0": {
+      "levels": {
+        "entrance_hall": {
+          "cells": [
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "oak_door_east"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_stairs_down"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ]
+          ],
+          "height": 5,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "guard_post": {
+          "cells": [
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "oak_door_west"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "flagstone"
+              ],
+              [
+                "stone_wall"
+              ]
+            ],
+            [
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ],
+              [
+                "stone_wall"
+              ]
+            ]
+          ],
+          "height": 5,
+          "law_zone": "none",
+          "maximum_clear_sightline": 4,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "lower_crypt": {
+          "cells": [
+            [
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ]
+            ],
+            [
+              [
+                "crypt_wall"
+              ],
+              [
+                "stone_stairs_up"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "crypt_wall"
+              ]
+            ],
+            [
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "iron_door_east"
+              ],
+              [
+                "crypt_wall"
+              ]
+            ],
+            [
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "crypt_flagstone"
+              ],
+              [
+                "crypt_wall"
+              ]
+            ],
+            [
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ],
+              [
+                "crypt_wall"
+              ]
+            ]
+          ],
+          "height": 5,
+          "law_zone": "none",
+          "maximum_clear_sightline": 3,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        },
+        "troll_den": {
+          "cells": [
+            [
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ]
+            ],
+            [
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_wall"
+              ]
+            ],
+            [
+              [
+                "iron_door_west"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_wall"
+              ]
+            ],
+            [
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_stone"
+              ],
+              [
+                "rough_wall"
+              ]
+            ],
+            [
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ],
+              [
+                "rough_wall"
+              ]
+            ]
+          ],
+          "height": 5,
+          "law_zone": "none",
+          "maximum_clear_sightline": 4,
+          "presentation_mode": "combat_space",
+          "scene_role": "combat_space",
+          "staged_viewport": null,
+          "static_props": [],
+          "wall_terrain_ids": [],
+          "width": 5,
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          }
+        }
+      },
+      "name": "Undercroft Loop"
+    }
+  },
+  "schema_version": 3,
+  "topology": {
+    "edge/entrance_hall/1/2": {
+      "at": {
+        "level": "entrance_hall",
+        "position": {
+          "x": 2,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/entrance_hall/1/2",
+        "endpoint_id": "edge/entrance_hall/1/2",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/guard_post/1/0"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "guard_post",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/entrance_hall/2/1": {
+      "at": {
+        "level": "entrance_hall",
+        "position": {
+          "x": 1,
+          "y": 2
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "down",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "lower_crypt",
+          "position": {
+            "x": 1,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/guard_post/1/0": {
+      "at": {
+        "level": "guard_post",
+        "position": {
+          "x": 0,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/entrance_hall/1/2",
+        "endpoint_id": "edge/guard_post/1/0",
+        "initial_state": "closed",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/entrance_hall/1/2"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "entrance_hall",
+          "position": {
+            "x": 2,
+            "y": 1
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/lower_crypt/1/1": {
+      "at": {
+        "level": "lower_crypt",
+        "position": {
+          "x": 1,
+          "y": 1
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "direction": "up",
+        "kind": "stairs"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "entrance_hall",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/lower_crypt/2/3": {
+      "at": {
+        "level": "lower_crypt",
+        "position": {
+          "x": 3,
+          "y": 2
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/lower_crypt/2/3",
+        "endpoint_id": "edge/lower_crypt/2/3",
+        "initial_state": "open",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/troll_den/2/0"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "troll_den",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "realm": "realm_0"
+        }
+      }
+    },
+    "edge/troll_den/2/0": {
+      "at": {
+        "level": "troll_den",
+        "position": {
+          "x": 0,
+          "y": 2
+        },
+        "realm": "realm_0"
+      },
+      "hidden": false,
+      "kind": {
+        "binding_id": "door_binding/edge/lower_crypt/2/3",
+        "endpoint_id": "edge/troll_den/2/0",
+        "initial_state": "open",
+        "kind": "door",
+        "reciprocal_endpoint_id": "edge/lower_crypt/2/3"
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "level": "lower_crypt",
+          "position": {
+            "x": 3,
+            "y": 2
+          },
+          "realm": "realm_0"
+        }
+      }
+    }
+  },
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+}

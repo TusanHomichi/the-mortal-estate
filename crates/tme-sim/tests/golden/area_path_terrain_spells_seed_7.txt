@@ -1,0 +1,178 @@
+The Mortal Estate local simulation
+scenario: area_path_terrain_spells
+seed: 7
+
+loaded "Area Path Terrain Spells" realms=[realm_0] levels=[realm_0/room_0]
+player Mira (Wizard) at realm_0/room_0:1,2 hp=10
+monster Ash Dummy at realm_0/room_0:3,2 hp=8
+
+player ready: Mira at 1
+Mira intent at 1: cast web_field on area realm_0/room_0:2,2
+tile effect applied: web_field at realm_0/room_0:1,1 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:2,1 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:3,1 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:1,2 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:2,2 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:3,2 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:1,3 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:2,3 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:3,3 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+Mira's Web Field practice on wizard_magic: raw=3 reason=eligible_successful_cast
+Mira gained 3 wizard_magic practice points (pool: 3)
+Mira's wizard_magic skill advanced to level 1, critique 1
+readiness scheduled: Mira cost=1 ready_at=2
+Mira regenerated 1 Mp (39/40, Active, time 2)
+time 2
+monster ready: Ash Dummy at 2
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=3
+
+player ready: Mira at 2
+Mira intent at 2: inspect
+Mira inspected at realm_0/room_0:1,2: tile=Flagstone + web_field
+  current tile: terrain=Flagstone + web_field cost=2
+  north -> realm_0/room_0:1,1: walkable terrain=Flagstone + web_field cost=2
+  northeast -> realm_0/room_0:2,1: walkable terrain=Flagstone + web_field cost=2
+  east -> realm_0/room_0:2,2: walkable terrain=Flagstone + web_field cost=2
+  southeast -> realm_0/room_0:2,3: walkable terrain=Flagstone + web_field cost=2
+  south -> realm_0/room_0:1,3: walkable terrain=Flagstone + web_field cost=2
+  southwest -> realm_0/room_0:0,3: blocked terrain terrain=Stone Wall
+  west -> realm_0/room_0:0,2: blocked terrain terrain=Stone Wall
+  northwest -> realm_0/room_0:0,1: blocked terrain terrain=Stone Wall
+readiness scheduled: Mira cost=0 ready_at=2
+
+player ready: Mira at 2
+Mira intent at 2: walk east
+Mira walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Mira step east -> (2,2): terrain=Flagstone + web_field cost=2 remaining=1
+Mira moved from (1,2) to (2,2)
+readiness scheduled: Mira cost=1 ready_at=3
+tile effect ticked: web_field at realm_0/room_0:1,1 remaining=1
+tile effect ticked: web_field at realm_0/room_0:2,1 remaining=1
+tile effect ticked: web_field at realm_0/room_0:3,1 remaining=1
+tile effect ticked: web_field at realm_0/room_0:1,2 remaining=1
+tile effect ticked: web_field at realm_0/room_0:2,2 remaining=1
+tile effect ticked: web_field at realm_0/room_0:3,2 remaining=1
+tile effect ticked: web_field at realm_0/room_0:1,3 remaining=1
+tile effect ticked: web_field at realm_0/room_0:2,3 remaining=1
+tile effect ticked: web_field at realm_0/room_0:3,3 remaining=1
+time 3
+monster ready: Ash Dummy at 3
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=4
+
+player ready: Mira at 3
+Mira intent at 3: cast ember_cloud on realm_0/room_0:3,2
+tile effect applied: ember_cloud at realm_0/room_0:3,2 passability=none sight=none hazard=fire cost=none remaining=2
+Mira's Ember Cloud practice on wizard_magic: raw=3 reason=eligible_successful_cast
+Mira gained 3 wizard_magic practice points (pool: 3)
+Mira's wizard_magic skill advanced to level 1, critique 2
+readiness scheduled: Mira cost=1 ready_at=4
+tile effect ticked: web_field at realm_0/room_0:1,1 remaining=0
+tile effect expired: web_field at realm_0/room_0:1,1
+tile effect ticked: web_field at realm_0/room_0:2,1 remaining=0
+tile effect expired: web_field at realm_0/room_0:2,1
+tile effect ticked: web_field at realm_0/room_0:3,1 remaining=0
+tile effect expired: web_field at realm_0/room_0:3,1
+tile effect ticked: web_field at realm_0/room_0:1,2 remaining=0
+tile effect expired: web_field at realm_0/room_0:1,2
+tile effect ticked: web_field at realm_0/room_0:2,2 remaining=0
+tile effect expired: web_field at realm_0/room_0:2,2
+tile effect ticked: web_field at realm_0/room_0:3,2 remaining=0
+tile effect expired: web_field at realm_0/room_0:3,2
+tile effect ticked: web_field at realm_0/room_0:1,3 remaining=0
+tile effect expired: web_field at realm_0/room_0:1,3
+tile effect ticked: web_field at realm_0/room_0:2,3 remaining=0
+tile effect expired: web_field at realm_0/room_0:2,3
+tile effect ticked: web_field at realm_0/room_0:3,3 remaining=0
+tile effect expired: web_field at realm_0/room_0:3,3
+Mira regenerated 1 Mp (38/40, Active, time 4)
+time 4
+monster ready: Ash Dummy at 4
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=5
+
+player ready: Mira at 4
+Mira intent at 4: wait
+readiness scheduled: Mira cost=1 ready_at=5
+tile effect ticked: ember_cloud at realm_0/room_0:3,2 remaining=1
+tile effect damaged: Ash Dummy by ember_cloud damage=2 hp=6
+contribution to target: character=Some(CharacterId("character:area_path_terrain_spells:primary")) class=Some(Physical) damage=2
+time 5
+monster ready: Ash Dummy at 5
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=6
+
+player ready: Mira at 5
+Mira intent at 5: wait
+readiness scheduled: Mira cost=1 ready_at=6
+tile effect ticked: ember_cloud at realm_0/room_0:3,2 remaining=0
+tile effect damaged: Ash Dummy by ember_cloud damage=2 hp=4
+contribution to target: character=Some(CharacterId("character:area_path_terrain_spells:primary")) class=Some(Physical) damage=2
+tile effect expired: ember_cloud at realm_0/room_0:3,2
+Mira regenerated 1 Mp (39/40, Inactive, time 6)
+Mira regenerated 1 Stamina (19/20, Inactive, time 6)
+time 6
+monster ready: Ash Dummy at 6
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=7
+
+player ready: Mira at 6
+Mira intent at 6: cast shadow_cloud on area realm_0/room_0:2,2
+tile effect applied: shadow_cloud at realm_0/room_0:1,1 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:2,1 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:3,1 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:1,2 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:2,2 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:3,2 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:1,3 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:2,3 passability=none sight=blocked hazard=none cost=none remaining=2
+tile effect applied: shadow_cloud at realm_0/room_0:3,3 passability=none sight=blocked hazard=none cost=none remaining=2
+Mira's Shadow Cloud practice on wizard_magic: raw=3 reason=eligible_successful_cast
+Mira gained 3 wizard_magic practice points (pool: 3)
+Mira's wizard_magic skill advanced to level 1, critique 3
+readiness scheduled: Mira cost=1 ready_at=7
+time 7
+monster ready: Ash Dummy at 7
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=8
+
+player ready: Mira at 7
+Mira intent at 7: cast clear_sight on realm_0/room_0:2,2
+tile effect applied: clear_sight at realm_0/room_0:2,2 passability=none sight=clear hazard=none cost=none remaining=1
+Mira's Clear Sight practice on wizard_magic: raw=2 reason=eligible_successful_cast
+Mira gained 2 wizard_magic practice points (pool: 2)
+readiness scheduled: Mira cost=1 ready_at=8
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=1
+Mira regenerated 1 Mp (37/40, Active, time 8)
+time 8
+monster ready: Ash Dummy at 8
+Ash Dummy intent: hold
+readiness scheduled: Ash Dummy cost=1 ready_at=9
+
+player ready: Mira at 8
+Mira intent at 8: inspect
+Mira inspected at realm_0/room_0:2,2: tile=Flagstone + shadow_cloud + clear_sight
+  current tile: terrain=Flagstone + shadow_cloud + clear_sight cost=1
+  north -> realm_0/room_0:2,1: walkable terrain=Flagstone + shadow_cloud cost=1
+  northeast -> realm_0/room_0:3,1: walkable terrain=Flagstone + shadow_cloud cost=1
+  east -> realm_0/room_0:3,2: walkable terrain=Flagstone + shadow_cloud cost=1
+  southeast -> realm_0/room_0:3,3: walkable terrain=Flagstone + shadow_cloud cost=1
+  south -> realm_0/room_0:2,3: walkable terrain=Flagstone + shadow_cloud cost=1
+  southwest -> realm_0/room_0:1,3: walkable terrain=Flagstone + shadow_cloud cost=1
+  west -> realm_0/room_0:1,2: walkable terrain=Flagstone + shadow_cloud cost=1
+  northwest -> realm_0/room_0:1,1: walkable terrain=Flagstone + shadow_cloud cost=1
+  nearby east: monster Ash Dummy at (3,2) hp=4
+readiness scheduled: Mira cost=0 ready_at=8
+
+final state
+Mira (Wizard) at realm_0/room_0:2,2 hp=10 alive
+Ash Dummy at realm_0/room_0:3,2 hp=4 alive

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "item_instance_contract",
+  "name": "Item Instance Contract",
+  "description": "A clean contract fixture for duplicate definitions and stacks.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project item-instance contract fixture.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/item_instance_contract.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/item_instance_contract",
+  "world_template": "world_templates/item_instance_contract.json",
+  "simulation_seed": "simulation_seeds/item_instance_contract.json",
+  "script": [
+    {
+      "move_item": {
+        "item_instance_id": "tonic_a",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_1"
+        }
+      }
+    },
+    {
+      "show_sack": true
+    },
+    {
+      "drink": "tonic_a"
+    },
+    {
+      "show_sack": true
+    },
+    {
+      "move_item": {
+        "item_instance_id": "tonic_b",
+        "destination": {
+          "kind": "carried",
+          "position": "sack_item_2"
+        }
+      }
+    },
+    {
+      "move_item": {
+        "item_instance_id": "tonic_b",
+        "destination": {
+          "kind": "ground_here"
+        }
+      }
+    }
+  ]
+}

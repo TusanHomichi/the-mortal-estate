@@ -1,0 +1,66 @@
+# Hosts tools/check_hostnames.py accepts in carried files.
+#
+# One host (or IPv4 literal) per line, lowercase, exact match. '#' starts a
+# comment; every entry carries the reason it is legitimate. Reserved names
+# (.invalid, .test, .example, .localhost, example.com/net/org), loopback
+# addresses, and the RFC 5737 documentation ranges are allowed by rule and never
+# need a line here.
+#
+# This list is deliberately minimal: it holds exactly the strings that appear in
+# the tree today, and nothing added in anticipation. An entry earns its place by
+# an actual occurrence.
+#
+# A missing, unreadable, or entry-less copy of this file makes the check
+# FAIL CLOSED.
+
+# --- Real external hosts, in license text only ---
+fsf.org      # AGPL-3.0 license text, copyright notice: <https://fsf.org/>
+www.gnu.org  # AGPL-3.0 license text: <https://www.gnu.org/licenses/>
+
+# --- Real external hosts, in generated dependency metadata ---
+# Cargo writes the crates.io registry's index URL into every package entry of
+# Cargo.lock: "registry+https://github.com/rust-lang/crates.io-index". It is
+# generated, it is the canonical crates.io index location, and it cannot be
+# spelled with a reserved name without breaking dependency resolution.
+github.com
+crates.io    # named in the comment above; the registry the index URL belongs to
+
+# --- Real external hosts, in package repository configurations ---
+apt.postgresql.org # PostgreSQL APT repository URL in deploy prepare-packages
+dl.cloudsmith.io   # Cloudsmith repository hosting Caddy Debian packages in deploy prepare-packages
+www.postgresql.org # PostgreSQL official key download URL in deploy prepare-packages
+
+# --- Real external hosts in tracked audio provenance and license notices ---
+creativecommons.org # canonical CC0 1.0 deed linked by the tracked license evidence
+freesound.org        # source and download pages for the individually verified CC0 chant
+kenney.nl            # official asset-pack host and bare host named by its in-pack notices
+www.kenney.nl        # creator site named by the Kenney in-pack CC0 notices
+support.kenney.nl    # support link carried verbatim in the Kenney in-pack CC0 notices
+request.kenney.nl    # request link carried verbatim in the Kenney in-pack CC0 notices
+patreon.com          # creator-support link carried verbatim in two Kenney notices
+twitter.com          # creator profile link carried verbatim in two Kenney notices
+
+# --- Code and configuration patterns matching hostname heuristics ---
+18-main.service           # systemd template instance name in postgresql@18-main.service
+context.store             # facet engine store field access in server facet code
+self.inner.draining.store # atomic boolean store operation in HTTP drain state
+self.store                # store field access in server coordinator and postgres code
+self.visible.store        # postgres store field access in server code
+ss.us                     # PostgreSQL TO_CHAR microsecond timestamp format literal in store queries
+tme.store                 # schema-qualified table prefix in tme.store_state queries
+
+# --- Synthetic strings that exist only as this check's own P9 mutants ---
+# These are invented, unregistered, and appear only inside
+# tests/test_check_hostnames.py, where each is fed to the check through a temp
+# repository with an EMPTY allowlist and must be killed. The kill is therefore
+# proven without these entries; the entries exist only so the test source may
+# carry the literals it mutates with. They are listed rather than hidden by
+# string concatenation, because a check you can dodge by splicing literals is
+# not a check.
+mutant-host.com    # mutant: bare host under a common TLD
+mutant-second.com  # mutant: second host, proving one allowlist entry excuses only itself
+mutant-url.sh      # mutant: host reachable only through the URI-authority rule
+mutant-port.zz     # mutant: host recognized by its :port suffix
+45.77.12.9         # mutant: non-loopback, non-documentation IPv4 literal
+records.mutant-estate.org    # mutant: bare host, proving tier 3 still fires
+archive.mutant-estate.world  # mutant: excluded label, proving tier 1 still fires

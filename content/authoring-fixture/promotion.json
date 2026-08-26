@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "kind": "authoring_fixture_promotion",
+  "status": "owner_accepted_at_g4x",
+  "attested_by": "peter",
+  "attested_on": "2026-08-19",
+  "master": {
+    "path": "content/authoring-fixture/fixture-surface.tmj",
+    "sha256": "3ffd01beec1db6df3218c0fb5870335dffe42128ec53cbbdfe8fdb832b5925da",
+    "byte_identical_to_reviewed_master": true
+  },
+  "companions": [
+    {
+      "path": "content/authoring-fixture/fixture-interior.tmj",
+      "sha256": "37ccf7f7cf91d5327def88724f34e80364395de8371976d946c2f276b343e48d"
+    }
+  ],
+  "authority": {
+    "coordinates": true,
+    "terrain_and_passability": true,
+    "structures_and_landmarks": true,
+    "member_transition_endpoints": true,
+    "runtime_loads_authoring_source": false,
+    "presentation_art": false,
+    "gameplay_tuning": false,
+    "content_canon": false
+  },
+  "research_boundary": {
+    "review_refs": [
+      "docs/authoring-compiler.md",
+      "content/authoring-fixture/README.md"
+    ]
+  }
+}

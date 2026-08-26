@@ -1,0 +1,40 @@
+[Unit]
+Description=TME authoritative server
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+StartLimitIntervalSec=5min
+StartLimitBurst=5
+
+[Service]
+Type=exec
+User=tme
+Group=tme
+WorkingDirectory=/var/lib/tme
+ExecStart=/opt/tme/current/bin/tme-server serve
+EnvironmentFile=/etc/tme/server.env
+LoadCredential=database-url:/etc/tme/credentials/database-url
+LoadCredential=auth-database-url:/etc/tme/credentials/auth-database-url
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=15s
+UMask=0027
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/tme
+
+[Install]
+WantedBy=multi-user.target

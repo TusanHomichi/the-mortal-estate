@@ -1,0 +1,49 @@
+The Mortal Estate local simulation
+scenario: summons_created_creature_lifecycle
+seed: 7
+
+loaded "Summons Created Creature Lifecycle" realms=[realm_0] levels=[realm_0/start]
+player Aria (Wizard) at realm_0/start:1,1 hp=10
+monster Ash Imp at realm_0/start:3,1 hp=4
+
+player ready: Aria at 1
+Aria intent at 1: cast call_echo on realm_0/start:2,1
+--- Aria summoned Echo Guardian at realm_0/start:2,1 for 2 rounds ---
+Aria's Call Echo practice on wizard_magic: raw=4 reason=eligible_successful_cast
+Aria gained 4 wizard_magic practice points (pool: 4)
+Aria's wizard_magic skill advanced to level 1, critique 1
+readiness scheduled: Aria cost=1 ready_at=2
+Aria regenerated 1 Mp (10/12, Active, time 2)
+time 2
+monster ready: Ash Imp at 2
+Ash Imp intent: hold
+readiness scheduled: Ash Imp cost=1 ready_at=3
+monster ready: Echo Guardian at 2
+Echo Guardian intent: watch
+readiness scheduled: Echo Guardian cost=1 ready_at=3
+
+player ready: Aria at 2
+Aria intent at 2: wait
+readiness scheduled: Aria cost=1 ready_at=3
+time 3
+monster ready: Ash Imp at 3
+Ash Imp intent: hold
+readiness scheduled: Ash Imp cost=1 ready_at=4
+monster ready: Echo Guardian at 3
+Echo Guardian intent: watch
+readiness scheduled: Echo Guardian cost=1 ready_at=4
+
+player ready: Aria at 3
+Aria intent at 3: wait
+readiness scheduled: Aria cost=1 ready_at=4
+--- Echo Guardian faded from realm_0/start:2,1 ---
+Aria regenerated 1 Mp (11/12, Inactive, time 4)
+Aria regenerated 1 Stamina (12/12, Inactive, time 4)
+time 4
+monster ready: Ash Imp at 4
+Ash Imp intent: hold
+readiness scheduled: Ash Imp cost=1 ready_at=5
+
+final state
+Aria (Wizard) at realm_0/start:1,1 hp=10 alive
+Ash Imp at realm_0/start:3,1 hp=4 alive

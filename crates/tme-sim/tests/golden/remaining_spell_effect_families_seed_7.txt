@@ -1,0 +1,294 @@
+The Mortal Estate local simulation
+scenario: remaining_spell_effect_families
+seed: 7
+
+loaded "Remaining Spell Effect Families" realms=[realm_0] levels=[realm_0/room_0, realm_0/vault]
+player Talia (Thaumaturge) at realm_0/room_0:1,1 hp=50
+monster Fallen Ally at realm_0/room_0:3,1 hp=8
+monster Warded Target at realm_0/room_0:3,2 hp=200
+monster Foreign Demon at realm_0/room_0:3,3 hp=20
+monster Mobile Undead at realm_0/room_0:2,2 hp=20
+monster Cornered Undead at realm_0/room_0:3,1 hp=20
+
+player ready: Talia at 1
+Talia intent at 1: cast death on fallen_ally --unsafe
+Fallen Ally resolves death save [death]: roll=11 threshold=0/20 natural=0 boost=0 result=failure mitigation=none damage=190->190.
+Talia's Death hits Fallen Ally for 8 damage (0 hp).
+contribution to fallen_ally: character=Some(CharacterId("character:remaining_spell_effect_families:primary")) class=Some(DirectedSpell) damage=8
+Fallen Ally was defeated: cause=other_magic claim=character:remaining_spell_effect_families:primary/killing_blow
+corpse corpse:1 created for Fallen Ally at realm_0/room_0:3,1 claim=character:remaining_spell_effect_families:primary/killing_blow
+Fallen Ally life state: alive -> dead
+shared defeat reward for Fallen Ally: available=0 awarded=0 reason=zero_authored_experience
+Talia's Death practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=2
+time 2
+monster ready: Warded Target at 2
+Warded Target intent: hold
+readiness scheduled: Warded Target cost=100 ready_at=102
+monster ready: Foreign Demon at 2
+Foreign Demon intent: hold
+readiness scheduled: Foreign Demon cost=100 ready_at=102
+monster ready: Mobile Undead at 2
+Mobile Undead intent: hold
+readiness scheduled: Mobile Undead cost=100 ready_at=102
+monster ready: Cornered Undead at 2
+Cornered Undead intent: hold
+readiness scheduled: Cornered Undead cost=100 ready_at=102
+
+player ready: Talia at 2
+Talia intent at 2: cast raise_dead on none
+Talia attempts Raise Dead on none: roll=none threshold=19/20 result=failure (no corpse).
+readiness scheduled: Talia cost=1 ready_at=3
+time 3
+
+player ready: Talia at 3
+Talia intent at 3: cast shadow_cloud on area realm_0/room_0:2,2
+tile effect applied: shadow_cloud at realm_0/room_0:1,1 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:2,1 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:3,1 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:1,2 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:2,2 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:3,2 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:1,3 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:2,3 passability=none sight=blocked hazard=none cost=none remaining=10
+tile effect applied: shadow_cloud at realm_0/room_0:3,3 passability=none sight=blocked hazard=none cost=none remaining=10
+Talia's Shadow Cloud practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=4
+time 4
+
+player ready: Talia at 4
+Talia intent at 4: cast night_vision on self
+Talia gains night_vision (vision) for 8 rounds.
+Talia's Night Vision practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=5
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=9
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=9
+time 5
+
+player ready: Talia at 5
+Talia intent at 5: cast death on warded_target --unsafe
+Warded Target resolves death save [death]: roll=2 threshold=20/20 natural=20 boost=0 result=success mitigation=half_damage damage=190->95.
+Talia's Death hits Warded Target for 95 damage (105 hp).
+contribution to warded_target: character=Some(CharacterId("character:remaining_spell_effect_families:primary")) class=Some(DirectedSpell) damage=95
+Talia's Death practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=6
+night_vision ticks on Talia (7 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=8
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=8
+time 6
+
+player ready: Talia at 6
+Talia intent at 6: cast banish on foreign_demon --unsafe
+Talia tests Banish against Foreign Demon: failure (willpower contest unresolved).
+readiness scheduled: Talia cost=1 ready_at=7
+night_vision ticks on Talia (6 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=7
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=7
+time 7
+
+player ready: Talia at 7
+Talia intent at 7: cast call_demon on realm_0/room_0:2,1
+--- Talia summoned Bound Demon at realm_0/room_0:2,1 for 20 rounds ---
+Talia's Call Demon practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=8
+night_vision ticks on Talia (5 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=6
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=6
+time 8
+monster ready: Bound Demon at 8
+Bound Demon intent: hold
+readiness scheduled: Bound Demon cost=100 ready_at=108
+
+player ready: Talia at 8
+Talia intent at 8: cast hide_door on door south
+--- Talia's Hide Door conceals the transition at realm_0/room_0:1,2 for 5 rounds ---
+Talia's Hide Door practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=9
+night_vision ticks on Talia (4 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=5
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=5
+time 9
+
+player ready: Talia at 9
+Talia intent at 9: cast sense_secret on none
+--- Transition concealment at realm_0/room_0:1,2 was revealed ---
+Talia's Sense Secret practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=10
+night_vision ticks on Talia (3 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=4
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=4
+time 10
+
+player ready: Talia at 10
+Talia intent at 10: cast feather_fall on self
+Talia gains feather_fall (fall_protection) for 2 rounds.
+Talia's Feather Fall practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=11
+night_vision ticks on Talia (2 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=3
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=3
+time 11
+
+player ready: Talia at 11
+Talia intent at 11: cast speed on self
+Talia gains speed (speed) for 2 rounds.
+Talia's Speed practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=12
+night_vision ticks on Talia (1 rounds remain).
+feather_fall ticks on Talia (1 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=2
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=2
+time 12
+
+player ready: Talia at 12
+Talia intent at 12: cast breathe_water on player
+Talia gains breathe_water (water_breathing) for 2 rounds.
+Talia's Breathe Water practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=13
+night_vision ticks on Talia (0 rounds remain).
+night_vision expires on Talia.
+feather_fall ticks on Talia (0 rounds remain).
+feather_fall expires on Talia.
+speed ticks on Talia (1 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=1
+time 13
+
+player ready: Talia at 13
+Talia intent at 13: cast turn_undead on none --unsafe
+Mobile Undead intent: flee (turned) southeast
+Mobile Undead walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Mobile Undead step southeast -> (3,3): terrain=Flagstone + shadow_cloud cost=1 remaining=0
+Mobile Undead moved from (2,2) to (3,3)
+Talia turns undead: considered=[mobile_undead] moved=[mobile_undead] blocked=[].
+Talia's Turn Undead practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=14
+speed ticks on Talia (0 rounds remain).
+speed expires on Talia.
+breathe_water ticks on Talia (1 rounds remain).
+tile effect ticked: shadow_cloud at realm_0/room_0:1,1 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:1,1
+tile effect ticked: shadow_cloud at realm_0/room_0:2,1 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:2,1
+tile effect ticked: shadow_cloud at realm_0/room_0:3,1 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:3,1
+tile effect ticked: shadow_cloud at realm_0/room_0:1,2 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:1,2
+tile effect ticked: shadow_cloud at realm_0/room_0:2,2 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:2,2
+tile effect ticked: shadow_cloud at realm_0/room_0:3,2 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:3,2
+tile effect ticked: shadow_cloud at realm_0/room_0:1,3 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:1,3
+tile effect ticked: shadow_cloud at realm_0/room_0:2,3 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:2,3
+tile effect ticked: shadow_cloud at realm_0/room_0:3,3 remaining=0
+tile effect expired: shadow_cloud at realm_0/room_0:3,3
+time 14
+
+player ready: Talia at 14
+Talia intent at 14: cast hide_in_shadows on self
+Talia gains hide_in_shadows (concealment) for 5 rounds.
+Talia melts into cover (hide_in_shadows) for 5 rounds.
+Talia's Hide in Shadows practice on thaumaturge_magic: raw=2 reason=eligible_successful_cast
+readiness scheduled: Talia cost=1 ready_at=15
+breathe_water ticks on Talia (0 rounds remain).
+breathe_water expires on Talia.
+time 15
+
+player ready: Talia at 15
+Talia intent at 15: run east,south
+Talia run: requested=2 accepted=2 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Talia step east -> (2,1): terrain=Flagstone cost=1 remaining=2
+Talia moved from (1,1) to (2,1)
+  Talia step south -> (2,2): terrain=Flagstone cost=1 remaining=1
+Talia moved from (2,1) to (2,2)
+Talia is revealed: move.
+readiness scheduled: Talia cost=1 ready_at=16
+time 16
+
+player ready: Talia at 16
+Talia intent at 16: walk northeast
+Talia walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Talia step northeast -> (3,1): terrain=Flagstone cost=1 remaining=2
+Talia moved from (2,2) to (3,1)
+readiness scheduled: Talia cost=1 ready_at=17
+time 17
+
+player ready: Talia at 17
+Talia intent at 17: cast raise_dead on none
+Talia attempts Raise Dead on corpse:1: roll=none threshold=19/20 result=failure (non-player corpse).
+readiness scheduled: Talia cost=1 ready_at=18
+time 18
+
+final state
+Talia (Thaumaturge) at realm_0/room_0:3,1 hp=50 alive
+Fallen Ally at realm_0/room_0:3,1 hp=0 dead
+Warded Target at realm_0/room_0:3,2 hp=105 alive
+Foreign Demon at realm_0/room_0:3,3 hp=20 alive
+Mobile Undead at realm_0/room_0:3,3 hp=20 alive
+Cornered Undead at realm_0/room_0:3,1 hp=20 alive
+Bound Demon at realm_0/room_0:2,1 hp=12 alive

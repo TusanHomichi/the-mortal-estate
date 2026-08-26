@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "alignment_social_law",
+  "name": "Alignment Social Law",
+  "description": "A clean project-authored social-rules fixture for Thief disguise, alignment hostility, attack confirmation, lawful-NPC grudges, and direct lawful-victim consequences.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, text, layout, and tuning for Slice EG mechanics proof. No source names, prose, placements, or private research rows are copied.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/alignment_social_law.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/alignment_social_law",
+  "world_template": "world_templates/alignment_social_law.json",
+  "simulation_seed": "simulation_seeds/alignment_social_law.json",
+  "script": [
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "lantern_wash",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "lantern_court",
+              "position": {
+                "x": 1,
+                "y": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "inspect": true
+    },
+    {
+      "physical_attack": {
+        "mode": "kick",
+        "target_actor_id": "harbor_warden",
+        "authorization": "confirmed_unsafe"
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "kick",
+        "target_actor_id": "white_hare",
+        "authorization": "confirmed_unsafe"
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "kick",
+        "target_actor_id": "quiet_hermit",
+        "authorization": "confirmed_unsafe"
+      }
+    },
+    {
+      "inspect": true
+    }
+  ]
+}

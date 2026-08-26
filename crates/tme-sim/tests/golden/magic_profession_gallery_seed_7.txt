@@ -1,0 +1,278 @@
+The Mortal Estate local simulation
+scenario: magic_profession_gallery
+seed: 7
+
+loaded "Magic Profession Gallery" realms=[realm_0] levels=[realm_0/room_0]
+player Shade Adept (Thief) at realm_0/room_0:1,2 hp=18
+monster Target Dummy at realm_0/room_0:4,2 hp=10
+monster Viperling at realm_0/room_0:5,1 hp=8
+
+player ready: Shade Adept at 1
+Shade Adept intent at 1: cast toxin_ward on self
+Shade Adept gains toxin_ward (protection) for 8 rounds.
+Shade Adept's Toxin Ward practice on thief_magic: raw=2 reason=eligible_successful_cast
+Shade Adept gained 2 Thief Magic practice points (pool: 2)
+readiness scheduled: Shade Adept cost=1 ready_at=2
+Shade Adept regenerated 1 Mp (40/40, Active, time 2)
+time 2
+monster ready: Target Dummy at 2
+Target Dummy intent: hold
+readiness scheduled: Target Dummy cost=1 ready_at=3
+monster ready: Viperling at 2
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=11 threshold=8/20 natural=5 boost=3 result=failure mitigation=none damage=none->none.
+Shade Adept gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=3
+
+player ready: Shade Adept at 2
+Shade Adept intent at 2: cast shadow_veil on realm_0/room_0:1,2
+tile effect applied: shadow_veil at realm_0/room_0:1,2 passability=none sight=obscured hazard=none cost=none remaining=4
+Shade Adept's Shadow Veil practice on thief_magic: raw=2 reason=eligible_successful_cast
+Shade Adept gained 2 Thief Magic practice points (pool: 4)
+Shade Adept's Thief Magic skill advanced to level 1, critique 1 (First Measure)
+readiness scheduled: Shade Adept cost=1 ready_at=3
+toxin_ward ticks on Shade Adept (7 rounds remain).
+time 3
+monster ready: Target Dummy at 3
+Target Dummy intent: hold
+readiness scheduled: Target Dummy cost=1 ready_at=4
+monster ready: Viperling at 3
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=2 threshold=8/20 natural=5 boost=3 result=success mitigation=negate damage=none->none.
+readiness scheduled: Viperling cost=1 ready_at=4
+
+player ready: Shade Adept at 3
+Shade Adept intent at 3: hide
+Shade Adept melts into cover (hidden) for 3 rounds.
+readiness scheduled: Shade Adept cost=1 ready_at=4
+toxin_ward ticks on Shade Adept (6 rounds remain).
+venom_bite ticks on Shade Adept (2 rounds remain).
+venom_bite damages Shade Adept for 1 (17 hp).
+contribution to player0: character=None class=None damage=1
+tile effect ticked: shadow_veil at realm_0/room_0:1,2 remaining=3
+Shade Adept regenerated 1 Hp (18/18, Active, time 4)
+Shade Adept regenerated 1 Mp (40/40, Active, time 4)
+time 4
+monster ready: Target Dummy at 4
+Target Dummy intent: search west
+Target Dummy walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Target Dummy step west -> (3,2): terrain=Flagstone cost=1 remaining=2
+Target Dummy moved from (4,2) to (3,2)
+readiness scheduled: Target Dummy cost=1 ready_at=5
+monster ready: Viperling at 4
+Viperling intent: search southwest
+Viperling walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Viperling step southwest -> (4,2): terrain=Flagstone cost=1 remaining=2
+Viperling moved from (5,1) to (4,2)
+readiness scheduled: Viperling cost=1 ready_at=5
+
+player ready: Shade Adept at 4
+Shade Adept intent at 4: move_item spell_book to right_hand
+Shade Adept moved Spell Book from (1,2) to right_hand
+Shade Adept is revealed: active_item_move.
+readiness scheduled: Shade Adept cost=1 ready_at=5
+toxin_ward ticks on Shade Adept (5 rounds remain).
+venom_bite ticks on Shade Adept (1 rounds remain).
+venom_bite damages Shade Adept for 1 (17 hp).
+contribution to player0: character=None class=None damage=1
+tile effect ticked: shadow_veil at realm_0/room_0:1,2 remaining=2
+time 5
+monster ready: Target Dummy at 5
+Target Dummy intent: hold
+readiness scheduled: Target Dummy cost=1 ready_at=6
+monster ready: Viperling at 5
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=9 threshold=8/20 natural=5 boost=3 result=failure mitigation=none damage=none->none.
+Shade Adept gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=6
+
+player ready: Shade Adept at 5
+Shade Adept intent at 5: learn_spell shadow_sting
+Shade Adept spent 10 gold
+Thief Trainer records Shadow Sting (thief_magic) in Shade Adept's retained Spell Book for 10 gold
+readiness scheduled: Shade Adept cost=1 ready_at=6
+toxin_ward ticks on Shade Adept (4 rounds remain).
+tile effect ticked: shadow_veil at realm_0/room_0:1,2 remaining=1
+Shade Adept regenerated 1 Hp (18/18, Active, time 6)
+time 6
+monster ready: Target Dummy at 6
+Target Dummy intent: hold
+readiness scheduled: Target Dummy cost=1 ready_at=7
+monster ready: Viperling at 6
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=8 threshold=8/20 natural=5 boost=3 result=success mitigation=negate damage=none->none.
+readiness scheduled: Viperling cost=1 ready_at=7
+
+player ready: Shade Adept at 6
+Shade Adept intent at 6: cast shadow_sting on target_dummy
+Target Dummy resolves shadow_sting save [shadow]: roll=11 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=3->3.
+Shade Adept's Shadow Sting hits Target Dummy for 3 damage (7 hp).
+contribution to target_dummy: character=Some(CharacterId("character:magic_profession_gallery:primary")) class=Some(DirectedSpell) damage=3
+Shade Adept's Shadow Sting practice on thief_magic: raw=3 reason=eligible_successful_cast
+Shade Adept gained 3 Thief Magic practice points (pool: 4)
+Shade Adept's Thief Magic skill advanced to level 1, critique 2 (First Measure)
+readiness scheduled: Shade Adept cost=1 ready_at=7
+toxin_ward ticks on Shade Adept (3 rounds remain).
+venom_bite ticks on Shade Adept (2 rounds remain).
+venom_bite damages Shade Adept for 1 (17 hp).
+contribution to player0: character=None class=None damage=1
+tile effect ticked: shadow_veil at realm_0/room_0:1,2 remaining=0
+tile effect expired: shadow_veil at realm_0/room_0:1,2
+time 7
+monster ready: Target Dummy at 7
+Target Dummy intent: hold
+readiness scheduled: Target Dummy cost=1 ready_at=8
+monster ready: Viperling at 7
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=2 threshold=8/20 natural=5 boost=3 result=success mitigation=negate damage=none->none.
+readiness scheduled: Viperling cost=1 ready_at=8
+
+player ready: Shade Adept at 7
+Shade Adept intent at 7: cast web_field on area realm_0/room_0:2,2
+tile effect applied: web_field at realm_0/room_0:1,1 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:2,1 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:3,1 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:1,2 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:2,2 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:3,2 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:1,3 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:2,3 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+tile effect applied: web_field at realm_0/room_0:3,3 passability=hindered sight=obscured hazard=none cost=2 remaining=2
+Shade Adept's Web Field practice on thief_magic: raw=3 reason=eligible_successful_cast
+Shade Adept gained 3 Thief Magic practice points (pool: 4)
+Shade Adept's Thief Magic skill advanced to level 1, critique 3 (First Measure)
+readiness scheduled: Shade Adept cost=1 ready_at=8
+toxin_ward ticks on Shade Adept (2 rounds remain).
+venom_bite ticks on Shade Adept (1 rounds remain).
+venom_bite damages Shade Adept for 1 (16 hp).
+contribution to player0: character=None class=None damage=1
+Shade Adept regenerated 1 Hp (17/18, Active, time 8)
+Shade Adept regenerated 1 Mp (37/40, Active, time 8)
+time 8
+monster ready: Target Dummy at 8
+Target Dummy intent: search west
+Target Dummy walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Target Dummy step west -> (2,2): terrain=Flagstone + web_field cost=2 remaining=1
+Target Dummy moved from (3,2) to (2,2)
+readiness scheduled: Target Dummy cost=1 ready_at=9
+monster ready: Viperling at 8
+Viperling intent: search west
+Viperling walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
+  Viperling step west -> (3,2): terrain=Flagstone + web_field cost=2 remaining=1
+Viperling moved from (4,2) to (3,2)
+readiness scheduled: Viperling cost=1 ready_at=9
+
+player ready: Shade Adept at 8
+Shade Adept intent at 8: walk east
+Shade Adept walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
+  Shade Adept step east -> (2,2): terrain=Flagstone + web_field cost=2 remaining=1
+Shade Adept moved from (1,2) to (2,2)
+readiness scheduled: Shade Adept cost=1 ready_at=9
+toxin_ward ticks on Shade Adept (1 rounds remain).
+venom_bite ticks on Shade Adept (0 rounds remain).
+venom_bite damages Shade Adept for 1 (16 hp).
+contribution to player0: character=None class=None damage=1
+venom_bite expires on Shade Adept.
+tile effect ticked: web_field at realm_0/room_0:1,1 remaining=1
+tile effect ticked: web_field at realm_0/room_0:2,1 remaining=1
+tile effect ticked: web_field at realm_0/room_0:3,1 remaining=1
+tile effect ticked: web_field at realm_0/room_0:1,2 remaining=1
+tile effect ticked: web_field at realm_0/room_0:2,2 remaining=1
+tile effect ticked: web_field at realm_0/room_0:3,2 remaining=1
+tile effect ticked: web_field at realm_0/room_0:1,3 remaining=1
+tile effect ticked: web_field at realm_0/room_0:2,3 remaining=1
+tile effect ticked: web_field at realm_0/room_0:3,3 remaining=1
+time 9
+monster ready: Target Dummy at 9
+Target Dummy intent: fight Shade Adept
+Target Dummy missed Shade Adept: roll=9 attack_score=0 defense_score=14
+readiness scheduled: Target Dummy cost=1 ready_at=10
+monster ready: Viperling at 9
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=16 threshold=8/20 natural=5 boost=3 result=failure mitigation=none damage=none->none.
+Shade Adept gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=10
+
+player ready: Shade Adept at 9
+Shade Adept intent at 9: cast dimming_hex on target_dummy
+Target Dummy gains dimming_hex (curse) for 3 rounds.
+Shade Adept's Dimming Hex practice on thief_magic: raw=2 reason=eligible_successful_cast
+Shade Adept gained 2 Thief Magic practice points (pool: 3)
+Shade Adept's Thief Magic skill advanced to level 1, critique 4 (First Measure)
+readiness scheduled: Shade Adept cost=1 ready_at=10
+toxin_ward ticks on Shade Adept (0 rounds remain).
+toxin_ward expires on Shade Adept.
+tile effect ticked: web_field at realm_0/room_0:1,1 remaining=0
+tile effect expired: web_field at realm_0/room_0:1,1
+tile effect ticked: web_field at realm_0/room_0:2,1 remaining=0
+tile effect expired: web_field at realm_0/room_0:2,1
+tile effect ticked: web_field at realm_0/room_0:3,1 remaining=0
+tile effect expired: web_field at realm_0/room_0:3,1
+tile effect ticked: web_field at realm_0/room_0:1,2 remaining=0
+tile effect expired: web_field at realm_0/room_0:1,2
+tile effect ticked: web_field at realm_0/room_0:2,2 remaining=0
+tile effect expired: web_field at realm_0/room_0:2,2
+tile effect ticked: web_field at realm_0/room_0:3,2 remaining=0
+tile effect expired: web_field at realm_0/room_0:3,2
+tile effect ticked: web_field at realm_0/room_0:1,3 remaining=0
+tile effect expired: web_field at realm_0/room_0:1,3
+tile effect ticked: web_field at realm_0/room_0:2,3 remaining=0
+tile effect expired: web_field at realm_0/room_0:2,3
+tile effect ticked: web_field at realm_0/room_0:3,3 remaining=0
+tile effect expired: web_field at realm_0/room_0:3,3
+Shade Adept regenerated 1 Hp (17/18, Active, time 10)
+Shade Adept regenerated 1 Mp (37/40, Active, time 10)
+time 10
+monster ready: Target Dummy at 10
+Target Dummy intent: fight Shade Adept
+Target Dummy attacked Shade Adept: roll=19 damage=1 label=light hp=16
+contribution to player0: character=None class=None damage=1
+readiness scheduled: Target Dummy cost=1 ready_at=11
+monster ready: Viperling at 10
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=14 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
+Shade Adept gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=11
+
+player ready: Shade Adept at 10
+Shade Adept intent at 10: cast self_hold on self
+Shade Adept resolves self_hold save [stun]: roll=17 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
+Shade Adept gains self_hold (control_status) for 2 rounds.
+Shade Adept's Self Hold practice on thief_magic: raw=2 reason=eligible_successful_cast
+Shade Adept gained 2 Thief Magic practice points (pool: 2)
+readiness scheduled: Shade Adept cost=1 ready_at=11
+dimming_hex ticks on Target Dummy (2 rounds remain).
+time 11
+monster ready: Target Dummy at 11
+Target Dummy intent: fight Shade Adept
+Target Dummy attacked Shade Adept: roll=16 damage=1 label=light hp=15
+contribution to player0: character=None class=None damage=1
+readiness scheduled: Target Dummy cost=1 ready_at=12
+monster ready: Viperling at 11
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=15 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
+Shade Adept gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Viperling cost=1 ready_at=12
+
+player ready: Shade Adept at 11
+Shade Adept intent at 11: walk east
+Shade Adept's walk east is suppressed by self_hold.
+readiness scheduled: Shade Adept cost=1 ready_at=12
+self_hold ticks on Shade Adept (1 rounds remain).
+dimming_hex ticks on Target Dummy (1 rounds remain).
+Shade Adept regenerated 2 Hp (17/18, Inactive, time 12)
+Shade Adept regenerated 1 Mp (37/40, Inactive, time 12)
+time 12
+monster ready: Target Dummy at 12
+Target Dummy intent: fight Shade Adept
+Target Dummy missed Shade Adept: roll=10 attack_score=0 defense_score=14
+readiness scheduled: Target Dummy cost=1 ready_at=13
+monster ready: Viperling at 12
+Viperling intent: use Venom Bite on Shade Adept
+Shade Adept resolves venom_bite save [poison]: roll=1 threshold=5/20 natural=5 boost=0 result=success mitigation=negate damage=none->none.
+readiness scheduled: Viperling cost=1 ready_at=13
+
+final state
+Shade Adept (Thief) at realm_0/room_0:2,2 hp=17 alive
+Target Dummy at realm_0/room_0:2,2 hp=7 alive
+Viperling at realm_0/room_0:3,2 hp=8 alive

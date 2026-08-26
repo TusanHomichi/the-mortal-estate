@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "workbench_session_manifest",
+  "workbench_version": "v0",
+  "session_id": "session-fixture",
+  "opened_at": "2026-08-19T00:00:00Z",
+  "view": "logical",
+  "land_id": "synthetic_fixture_land",
+  "realm_id": "synthetic_realm",
+  "candidate_member": "synthetic_surface",
+  "repository_revision": "0000000000000000000000000000000000000000",
+  "revision_binding": "advisory",
+  "digest_binding": "fail_closed",
+  "projection": {
+    "path": "projection/synthetic-logical-projection.json",
+    "sha256": "c5ea477296d9da6dc05db83d165f8231352699466c38f5419b8e9b5a342f12ec"
+  },
+  "base_digests": [
+    {
+      "role": "master",
+      "path": "sources/synthetic-master.json",
+      "sha256": "dec9be168f737bd14ae654a6630213a0ab474c726b63483ff447fe4a25831fed"
+    },
+    {
+      "role": "companion",
+      "path": "sources/synthetic-companion.json",
+      "sha256": "7aa8fd467fd3ea4ea1d2c054e46484c4211d7d77779c48b36b673f05a16b2af6"
+    },
+    {
+      "role": "receipt",
+      "path": "sources/synthetic-receipt.json",
+      "sha256": "51332511aff718f81cefc934ca5084b60acaacf9e52fd4c62130ef2e8172e63d"
+    },
+    {
+      "role": "runtime_projection",
+      "path": "sources/synthetic-runtime-projection.json",
+      "sha256": "cc67ff1f5c10ffa05d4c8358d2a9f804c4ac94a813036fbf6bb16bdeb9996995"
+    },
+    {
+      "role": "logical_projection",
+      "path": "projection/synthetic-logical-projection.json",
+      "sha256": "c5ea477296d9da6dc05db83d165f8231352699466c38f5419b8e9b5a342f12ec"
+    }
+  ],
+  "authority": {
+    "tracked_content": false,
+    "runtime_input": false,
+    "staged_operations": false,
+    "apply": false
+  },
+  "retention": {
+    "policy": "disposable",
+    "statement": "Disposable working state. Sessions live under an ignored root, are never tracked, are never runtime input, and are never an authority. Delete any session directory at any time; nothing references it. Convention: keep the session you are working in, drop the rest \u2014 'rm -rf .workbench/sessions' is always a safe command in this repository. Automatic cleanup: sessions older than 14 days, and any session beyond the most recent 10, are removed by tools/workbench_prune.py."
+  }
+}

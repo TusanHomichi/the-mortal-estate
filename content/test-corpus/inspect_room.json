@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "inspect_room",
+  "name": "Inspect Room",
+  "description": "A clean project-authored fixture for inspect transcript testing.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, text, layout, and numbers for inspect action testing. No raw research material is copied.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/inspect_room.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/combat_labels",
+  "world_template": "world_templates/inspect_room.json",
+  "simulation_seed": "simulation_seeds/inspect_room.json",
+  "script": [
+    {
+      "inspect": true
+    }
+  ]
+}

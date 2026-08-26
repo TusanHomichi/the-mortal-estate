@@ -1,0 +1,5 @@
+# Issue #25: local development and CI prove the same exact compiler baseline.
+[toolchain]
+channel = "1.98.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

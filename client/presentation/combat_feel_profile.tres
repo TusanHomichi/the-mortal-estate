@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CombatFeelProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://presentation/combat_feel_profile.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+double_activation_window_msec = 420
+melee_wind_up_msec = 180
+melee_minimum_payoff_msec = 280
+ranged_release_msec = 160
+ranged_minimum_payoff_msec = 260
+spell_chant_msec = 600
+spell_release_msec = 180
+spell_minimum_payoff_msec = 300
+visual_tail_cap_msec = 700

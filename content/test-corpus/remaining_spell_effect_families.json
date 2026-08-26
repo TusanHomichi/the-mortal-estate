@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "remaining_spell_effect_families",
+  "name": "Remaining Spell Effect Families",
+  "description": "Clean deterministic fixture for Slice DY spell effect family ownership.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project runtime fixture for Slice DY; provisional values are not commercial claims.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/remaining_spell_effect_families.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/remaining_spell_effect_families",
+  "world_template": "world_templates/remaining_spell_effect_families.json",
+  "simulation_seed": "simulation_seeds/remaining_spell_effect_families.json",
+  "script": [
+    {
+      "cast_spell": {
+        "authorization": "confirmed_unsafe",
+        "spell_id": "death",
+        "target": {
+          "actor": {
+            "actor_id": "fallen_ally"
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "raise_dead",
+        "target": "none"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "shadow_cloud",
+        "target": {
+          "area": {
+            "center": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "night_vision",
+        "target": "self_target"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "confirmed_unsafe",
+        "spell_id": "death",
+        "target": {
+          "actor": {
+            "actor_id": "warded_target"
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "confirmed_unsafe",
+        "spell_id": "banish",
+        "target": {
+          "actor": {
+            "actor_id": "foreign_demon"
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "call_demon",
+        "target": {
+          "coordinate": {
+            "position": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "hide_door",
+        "target": {
+          "door": {
+            "direction": "south"
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "sense_secret",
+        "target": "none"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "feather_fall",
+        "target": "self_target"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "speed",
+        "target": "self_target"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "breathe_water",
+        "target": {
+          "actor": {
+            "actor_id": "player"
+          }
+        }
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "confirmed_unsafe",
+        "spell_id": "turn_undead",
+        "target": "none"
+      }
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "hide_in_shadows",
+        "target": "self_target"
+      }
+    },
+    {
+      "move_path": [
+        "east",
+        "south"
+      ]
+    },
+    {
+      "move_path": [
+        "northeast"
+      ]
+    },
+    {
+      "cast_spell": {
+        "authorization": "safe",
+        "spell_id": "raise_dead",
+        "target": "none"
+      }
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schema_version": 3,
+  "kind": "simulation_seed",
+  "id": "gold_bank_locker_storage",
+  "actors": [
+    {
+      "id": "player",
+      "actor_definition_id": "actor/gold_bank_locker_storage/player",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      },
+      "npc": null,
+      "character_id": "character:gold_bank_locker_storage:primary",
+      "character": {
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "fighter",
+          "display_class": "Fighter",
+          "nationality_id": "aldland"
+        },
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "strength": 14,
+          "dexterity": 12,
+          "constitution": 13,
+          "intelligence": 9,
+          "wisdom": 10,
+          "charisma": 8
+        },
+        "resources": {
+          "hp": 12,
+          "max_hp": 12,
+          "peak_hp": 12,
+          "mp": 0,
+          "max_mp": 0,
+          "stamina": 10,
+          "max_stamina": 10
+        },
+        "progression": {
+          "level": 3,
+          "experience": 300
+        },
+        "physical_attribute_adds": {
+          "strength_adds": 0,
+          "dexterity_adds": 0
+        },
+        "promotion_history": [],
+        "skill_ledger": []
+      },
+      "carried": {
+        "items": [
+          {
+            "item_instance_id": "field_case",
+            "position": "sack_item_1"
+          }
+        ],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 120
+        }
+      },
+      "active_effects": []
+    },
+    {
+      "id": "dummy",
+      "actor_definition_id": "actor/gold_bank_locker_storage/dummy",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "npc": null,
+      "carried": {
+        "items": [],
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        }
+      },
+      "active_effects": []
+    }
+  ],
+  "item_instances": {
+    "field_case": {
+      "definition_id": "field_case",
+      "knowledge": {
+        "identified": true,
+        "appraised": false
+      },
+      "binding": {
+        "state": "unrestricted"
+      }
+    }
+  },
+  "ground_items": [],
+  "service_instances": [
+    {
+      "id": "west_counter",
+      "service_definition_id": "west_counter",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      }
+    },
+    {
+      "id": "east_counter",
+      "service_definition_id": "east_counter",
+      "location": {
+        "realm": "realm_0",
+        "level": "room_0",
+        "position": {
+          "x": 1,
+          "y": 1
+        }
+      }
+    }
+  ],
+  "merchant_inventories": [],
+  "ecology_sites": []
+}

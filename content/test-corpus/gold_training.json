@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_scenario",
+  "id": "gold_training",
+  "name": "Gold Ledger and Training V1",
+  "description": "Original clean fixture proving read-only critique, a value-conserving permanent learning-rate purchase, positive training XP, and later rate-adjusted Sword practice.",
+  "clean_content": true,
+  "research_boundary": {
+    "status": "clean_original_fixture",
+    "notes": "Original project names, text, layout, and numeric tuning. The visible thresholds, rate caps, seven-gold unit, and three-XP unit are deterministic clean-fixture values, not commercial 1.11 constants.",
+    "review_refs": [
+      "docs/test-corpus-provenance.md",
+      "content/test-corpus/gold_training.provenance.md"
+    ]
+  },
+  "rng_seed": 7,
+  "catalog": "catalogs/prototype_catalog_v6.json",
+  "catalog_profile": "profile/gold_training",
+  "world_template": "world_templates/gold_training.json",
+  "simulation_seed": "simulation_seeds/gold_training.json",
+  "script": [
+    {
+      "critique": {
+        "service_id": "sword_trainer",
+        "track_id": "sword"
+      }
+    },
+    {
+      "train": {
+        "service_id": "sword_trainer",
+        "offered_gold": 40
+      }
+    },
+    {
+      "physical_attack": {
+        "mode": "poke",
+        "target_actor_id": "dummy",
+        "authorization": "safe"
+      }
+    }
+  ]
+}

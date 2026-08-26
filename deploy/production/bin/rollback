@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+# shellcheck source-path=SCRIPTDIR
+. "$(dirname -- "$0")/release-operation"
+
+require_root
+[ "$#" -eq 1 ] || fail 'usage: rollback <release-id>'
+release_id=$1
+release=$(release_directory "$release_id")
+if ! rollback_manifest_sha256=$(verify_release_integrity "$release"); then
+    fail 'rollback release integrity is missing, malformed, or incompatible'
+fi
+[ -n "$rollback_manifest_sha256" ] || fail 'rollback release manifest digest is absent'
+load_environment
+"$PRODUCTION_ROOT/bin/preflight" "$release/bin/tme-server"
+require_operation_lock
+exec 9>"$OPERATION_LOCK"
+flock -n 9 || fail 'another release operation is active'
+begin_release_operation rollback "$release"
+
+verify_database_contract "$release"
+update_operation_phase database_verified
+update_operation_phase service_stopping
+systemctl stop tme-server.service
+RELEASE_OPERATION_SERVICE_STOPPED=true
+update_operation_phase service_stopped
+update_operation_phase release_switching
+switch_release "$release"
+# Referenced by the sourced release-operation failure handler.
+# shellcheck disable=SC2034
+RELEASE_OPERATION_SWITCHED=true
+update_operation_phase release_switched
+systemctl start tme-server.service
+# Referenced by the sourced release-operation failure handler.
+# shellcheck disable=SC2034
+RELEASE_OPERATION_SERVICE_STOPPED=false
+update_operation_phase service_started
+wait_private_readiness || fail 'rollback release did not become privately ready'
+update_operation_phase readiness_verified
+run_authenticated_admission_smoke "$release"
+update_operation_phase smoke_verified
+commit_release_operation
+printf '%s\n' "rollback: $release_id committed and admission opened"
