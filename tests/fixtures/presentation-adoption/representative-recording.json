@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "kind": "presentation_adoption_recording_fixture",
+  "source": {
+    "world_document": "content/lands/identity-proof/world.json",
+    "simulation_seed": "content/lands/identity-proof/simulation_seed.json",
+    "simulation_seed_sha256": "ac3952813d5a06759891932c562c4182a8bcefe3ee9c4776eabf47eab4c76fd6"
+  },
+  "arrangements": {
+    "actors": [
+      {
+        "actor_id": "threshold_keeper",
+        "location": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      }
+    ],
+    "ecology_members": [
+      {
+        "member_id": "great_bear",
+        "site_id": "ruin_mouth_lair",
+        "location": {
+          "level": "settlement",
+          "position": {
+            "x": 14,
+            "y": 16
+          },
+          "realm": "identity_proof"
+        }
+      }
+    ],
+    "services": [
+      {
+        "service_id": "keeper_rite",
+        "location": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      }
+    ]
+  },
+  "capture_barrier": {
+    "minimum_logical_time": 2,
+    "observer_actor_id": "player",
+    "actor_count": 3,
+    "actors": [
+      {
+        "actor_id": "player",
+        "attack_safety": "invalid",
+        "kind": "player",
+        "life_state": "alive",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      },
+      {
+        "actor_id": "ecology:ruin_mouth_lair:great_bear:0",
+        "attack_safety": "open_hostile",
+        "kind": "monster",
+        "life_state": "alive",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 13,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      },
+      {
+        "actor_id": "threshold_keeper",
+        "attack_safety": "protected",
+        "kind": "npc",
+        "life_state": "alive",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      }
+    ],
+    "action_option": {
+      "blocked_reason": null,
+      "enabled": true,
+      "id": "npc:threshold_keeper:ask_about_the_rite:none",
+      "label": "the keeper: Ask about the rite"
+    },
+    "npc_interaction": {
+      "actor_id": "threshold_keeper",
+      "interaction_id": "ask_about_the_rite"
+    },
+    "service": {
+      "capability_id": "keeper_restoration",
+      "service_id": "keeper_rite",
+      "position": {
+        "level": "settlement",
+        "position": {
+          "x": 12,
+          "y": 15
+        },
+        "realm": "identity_proof"
+      }
+    },
+    "required_terrain_ids": [
+      "testland_grass",
+      "testland_path",
+      "testland_structure_footprint",
+      "testland_town_ground"
+    ]
+  },
+  "evidence_limits": {
+    "dead_layer": false,
+    "static_prop_required": false,
+    "transition_aperture_required": false
+  }
+}

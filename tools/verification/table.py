@@ -67,6 +67,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
     "harness": (
         "tests.test_live_proof_land",
         "tests.test_live_proof_pulse",
+        "tests.test_presentation_adoption_recording",
         "tests.test_pulse_capture",
         "tests.test_run_clean_clone_proof",
         "tests.test_run_gated_postgres",
@@ -269,6 +270,21 @@ _STATIC: tuple[Step, ...] = (
             "$TME_PG_ADMIN_URL_FILE",
         ),
         requires=("godot", "postgres"),
+        timeout=1800.0,
+    ),
+    Step(
+        key="capture.presentation_adoption",
+        owner="capture",
+        label="capture: representative presentation-adoption observer frame",
+        argv=(
+            "python3",
+            "tools/run_presentation_adoption_recording.py",
+            "--admin-url-file",
+            "$TME_PG_ADMIN_URL_FILE",
+            "--output",
+            "$TME_CAPTURE_OUTPUT/presentation-adoption",
+        ),
+        requires=("godot", "postgres", "capture-output"),
         timeout=1800.0,
     ),
 )
