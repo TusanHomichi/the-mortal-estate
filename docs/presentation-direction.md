@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-08-27
-revision: 3
-status: Owner-authorized visual target owner. The grammar and production rule stand; one exact target-authority packet is resumed under private-archive issue #24 before any presenter or production pipeline is selected.
+revision: 5
+status: Owner-accepted visual target. The exact ten-part packet is accepted at its content digest; no presenter, representative implementation, or production pipeline is accepted.
 public_safe: true
-summary: The visual target, the production rule that gates scale, and the owner-authorized ten-part target packet used to judge the bounded Nomos presentation experiment without preselecting browser, Godot, or another pipeline.
+summary: The owner-accepted isometric-oblique target packet and calm-field texture discipline, plus the production rule used to judge the bounded Nomos presentation experiment without preselecting browser, Godot, or another pipeline.
 routes:
   - client/presentation/**
   - content/test-corpus/**
@@ -16,10 +16,12 @@ getting there. The client's architecture is
 [client architecture](client-architecture.md); what is currently implemented is
 [client notes](client-notes.md).
 
-Revision 1 added no art decision beyond the charter. Revision 2 records the
-owner's bounded target-packet ruling and evidence order. The visual target is
-still the owner's to set, and this document is where the owner's version is
-recorded — not where an agent manufactures acceptance.
+Earlier revisions established the charter-level direction, the bounded target
+packet, its evidence order, the owner-selected projection, and the
+surface-pattern correction found while calibrating it. Revision 5 records the
+owner's exact packet acceptance. The visual target is still the owner's to set,
+and this document is where the owner's version is recorded — not where an agent
+manufactures acceptance.
 
 ## The target
 
@@ -30,9 +32,14 @@ miniature 3D diorama photographed from above.
 
 ### The grammar
 
-- a fixed oblique or orthographic-oblique gameplay view;
+- a fixed isometric-oblique orthographic gameplay view at an intimate, local
+  play scale rather than a world-overview scale;
 - continuous terrain art over authoritative logical cells;
-- broad intentional pixel clusters rather than noisy fake-pixel detail;
+- broad intentional pixel clusters and large calm material fields rather than
+  noisy fake-pixel detail;
+- uneven, material-specific texture density: wear follows traffic, roots follow
+  trees, stones explain structure or terrain, and detail yields around actors,
+  routes, and interaction anchors;
 - limited material and regional palettes with a strong value hierarchy;
 - actors, enemies, doors, stairs, bridges, and interactables enlarged for
   gameplay readability;
@@ -43,6 +50,25 @@ miniature 3D diorama photographed from above.
   weight shifts, and concise combat effects;
 - information-dense UI that shares the world's art language without overwhelming
   the playfield.
+
+### Projection and surface ruling
+
+**Owner ruling, 2026-08-27:** the current target-authority packet authors to the
+fixed isometric-oblique projection above. The camera stays close enough that one
+actor, the immediate traversable ground, and a nearby interaction anchor are
+readable at native play size. Geography leaves the frame naturally, and routes
+may disappear behind terrain rather than being surveyed from above.
+
+The generated candidates also exposed a specific style failure: filling every
+surface with curling, equally weighted pattern. That is not TME's pixel grammar.
+Large quiet shapes establish material and navigation first. Smaller clusters add
+wear, growth, breakage, or relief only where the surface calls for them. Repeated
+swirls, decorative meanders, and uniform high-frequency texture are generation
+defects to correct, not characteristics to preserve.
+
+This ruling selects the packet's visual projection. It does **not** select a
+renderer, engine, platform, logical-to-screen implementation, or production
+tool. Those remain downstream evidence questions.
 
 ### The dead world
 
@@ -108,6 +134,18 @@ the next matching thing.
 The owner records exactly one target verdict: `accepted` or `rejected`.
 Rejection ends the experiment before presenter selection. Acceptance approves
 the target only.
+
+**Owner verdict, 2026-08-27: `accepted`.** The owner reviewed all six visual
+artifacts at their native 1672 × 941 size together with the explicit invariants
+and non-invariants. The ten required parts are represented by the hero frame,
+normal gameplay frame, actor-and-material sheet, combat-and-UI frame,
+living/dead-and-effect comparison, motion-timing sheet, and the written
+invariant ruling. Their exact accepted target manifest has SHA-256
+`d6676c95918280587cf737b07162579eb69d0e3eeef43c40b229bc12efe53487`.
+The manifest and generated sources remain content-addressed local evidence and
+are not tracked build inputs or promoted runtime assets. This verdict clears P0
+only: it accepts no representative presenter result, Nomos boundary, renderer,
+engine, or platform.
 
 ## Presenter evidence order
 
@@ -194,9 +232,10 @@ approving its own art is an explicit project non-goal.
 
 Deliberately unresolved, and not to be resolved by implementation:
 
-- the owner verdict on the current target packet and representative micro-scene;
-- the final pixel grammar, including grid pitch, palette discipline, and
-  animation budget;
+- the owner verdict on the representative micro-scene;
+- the exact camera pitch and actor scale within the ruled intimate framing;
+- the exact palette discipline and animation budget within the ruled pixel and
+  surface grammar;
 - the dead world's visual identity beyond the direction above;
 - the UI's typography and contrast palette
   ([client architecture](client-architecture.md#input-and-the-accessibility-floor)
