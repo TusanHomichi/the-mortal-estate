@@ -52,8 +52,13 @@ func _run() -> void:
 		_fail("the shipped world shell is not presenting through GridWorldView")
 		return
 	var started: int = Time.get_ticks_msec()
+	var last_logical_time: String = ""
 	while Time.get_ticks_msec() - started < TIMEOUT_MSEC:
 		var frame: Dictionary = view.frame()
+		var logical_time: String = str(frame.get("logical_time", ""))
+		if not logical_time.is_empty() and logical_time != last_logical_time:
+			last_logical_time = logical_time
+			print("barrier_candidate = %s" % JSON.stringify(_barrier_diagnostics(frame, barrier)))
 		if _matches_barrier(frame, barrier as Dictionary):
 			if not _record(frame, view.frame_generation(), client, barrier as Dictionary, output):
 				_fail("could not write the authoritative frame")
@@ -70,21 +75,29 @@ func _run() -> void:
 
 
 func _matches_barrier(frame: Dictionary, barrier: Dictionary) -> bool:
+	return _barrier_failures(frame, barrier).is_empty()
+
+
+func _barrier_failures(frame: Dictionary, barrier: Dictionary) -> Array[String]:
+	var failures: Array[String] = []
 	if int(frame.get("logical_time", -1)) < int(barrier.get("minimum_logical_time", -1)):
-		return false
+		failures.append("logical_time")
 	if str(frame.get("observer_actor_id", "")) != str(barrier.get("observer_actor_id", "")):
-		return false
+		failures.append("observer_actor_id")
 	var actors: Array = frame.get("actors", []) as Array
 	if actors.size() != int(barrier.get("actor_count", -1)):
-		return false
+		failures.append("actor_count")
 	for expected_value: Variant in barrier.get("actors", []) as Array:
 		var expected: Dictionary = expected_value as Dictionary
 		var actor: Dictionary = _find(actors, "actor_id", str(expected.get("actor_id", "")))
 		if actor.is_empty():
-			return false
-		for field: String in ["attack_safety", "kind", "life_state", "position"]:
+			failures.append("actor:%s" % str(expected.get("actor_id", "")))
+			continue
+		for field: String in ["attack_safety", "kind", "life_state"]:
 			if actor.get(field) != expected.get(field):
-				return false
+				failures.append("actor:%s:%s" % [str(expected.get("actor_id", "")), field])
+		if not _same_location(actor.get("position"), expected.get("position")):
+			failures.append("actor:%s:position" % str(expected.get("actor_id", "")))
 
 	var expected_action: Dictionary = barrier.get("action_option", {}) as Dictionary
 	var action: Dictionary = _find(
@@ -93,10 +106,11 @@ func _matches_barrier(frame: Dictionary, barrier: Dictionary) -> bool:
 		str(expected_action.get("id", "")),
 	)
 	if action.is_empty():
-		return false
-	for field: String in ["blocked_reason", "enabled", "label"]:
-		if action.get(field) != expected_action.get(field):
-			return false
+		failures.append("action")
+	else:
+		for field: String in ["blocked_reason", "enabled", "label"]:
+			if action.get(field) != expected_action.get(field):
+				failures.append("action:%s" % field)
 
 	var expected_npc: Dictionary = barrier.get("npc_interaction", {}) as Dictionary
 	var npc: Dictionary = _find(
@@ -104,12 +118,14 @@ func _matches_barrier(frame: Dictionary, barrier: Dictionary) -> bool:
 		"actor_id",
 		str(expected_npc.get("actor_id", "")),
 	)
-	if npc.is_empty() or _find(
-		npc.get("interactions", []) as Array,
-		"interaction_id",
-		str(expected_npc.get("interaction_id", "")),
-	).is_empty():
-		return false
+	if npc.is_empty():
+		failures.append("npc")
+	elif _find(
+			npc.get("interactions", []) as Array,
+			"interaction_id",
+			str(expected_npc.get("interaction_id", "")),
+		).is_empty():
+		failures.append("npc:interaction")
 
 	var expected_service: Dictionary = barrier.get("service", {}) as Dictionary
 	var service: Dictionary = _find(
@@ -117,14 +133,17 @@ func _matches_barrier(frame: Dictionary, barrier: Dictionary) -> bool:
 		"service_id",
 		str(expected_service.get("service_id", "")),
 	)
-	if service.is_empty() or service.get("position") != expected_service.get("position"):
-		return false
-	if _find(
-		service.get("capabilities", []) as Array,
-		"capability_id",
-		str(expected_service.get("capability_id", "")),
-	).is_empty():
-		return false
+	if service.is_empty():
+		failures.append("service")
+	else:
+		if not _same_location(service.get("position"), expected_service.get("position")):
+			failures.append("service:position")
+		if _find(
+			service.get("capabilities", []) as Array,
+			"capability_id",
+			str(expected_service.get("capability_id", "")),
+		).is_empty():
+			failures.append("service:capability")
 
 	var terrain_ids: Dictionary = {}
 	var context: Dictionary = frame.get("static_scene_context", {}) as Dictionary
@@ -134,8 +153,58 @@ func _matches_barrier(frame: Dictionary, barrier: Dictionary) -> bool:
 			terrain_ids[str(terrain_id)] = true
 	for required: Variant in barrier.get("required_terrain_ids", []) as Array:
 		if not terrain_ids.has(str(required)):
-			return false
-	return true
+			failures.append("terrain:%s" % str(required))
+	return failures
+
+
+func _same_location(actual_value: Variant, expected_value: Variant) -> bool:
+	if actual_value is not Dictionary or expected_value is not Dictionary:
+		return false
+	var actual: Dictionary = actual_value as Dictionary
+	var expected: Dictionary = expected_value as Dictionary
+	var actual_position: Variant = actual.get("position")
+	var expected_position: Variant = expected.get("position")
+	if actual_position is not Dictionary or expected_position is not Dictionary:
+		return false
+	return (
+		str(actual.get("level", "")) == str(expected.get("level", ""))
+		and str(actual.get("realm", "")) == str(expected.get("realm", ""))
+		and int((actual_position as Dictionary).get("x", -1))
+		== int((expected_position as Dictionary).get("x", -1))
+		and int((actual_position as Dictionary).get("y", -1))
+		== int((expected_position as Dictionary).get("y", -1))
+	)
+
+
+func _barrier_diagnostics(frame: Dictionary, barrier: Dictionary) -> Dictionary:
+	var actors: Array[Dictionary] = []
+	for actor_value: Variant in frame.get("actors", []) as Array:
+		var actor: Dictionary = actor_value as Dictionary
+		actors.append({
+			"actor_id": actor.get("actor_id"),
+			"attack_safety": actor.get("attack_safety"),
+			"kind": actor.get("kind"),
+			"life_state": actor.get("life_state"),
+			"position": actor.get("position"),
+		})
+	var actions: Array[String] = []
+	for action_value: Variant in frame.get("action_options", []) as Array:
+		actions.append(str((action_value as Dictionary).get("id", "")))
+	var services: Array[String] = []
+	for service_value: Variant in frame.get("services_here", []) as Array:
+		services.append(str((service_value as Dictionary).get("service_id", "")))
+	var npcs: Array[String] = []
+	for npc_value: Variant in frame.get("npcs_here", []) as Array:
+		npcs.append(str((npc_value as Dictionary).get("actor_id", "")))
+	return {
+		"logical_time": frame.get("logical_time"),
+		"observer_actor_id": frame.get("observer_actor_id"),
+		"actors": actors,
+		"action_ids": actions,
+		"service_ids": services,
+		"npc_ids": npcs,
+		"failures": _barrier_failures(frame, barrier),
+	}
 
 
 func _find(rows: Array, field: String, value: String) -> Dictionary:
