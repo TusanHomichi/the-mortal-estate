@@ -1,0 +1,169 @@
+{
+  "canonical_command": [
+    "python3",
+    "tools/run_presentation_adoption_recording.py",
+    "--admin-url-file",
+    "$TME_PG_ADMIN_URL_FILE",
+    "--godot",
+    "$TME_GODOT",
+    "--output",
+    "$TME_CAPTURE_OUTPUT/presentation-adoption",
+    "--expected-frame",
+    "tests/fixtures/presentation-adoption/identity-proof-observer-frame.json"
+  ],
+  "disposition": "prerequisite_candidate_pending_non_author_rerun",
+  "effective_input": {
+    "arrangement_deltas": [
+      {
+        "after": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        },
+        "before": {
+          "level": "settlement",
+          "position": {
+            "x": 11,
+            "y": 13
+          },
+          "realm": "identity_proof"
+        },
+        "path": "actors/threshold_keeper/location"
+      },
+      {
+        "after": {
+          "level": "settlement",
+          "position": {
+            "x": 14,
+            "y": 16
+          },
+          "realm": "identity_proof"
+        },
+        "before": {
+          "level": "settlement",
+          "position": {
+            "x": 44,
+            "y": 16
+          },
+          "realm": "identity_proof"
+        },
+        "path": "ecology_sites/ruin_mouth_lair/member_locations/great_bear"
+      },
+      {
+        "after": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        },
+        "before": {
+          "level": "settlement",
+          "position": {
+            "x": 11,
+            "y": 13
+          },
+          "realm": "identity_proof"
+        },
+        "path": "service_instances/keeper_rite/location"
+      }
+    ],
+    "simulation_seed_sha256": "ec29dc2173a0679d5c9b5257c6ec902ac1da63016e69a0d2a3a434c0184282c5"
+  },
+  "elapsed_seconds": 11.301,
+  "evidence_limits": {
+    "dead_layer": false,
+    "static_prop_required": false,
+    "transition_aperture_required": false
+  },
+  "kind": "presentation_adoption_recording_receipt",
+  "observed": {
+    "actor_count": 3,
+    "frame_sha256": "3ab13123836830a50227bbe3729a21ed10b89bec2617a46d74c9fc9be04e7b48",
+    "logical_time": "2",
+    "normalized_projection_sha256": "ad8c5577c7d52715eddeac104b273866b015b45db890d29bc3d36a6d7dbadb21",
+    "observation_center": {
+      "level": "settlement",
+      "position": {
+        "x": 12,
+        "y": 15
+      },
+      "realm": "identity_proof"
+    },
+    "server_status": {
+      "control_api_version": 3,
+      "draining": false,
+      "gameplay_ready": true,
+      "mailbox_capacity": 64,
+      "maximum_mailbox_depth": 0,
+      "open_connections": 0,
+      "preauth_connections": 0,
+      "protocol_major": 1,
+      "protocol_minor": 8,
+      "restore_fence_epoch": 0,
+      "status": "ready"
+    }
+  },
+  "proof_sources": {
+    "client_recorder_sha256": "9315a54936da15977993b8564bb1ef692116589997f9b998348c3df9c88a6c29",
+    "driver_sha256": "8548a1207206f4dfa136c3398d44ec0d746ad9f08a003271570efba2fefb5309"
+  },
+  "recorded_at_utc": "2026-08-27T07:06:46.628412+00:00",
+  "rerun_policy": {
+    "compare": "normalized_projection_sha256",
+    "compared_fields": [
+      "logical_time",
+      "observer_actor_id",
+      "observation_center",
+      "observation_radius",
+      "actors",
+      "action_options",
+      "action_options_truncated",
+      "npcs_here",
+      "services_here",
+      "static_scene_context",
+      "tiles"
+    ],
+    "excluded_run_local_fields": [
+      "actors[].character_id",
+      "frame_generation",
+      "provenance.server_sequence",
+      "provenance.world_revision",
+      "receipt paths",
+      "ports",
+      "process ids",
+      "timing"
+    ],
+    "expected_comparison": {
+      "equal": null,
+      "performed": false
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "commit": "8bb7316d845a427f4925adcb46d60cbfc27acfbd",
+    "recording_fixture": "tests/fixtures/presentation-adoption/representative-recording.json",
+    "recording_fixture_sha256": "fec24b6c92d64bf19ee623886742ba75cd86421d85cf03adbb7bbde4d94e788e",
+    "simulation_seed": "content/lands/identity-proof/simulation_seed.json",
+    "simulation_seed_sha256": "ac3952813d5a06759891932c562c4182a8bcefe3ee9c4776eabf47eab4c76fd6",
+    "tracked_status_before": [],
+    "tree": "4419e8d76c1a8100c83beaca8603a281e6042bdd",
+    "world_document": "content/lands/identity-proof/world.json",
+    "world_document_sha256": "df8c308b808cba483dfc584e0ee891ea56514939af41091512ee9b74d0574eff",
+    "world_template": "content/lands/identity-proof/generated/world_template.json",
+    "world_template_sha256": "a2932c57dcb381c5b6dbe18d0820b331955e3874fd8447a3f5a97236c31aad64"
+  },
+  "toolchain": {
+    "godot_binary_sha256": "8d106cbe6144c2dc7e881d61d2429c1a8a76e6b22ef48bd5e48dcf934953f71e",
+    "godot_version": "4.7.2.stable.official.ed1daf0bf",
+    "host": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026 (Library: OpenSSL 3.5.5 27 Jan 2026)",
+    "postgres_client": "psql (PostgreSQL) 18.6 (Ubuntu 18.6-0ubuntu0.26.04.1)",
+    "python": "3.14.4",
+    "server_binary_sha256": "a0592c0586a5db7f2bfa2c1697fbda6831ec5a4f70997c050f3f7826816fb930"
+  }
+}

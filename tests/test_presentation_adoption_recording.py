@@ -160,5 +160,63 @@ class TheDriverAndClientContract(unittest.TestCase):
         self.assertTrue(client_path.is_file())
 
 
+class TheTrackedRecording(unittest.TestCase):
+    def setUp(self) -> None:
+        self.fixture = recording.load_fixture()
+        self.frame_path = REPOSITORY_ROOT / recording.TRACKED_FRAME_PATH
+        self.receipt_path = self.frame_path.with_suffix(".receipt.json")
+        self.frame = json.loads(self.frame_path.read_text(encoding="utf-8"))
+        self.receipt = json.loads(self.receipt_path.read_text(encoding="utf-8"))
+
+    def test_it_is_the_real_server_and_shipped_client_output(self) -> None:
+        provenance = self.frame["provenance"]
+        self.assertEqual("headless_live_server", provenance["route"])
+        self.assertEqual(
+            "client/tests/record_presentation_adoption_frame.gd", provenance["recorded_by"]
+        )
+        self.assertEqual("tools/run_presentation_adoption_recording.py", provenance["driver"])
+        self.assertEqual(self.receipt["source"]["commit"], provenance["source_commit"])
+        self.assertEqual(self.receipt["source"]["tree"], provenance["source_tree"])
+        recording.validate_frame(self.frame, self.fixture)
+
+    def test_receipt_binds_every_tracked_source_and_observed_projection(self) -> None:
+        source = self.receipt["source"]
+        self.assertEqual([], source["tracked_status_before"])
+        self.assertEqual(
+            recording.git_value("rev-parse", f"{source['commit']}^{{tree}}"), source["tree"]
+        )
+        self.assertEqual(recording.sha256(self.frame_path), self.receipt["observed"]["frame_sha256"])
+        projection = recording.normalized_projection(self.frame)
+        self.assertEqual(
+            recording.sha256_bytes(recording.canonical_json(projection)),
+            self.receipt["observed"]["normalized_projection_sha256"],
+        )
+        self.assertEqual(
+            recording.sha256(REPOSITORY_ROOT / recording.FIXTURE_PATH),
+            source["recording_fixture_sha256"],
+        )
+        self.assertEqual(
+            recording.sha256(REPOSITORY_ROOT / "tools/run_presentation_adoption_recording.py"),
+            self.receipt["proof_sources"]["driver_sha256"],
+        )
+        self.assertEqual(
+            recording.sha256(REPOSITORY_ROOT / "client/tests/record_presentation_adoption_frame.gd"),
+            self.receipt["proof_sources"]["client_recorder_sha256"],
+        )
+
+    def test_the_receipt_cannot_be_misread_as_dead_layer_evidence(self) -> None:
+        self.assertEqual(
+            {
+                "dead_layer": False,
+                "static_prop_required": False,
+                "transition_aperture_required": False,
+            },
+            self.receipt["evidence_limits"],
+        )
+        self.assertEqual(
+            "prerequisite_candidate_pending_non_author_rerun", self.receipt["disposition"]
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

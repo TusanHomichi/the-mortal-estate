@@ -1,0 +1,5570 @@
+{
+  "frame": {
+    "action_options": [
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_north",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "north"
+          ]
+        },
+        "label": "Move north"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_northeast",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "northeast"
+          ]
+        },
+        "label": "Move northeast"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_east",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "east"
+          ]
+        },
+        "label": "Move east"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_southeast",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "southeast"
+          ]
+        },
+        "label": "Move southeast"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_south",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "south"
+          ]
+        },
+        "label": "Move south"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_southwest",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "southwest"
+          ]
+        },
+        "label": "Move southwest"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_west",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "west"
+          ]
+        },
+        "label": "Move west"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "move_northwest",
+        "intent": {
+          "kind": "move_path",
+          "path": [
+            "northwest"
+          ]
+        },
+        "label": "Move northwest"
+      },
+      {
+        "blocked_reason": "not_engaged",
+        "enabled": false,
+        "id": "physical_attack_fight_ecology:ruin_mouth_lair:great_bear:0",
+        "intent": null,
+        "label": "fight a great bear"
+      },
+      {
+        "blocked_reason": "not_engaged",
+        "enabled": false,
+        "id": "physical_attack_kick_ecology:ruin_mouth_lair:great_bear:0",
+        "intent": null,
+        "label": "kick a great bear"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "physical_attack_jumpkick_ecology:ruin_mouth_lair:great_bear:0",
+        "intent": {
+          "authorization": "safe",
+          "kind": "physical_attack",
+          "mode": "jumpkick",
+          "target_actor_id": "ecology:ruin_mouth_lair:great_bear:0"
+        },
+        "label": "jumpkick a great bear"
+      },
+      {
+        "blocked_reason": "physical_mode_not_supported",
+        "enabled": false,
+        "id": "physical_attack_poke_ecology:ruin_mouth_lair:great_bear:0",
+        "intent": null,
+        "label": "poke a great bear"
+      },
+      {
+        "blocked_reason": "physical_mode_not_supported",
+        "enabled": false,
+        "id": "physical_attack_shoot_ecology:ruin_mouth_lair:great_bear:0",
+        "intent": null,
+        "label": "shoot a great bear"
+      },
+      {
+        "blocked_reason": "physical_mode_not_supported",
+        "enabled": false,
+        "id": "physical_attack_throw_ecology:ruin_mouth_lair:great_bear:0",
+        "intent": null,
+        "label": "throw a great bear"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "physical_attack_fight_threshold_keeper",
+        "intent": {
+          "authorization": "confirmed_unsafe",
+          "kind": "physical_attack",
+          "mode": "fight",
+          "target_actor_id": "threshold_keeper"
+        },
+        "label": "fight the keeper"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "physical_attack_kick_threshold_keeper",
+        "intent": {
+          "authorization": "confirmed_unsafe",
+          "kind": "physical_attack",
+          "mode": "kick",
+          "target_actor_id": "threshold_keeper"
+        },
+        "label": "kick the keeper"
+      },
+      {
+        "blocked_reason": "out_of_range",
+        "enabled": false,
+        "id": "physical_attack_jumpkick_threshold_keeper",
+        "intent": null,
+        "label": "jumpkick the keeper"
+      },
+      {
+        "blocked_reason": "physical_mode_not_supported",
+        "enabled": false,
+        "id": "physical_attack_poke_threshold_keeper",
+        "intent": null,
+        "label": "poke the keeper"
+      },
+      {
+        "blocked_reason": "physical_mode_not_supported",
+        "enabled": false,
+        "id": "physical_attack_shoot_threshold_keeper",
+        "intent": null,
+        "label": "shoot the keeper"
+      },
+      {
+        "blocked_reason": "physical_mode_not_supported",
+        "enabled": false,
+        "id": "physical_attack_throw_threshold_keeper",
+        "intent": null,
+        "label": "throw the keeper"
+      },
+      {
+        "blocked_reason": "right_hand_not_weapon",
+        "enabled": false,
+        "id": "nock",
+        "intent": {
+          "kind": "nock"
+        },
+        "label": "Nock bow"
+      },
+      {
+        "blocked_reason": "right_hand_not_weapon",
+        "enabled": false,
+        "id": "unload_bow",
+        "intent": {
+          "kind": "unload_bow"
+        },
+        "label": "Unload bow"
+      },
+      {
+        "blocked_reason": "no_traversal_here",
+        "enabled": false,
+        "id": "stairs_up",
+        "intent": {
+          "kind": "traverse",
+          "traversal": "stairs_up"
+        },
+        "label": "traverse stairs_up"
+      },
+      {
+        "blocked_reason": "no_traversal_here",
+        "enabled": false,
+        "id": "stairs_down",
+        "intent": {
+          "kind": "traverse",
+          "traversal": "stairs_down"
+        },
+        "label": "traverse stairs_down"
+      },
+      {
+        "blocked_reason": "no_traversal_here",
+        "enabled": false,
+        "id": "climb_up",
+        "intent": {
+          "kind": "traverse",
+          "traversal": "climb_up"
+        },
+        "label": "traverse climb_up"
+      },
+      {
+        "blocked_reason": "no_traversal_here",
+        "enabled": false,
+        "id": "climb_down",
+        "intent": {
+          "kind": "traverse",
+          "traversal": "climb_down"
+        },
+        "label": "traverse climb_down"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "rest",
+        "intent": {
+          "kind": "rest"
+        },
+        "label": "Rest"
+      },
+      {
+        "blocked_reason": "no_profession_action",
+        "enabled": false,
+        "id": "hide",
+        "intent": {
+          "kind": "hide"
+        },
+        "label": "Hide"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "show_sack",
+        "intent": {
+          "kind": "show_sack"
+        },
+        "label": "Show Sack"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "wait",
+        "intent": {
+          "kind": "wait"
+        },
+        "label": "Wait"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "inspect",
+        "intent": {
+          "kind": "inspect"
+        },
+        "label": "Inspect"
+      },
+      {
+        "blocked_reason": "no_such_corpse",
+        "enabled": false,
+        "id": "use_restoration_service_keeper_rite_restore_the_body_none_none",
+        "intent": {
+          "capability_id": "keeper_restoration",
+          "corpse_id": null,
+          "item_instance_id": null,
+          "kind": "use_restoration_service",
+          "operation_id": "restore_the_body",
+          "service_id": "keeper_rite"
+        },
+        "label": "Restore the body"
+      },
+      {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "npc:threshold_keeper:ask_about_the_rite:none",
+        "intent": {
+          "interaction_id": "ask_about_the_rite",
+          "item_instance_id": null,
+          "kind": "interact_with_npc",
+          "npc_actor_id": "threshold_keeper"
+        },
+        "label": "the keeper: Ask about the rite"
+      }
+    ],
+    "action_options_truncated": false,
+    "actors": [
+      {
+        "actor_id": "ecology:ruin_mouth_lair:great_bear:0",
+        "attack_safety": "open_hostile",
+        "character_id": null,
+        "hp": 120,
+        "kind": "monster",
+        "life_state": "alive",
+        "max_hp": 120,
+        "name": "a great bear",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 13,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      },
+      {
+        "actor_id": "player",
+        "attack_safety": "invalid",
+        "character_id": "155b8862-18a6-47a9-b915-1d40d2f40b17",
+        "hp": 20,
+        "kind": "player",
+        "life_state": "alive",
+        "max_hp": 20,
+        "name": "Edda",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      },
+      {
+        "actor_id": "threshold_keeper",
+        "attack_safety": "protected",
+        "character_id": null,
+        "hp": 20,
+        "kind": "npc",
+        "life_state": "alive",
+        "max_hp": 20,
+        "name": "the keeper",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        }
+      }
+    ],
+    "burden": {
+      "coin_burden": "0",
+      "heavily_loaded_limit": "300000",
+      "item_burden": "0",
+      "lightly_loaded_limit": "100000",
+      "moderately_loaded_limit": "200000",
+      "tier": "lightly_loaded",
+      "total_burden": "0"
+    },
+    "can_act": true,
+    "carried": {
+      "gold": {
+        "left_hand": "0",
+        "right_hand": "0",
+        "sack": "0"
+      },
+      "items": []
+    },
+    "character": {
+      "alignment": "lawful",
+      "attributes": {
+        "charisma": 10,
+        "constitution": 10,
+        "dexterity": 10,
+        "intelligence": 14,
+        "strength": 10,
+        "wisdom": 12
+      },
+      "identity": {
+        "base_class_id": "wizard",
+        "current_class_id": "wizard",
+        "display_class": "Wizard",
+        "nationality_id": "aldland",
+        "sex_or_gender_display": null
+      },
+      "karma_points": 0,
+      "known_spells": [
+        {
+          "lane": "wizard_magic",
+          "learned_at_level": 1,
+          "spell_id": "sense_secret"
+        }
+      ],
+      "physical_attribute_adds": {
+        "dexterity_adds": 0,
+        "strength_adds": 0
+      },
+      "progression": {
+        "experience": "0",
+        "level": 1,
+        "pending_target_level": null
+      },
+      "promotion_history": [],
+      "resources": {
+        "hp": 20,
+        "max_hp": 20,
+        "max_mp": 40,
+        "max_stamina": 20,
+        "mp": 40,
+        "peak_hp": 20,
+        "stamina": 20
+      },
+      "skill_ledger": [
+        {
+          "critique_rank": 0,
+          "learning_rate": "1",
+          "level": 1,
+          "level_title": null,
+          "practice_points": "0",
+          "track_display": null,
+          "track_id": "wizard_magic"
+        }
+      ]
+    },
+    "contract_version": 7,
+    "corpses": [],
+    "corpses_truncated": false,
+    "gold_piles": [],
+    "gold_piles_truncated": false,
+    "ground_items": [],
+    "ground_items_truncated": false,
+    "incoming_item_offers": [],
+    "logical_time": "2",
+    "npcs_here": [
+      {
+        "actor_id": "threshold_keeper",
+        "following_character_id": null,
+        "interactions": [
+          {
+            "actions": [
+              {
+                "blocked_reason": null,
+                "enabled": true,
+                "id": "npc:threshold_keeper:ask_about_the_rite:none",
+                "intent": {
+                  "interaction_id": "ask_about_the_rite",
+                  "item_instance_id": null,
+                  "kind": "interact_with_npc",
+                  "npc_actor_id": "threshold_keeper"
+                },
+                "label": "the keeper: Ask about the rite"
+              }
+            ],
+            "costs": [],
+            "interaction_id": "ask_about_the_rite",
+            "label": "Ask about the rite",
+            "outcome": {
+              "kind": "speak"
+            },
+            "requirements": [],
+            "rewards": []
+          }
+        ],
+        "name": "the keeper"
+      }
+    ],
+    "observation_center": {
+      "level": "settlement",
+      "position": {
+        "x": 12,
+        "y": 15
+      },
+      "realm": "identity_proof"
+    },
+    "observation_radius": 7,
+    "observer_actor_id": "player",
+    "outgoing_item_offers": [],
+    "quest_log": [],
+    "ready_at": "1",
+    "services_here": [
+      {
+        "capabilities": [
+          {
+            "capability_id": "keeper_restoration",
+            "kind": "restoration",
+            "operations": [
+              {
+                "actions": [
+                  {
+                    "blocked_reason": "no_such_corpse",
+                    "enabled": false,
+                    "id": "use_restoration_service_keeper_rite_restore_the_body_none_none",
+                    "intent": {
+                      "capability_id": "keeper_restoration",
+                      "corpse_id": null,
+                      "item_instance_id": null,
+                      "kind": "use_restoration_service",
+                      "operation_id": "restore_the_body",
+                      "service_id": "keeper_rite"
+                    },
+                    "label": "Restore the body"
+                  }
+                ],
+                "costs": [],
+                "label": "Restore the body",
+                "operation_id": "restore_the_body",
+                "outcome": {
+                  "kind": "priest_resurrection"
+                },
+                "requirements": []
+              }
+            ]
+          }
+        ],
+        "name": "The keeper's rite",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "realm": "identity_proof"
+        },
+        "service_id": "keeper_rite"
+      }
+    ],
+    "social": {
+      "blocked_character_ids": [],
+      "character_id": "155b8862-18a6-47a9-b915-1d40d2f40b17",
+      "following_character_id": null,
+      "group": null,
+      "incoming_invitations": [],
+      "outgoing_invitations": [],
+      "pages_enabled": true
+    },
+    "spell_actions": [
+      {
+        "cast": {
+          "blocked_reason": "invalid_target",
+          "enabled": false,
+          "intent": null,
+          "requires_target_selection": false
+        },
+        "cast_class": "not_applicable",
+        "casting_method": "direct",
+        "hostile_act": false,
+        "mp_cost": 1,
+        "spell_id": "sense_secret",
+        "spell_name": "Sense Secret",
+        "stamina_cost": 0,
+        "target_kind": "none",
+        "town_law_violation": false,
+        "warm": {
+          "blocked_reason": "spell_casts_directly",
+          "enabled": false,
+          "intent": null,
+          "requires_target_selection": false
+        }
+      }
+    ],
+    "static_scene_context": {
+      "bounds": {
+        "max": {
+          "x": 19,
+          "y": 21
+        },
+        "min": {
+          "x": 5,
+          "y": 9
+        }
+      },
+      "content_digest": "419d810fbbb449ce412cbeb0f2cd89b8fbb17e99989f63d8ba755798d66011f1",
+      "contract_version": 1,
+      "presentation_mode": "overworld_town",
+      "scene_role": "overworld",
+      "site": {
+        "level": "settlement",
+        "realm": "identity_proof"
+      },
+      "static_props": [],
+      "tiles": [
+        {
+          "position": {
+            "x": 5,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 9
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 10
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 11
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 12
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 13
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 14
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 15
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_grass",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_grass",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 16
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_structure_footprint"
+          ],
+          "walkable": false
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 17
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_town_ground",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_grass",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_grass",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 18
+          },
+          "terrain_ids": [
+            "testland_grass",
+            "testland_path"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 19
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_town_ground"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 20
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 5,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 6,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 7,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 8,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 9,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 10,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 11,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 12,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 13,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 14,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 15,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 16,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_grass"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 17,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 18,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        },
+        {
+          "position": {
+            "x": 19,
+            "y": 21
+          },
+          "terrain_ids": [
+            "testland_forest"
+          ],
+          "walkable": true
+        }
+      ],
+      "transition_apertures": [],
+      "visual_manifest_digest": "320ecf5553a110ca349272db2ddbb3de005021f648b8b397d8d6bbf9f98b0b0a",
+      "walkable_mask": [
+        {
+          "x": 5,
+          "y": 9
+        },
+        {
+          "x": 6,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 9
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 10,
+          "y": 9
+        },
+        {
+          "x": 11,
+          "y": 9
+        },
+        {
+          "x": 12,
+          "y": 9
+        },
+        {
+          "x": 13,
+          "y": 9
+        },
+        {
+          "x": 14,
+          "y": 9
+        },
+        {
+          "x": 15,
+          "y": 9
+        },
+        {
+          "x": 16,
+          "y": 9
+        },
+        {
+          "x": 17,
+          "y": 9
+        },
+        {
+          "x": 18,
+          "y": 9
+        },
+        {
+          "x": 19,
+          "y": 9
+        },
+        {
+          "x": 5,
+          "y": 10
+        },
+        {
+          "x": 6,
+          "y": 10
+        },
+        {
+          "x": 7,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 10
+        },
+        {
+          "x": 12,
+          "y": 10
+        },
+        {
+          "x": 13,
+          "y": 10
+        },
+        {
+          "x": 14,
+          "y": 10
+        },
+        {
+          "x": 15,
+          "y": 10
+        },
+        {
+          "x": 16,
+          "y": 10
+        },
+        {
+          "x": 17,
+          "y": 10
+        },
+        {
+          "x": 18,
+          "y": 10
+        },
+        {
+          "x": 19,
+          "y": 10
+        },
+        {
+          "x": 5,
+          "y": 11
+        },
+        {
+          "x": 6,
+          "y": 11
+        },
+        {
+          "x": 7,
+          "y": 11
+        },
+        {
+          "x": 8,
+          "y": 11
+        },
+        {
+          "x": 12,
+          "y": 11
+        },
+        {
+          "x": 13,
+          "y": 11
+        },
+        {
+          "x": 14,
+          "y": 11
+        },
+        {
+          "x": 15,
+          "y": 11
+        },
+        {
+          "x": 16,
+          "y": 11
+        },
+        {
+          "x": 17,
+          "y": 11
+        },
+        {
+          "x": 18,
+          "y": 11
+        },
+        {
+          "x": 19,
+          "y": 11
+        },
+        {
+          "x": 5,
+          "y": 12
+        },
+        {
+          "x": 6,
+          "y": 12
+        },
+        {
+          "x": 7,
+          "y": 12
+        },
+        {
+          "x": 8,
+          "y": 12
+        },
+        {
+          "x": 9,
+          "y": 12
+        },
+        {
+          "x": 10,
+          "y": 12
+        },
+        {
+          "x": 11,
+          "y": 12
+        },
+        {
+          "x": 12,
+          "y": 12
+        },
+        {
+          "x": 13,
+          "y": 12
+        },
+        {
+          "x": 14,
+          "y": 12
+        },
+        {
+          "x": 15,
+          "y": 12
+        },
+        {
+          "x": 16,
+          "y": 12
+        },
+        {
+          "x": 17,
+          "y": 12
+        },
+        {
+          "x": 18,
+          "y": 12
+        },
+        {
+          "x": 19,
+          "y": 12
+        },
+        {
+          "x": 5,
+          "y": 13
+        },
+        {
+          "x": 6,
+          "y": 13
+        },
+        {
+          "x": 7,
+          "y": 13
+        },
+        {
+          "x": 8,
+          "y": 13
+        },
+        {
+          "x": 9,
+          "y": 13
+        },
+        {
+          "x": 10,
+          "y": 13
+        },
+        {
+          "x": 11,
+          "y": 13
+        },
+        {
+          "x": 12,
+          "y": 13
+        },
+        {
+          "x": 13,
+          "y": 13
+        },
+        {
+          "x": 14,
+          "y": 13
+        },
+        {
+          "x": 15,
+          "y": 13
+        },
+        {
+          "x": 16,
+          "y": 13
+        },
+        {
+          "x": 17,
+          "y": 13
+        },
+        {
+          "x": 18,
+          "y": 13
+        },
+        {
+          "x": 19,
+          "y": 13
+        },
+        {
+          "x": 5,
+          "y": 14
+        },
+        {
+          "x": 6,
+          "y": 14
+        },
+        {
+          "x": 7,
+          "y": 14
+        },
+        {
+          "x": 8,
+          "y": 14
+        },
+        {
+          "x": 9,
+          "y": 14
+        },
+        {
+          "x": 10,
+          "y": 14
+        },
+        {
+          "x": 11,
+          "y": 14
+        },
+        {
+          "x": 12,
+          "y": 14
+        },
+        {
+          "x": 13,
+          "y": 14
+        },
+        {
+          "x": 14,
+          "y": 14
+        },
+        {
+          "x": 15,
+          "y": 14
+        },
+        {
+          "x": 16,
+          "y": 14
+        },
+        {
+          "x": 17,
+          "y": 14
+        },
+        {
+          "x": 18,
+          "y": 14
+        },
+        {
+          "x": 19,
+          "y": 14
+        },
+        {
+          "x": 5,
+          "y": 15
+        },
+        {
+          "x": 6,
+          "y": 15
+        },
+        {
+          "x": 7,
+          "y": 15
+        },
+        {
+          "x": 8,
+          "y": 15
+        },
+        {
+          "x": 9,
+          "y": 15
+        },
+        {
+          "x": 10,
+          "y": 15
+        },
+        {
+          "x": 11,
+          "y": 15
+        },
+        {
+          "x": 12,
+          "y": 15
+        },
+        {
+          "x": 13,
+          "y": 15
+        },
+        {
+          "x": 14,
+          "y": 15
+        },
+        {
+          "x": 15,
+          "y": 15
+        },
+        {
+          "x": 18,
+          "y": 15
+        },
+        {
+          "x": 19,
+          "y": 15
+        },
+        {
+          "x": 5,
+          "y": 16
+        },
+        {
+          "x": 6,
+          "y": 16
+        },
+        {
+          "x": 7,
+          "y": 16
+        },
+        {
+          "x": 8,
+          "y": 16
+        },
+        {
+          "x": 9,
+          "y": 16
+        },
+        {
+          "x": 10,
+          "y": 16
+        },
+        {
+          "x": 11,
+          "y": 16
+        },
+        {
+          "x": 12,
+          "y": 16
+        },
+        {
+          "x": 13,
+          "y": 16
+        },
+        {
+          "x": 14,
+          "y": 16
+        },
+        {
+          "x": 15,
+          "y": 16
+        },
+        {
+          "x": 18,
+          "y": 16
+        },
+        {
+          "x": 19,
+          "y": 16
+        },
+        {
+          "x": 5,
+          "y": 17
+        },
+        {
+          "x": 6,
+          "y": 17
+        },
+        {
+          "x": 7,
+          "y": 17
+        },
+        {
+          "x": 8,
+          "y": 17
+        },
+        {
+          "x": 9,
+          "y": 17
+        },
+        {
+          "x": 10,
+          "y": 17
+        },
+        {
+          "x": 11,
+          "y": 17
+        },
+        {
+          "x": 12,
+          "y": 17
+        },
+        {
+          "x": 13,
+          "y": 17
+        },
+        {
+          "x": 14,
+          "y": 17
+        },
+        {
+          "x": 15,
+          "y": 17
+        },
+        {
+          "x": 18,
+          "y": 17
+        },
+        {
+          "x": 19,
+          "y": 17
+        },
+        {
+          "x": 5,
+          "y": 18
+        },
+        {
+          "x": 6,
+          "y": 18
+        },
+        {
+          "x": 7,
+          "y": 18
+        },
+        {
+          "x": 8,
+          "y": 18
+        },
+        {
+          "x": 9,
+          "y": 18
+        },
+        {
+          "x": 10,
+          "y": 18
+        },
+        {
+          "x": 11,
+          "y": 18
+        },
+        {
+          "x": 12,
+          "y": 18
+        },
+        {
+          "x": 13,
+          "y": 18
+        },
+        {
+          "x": 14,
+          "y": 18
+        },
+        {
+          "x": 15,
+          "y": 18
+        },
+        {
+          "x": 16,
+          "y": 18
+        },
+        {
+          "x": 17,
+          "y": 18
+        },
+        {
+          "x": 18,
+          "y": 18
+        },
+        {
+          "x": 19,
+          "y": 18
+        },
+        {
+          "x": 5,
+          "y": 19
+        },
+        {
+          "x": 6,
+          "y": 19
+        },
+        {
+          "x": 7,
+          "y": 19
+        },
+        {
+          "x": 8,
+          "y": 19
+        },
+        {
+          "x": 9,
+          "y": 19
+        },
+        {
+          "x": 10,
+          "y": 19
+        },
+        {
+          "x": 11,
+          "y": 19
+        },
+        {
+          "x": 12,
+          "y": 19
+        },
+        {
+          "x": 13,
+          "y": 19
+        },
+        {
+          "x": 14,
+          "y": 19
+        },
+        {
+          "x": 15,
+          "y": 19
+        },
+        {
+          "x": 16,
+          "y": 19
+        },
+        {
+          "x": 17,
+          "y": 19
+        },
+        {
+          "x": 18,
+          "y": 19
+        },
+        {
+          "x": 19,
+          "y": 19
+        },
+        {
+          "x": 5,
+          "y": 20
+        },
+        {
+          "x": 6,
+          "y": 20
+        },
+        {
+          "x": 7,
+          "y": 20
+        },
+        {
+          "x": 8,
+          "y": 20
+        },
+        {
+          "x": 9,
+          "y": 20
+        },
+        {
+          "x": 10,
+          "y": 20
+        },
+        {
+          "x": 11,
+          "y": 20
+        },
+        {
+          "x": 12,
+          "y": 20
+        },
+        {
+          "x": 13,
+          "y": 20
+        },
+        {
+          "x": 14,
+          "y": 20
+        },
+        {
+          "x": 15,
+          "y": 20
+        },
+        {
+          "x": 16,
+          "y": 20
+        },
+        {
+          "x": 17,
+          "y": 20
+        },
+        {
+          "x": 18,
+          "y": 20
+        },
+        {
+          "x": 19,
+          "y": 20
+        },
+        {
+          "x": 5,
+          "y": 21
+        },
+        {
+          "x": 6,
+          "y": 21
+        },
+        {
+          "x": 7,
+          "y": 21
+        },
+        {
+          "x": 8,
+          "y": 21
+        },
+        {
+          "x": 9,
+          "y": 21
+        },
+        {
+          "x": 10,
+          "y": 21
+        },
+        {
+          "x": 11,
+          "y": 21
+        },
+        {
+          "x": 12,
+          "y": 21
+        },
+        {
+          "x": 13,
+          "y": 21
+        },
+        {
+          "x": 14,
+          "y": 21
+        },
+        {
+          "x": 15,
+          "y": 21
+        },
+        {
+          "x": 16,
+          "y": 21
+        },
+        {
+          "x": 17,
+          "y": 21
+        },
+        {
+          "x": 18,
+          "y": 21
+        },
+        {
+          "x": 19,
+          "y": 21
+        }
+      ],
+      "world_zoom": [
+        156,
+        104
+      ]
+    },
+    "tiles": [
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 8
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "position": {
+          "x": 6,
+          "y": 8
+        }
+      },
+      {
+        "position": {
+          "x": 7,
+          "y": 8
+        }
+      },
+      {
+        "position": {
+          "x": 8,
+          "y": 8
+        }
+      },
+      {
+        "position": {
+          "x": 9,
+          "y": 8
+        }
+      },
+      {
+        "position": {
+          "x": 10,
+          "y": 8
+        }
+      },
+      {
+        "position": {
+          "x": 11,
+          "y": 8
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 8
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 9
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 9
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "position": {
+          "x": 7,
+          "y": 9
+        }
+      },
+      {
+        "position": {
+          "x": 8,
+          "y": 9
+        }
+      },
+      {
+        "position": {
+          "x": 9,
+          "y": 9
+        }
+      },
+      {
+        "position": {
+          "x": 10,
+          "y": 9
+        }
+      },
+      {
+        "position": {
+          "x": 11,
+          "y": 9
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 9
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 9
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 9
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 9
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 9
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 9
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 9
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 9
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 10
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 10
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 10
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "position": {
+          "x": 8,
+          "y": 10
+        }
+      },
+      {
+        "position": {
+          "x": 9,
+          "y": 10
+        }
+      },
+      {
+        "position": {
+          "x": 10,
+          "y": 10
+        }
+      },
+      {
+        "position": {
+          "x": 11,
+          "y": 10
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 10
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 10
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 10
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 10
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 10
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 10
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 10
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 10
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 11
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 11
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "passable": false,
+        "position": {
+          "x": 9,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground+testland_structure_footprint",
+        "terrain_name": "Testland Town Ground + Standing Structure"
+      },
+      {
+        "passable": false,
+        "position": {
+          "x": 10,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground+testland_structure_footprint",
+        "terrain_name": "Testland Town Ground + Standing Structure"
+      },
+      {
+        "passable": false,
+        "position": {
+          "x": 11,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground+testland_structure_footprint",
+        "terrain_name": "Testland Town Ground + Standing Structure"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 11
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 11
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 12
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 12
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 13
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 13
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 14
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 14
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 15
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 15
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "passable": false,
+        "position": {
+          "x": 16,
+          "y": 15
+        },
+        "terrain_id": "testland_town_ground+testland_structure_footprint",
+        "terrain_name": "Testland Town Ground + Standing Structure"
+      },
+      {
+        "position": {
+          "x": 17,
+          "y": 15
+        }
+      },
+      {
+        "position": {
+          "x": 18,
+          "y": 15
+        }
+      },
+      {
+        "position": {
+          "x": 19,
+          "y": 15
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 16
+        },
+        "terrain_id": "testland_grass+testland_path",
+        "terrain_name": "Testland Grass + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 16
+        },
+        "terrain_id": "testland_grass+testland_path",
+        "terrain_name": "Testland Grass + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "passable": false,
+        "position": {
+          "x": 16,
+          "y": 16
+        },
+        "terrain_id": "testland_town_ground+testland_structure_footprint",
+        "terrain_name": "Testland Town Ground + Standing Structure"
+      },
+      {
+        "position": {
+          "x": 17,
+          "y": 16
+        }
+      },
+      {
+        "position": {
+          "x": 18,
+          "y": 16
+        }
+      },
+      {
+        "position": {
+          "x": 19,
+          "y": 16
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "passable": false,
+        "position": {
+          "x": 16,
+          "y": 17
+        },
+        "terrain_id": "testland_town_ground+testland_structure_footprint",
+        "terrain_name": "Testland Town Ground + Standing Structure"
+      },
+      {
+        "position": {
+          "x": 17,
+          "y": 17
+        }
+      },
+      {
+        "position": {
+          "x": 18,
+          "y": 17
+        }
+      },
+      {
+        "position": {
+          "x": 19,
+          "y": 17
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 18
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 18
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 18
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 18
+        },
+        "terrain_id": "testland_town_ground+testland_path",
+        "terrain_name": "Testland Town Ground + Testland Path"
+      },
+      {
+        "position": {
+          "x": 17,
+          "y": 18
+        }
+      },
+      {
+        "position": {
+          "x": 18,
+          "y": 18
+        }
+      },
+      {
+        "position": {
+          "x": 19,
+          "y": 18
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 19
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 19
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 19
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 19
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 19
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 19
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 19
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "position": {
+          "x": 19,
+          "y": 19
+        }
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 20
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 20
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 20
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 20
+        },
+        "terrain_id": "testland_town_ground",
+        "terrain_name": "Testland Town Ground"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 20
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 21
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 21
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 21
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 21
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 5,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 6,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 7,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 8,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 9,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 10,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 11,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 12,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 13,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 14,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 15,
+          "y": 22
+        },
+        "terrain_id": "testland_grass",
+        "terrain_name": "Testland Grass"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 16,
+          "y": 22
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 17,
+          "y": 22
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 18,
+          "y": 22
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      },
+      {
+        "move_cost": 1,
+        "passable": true,
+        "position": {
+          "x": 19,
+          "y": 22
+        },
+        "terrain_id": "testland_forest",
+        "terrain_name": "Testland Forest Floor"
+      }
+    ],
+    "warmed_spell": null
+  },
+  "frame_generation": 1,
+  "kind": "capture_frame_fixture",
+  "provenance": {
+    "driver": "tools/run_presentation_adoption_recording.py",
+    "recorded_by": "client/tests/record_presentation_adoption_frame.gd",
+    "route": "headless_live_server",
+    "semantic_barrier": {
+      "action_option": {
+        "blocked_reason": null,
+        "enabled": true,
+        "id": "npc:threshold_keeper:ask_about_the_rite:none",
+        "label": "the keeper: Ask about the rite"
+      },
+      "actor_count": 3.0,
+      "actors": [
+        {
+          "actor_id": "player",
+          "attack_safety": "invalid",
+          "kind": "player",
+          "life_state": "alive",
+          "position": {
+            "level": "settlement",
+            "position": {
+              "x": 12.0,
+              "y": 15.0
+            },
+            "realm": "identity_proof"
+          }
+        },
+        {
+          "actor_id": "ecology:ruin_mouth_lair:great_bear:0",
+          "attack_safety": "open_hostile",
+          "kind": "monster",
+          "life_state": "alive",
+          "position": {
+            "level": "settlement",
+            "position": {
+              "x": 13.0,
+              "y": 15.0
+            },
+            "realm": "identity_proof"
+          }
+        },
+        {
+          "actor_id": "threshold_keeper",
+          "attack_safety": "protected",
+          "kind": "npc",
+          "life_state": "alive",
+          "position": {
+            "level": "settlement",
+            "position": {
+              "x": 12.0,
+              "y": 15.0
+            },
+            "realm": "identity_proof"
+          }
+        }
+      ],
+      "minimum_logical_time": 2.0,
+      "npc_interaction": {
+        "actor_id": "threshold_keeper",
+        "interaction_id": "ask_about_the_rite"
+      },
+      "observer_actor_id": "player",
+      "required_terrain_ids": [
+        "testland_grass",
+        "testland_path",
+        "testland_structure_footprint",
+        "testland_town_ground"
+      ],
+      "service": {
+        "capability_id": "keeper_restoration",
+        "position": {
+          "level": "settlement",
+          "position": {
+            "x": 12.0,
+            "y": 15.0
+          },
+          "realm": "identity_proof"
+        },
+        "service_id": "keeper_rite"
+      }
+    },
+    "server_sequence": "3",
+    "source_commit": "8bb7316d845a427f4925adcb46d60cbfc27acfbd",
+    "source_tree": "4419e8d76c1a8100c83beaca8603a281e6042bdd",
+    "world_revision": "3"
+  },
+  "schema_version": 1
+}
