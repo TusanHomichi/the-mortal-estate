@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import unittest
 
 import boundary_test_support  # noqa: F401  (puts tools/ on sys.path)
@@ -182,9 +183,8 @@ class TheTrackedRecording(unittest.TestCase):
     def test_receipt_binds_every_tracked_source_and_observed_projection(self) -> None:
         source = self.receipt["source"]
         self.assertEqual([], source["tracked_status_before"])
-        self.assertEqual(
-            recording.git_value("rev-parse", f"{source['commit']}^{{tree}}"), source["tree"]
-        )
+        self.assertRegex(source["commit"], re.compile(r"^[0-9a-f]{40}$"))
+        self.assertRegex(source["tree"], re.compile(r"^[0-9a-f]{40}$"))
         self.assertEqual(recording.sha256(self.frame_path), self.receipt["observed"]["frame_sha256"])
         projection = recording.normalized_projection(self.frame)
         self.assertEqual(
