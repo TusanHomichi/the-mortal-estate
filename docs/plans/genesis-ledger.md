@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-27
-revision: 4
-status: The live ledger of the genesis plan. Phase 10 remains open after S1 and S8; revision 4 records the audited clean public-source cut while the G11 external release remains closed.
+last_updated: 2026-08-29
+revision: 5
+status: The live ledger of the genesis plan. Phase 10, G10, and G11 remain open; the owner paused before presentation-experiment P1 with its target, disposable-evidence baseline, and recording pinned and the dead-layer choice unresolved.
 public_safe: true
-summary: One row per genesis-plan phase, its gate and evidence, plus the open gates and the owner's standing orders; revision 4 records the clean public-source cut separately from the G11 external release.
+summary: One row per genesis-plan phase, its gate and evidence, plus the open gates and the owner's standing orders; revision 5 records the pre-P1 presentation-experiment pause without inferring a disposition, adoption, or return to S3.
 ---
 
 # The genesis ledger
@@ -42,17 +42,29 @@ owner's and are numbered by the phase they guard.
 | 7 | G7 | 2026-08-20 | **Stop point reached.** Owners named for death, lineage, succession, aging, ancestry, and the pulse; the authoring workflow has no private-corpus dependency. | `8598f72`; `docs/boundary-map.md`, `docs/agent-workflow.md`, `docs/presentation-direction.md`. |
 | 8 | G8 | 2026-08-20 | **Stop point reached.** The verification spine: fast, capture, and full scopes; exit 3 means incomplete; clean-clone proof real; the pulse at the ruled 3.0 s. | `966d8c6`, `e26a371`; `tools/run_verification.py`, `docs/working-root-policy.md`. |
 | 9 | G9 | 2026-08-21 | **Stop point reached.** Workbench V1: six truth verbs, deterministic replay, candidate preview, atomic Apply; the promotion ceremony untouched. | `1255e60` (after the CI disk-budget fix `0826a2f`); `docs/workbench-v1.md`. |
-| 10 (partial) | G10 open | 2026-08-21; bracketed 2026-08-26 | **Started; S1 and S8 landed; the S3-first remainder is bracketed by one bounded presentation experiment.** The design packet mapped the charter's ten proof items to ten implementation slices and twelve owner rulings, all ruled (R5 amended to 20 beats / 60 s). Item 9 is split between S9 and S10; item 10's clean-build obligation applies across the slices. **S1:** the served world is authored — the compiler compiles a table of lands with content-driven member sets; the proof settlement (48×32) is compiled, loaded through a required bootstrap manifest that refuses an absent or invalid template by name, and seeded with its living cast; the owner reviewed a render, sent the geography back for a shape pass, accepted v2, and the receipt was re-signed `owner_accepted_at_s1`. **S8:** the pulse made visible from one derivation of the beat — meter, movement across the beat, preparation band, feedback bounded by the beat; the client measures the cadence rather than being told it; the live proof caught a per-frame layout stall before merge. **Current bracket:** resume only an owner-judged target packet and pinned Nomos presentation evidence; no S2–S9 mechanic slice is dispatched unless separately released as a required input. | Packet `d2752fd`, rulings `c13a17e`, order ruling PR #20; S8 `5cae537` (PR #21); S1 `8021c9d` merged via PR #19. Each merged implementation commit carries the supervisor's own `--scope full` COMPLETE. The current bracket is issue #24 and [`2026-08-26-nomos-presentation-adoption-experiment.md`](2026-08-26-nomos-presentation-adoption-experiment.md), bound to Nomos decision 0022 at `5e0e44c`. Defects filed: #12, #13, #15, #16, #17, #18; #9 and #10 closed as fixed in Phase 8. |
+| 10 (partial) | G10 open | 2026-08-21; bracketed 2026-08-26; paused 2026-08-29 | **Started; S1 and S8 landed; the S3-first remainder is bracketed by one bounded presentation experiment, now paused before P1.** The design packet mapped the charter's ten proof items to ten implementation slices and twelve owner rulings, all ruled (R5 amended to 20 beats / 60 s). Item 9 is split between S9 and S10; item 10's clean-build obligation applies across the slices. **S1:** the served world is authored — the compiler compiles a table of lands with content-driven member sets; the proof settlement (48×32) is compiled, loaded through a required bootstrap manifest that refuses an absent or invalid template by name, and seeded with its living cast; the owner reviewed a render, sent the geography back for a shape pass, accepted v2, and the receipt was re-signed `owner_accepted_at_s1`. **S8:** the pulse made visible from one derivation of the beat — meter, movement across the beat, preparation band, feedback bounded by the beat; the client measures the cadence rather than being told it; the live proof caught a per-frame layout stall before merge. **Current bracket:** P0, the disposable-evidence Nomos point, and the authoritative TME recording are complete. The recording supplies no dead layer and the owner paused before choosing whether to release S2 or narrow the candidate. The rejected generic Nomos R2 successor remains unadmitted but is not required by this plan. No experiment phase or S2–S9 mechanic slice is dispatched without a new owner direction. | Packet `d2752fd`, rulings `c13a17e`, order ruling PR #20; S8 `5cae537` (PR #21); S1 `8021c9d` merged via PR #19. Each merged implementation commit carries the supervisor's own `--scope full` COMPLETE. The present bracket and exact input identities are recorded in [`2026-08-26-nomos-presentation-adoption-experiment.md`](2026-08-26-nomos-presentation-adoption-experiment.md); private-archive issue #24 remains its original authority. Defects filed: #12, #13, #15, #16, #17, #18; #9 and #10 closed as fixed in Phase 8. |
 | Public source cut | — | 2026-08-27 | **Accepted.** An in-place visibility change was refused when independent review found one private-lineage token in reachable commit metadata. The accepted tree was exported without Git or collaboration history into a new parentless public repository; the development repository remains a private read-only archive. | [Public boundary policy](../public-boundary-policy.md); the public root; owner-held local-proof and independent-review cut evidence in the private archive. Verification is rerun from the public root. |
+
+## Current owner pause (2026-08-29)
+
+The owner paused before presentation-experiment P1 to consider the overall
+direction. The
+[experiment checkpoint](2026-08-26-nomos-presentation-adoption-experiment.md#current-pre-p1-stop-line-owner-2026-08-29)
+owns the exact inputs and current stop line. No experiment phase or
+remaining Phase 10 slice resumes without a new owner direction.
+
+This pause is not a final experiment disposition, a Nomos R2 verdict, a TME
+adoption decision, or a release of S3. TME's target remains accepted, its
+representative micro-scene remains unjudged, and G10 and G11 remain open.
 
 ## Open gates
 
 | Gate | Guards | State |
 | --- | --- | --- |
-| G10 | Exit of Phase 10 — the first identity proof accepted as met | Open. Slices S2–S7 and S9 remain; S10 remains parked as Phase 10 implementation. The presentation experiment brackets the S3-first fallback but cannot satisfy G10. |
+| G10 | Exit of Phase 10 — the first identity proof accepted as met | Open. Slices S2–S7 and S9 remain; S10 remains parked as Phase 10 implementation. The presentation experiment is paused before P1, brackets the S3-first fallback, and cannot satisfy G10. |
 | G11 | End of Phase 11 — the first external public release, irreversible | Open. Blocked on G10 and on trademark clearance (charter §15). The completed public-source cut cannot satisfy G11. |
 
-## Standing orders (owner, 2026-08-21; amended 2026-08-27)
+## Standing orders (owner, 2026-08-21; amended 2026-08-29)
 
 1. **Order of the remaining slices:** S3 → S2 → (S4, S5, S7 in parallel) → S6
    → S9. Recorded in the
@@ -61,16 +73,22 @@ owner's and are numbered by the phase they guard.
    #15, #16, #17, #18.
 3. **Bounded resumption before S3:** private-archive issue #24 authorized the target packet and
    [`2026-08-26-nomos-presentation-adoption-experiment.md`](2026-08-26-nomos-presentation-adoption-experiment.md).
-   Browser/WebGL is the first evidence candidate; Godot is a conditional
-   same-input comparison, not a preselected winner. S10 remains parked as a
-   Phase 10 implementation slice, and #1 remains open until target evidence
-   supplies its separately falsifiable recut.
-4. **Order bracket, not replacement:** no S2–S9 mechanic slice is dispatched
-   during the experiment unless the owner separately releases it as a required
-   input. A stop returns to S3. Any proceed disposition records a new order.
-5. **Dead-layer stop:** if the accepted target requires an authoritative
-   dead-layer recording before S2 exists, the experiment pauses for an owner
-   choice to release S2 or narrow the candidate. The lab may not fabricate it.
+   P0 and the authoritative TME recording are complete. The exact Nomos
+   decision-0022 point is admitted for disposable evidence only; its rejected
+   R2 successor is not admitted, does not displace that baseline, and is not a
+   prerequisite this plan added. Browser/WebGL remains the first planned evidence
+   candidate and Godot a conditional same-input comparison, but neither has
+   begun. S10 remains parked; closing public issue #1 accepted the target, not a
+   representative micro-scene or visual implementation.
+4. **Order bracket, not replacement:** during the current owner pause, no
+   experiment phase or S2–S10 slice is dispatched. The pause is neither a final
+   disposition nor an automatic return to S3. Any stop, resumption, or new order
+   requires an explicit owner direction.
+5. **Dead-layer stop:** the authoritative recording explicitly supplies no dead
+   layer, while the accepted production rule requires living/dead
+   correspondence. Before P1, the owner must release S2 as an input or narrow
+   the candidate. Neither choice has been made, and the lab may not fabricate
+   the missing authority.
 6. **The predecessor repository is frozen** as private reference. Nothing is
    imported from it; its evidence stays where Phase 1 put it.
 
