@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-27
-revision: 3
-status: Owner-authorized bounded execution plan, first tracked by private-archive issue #24. Target work may begin; executable integration waits for target acceptance, an authoritative TME recording, and a separately reviewed immutable Nomos dependency point. The clean public-source cut is not external-boundary activation.
+last_updated: 2026-08-31
+revision: 5
+status: Owner-paused before P1. Revision 5 records the later orthographic 2:1 dimetric target selection without treating it as experiment resumption: the accepted camera changed after P0, the recording still supplies no dead layer, and no P1 work, tracked dependency, adoption, or final disposition exists.
 public_safe: true
-summary: The bounded plan for testing whether pinned Nomos presentation authoring can produce The Mortal Estate's accepted gameplay look while TME retains every gameplay fact, browser and Godot consume the same input, and reusable findings land upstream first.
+summary: The bounded, still-paused pre-P1 plan for testing a presentation-authoring boundary; the owner has since selected a new target projection, so any resumption must bind fresh target evidence and separately resolve the missing authoritative dead layer.
 ---
 
 # Nomos presentation-adoption experiment
@@ -30,9 +30,25 @@ baseline.
 
 Nomos authorized the corresponding evidence program in decision 0022 at commit
 `5e0e44cc912b57a1d29cc3e722497c16cf9a1797`, tree
-`7e606bde9f91307483307c4af1e0764d81df5c72`. That is an authority point, not an
-executable dependency point. A later Nomos issue must establish an immutable,
-reviewed, digest-recorded dependency before integration begins.
+`7e606bde9f91307483307c4af1e0764d81df5c72`. At this plan's authorization
+baseline that was an authority point, not an executable dependency point, and a
+later Nomos issue still had to establish an immutable, reviewed,
+digest-recorded point before integration. The owner has since admitted that
+exact commit and tree for **disposable evidence only**, with dependency-record
+SHA-256
+`afd5c76dd7b5a3aeafa357831fac7b80b9c933567354b33928cd683a9767907b`.
+It is not a tracked TME dependency, runtime input, or adoption.
+
+The later Nomos R2 candidate at commit
+`ad99db0daa3215a7f3af56540c6081bb12ce3121`, tree
+`60c49a38ed22d6db331c23831b392ce06b05a735`, is not admitted here. Its generic
+2560 × 720 contact sheet, SHA-256
+`b76edbd9dd03fce5a99c074200ee7311bf87d5d2e5829c800170c129d00bf576`,
+received the owner's `rejected` visual-family verdict on 2026-08-29. Nomos
+records that its exact candidate therefore cannot be accepted as R2. That
+upstream result does not decide TME's accepted target or its representative
+micro-scene: the sheet did not consume TME's recording and was not a TME P1
+candidate.
 
 This plan imports no Nomos gate, decision-document family, or authority into
 TME. Each repository owns its own present facts.
@@ -61,6 +77,14 @@ records exactly `accepted` or `rejected`, the review size, and the artifacts
 seen. Rejection closes issue #24 with a stop disposition. Acceptance permits
 prerequisite work; it does not approve Nomos, a presenter, or a platform.
 
+**Completed, 2026-08-27.** The owner accepted the target packet at manifest
+SHA-256
+`d6676c95918280587cf737b07162579eb69d0e3eeef43c40b229bc12efe53487`.
+The exact verdict and its limits remain owned by
+[presentation direction](../presentation-direction.md#the-current-target-authority-packet):
+P0 accepts no representative result, Nomos boundary, presenter, engine,
+platform, or production pipeline.
+
 ## 3. Prerequisites for executable evidence
 
 All of these must exist together:
@@ -79,9 +103,19 @@ All of these must exist together:
 The first candidate's sole recorded gameplay input is reserved at
 `tests/fixtures/presentation-adoption/identity-proof-observer-frame.json`. It
 must be an observed frame produced by the real TME server from the identity-proof
-world, not a debug snapshot or a hand-written projection. The recording is
-absent at this authorization commit, so P1 is blocked until a separate reviewed
-prerequisite change records it, its provenance, and its digest.
+world, not a debug snapshot or a hand-written projection. The recording was
+absent at this authorization commit. It is now tracked after the independently
+rerun prerequisite change merged through public PR #6 at commit
+`bafe68bcf12abf2c34c97560063eeb8b041a3de2`, tree
+`85468314caf08fb9f5ef775a0b5f3b625c63d3f9`. The frame SHA-256 is
+`3ab13123836830a50227bbe3729a21ed10b89bec2617a46d74c9fc9be04e7b48`,
+its receipt SHA-256 is
+`5be52a188cbe370228d97a35b3ec5d4834129eee39071cf03bb3482011257672`,
+and its normalized semantic projection SHA-256 is
+`ad8c5577c7d52715eddeac104b273866b015b45db890d29bc3d36a6d7dbadb21`.
+The producing receipt's historical disposition remains unchanged; the later
+non-author rerun and merge are recorded here rather than rewritten into that
+immutable receipt.
 
 At this plan baseline the recording starts from these exact TME-owned inputs:
 
@@ -105,6 +139,48 @@ recording cannot supply before S2 exists, stop. The owner may separately release
 the already-ruled S2 slice as a required input or narrow the candidate and name
 what can no longer be proved. The lab may not invent a dead layer or relabel a
 presentation mock as game evidence.
+
+### Current pre-P1 stop line (owner, 2026-08-29)
+
+P1 has not begun. The authoritative recording explicitly records
+`dead_layer: false`, while the accepted production rule requires living/dead
+correspondence. The owner has neither released S2 as a required input nor
+narrowed the candidate. That owner choice is the present authority blocker.
+
+Nomos commit `5e0e44c` remains the admitted disposable-evidence baseline. The
+rejected R2 candidate is not an admitted successor and may not be silently
+substituted for that baseline, but this plan does not require an R2 successor;
+its rejection is context, not a second P1 blocker.
+
+The temporary sibling lab already preserves a preliminary authority audit,
+bound input copies, recording scripts and a toolchain receipt, and one
+disposable prerequisite-feasibility candidate. Those non-authoritative
+materials do not start P1 or become repository inputs. No TME code, content, or
+tracked dependency consumes Nomos, and no P1 mapping, compiled lab candidate,
+browser presenter, Godot comparison, or second-author scene exists. P1, P2, and
+P3 are all unstarted.
+
+The owner paused here to consider the overall direction. The pause is not one of
+the final dispositions in section 11, does not infer a Nomos R2 or TME adoption
+verdict, does not alter TME's accepted target or open representative-micro-scene
+verdict, and does not release or automatically return the project to S3.
+
+### Target changed while paused (owner, 2026-08-31)
+
+The owner has now selected the fixed orthographic 2:1 dimetric projection and
+ordinary world-up geometry recorded in
+[presentation direction](../presentation-direction.md#projection-and-surface-ruling).
+That closes the camera-selection question; it does not resume this experiment.
+
+The P0 packet digest above binds an earlier projection that the current target
+explicitly supersedes. P1 has never begun, so no candidate may inherit that
+packet's clearance or silently reinterpret it under the new camera. Any later
+resumption must bind fresh target evidence and its digest to the current
+presentation ruling, retain the same authority audit and disposable-lab
+boundary, and separately resolve the missing authoritative dead layer. Until an
+owner direction supplies those inputs, this plan remains at its pre-P1 stop
+line, makes no presenter or dependency selection, and dispatches no Phase 10
+implementation slice.
 
 ## 4. Phase P1 — browser evidence first
 
