@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-08-31
-revision: 12
-status: Owner-accepted visual target. Revision 12 selects fixed orthographic 2:1 dimetric projection and ordinary world-up geometry, superseding the screen-square high-oblique projection without accepting a renderer, asset set, or production pipeline.
+revision: 13
+status: Owner-accepted visual target. Revision 13 removes settled camera pitch from the open list and scopes the browser-first evidence order to the paused experiment that owns it; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
-summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, and calm-field texture discipline, plus the production rule used to judge a presentation experiment without preselecting a renderer or pipeline.
+summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, and the production rule and paused-experiment context used to judge future presentation evidence.
 routes:
   - client/presentation/**
   - content/test-corpus/**
@@ -33,9 +33,11 @@ explicit: base runs remain H/V and corresponding elevated vertices use that
 shared direction. Revision 11 records the generated-source isolation and alpha
 validation rule proven during disposable visual iteration. Revision 12 records
 the owner's selection of the 2:1 dimetric challenger after native-size real-3D
-projection and matched production-art comparisons. The visual target is still
-the owner's to set, and this document is where the owner's version is recorded —
-not where an agent manufactures acceptance.
+projection and matched production-art comparisons. Revision 13 scopes the old
+browser-first order to its paused experiment and removes the now-settled camera
+pitch from the open calibration list. The visual target is still the owner's to
+set, and this document is where the owner's version is recorded — not where an
+agent manufactures acceptance.
 
 ## The target
 
@@ -287,7 +289,14 @@ bounded experiment; a production implementation of the accepted dimetric target
 must still earn the representative micro-scene verdict under the current
 production rule.
 
-## Presenter evidence order
+## Paused-experiment presenter evidence order
+
+This order belongs only to the paused bounded experiment recorded in the
+[experiment plan](plans/2026-08-26-nomos-presentation-adoption-experiment.md).
+It is not an active production order and dispatches no presenter work. Resuming
+it requires the fresh current-target evidence and separate owner direction named
+by that plan; a future presentation slice that does not resume that experiment
+is not browser-first by inheritance.
 
 The browser/WebGL presenter is tested first because the authorized upstream
 already carries that evidence path. This is an economy of evidence, not a
@@ -408,7 +417,8 @@ approving its own art is an explicit project non-goal.
 Deliberately unresolved, and not to be resolved by implementation:
 
 - the owner verdict on the representative micro-scene;
-- the exact camera pitch and actor scale within the ruled intimate framing;
+- the exact native tile-edge length, joint width, camera distance, and actor
+  scale within the ruled 45-degree-yaw, 30-degree-elevation framing;
 - the exact palette discipline and animation budget within the ruled pixel and
   surface grammar;
 - the dead world's visual identity beyond the direction above;
