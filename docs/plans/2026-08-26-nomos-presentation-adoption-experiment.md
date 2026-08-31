@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-29
-revision: 4
-status: Owner-paused before P1. P0, the disposable-evidence Nomos baseline, and the authoritative TME recording are complete; the recording supplies no dead layer and the required owner choice remains open. No P1 work has begun; no tracked TME dependency on Nomos, adoption, or final disposition exists.
+last_updated: 2026-08-31
+revision: 5
+status: Owner-paused before P1. Revision 5 records the later orthographic 2:1 dimetric target selection without treating it as experiment resumption: the accepted camera changed after P0, the recording still supplies no dead layer, and no P1 work, tracked dependency, adoption, or final disposition exists.
 public_safe: true
-summary: The bounded, currently pre-P1 plan for testing whether pinned Nomos presentation authoring can produce The Mortal Estate's accepted gameplay look while TME retains every gameplay fact, browser and Godot consume the same input, and reusable findings land upstream first.
+summary: The bounded, still-paused pre-P1 plan for testing a presentation-authoring boundary; the owner has since selected a new target projection, so any resumption must bind fresh target evidence and separately resolve the missing authoritative dead layer.
 ---
 
 # Nomos presentation-adoption experiment
@@ -164,6 +164,23 @@ The owner paused here to consider the overall direction. The pause is not one of
 the final dispositions in section 11, does not infer a Nomos R2 or TME adoption
 verdict, does not alter TME's accepted target or open representative-micro-scene
 verdict, and does not release or automatically return the project to S3.
+
+### Target changed while paused (owner, 2026-08-31)
+
+The owner has now selected the fixed orthographic 2:1 dimetric projection and
+ordinary world-up geometry recorded in
+[presentation direction](../presentation-direction.md#projection-and-surface-ruling).
+That closes the camera-selection question; it does not resume this experiment.
+
+The P0 packet digest above binds an earlier projection that the current target
+explicitly supersedes. P1 has never begun, so no candidate may inherit that
+packet's clearance or silently reinterpret it under the new camera. Any later
+resumption must bind fresh target evidence and its digest to the current
+presentation ruling, retain the same authority audit and disposable-lab
+boundary, and separately resolve the missing authoritative dead layer. Until an
+owner direction supplies those inputs, this plan remains at its pre-P1 stop
+line, makes no presenter or dependency selection, and dispatches no Phase 10
+implementation slice.
 
 ## 4. Phase P1 — browser evidence first
 

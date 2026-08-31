@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-27
-revision: 5
-status: Owner-accepted visual target. The exact ten-part packet is accepted at its content digest; no presenter, representative implementation, or production pipeline is accepted.
+last_updated: 2026-08-31
+revision: 12
+status: Owner-accepted visual target. Revision 12 selects fixed orthographic 2:1 dimetric projection and ordinary world-up geometry, superseding the screen-square high-oblique projection without accepting a renderer, asset set, or production pipeline.
 public_safe: true
-summary: The owner-accepted isometric-oblique target packet and calm-field texture discipline, plus the production rule used to judge the bounded Nomos presentation experiment without preselecting browser, Godot, or another pipeline.
+summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, and calm-field texture discipline, plus the production rule used to judge a presentation experiment without preselecting a renderer or pipeline.
 routes:
   - client/presentation/**
   - content/test-corpus/**
@@ -17,11 +17,25 @@ getting there. The client's architecture is
 [client notes](client-notes.md).
 
 Earlier revisions established the charter-level direction, the bounded target
-packet, its evidence order, the owner-selected projection, and the
+packet, its evidence order, the first owner-selected projection, and the
 surface-pattern correction found while calibrating it. Revision 5 records the
-owner's exact packet acceptance. The visual target is still the owner's to set,
-and this document is where the owner's version is recorded — not where an agent
-manufactures acceptance.
+owner's exact packet acceptance. Revision 6 records the then-current
+high-oblique projection and screen-cell contract, both now superseded by
+Revision 12. Revision 7 records the relational scale discipline that survives
+that replacement and makes logical cells a common ruler rather than a common
+object size.
+Revision 8 records the building consequence: play can expose a roof-off cutaway,
+and footprint, wall, and opening modules — not a whole-building card — establish
+its scale. Revision 9 records the projection consequence: every elevated subject
+uses one shared diagonal screen direction for height while the tile plane remains
+screen-aligned. Revision 10 makes the structural construction consequence
+explicit: base runs remain H/V and corresponding elevated vertices use that
+shared direction. Revision 11 records the generated-source isolation and alpha
+validation rule proven during disposable visual iteration. Revision 12 records
+the owner's selection of the 2:1 dimetric challenger after native-size real-3D
+projection and matched production-art comparisons. The visual target is still
+the owner's to set, and this document is where the owner's version is recorded —
+not where an agent manufactures acceptance.
 
 ## The target
 
@@ -32,9 +46,11 @@ miniature 3D diorama photographed from above.
 
 ### The grammar
 
-- a fixed isometric-oblique orthographic gameplay view at an intimate, local
-  play scale rather than a world-overview scale;
-- continuous terrain art over authoritative logical cells;
+- a fixed orthographic **2:1 dimetric** gameplay projection at an intimate,
+  local play scale: square world cells project as diamonds, both perpendicular
+  wall faces remain readable, and standing geometry uses ordinary world up;
+- tile-coherent terrain over authoritative logical cells, with restrained visible
+  joints rather than a requirement for invisible pixel-perfect seams;
 - broad intentional pixel clusters and large calm material fields rather than
   noisy fake-pixel detail;
 - uneven, material-specific texture density: wear follows traffic, roots follow
@@ -53,11 +69,38 @@ miniature 3D diorama photographed from above.
 
 ### Projection and surface ruling
 
-**Owner ruling, 2026-08-27:** the current target-authority packet authors to the
-fixed isometric-oblique projection above. The camera stays close enough that one
-actor, the immediate traversable ground, and a nearby interaction anchor are
-readable at native play size. Geography leaves the frame naturally, and routes
-may disappear behind terrain rather than being surveyed from above.
+**Owner ruling, 2026-08-31:** the world uses a fixed orthographic **2:1
+dimetric** gameplay projection. The camera has no perspective convergence, uses
+a 45-degree yaw around world up, and looks down at a 30-degree elevation. A
+square logical ground cell therefore projects as a diamond whose full screen
+width is twice its full screen height. The choice is dimetric rather than true
+isometric: the shallower camera presents actors and vertical structures more
+frontally while retaining an orthographic 3D world.
+
+Standing geometry uses ordinary world up. Actors, walls, doors, posts, props,
+trees, and monsters receive no camera-facing shear and no shared northwest lean.
+Their volumetric construction, animation, lighting, self-occlusion, and shadows
+remain coherent in world space. Facing rotates a subject around world up; it does
+not change that subject's up direction or turn it into a billboard.
+
+An actor's feet/contact sit at the centre of its authoritative square ground
+cell. A nearby wall edge or doorway threshold does not replace or move that
+cell-centre anchor. Its rendered body may cover portions of several projected
+diamonds, but visual coverage does not redefine occupancy.
+
+The camera stays close enough that one actor, the immediate traversable ground,
+and a nearby interaction anchor are readable at native play size. Geography
+leaves the frame naturally, and routes may disappear behind structures or
+terrain rather than being surveyed from above. Steam Deck native **1280 × 800**
+is the minimum play-size review surface; an enlarged lower-resolution capture is
+useful evidence but does not substitute for that judgment.
+
+This ruling supersedes the 2026-08-30 screen-square high-oblique selection,
+including its camera-facing compensation and northwest-rise experiments. It
+changes the projection and projected-up facts, not the accepted calm-field
+texture discipline, material hierarchy, palette direction, silhouette
+priorities, visible-joint tolerance, relational-scale discipline, or production
+rule.
 
 The generated candidates also exposed a specific style failure: filling every
 surface with curling, equally weighted pattern. That is not TME's pixel grammar.
@@ -69,6 +112,93 @@ defects to correct, not characteristics to preserve.
 This ruling selects the packet's visual projection. It does **not** select a
 renderer, engine, platform, logical-to-screen implementation, or production
 tool. Those remain downstream evidence questions.
+
+### Tile assembly ruling
+
+**Owner ruling, 2026-08-30, retained under the 2026-08-31 projection change:** a
+restrained material joint may remain visible between terrain cells. Adjacent
+tiles must agree on apparent scale, material family, value hierarchy, lighting
+convention, and their quiet edge band; cracks, stones, grass blades, and other
+interior clusters do not have to continue pixel-for-pixel across the boundary.
+
+The terrain cell is one square logical world cell, projected by the accepted
+camera as a 2:1 screen diamond. The former **64 × 64 screen-pixel cell**, its
+one-pixel perimeter, and its 62 × 62 interior belonged to the superseded
+screen-square projection and carry no authority into the dimetric world. No
+raster source resolution, projected diamond bounds, native tile-edge length, or
+joint width is accepted yet; those are representative-scene calibration at the
+1280 × 800 minimum play surface. A comparison zoom chosen only to normalize two
+experimental cameras is evidence, not a production scale value.
+
+Taller props, facades, trees, roofs, and compound modules may span integer cell
+footprints and extend above their ground anchors; they do not change the logical
+terrain-cell contract. The joint's material colour may vary with the admitted
+material family, but its accepted native treatment may not drift asset by asset
+once calibration closes.
+
+Building floors and wall runs use that same cell ruler. Active play presents the
+roof-off cutaway by default so occupants, interior cells, and wall-relative
+height remain readable; separately controllable roof art may complete an
+exterior silhouette when the presentation calls for it. The roof does not own
+footprint, wall height, door scale, occupancy, interaction, or sorting facts.
+
+An actor — player or monster — remains anchored by its feet/contact point at the
+centre of exactly one authoritative square ground cell. Its body is not clipped
+to the projected diamond: ordinary world-up height and volumetric width may cover
+neighboring screen cells where the silhouette needs them. Walls, doors, posts,
+props, trees, and other elevated modules retain their own ground contacts and
+world-space construction. Visual extent never changes occupancy, walkability,
+targeting identity, or collision; those remain facts supplied to the renderer
+seam rather than inferred from projected bounds.
+
+The joint belongs to the world art. It is not a debug grid, editor overlay,
+selection cue, or substitute for authoritative targeting. This tolerance allows
+independently authored or generated tile candidates to enter the ordinary
+candidate lifecycle when they are visually coherent after assembly; it does not
+promote a generator output, waive provenance, or let a tile bypass owner visual
+acceptance.
+
+### Relative scale ruling
+
+**Owner ruling, 2026-08-30, retained under the 2026-08-31 projection change:**
+the logical terrain cell is the world's common visual ruler, not a box that makes
+every asset the same size. Production assets are normalized to one shared
+projection scale and displayed at their authored size. An arbitrary per-scene
+multiplier may diagnose a candidate, but it is not a production scale decision
+and cannot make unlike source assets coherent.
+
+An adult human is the comparison baseline for visual-development review, not a
+new gameplay unit. Doors, windows, storeys, furniture, graves, vegetation, and
+other familiar cues must remain mutually believable around that baseline. A
+building must read as a tiled, occupiable volume capable of containing its
+intended occupants: its floor footprint, wall and corner runs, openings, and any
+optional roof layer must agree around the person. In the ordinary roof-off view,
+the footprint, wall height, and clear door opening establish scale directly; a
+detached whole-building card or roof silhouette does not. A monster intended to
+read as large must stand unambiguously taller and carry more silhouette mass than
+the adult baseline when both share the same ground-contact line and display
+scale. The same rule applies to every authored size relationship: the picture
+must express the size the subject is supposed to have.
+
+Presentation metadata therefore distinguishes facts that must not collapse into
+one another: the instance's ground-anchor **cell**, the asset-local **contact
+point** placed on that cell, the presentation-only ground/occlusion **footprint**,
+the subject's **nominal physical height**, and its native projected screen
+**vector and bounds**. The last two are not interchangeable: foreshortening can
+make a physically taller subject occupy fewer vertical screen pixels. These are
+art and ordering facts. State and animation variants of one subject preserve
+their declared scale, contact, footprint, and projected world-up direction
+unless the authored variant is explicitly a differently sized subject. Authoritative
+occupancy, collision, walkability, interaction reach, and targeting remain
+separate gameplay facts and are never derived from visual height or sprite
+bounds.
+
+Before a scale family can be accepted, a neutral native-1280 × 800 scale audit
+must align representative subjects on their ground contacts with atmosphere and
+perspective tricks disabled, then the same subjects must remain coherent in the
+representative gameplay micro-scene. Exact actor heights, building dimensions,
+monster categories, and footprint values remain authored/test-calibrated rather
+than being invented by this relational ruling.
 
 ### The dead world
 
@@ -147,6 +277,16 @@ are not tracked build inputs or promoted runtime assets. This verdict clears P0
 only: it accepts no representative presenter result, Nomos boundary, renderer,
 engine, or platform.
 
+The 2026-08-31 dimetric ruling supersedes the packet's camera geometry and every
+intervening projection experiment. Any screen-square high-oblique, true
+isometric, or other camera visible in those digest-bound artifacts is explicit
+non-authority. Their remaining palette, material, surface-density, silhouette,
+motion, UI, and living/dead evidence stays useful where it does not depend on a
+retired projection. The packet's prior P0 clearance is historical for that
+bounded experiment; a production implementation of the accepted dimetric target
+must still earn the representative micro-scene verdict under the current
+production rule.
+
 ## Presenter evidence order
 
 The browser/WebGL presenter is tested first because the authorized upstream
@@ -185,6 +325,41 @@ expensive produces fewer experiments, and taste is a volume problem.
 
 Provenance and licensing for every promoted asset are mandatory and are owned by
 [public boundary policy](public-boundary-policy.md).
+
+### Generated-source isolation and alpha validation
+
+Generated source assets enter the candidate lifecycle **one isolated subject per
+generation request**. A request for a character, plant, prop, or other reusable
+piece asks for one complete silhouette with transparent padding and genuine PNG
+alpha. It explicitly excludes a backdrop, floor, border, checker pattern, glow,
+halo, environmental shadow, and coloured matte. Multi-subject sheets, grids,
+quadrants, and atlases are assembled deterministically from separately validated
+pieces; they are not requested as the generated source. This keeps generation
+focused on the subject and prevents a sheet-layout convention from being drawn
+as part of the image.
+
+Prompt language is a request, not evidence. Before any generated result can
+become a review candidate, a mechanical inspection must prove that the untouched
+file is an RGBA image whose alpha includes both fully transparent background and
+non-transparent subject pixels. The candidate is then composited over at least
+one light and one dark contrasting field at source scale and at native gameplay
+scale to expose matte fringe, halos, clipped fine detail, or an opaque background
+disguised as transparency. A filename, preview checker, or claim by the generator
+does not satisfy this check.
+
+If native alpha is absent, the result stays disposable. A focused background
+extraction retry or deterministic matte-cleanup pass creates a **new** candidate;
+it never rewrites the untouched generated source or inherits acceptance from it.
+The prompt, meaningful project-owned inputs, untouched output, transformations,
+and tool identity remain external evidence until promotion. Nothing enters the
+tree merely because it passed the alpha check: visual acceptance still belongs
+to the owner, and promotion still requires the provenance and licensing record
+owned by [public boundary policy](public-boundary-policy.md#generated-content).
+
+This rule validates a cheap way to produce and judge reusable transparent source
+pieces. It does **not** accept a particular model, provider, subscription, asset,
+atlas packer, renderer, or end-to-end production pipeline. Those still earn scale
+only through the representative micro-scene and second-matching-asset proof.
 
 ## Retired pipelines carry no authority
 

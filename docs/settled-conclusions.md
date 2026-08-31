@@ -1,27 +1,29 @@
 ---
-last_updated: 2026-08-27
-revision: 6
-status: Authored at genesis plan Phase 7; a live index that grows as slices close. Revision 6 records the clean public-source cut after independent review refused an in-place visibility change.
+last_updated: 2026-08-31
+revision: 12
+status: Authored at genesis plan Phase 7; a live index that grows as slices close. Revision 12 records the owner-selected orthographic 2:1 dimetric projection and retires the screen-square elevation and pixel-cell assumptions it supersedes.
 public_safe: true
-summary: The anti-rework index — conclusions about this project's own code and method that are closed, where each is owned, and what reopening one costs.
+summary: The anti-rework index — closed conclusions about this project's code, method, visual projection, and relational scale; their owners; and what reopening one costs.
 always: true
 ---
 
 # Settled conclusions
 
 This is the anti-rework index. Every row is a question this project has already
-answered **about its own code or method**, with the document that owns the answer.
+answered **about its own code, method, or accepted presentation direction**,
+with the document that owns the answer.
 
 It exists because the expensive failure mode for an agent-worked repository is not
 a wrong decision — it is the same decision being re-derived every few sessions,
 slightly differently each time, with no record of why the last version was
 discarded.
 
-**Scope, strictly.** Only conclusions about this project's own implementation and
-working method belong here. **No gameplay mechanic, value, name, timing, penalty,
-or route** appears on this list. Ruling D2 reopened all of them for fresh design,
-and a "settled" list is exactly the wrong place for something that is deliberately
-open — see [boundary map](boundary-map.md#what-an-authored-seam-does-and-does-not-settle).
+**Scope, strictly.** Only conclusions about this project's own implementation,
+working method, and owner-accepted presentation direction belong here. **No
+gameplay mechanic, value, name, timing, penalty, or route** appears on this list.
+Ruling D2 reopened all of them for fresh design, and a "settled" list is exactly
+the wrong place for something that is deliberately open — see
+[boundary map](boundary-map.md#what-an-authored-seam-does-and-does-not-settle).
 
 ## Closed
 
@@ -32,6 +34,12 @@ open — see [boundary map](boundary-map.md#what-an-authored-seam-does-and-does-
 | Client shape | Protocol-first and thin: no rules types, no legality inference, no gameplay ledger, no second clock. | [client architecture](client-architecture.md) |
 | Engine baseline | Godot `4.7.2` on `gl_compatibility`, typed GDScript, no addon, C#, GDExtension, or native dependency. Changing it is a contract change with full re-proof. | [client architecture](client-architecture.md#engine-baseline) |
 | Feel surface | The engine client is where movement, cursor, camera, and layering feel is judged. A browser/DOM board was hand-tested for that role and found insufficient; it is not the feel surface and should not be rebuilt as one. | this document |
+| World-view projection | A fixed orthographic 2:1 dimetric projection: 45-degree yaw, 30-degree elevation, no perspective convergence, and square world cells projected as 2:1 screen diamonds. The screen-square high-oblique and true-isometric candidates are superseded. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) — owner ruling 2026-08-31 |
+| World-up standing geometry | Actors, walls, doors, posts, props, trees, and monsters use ordinary volumetric world-up construction. The accepted camera applies no camera-facing shear and no shared northwest lean; facing rotates around world up. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) — owner ruling 2026-08-31 |
+| Tile assembly | A restrained material joint may remain visible between logical square world cells after they project as 2:1 diamonds. Adjacent cell interiors share material and scale grammar but need not continue pixel-perfectly. Exact raster source resolution, native diamond bounds, tile-edge length, and joint width remain representative-scene calibration; the retired 64 × 64 screen-cell contract carries no authority. | [presentation direction](presentation-direction.md#tile-assembly-ruling) — owner rulings 2026-08-30 and 2026-08-31 |
+| Cutaway building assembly | Building floors, wall runs, and openings use the same cell ruler. Active play is roof-off by default; a separately controllable roof layer never owns footprint, wall height, door scale, occupancy, interaction, or sorting. | [presentation direction](presentation-direction.md#tile-assembly-ruling) — owner ruling 2026-08-30 |
+| Ground-contact anchoring | Actors keep one authoritative feet/contact anchor at the centre of one logical square ground cell. Their volumetric world-up bodies may cover neighboring projected diamonds. A doorway threshold remains a separate presentation point. Visual extent and draw order never redefine occupancy, collision, walkability, or semantic targeting. | [presentation direction](presentation-direction.md#tile-assembly-ruling) — owner rulings 2026-08-30 and 2026-08-31 |
+| Relative visual scale | The logical terrain cell is one shared ruler, not one object size. Adult humans are the review baseline; buildings must read as occupiable volumes larger than people, and subjects intended as large must be visibly taller/more massive when measured under the accepted projection at the same ground contact and display scale. Exact dimensions remain authored and test-calibrated. | [presentation direction](presentation-direction.md#relative-scale-ruling) — owner rulings 2026-08-30 and 2026-08-31 |
 | One world | One canonical persistent world; no player-selectable divergent copies. Enforced in the schema by a singleton index, not only in code. | [server notes](server-notes.md#the-world-instance-and-what-it-is-for) — owner ruling D4 |
 | Logical time | The rules clock is logical rounds, deliberately independent of wall-clock seconds. Wall time belongs to the server, and the cadence is one value in one place. | [boundary map](boundary-map.md#14-deterministic-logical-time) |
 | Presenting the pulse | The client is never told the cadence — nothing on the wire carries one — so it **measures** the beat from consecutive frame arrivals and interpolates inside it. Readiness stays the frame's `can_act`, the wait stays the frame's arithmetic, and the fill is never extrapolated past what was measured. Adding a cadence field to the wire would put a one-place value in two places. | [client notes](client-notes.md#the-pulse-made-visible) — under owner ruling D5 |
