@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-08-31
-revision: 13
-status: Owner-accepted visual target. Revision 13 removes settled camera pitch from the open list and scopes the browser-first evidence order to the paused experiment that owns it; no renderer, asset set, or production pipeline is accepted.
+last_updated: 2026-09-01
+revision: 14
+status: Owner-accepted visual target. Revision 14 records the in-engine feel scene as a bounded experiment beside the world-view seam, and the candidate-asset rule it runs under; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, and the production rule and paused-experiment context used to judge future presentation evidence.
 routes:
@@ -411,6 +411,49 @@ The owner is the final authority for taste, visual acceptance, and the accepted
 masters. Agents may present evidence, candidates, and recommendations; **they do
 not manufacture acceptance through automated consensus**, and an autonomous studio
 approving its own art is an explicit project non-goal.
+
+## The in-engine feel scene
+
+**Owner direction, 2026-09-01:** after the lab's constructed-scene experiments
+(one deterministic compositor assembling separately generated, alpha-validated
+components on the ruled grid; then a member-level wall kit whose every shared
+edge is drawn by geometry rather than by the generator), the owner directed the
+next evidence step into the engine: a real 3D scene under the ruled camera, so
+lighting, foliage motion, weather, and time of day can be felt rather than
+inferred from stills.
+
+`client/presentation/feel/` holds that scene. It is a **bounded experiment
+beside the world-view seam**, not a presenter behind it: it consumes no
+authoritative frame, emits no targets, sends no command, and replaces nothing.
+`GridWorldView` remains the current world view. Whether anything in the feel
+scene earns a place behind `WorldViewSeam` is decided by the production rule
+above, not by this section.
+
+Its construction follows the lab's conclusions rather than re-deriving them:
+the camera is orthographic at 45-degree yaw and 30-degree elevation, sized so
+one ground cell projects as a 224-pixel-wide diamond at 1280 × 800; ground
+cells are flat quads carrying material swatches in continuous world-plane
+coordinates; walls are real geometry built from a member profile in world
+units (plinth, sill, plaster, posts at every cell boundary, braces, lintel and
+door, cap front and cap top) so courses never seam; standing subjects are
+world-up billboards anchored at their cell centres at their nominal heights;
+and the scene's only warmth comes from actual light sources — the lantern and
+candles — as the owner ruled in the lab.
+
+**The candidate-asset rule.** The scene's art is candidate material from the
+lab, and none of it is tracked. The scene loads assets only from the directory
+named by the environment variable `TME_FEEL_ASSETS`, through a manifest that
+binds every file to its digest; a mismatch is refused. With the variable unset
+the scene presents absence inside the picture and still runs. This is the
+same discipline the credential model and the capture output use: a private
+input is named out of band, never defaulted to, and never a tracked path. The
+tracked proof exercises the loader and the geometry against a tiny synthetic
+fixture under `client/tests/fixtures/feel/`. Presets — time of day, rain, fog,
+wind — are selected by `TME_FEEL_PRESET`, not by input actions, so the
+accessibility floor is untouched.
+
+Nothing this scene renders is an accepted master. Acceptance of any of it is
+the owner's, at play size, through the production rule.
 
 ## Open
 
