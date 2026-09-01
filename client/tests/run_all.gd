@@ -27,6 +27,7 @@ const GridWorldViewSuite: Script = preload("res://tests/test_grid_world_view.gd"
 const InteractionDirectorSuite: Script = preload("res://tests/test_interaction_director.gd")
 const GroundTraySuite: Script = preload("res://tests/test_ground_tray.gd")
 const DevCredentialsSuite: Script = preload("res://tests/test_dev_credentials.gd")
+const FeelSceneSuite: Script = preload("res://tests/test_feel_scene.gd")
 
 class ScriptErrorMonitor extends Logger:
 	var _mutex: Mutex = Mutex.new()
@@ -102,6 +103,7 @@ func _run() -> void:
 		"interaction_director": InteractionDirectorSuite,
 		"ground_tray": GroundTraySuite,
 		"dev_credentials": DevCredentialsSuite,
+		"feel_scene": FeelSceneSuite,
 	}
 	var selected_suites: PackedStringArray = _selected_suites()
 	if _script_error_probe_requested():
