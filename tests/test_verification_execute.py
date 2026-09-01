@@ -13,10 +13,11 @@ import subprocess
 import unittest
 from contextlib import redirect_stdout
 from dataclasses import dataclass
+from unittest.mock import patch
 
 from verification_test_support import REPO_ROOT  # noqa: F401  (path setup)
 
-from verification import execute
+from verification import capabilities, execute
 from verification.model import (
     CapabilityState,
     EXIT_FAILED,
@@ -55,6 +56,28 @@ def clock_from(values):
 
 ALWAYS = Step("ok.one", "docs", "always runs", ("always",))
 NEEDS_GODOT = Step("client.x", "client", "needs the client", ("godot",), requires=("godot",))
+
+
+class NodeCapability(unittest.TestCase):
+    def test_node_is_a_reported_capability(self) -> None:
+        self.assertIn("node", capabilities.BY_NAME)
+
+    def test_node_22_and_npm_make_the_capability_available(self) -> None:
+        def versions(argv, **_kwargs):
+            reported = (
+                "v22.4.1\n"
+                if argv[-1] == "--version" and "node" in argv[0]
+                else "10.8.1\n"
+            )
+            return FakeCompleted(stdout=reported)
+
+        with (
+            patch.object(capabilities.shutil, "which", side_effect=["/fake/node", "/fake/npm"]),
+            patch.object(capabilities.subprocess, "run", side_effect=versions),
+        ):
+            state = capabilities.BY_NAME["node"].evaluate({"PATH": "/fake"})
+        self.assertTrue(state.available, state.reason)
+        self.assertIn("npm", state.reason)
 
 
 class UnavailableIsNeverPass(unittest.TestCase):

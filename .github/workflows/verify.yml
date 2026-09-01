@@ -91,10 +91,16 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
       # What is about to run, printed before it runs, so a failed job's log
       # opens with the plan rather than only the wreckage.
       - name: resolved plan
-        run: python3 tools/run_verification.py --list --scope portable --scope client --scope gated
+        run: python3 tools/run_verification.py --list --scope portable --scope web --scope client --scope gated
 
       # No TME_* variable is set here, deliberately. `.cargo/config.toml`
       # supplies TME_BANNED_TERMS_FILE (force = false) pointing at the tracked
@@ -104,7 +110,7 @@ jobs:
       # not merely by an absent variable — and the `gated` lane, which does run
       # them, reports UNAVAILABLE here rather than passing vacuously.
       - name: the lanes this checkout can prove
-        run: python3 tools/run_verification.py --scope portable --scope client --scope gated --allow-unavailable --report-disk
+        run: python3 tools/run_verification.py --scope portable --scope web --scope client --scope gated --allow-unavailable --report-disk
 
   cleanclone:
     name: a clean copy builds and tests with no private root

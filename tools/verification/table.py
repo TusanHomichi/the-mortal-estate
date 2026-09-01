@@ -189,6 +189,34 @@ _STATIC: tuple[Step, ...] = (
         argv=("python3", "-m", "compileall", "-q", "tools", "tests"),
     ),
     Step(
+        key="web.install",
+        owner="web",
+        label="web: clean dependency install",
+        argv=("npm", "--prefix", "web", "ci"),
+        requires=("node",),
+    ),
+    Step(
+        key="web.typecheck",
+        owner="web",
+        label="web: TypeScript typecheck",
+        argv=("npm", "--prefix", "web", "run", "typecheck"),
+        requires=("node",),
+    ),
+    Step(
+        key="web.test",
+        owner="web",
+        label="web: unit tests",
+        argv=("npm", "--prefix", "web", "test"),
+        requires=("node",),
+    ),
+    Step(
+        key="web.build",
+        owner="web",
+        label="web: production build",
+        argv=("npm", "--prefix", "web", "run", "build"),
+        requires=("node",),
+    ),
+    Step(
         key="client.import",
         owner="client",
         label="client: engine import",
@@ -300,7 +328,7 @@ def build_steps() -> dict[str, Step]:
         if step.key in steps:
             raise ResolutionError(f"duplicate step key: {step.key}")
         steps[step.key] = step
-    return dict(sorted(steps.items()))
+    return steps
 
 
 STEPS: dict[str, Step] = build_steps()
@@ -315,6 +343,7 @@ OWNER_SCOPES: tuple[str, ...] = (
     "python",
     "rust",
     "workbench",
+    "web",
     "client",
     "gated",
     "cleanclone",
@@ -335,14 +364,14 @@ CARGO_OWNERS: frozenset[str] = frozenset({"rust", "cleanclone"})
 #: steps run in: cheap and diagnostic first, expensive last.
 COMPOSED: dict[str, tuple[str, ...]] = {
     "portable": ("@meta", "@docs", "@boundary", "@python", "@rust", "@workbench"),
-    "full": ("@portable", "@client", "@gated", "@cleanclone"),
+    "full": ("@portable", "@web", "@client", "@gated", "@cleanclone"),
 }
 
 #: Standing rule, encoded: the fast lane is defined by what it excludes.
 #: Nothing in this set may ever appear in a `fast` resolution, whatever the
 #: changed paths were, unless the matching family was actually touched.
 FAST_FORBIDDEN_WITHOUT_CAUSE: frozenset[str] = frozenset(
-    {"rust", "client", "gated", "cleanclone", "capture"}
+    {"rust", "web", "client", "gated", "cleanclone", "capture"}
 )
 
 ALL_SCOPES: tuple[str, ...] = tuple(sorted({*OWNER_SCOPES, *COMPOSED, "fast"}))

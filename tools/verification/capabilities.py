@@ -9,6 +9,7 @@ one says how to supply what is missing.
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -35,6 +36,35 @@ SYNTHETIC_TERMS = "tools/ci-synthetic-banned-terms.txt"
 ADMIN_URL_VARIABLE = "TME_PG_ADMIN_URL_FILE"
 
 GODOT_VARIABLE = "TME_GODOT"
+
+
+def _probe_node(environ: Mapping[str, str]) -> tuple[bool, str]:
+    search_path = environ.get("PATH")
+    node = shutil.which("node", path=search_path)
+    npm = shutil.which("npm", path=search_path)
+    if node is None:
+        return False, "node is not on PATH; the browser client requires Node 22 or newer"
+    if npm is None:
+        return False, "npm is not on PATH; it is required for the browser client"
+    try:
+        completed = subprocess.run(
+            [node, "--version"], capture_output=True, text=True, timeout=60
+        )
+        npm_completed = subprocess.run(
+            [npm, "--version"], capture_output=True, text=True, timeout=60
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        return False, f"node or npm could not be asked for its version: {error}"
+    reported = (completed.stdout or "").strip()
+    match = re.fullmatch(r"v(\d+)(?:\.\d+){2}", reported)
+    if completed.returncode != 0 or match is None:
+        return False, f"{node} reports an invalid version {reported!r}"
+    if int(match.group(1)) < 22:
+        return False, f"{node} reports {reported}; the browser client requires Node 22 or newer"
+    npm_reported = (npm_completed.stdout or "").strip()
+    if npm_completed.returncode != 0 or not npm_reported:
+        return False, f"{npm} could not report a usable version"
+    return True, f"node {reported}, npm {npm_reported}"
 
 
 def _probe_godot(environ: Mapping[str, str]) -> tuple[bool, str]:
@@ -95,13 +125,14 @@ def _probe_display(environ: Mapping[str, str]) -> tuple[bool, str]:
 
 
 GODOT = Capability("godot", "the pinned Godot client binary", _probe_godot)
+NODE = Capability("node", "Node 22 or newer and npm", _probe_node)
 POSTGRES = Capability("postgres", "a PostgreSQL superuser URL and psql", _probe_postgres)
 PRIVATE_TERMS_LIST = Capability(
     "private-terms", "the private banned-term denylist", _probe_private_terms
 )
 DISPLAY = Capability("display", "a display a windowed capture can use", _probe_display)
 
-CAPABILITIES: tuple[Capability, ...] = (GODOT, POSTGRES, PRIVATE_TERMS_LIST, DISPLAY)
+CAPABILITIES: tuple[Capability, ...] = (GODOT, NODE, POSTGRES, PRIVATE_TERMS_LIST, DISPLAY)
 BY_NAME = {capability.name: capability for capability in CAPABILITIES}
 
 

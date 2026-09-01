@@ -85,7 +85,7 @@ Related owners, none of which this document duplicates:
 | Rules | `crates/tme-rules` | gameplay truth: legality, resolution, timing semantics, life state, projection |
 | Content | `content/`, validated by `crates/tme-rules/src/content` | the authored facts the rules consume |
 | Server runtime | `crates/tme-server` | sessions, admission, wall-clock scheduling, durable authority, the wire |
-| Client | `client/` | input, presentation, accessibility, discardable local state |
+| Client | `web/`, `client/` | input, presentation, accessibility, discardable local state |
 | Authoring | `crates/tme-authoring`, `content/lands/` | authored documents to proven runtime content |
 | Simulation | `crates/tme-sim` | fast deterministic gameplay proving over the same rules boundary |
 | Tools | `tools/` | boundary checks, the Workbench, proof harnesses |
