@@ -5,44 +5,54 @@ export interface FootprintPoint {
   z: number;
 }
 
-export interface FootprintPair {
+export interface FootprintPlacement {
+  printIndex: number;
   pathIndex: number;
+  foot: "left" | "right";
   angle: number;
-  lead: "left" | "right";
-  left: FootprintPoint;
-  right: FootprintPoint;
+  position: FootprintPoint;
 }
 
-const LATERAL_OFFSET = 0.06;
-const STRIDE_OFFSET = 0.035;
+const PRINTS_PER_SQUARE = 2;
+const LATERAL_OFFSET = 0.07;
 
-function directionInto(path: readonly Cell[], index: number): Cell {
-  const from = path[index - 1]!;
-  const to = path[index]!;
+function directionAlong(from: Cell, to: Cell): FootprintPoint {
   const length = Math.hypot(to.i - from.i, to.j - from.j) || 1;
-  return { i: (to.i - from.i) / length, j: (to.j - from.j) / length };
+  return { x: (to.i - from.i) / length, z: (to.j - from.j) / length };
 }
 
-export function footprintsFromPath(path: readonly Cell[]): FootprintPair[] {
-  return path.slice(1).map((cell, enteredIndex) => {
-    const pathIndex = enteredIndex + 1;
-    const direction = directionInto(path, pathIndex);
-    const perpendicular = { i: -direction.j, j: direction.i };
-    const lead: FootprintPair["lead"] = enteredIndex % 2 === 0 ? "left" : "right";
-    const leftStride = lead === "left" ? STRIDE_OFFSET : -STRIDE_OFFSET;
-    const rightStride = -leftStride;
-    return {
-      pathIndex,
-      angle: Math.atan2(direction.i, direction.j),
-      lead,
-      left: {
-        x: cell.i + perpendicular.i * LATERAL_OFFSET + direction.i * leftStride,
-        z: cell.j + perpendicular.j * LATERAL_OFFSET + direction.j * leftStride,
-      },
-      right: {
-        x: cell.i - perpendicular.i * LATERAL_OFFSET + direction.i * rightStride,
-        z: cell.j - perpendicular.j * LATERAL_OFFSET + direction.j * rightStride,
-      },
-    };
-  });
+/**
+ * Places one alternating stride along a locally authored route.
+ *
+ * The route is presentation-only evidence in the feel experiment. These marks
+ * explain that route; they neither supply nor imply authoritative walkability.
+ */
+export function footprintsFromPath(path: readonly Cell[]): FootprintPlacement[] {
+  const placements: FootprintPlacement[] = [];
+
+  for (let pathIndex = 1; pathIndex < path.length; pathIndex += 1) {
+    const from = path[pathIndex - 1]!;
+    const to = path[pathIndex]!;
+    const direction = directionAlong(from, to);
+    const left = { x: -direction.z, z: direction.x };
+
+    for (let halfStep = 1; halfStep <= PRINTS_PER_SQUARE; halfStep += 1) {
+      const printIndex = placements.length;
+      const foot: FootprintPlacement["foot"] = printIndex % 2 === 0 ? "left" : "right";
+      const progress = halfStep / PRINTS_PER_SQUARE;
+      const side = foot === "left" ? 1 : -1;
+      placements.push({
+        printIndex,
+        pathIndex,
+        foot,
+        angle: Math.atan2(direction.x, direction.z),
+        position: {
+          x: from.i + (to.i - from.i) * progress + left.x * LATERAL_OFFSET * side,
+          z: from.j + (to.j - from.j) * progress + left.z * LATERAL_OFFSET * side,
+        },
+      });
+    }
+  }
+
+  return placements;
 }

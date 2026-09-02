@@ -6,9 +6,9 @@
  * intentionally the walk feature's only Three.js and DOM boundary.
  */
 import {
+  AdditiveBlending,
   BufferGeometry,
   CanvasTexture,
-  Color,
   Float32BufferAttribute,
   LineBasicMaterial,
   LineLoop,
@@ -81,27 +81,56 @@ interface LandedFootprints {
   landedAt: number;
 }
 
-const DRAFT_COLOUR = new Color("#9eb5ca");
-const COMMITTED_COLOUR = new Color("#c8c3b8");
+const DRAFT_FOOTPRINT_OPACITY = 0.7;
+const COMMITTED_FOOTPRINT_OPACITY = 1;
 
 function routeIdentity(route: readonly Cell[] | null): string {
   return route?.map((cell) => `${cell.i},${cell.j}`).join(";") ?? "";
 }
 
-function makeSoleTexture(): CanvasTexture {
+function traceSole(context: CanvasRenderingContext2D): void {
+  context.beginPath();
+  context.moveTo(48, 12);
+  context.bezierCurveTo(65, 12, 76, 24, 74, 42);
+  context.bezierCurveTo(73, 54, 66, 60, 59, 66);
+  context.bezierCurveTo(54, 72, 55, 82, 61, 94);
+  context.bezierCurveTo(67, 108, 63, 127, 51, 132);
+  context.bezierCurveTo(38, 137, 27, 127, 28, 113);
+  context.bezierCurveTo(29, 101, 36, 92, 36, 81);
+  context.bezierCurveTo(36, 72, 29, 66, 24, 57);
+  context.bezierCurveTo(14, 40, 21, 20, 38, 14);
+  context.bezierCurveTo(41, 13, 45, 12, 48, 12);
+  context.closePath();
+}
+
+function paintSoleLayer(
+  context: CanvasRenderingContext2D,
+  colour: string,
+  opacity: number,
+  blur: number,
+): void {
+  context.save();
+  // Canvas bottom becomes the print's toe after the ground-plane rotation.
+  context.translate(16, 168);
+  context.scale(1, -1);
+  context.filter = `blur(${blur}px)`;
+  context.globalAlpha = opacity;
+  context.fillStyle = colour;
+  traceSole(context);
+  context.fill();
+  context.restore();
+}
+
+function makeSoleTexture(kind: "draft" | "committed"): CanvasTexture {
   const drawing = document.createElement("canvas");
-  drawing.width = 48;
-  drawing.height = 80;
+  drawing.width = 128;
+  drawing.height = 192;
   const context = drawing.getContext("2d");
   if (context === null) throw new Error("the walk experiment could not draw its footprints");
   context.clearRect(0, 0, drawing.width, drawing.height);
-  context.filter = "blur(2px)";
-  context.fillStyle = "rgba(255, 255, 255, 0.92)";
-  context.beginPath();
-  context.ellipse(24, 24, 13, 18, 0, 0, Math.PI * 2);
-  context.ellipse(24, 54, 9, 18, 0, 0, Math.PI * 2);
-  context.fill();
-  context.filter = "none";
+  paintSoleLayer(context, "#8fb4ff", kind === "draft" ? 0.48 : 0.68, kind === "draft" ? 8 : 11);
+  paintSoleLayer(context, "#dfeaff", 0.9, 2.4);
+  paintSoleLayer(context, "#dfeaff", 0.55, 0.8);
   const texture = new CanvasTexture(drawing);
   texture.colorSpace = SRGBColorSpace;
   texture.needsUpdate = true;
@@ -139,7 +168,10 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const homeScaleX = Math.abs(caretaker.card.scale.x || 1);
   const cardHeight = caretaker.card.position.y;
   const shadowHeight = caretaker.contactShadow.position.y;
-  const soleTexture = makeSoleTexture();
+  const soleTextures = {
+    draft: makeSoleTexture("draft"),
+    committed: makeSoleTexture("committed"),
+  };
   const hoverOutline = makeHoverOutline();
   const cursorDataUris = walkCursorDataUris();
   scene.add(hoverOutline);
@@ -155,6 +187,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   let footprintIdentity = "";
   let landedFootprints: LandedFootprints | null = null;
   let hoverCell: Cell | null = null;
+  stage.dataset.walkClockStartedAt = String(options.startedAt);
 
   const clearFootprints = (): void => {
     for (const footprint of footprints) {
@@ -168,29 +201,33 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const drawFootprints = (
     route: readonly Cell[],
     kind: FootprintKind,
-    colour: Color,
     opacity: number,
   ): void => {
-    for (const pair of footprintsFromPath(route)) {
-      for (const point of [pair.left, pair.right]) {
-        const material = new MeshBasicMaterial({
-          map: soleTexture,
-          color: colour.clone(),
-          transparent: true,
-          opacity,
-          depthWrite: false,
-          polygonOffset: true,
-          polygonOffsetFactor: -2,
-        });
-        const mesh = new Mesh(new PlaneGeometry(0.12, 0.2), material);
-        mesh.name = `Walk${kind[0]!.toUpperCase()}${kind.slice(1)}Footprint_${pair.pathIndex}`;
-        mesh.rotation.x = -Math.PI / 2;
-        mesh.rotation.z = -pair.angle;
-        mesh.position.set(point.x, kind === "draft" ? 0.007 : 0.006, point.z);
-        mesh.renderOrder = kind === "draft" ? 4 : 3;
-        scene.add(mesh);
-        footprints.push({ mesh, kind });
-      }
+    const texture = kind === "draft" ? soleTextures.draft : soleTextures.committed;
+    for (const print of footprintsFromPath(route)) {
+      const material = new MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity,
+        blending: AdditiveBlending,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        toneMapped: false,
+      });
+      const mesh = new Mesh(new PlaneGeometry(0.18, 0.27), material);
+      mesh.name = `Walk${kind[0]!.toUpperCase()}${kind.slice(1)}Footprint_${print.printIndex}_${print.foot}`;
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.rotation.z = print.angle;
+      mesh.scale.x = print.foot === "left" ? -1 : 1;
+      mesh.position.set(
+        print.position.x,
+        kind === "draft" ? 0.007 : 0.006,
+        print.position.z,
+      );
+      mesh.renderOrder = kind === "draft" ? 4 : 3;
+      scene.add(mesh);
+      footprints.push({ mesh, kind });
     }
   };
 
@@ -204,13 +241,13 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     footprintIdentity = identity;
     clearFootprints();
     if (landedFootprints !== null) {
-      drawFootprints(landedFootprints.route, "landed", COMMITTED_COLOUR, 0.85);
+      drawFootprints(landedFootprints.route, "landed", COMMITTED_FOOTPRINT_OPACITY);
     }
     if (state.committed !== null) {
-      drawFootprints(state.committed.route, "committed", COMMITTED_COLOUR, 0.85);
+      drawFootprints(state.committed.route, "committed", COMMITTED_FOOTPRINT_OPACITY);
     }
     if (state.draft !== null) {
-      drawFootprints(state.draft, "draft", DRAFT_COLOUR, 0.45);
+      drawFootprints(state.draft, "draft", DRAFT_FOOTPRINT_OPACITY);
     }
   };
 
@@ -350,7 +387,9 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
           1 - (now - landedFootprints.landedAt) / WALK_STAND_IN_BEAT_SECONDS,
         );
         for (const footprint of footprints) {
-          if (footprint.kind === "landed") footprint.mesh.material.opacity = 0.85 * fade;
+          if (footprint.kind === "landed") {
+            footprint.mesh.material.opacity = COMMITTED_FOOTPRINT_OPACITY * fade;
+          }
         }
         if (fade === 0) {
           landedFootprints = null;
@@ -369,12 +408,14 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       scene.remove(hoverOutline);
       hoverOutline.geometry.dispose();
       hoverOutline.material.dispose();
-      soleTexture.dispose();
+      soleTextures.draft.dispose();
+      soleTextures.committed.dispose();
       label.remove();
       canvas.style.cursor = "";
       delete stage.dataset.walkState;
       delete stage.dataset.walkPace;
       delete stage.dataset.walkCursor;
+      delete stage.dataset.walkClockStartedAt;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;
     },

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { copyFile, cp, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { copyFile, cp, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import net from "node:net";
 import path from "node:path";
@@ -68,10 +68,27 @@ async function stageAttribute(page, name) {
   return value;
 }
 
-async function assertCustomCursor(page, fallback) {
-  const value = await page.locator("#feel-stage canvas").evaluate((canvas) => canvas.style.cursor);
+function assertCustomCursorValue(value, fallback) {
   assert.match(value, /^url\(["']?data:image\/svg\+xml,/);
   assert.ok(value.endsWith(`, ${fallback}`), `cursor fallback is ${value}`);
+}
+
+async function assertCustomCursor(page, fallback) {
+  const value = await page.locator("#feel-stage canvas").evaluate((canvas) => canvas.style.cursor);
+  assertCustomCursorValue(value, fallback);
+}
+
+async function assertCommittedPresentation(page, pace) {
+  const snapshot = await page.locator("#feel-stage").evaluate((stage) => ({
+    state: stage.dataset.walkState,
+    cursorKind: stage.dataset.walkCursor,
+    pace: stage.dataset.walkPace,
+    cursorValue: stage.querySelector("canvas")?.style.cursor ?? "",
+  }));
+  assert.equal(snapshot.state, "committed");
+  assert.equal(snapshot.cursorKind, "waiting");
+  assert.equal(snapshot.pace, pace);
+  assertCustomCursorValue(snapshot.cursorValue, "wait");
 }
 
 async function assertCaretakerCentred(page) {
@@ -104,6 +121,51 @@ async function visibleGroundCellPoint(page, focus, targets) {
     }
   }
   throw new Error("no five-square proof target projects inside the viewport");
+}
+
+async function captureThreeTimesRouteCrop(page, from, to, outputPath) {
+  const [start, end] = await Promise.all([
+    groundCellPoint(page, from, from),
+    groundCellPoint(page, from, to),
+  ]);
+  const left = Math.max(0, Math.floor(Math.min(start.x, end.x) - 80));
+  const top = Math.max(0, Math.floor(Math.min(start.y, end.y) - 190));
+  const right = Math.min(1280, Math.ceil(Math.max(start.x, end.x) + 80));
+  const bottom = Math.min(800, Math.ceil(Math.max(start.y, end.y) + 80));
+  const source = await page.screenshot({
+    clip: { x: left, y: top, width: right - left, height: bottom - top },
+  });
+  const scaledBase64 = await page.evaluate(
+    async ({ encoded, scale }) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${encoded}`;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth * scale;
+      canvas.height = image.naturalHeight * scale;
+      const context = canvas.getContext("2d");
+      if (context === null) throw new Error("the proof could not create its review crop");
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, "");
+    },
+    { encoded: source.toString("base64"), scale: 3 },
+  );
+  await writeFile(outputPath, Buffer.from(scaledBase64, "base64"));
+}
+
+async function waitForFreshStandInBeat(page, clockStartedAt) {
+  await page.waitForFunction(
+    async (readyAt) => {
+      const { WALK_STAND_IN_BEAT_SECONDS } = await import("/src/walk/beat.ts");
+      const beatMilliseconds = WALK_STAND_IN_BEAT_SECONDS * 1_000;
+      const phase = (performance.now() - readyAt) % beatMilliseconds;
+      return phase >= 0 && phase < beatMilliseconds * 0.08;
+    },
+    clockStartedAt,
+    { timeout: 4_000 },
+  );
 }
 
 async function measureFrames(page) {
@@ -140,7 +202,7 @@ async function measureFrames(page) {
   );
 }
 
-async function walkRoute(page, from, to, pace, captureName = null) {
+async function walkRoute(page, clockStartedAt, from, to, pace, captureName = null) {
   const target = await groundCellPoint(page, from, to);
   await page.mouse.move(target.x, target.y);
   assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
@@ -153,16 +215,29 @@ async function walkRoute(page, from, to, pace, captureName = null) {
     new RegExp(` · ${pace.toUpperCase()}$`),
   );
   if (captureName !== null) {
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
+    );
+    if (captureName === "walk-preview.png") {
+      // Chromium's first WebGL readback can precede a textured card upload.
+      // Warm the readback so both review captures contain the route's origin.
+      await page.screenshot();
+      await captureThreeTimesRouteCrop(
+        page,
+        from,
+        to,
+        path.join(captureRoot, "walk-footprints-crop.png"),
+      );
+    }
     await page.screenshot({ path: path.join(captureRoot, captureName) });
   }
 
+  await waitForFreshStandInBeat(page, clockStartedAt);
   await page.mouse.dblclick(target.x, target.y);
-  await page.waitForFunction(
-    () => document.querySelector("#feel-stage")?.dataset.walkState === "committed",
-  );
-  assert.equal(await stageAttribute(page, "data-walk-cursor"), "waiting");
-  await assertCustomCursor(page, "wait");
-  assert.equal(await stageAttribute(page, "data-walk-pace"), pace);
+  await assertCommittedPresentation(page, pace);
   await page.waitForFunction(
     (cell) => document.querySelector("#feel-stage")?.dataset.caretakerCell === cell,
     `${to.i},${to.j}`,
@@ -227,6 +302,8 @@ try {
 
   await page.goto(`${baseUrl}?preset=night`, { waitUntil: "networkidle" });
   await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
+  const clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
+  assert.ok(Number.isFinite(clockStartedAt));
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
   );
@@ -258,14 +335,14 @@ try {
   assert.ok(Number.isFinite(measurement.averageRenderMilliseconds));
 
   const sprintEnd = authorable;
-  await walkRoute(page, initial, sprintEnd, "sprint", "walk-preview.png");
+  await walkRoute(page, clockStartedAt, initial, sprintEnd, "sprint", "walk-preview.png");
   await page.screenshot({ path: path.join(captureRoot, "walk-landed.png") });
 
   const walkEnd = { i: sprintEnd.i, j: sprintEnd.j + 1 };
-  await walkRoute(page, sprintEnd, walkEnd, "walk");
+  await walkRoute(page, clockStartedAt, sprintEnd, walkEnd, "walk");
 
   const runEnd = { i: walkEnd.i - 2, j: walkEnd.j };
-  await walkRoute(page, walkEnd, runEnd, "run");
+  await walkRoute(page, clockStartedAt, walkEnd, runEnd, "run");
   await page.screenshot({ path: path.join(captureRoot, "walk-world.png") });
 
   assert.deepEqual(consoleErrors, []);

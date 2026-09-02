@@ -27,10 +27,11 @@ function svgDataUri(detail = ""): string {
 
 export function walkCursorDataUris(): WalkCursorDataUris {
   const hourglass = `<path d="M15 14.5h6v1c0 1.2-.8 1.9-2 2.5 1.2.6 2 1.3 2 2.5v1h-6v-1c0-1.2.8-1.9 2-2.5-1.2-.6-2-1.3-2-2.5z" fill="${PALE}" stroke="${DARK}" stroke-width="1" stroke-linejoin="round"/>`;
-  const refusedBar = `<path d="M15 21l6-6" fill="none" stroke="${DARK}" stroke-width="5" stroke-linecap="round"/><path d="M15 21l6-6" fill="none" stroke="${PALE}" stroke-width="3" stroke-linecap="round"/>`;
+  // A small cross at the heel: a lone diagonal reads as a tick, not a refusal.
+  const refusedCross = `<path d="M15.5 15.5l5 5M20.5 15.5l-5 5" fill="none" stroke="${DARK}" stroke-width="4.5" stroke-linecap="round"/><path d="M15.5 15.5l5 5M20.5 15.5l-5 5" fill="none" stroke="${PALE}" stroke-width="2.5" stroke-linecap="round"/>`;
   return {
     ready: svgDataUri(),
     waiting: svgDataUri(hourglass),
-    refused: svgDataUri(refusedBar),
+    refused: svgDataUri(refusedCross),
   };
 }
