@@ -25,6 +25,11 @@ import {
 import { CAMERA_TARGET_HEIGHT, focusFeelCamera } from "../camera";
 import type { FeelLayout } from "../feelTypes";
 import { BeatClock, WALK_STAND_IN_BEAT_SECONDS } from "./beat";
+import {
+  WALK_CURSOR_HOTSPOT,
+  walkCursorDataUris,
+  type WalkCursorKind,
+} from "./cursors";
 import { footprintsFromPath } from "./footprints";
 import { passabilityFrom, sameCell, type Cell } from "./layoutPassability";
 import { cellUnderPointer } from "./pointer";
@@ -136,6 +141,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const shadowHeight = caretaker.contactShadow.position.y;
   const soleTexture = makeSoleTexture();
   const hoverOutline = makeHoverOutline();
+  const cursorDataUris = walkCursorDataUris();
   scene.add(hoverOutline);
 
   const label = document.createElement("div");
@@ -143,14 +149,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   label.textContent = "WALK EXPERIMENT — LOCAL, NOT AUTHORITY";
   label.setAttribute("aria-hidden", "true");
   stage.append(label);
-
-  const meter = document.createElement("div");
-  meter.className = "walk-beat-meter";
-  meter.setAttribute("aria-hidden", "true");
-  const meterFill = document.createElement("div");
-  meterFill.className = "walk-beat-meter__fill";
-  meter.append(meterFill);
-  stage.append(meter);
 
   let state = createWalkIntent(options.initialCell);
   let footprints: DrawnFootprint[] = [];
@@ -216,14 +214,28 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     }
   };
 
+  const setCursor = (kind: WalkCursorKind | "default"): void => {
+    stage.dataset.walkCursor = kind;
+    if (kind === "default") {
+      canvas.style.cursor = "default";
+      return;
+    }
+    const fallback = kind === "waiting" ? "wait" : kind === "refused" ? "not-allowed" : "default";
+    canvas.style.cursor = `url(${cursorDataUris[kind]}) ${WALK_CURSOR_HOTSPOT.x} ${WALK_CURSOR_HOTSPOT.y}, ${fallback}`;
+  };
+
   const updateHover = (): void => {
     if (hoverCell === null) {
       hoverOutline.visible = false;
+      setCursor("default");
       return;
     }
     const authorable = authorRoute(passability, state.caretakerCell, hoverCell) !== null;
     hoverOutline.visible = authorable;
     if (authorable) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
+    if (state.committed !== null) setCursor("waiting");
+    else if (authorable || sameCell(state.caretakerCell, hoverCell)) setCursor("ready");
+    else setCursor("refused");
   };
 
   const applyFacing = (): void => {
@@ -332,8 +344,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       const advanced = advanceWalk(state, now);
       if (advanced !== state) transition(advanced, now);
 
-      meterFill.style.transform = `scaleX(${standInClock.phase(now)})`;
-
       if (landedFootprints !== null) {
         const fade = Math.max(
           0,
@@ -361,9 +371,10 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       hoverOutline.material.dispose();
       soleTexture.dispose();
       label.remove();
-      meter.remove();
+      canvas.style.cursor = "";
       delete stage.dataset.walkState;
       delete stage.dataset.walkPace;
+      delete stage.dataset.walkCursor;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;
     },

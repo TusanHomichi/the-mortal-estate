@@ -68,6 +68,12 @@ async function stageAttribute(page, name) {
   return value;
 }
 
+async function assertCustomCursor(page, fallback) {
+  const value = await page.locator("#feel-stage canvas").evaluate((canvas) => canvas.style.cursor);
+  assert.match(value, /^url\(["']?data:image\/svg\+xml,/);
+  assert.ok(value.endsWith(`, ${fallback}`), `cursor fallback is ${value}`);
+}
+
 async function assertCaretakerCentred(page) {
   const projection = await stageAttribute(page, "data-caretaker-projection");
   const [x, y] = projection.split(",").map(Number);
@@ -90,12 +96,14 @@ async function groundCellPoint(page, focus, target) {
   );
 }
 
-async function waitForEarlyBeat(page) {
-  await page.waitForFunction(() => {
-    const transform = document.querySelector(".walk-beat-meter__fill")?.style.transform ?? "";
-    const match = /^scaleX\(([^)]+)\)$/.exec(transform);
-    return match !== null && Number(match[1]) < 0.12;
-  });
+async function visibleGroundCellPoint(page, focus, targets) {
+  for (const target of targets) {
+    const point = await groundCellPoint(page, focus, target);
+    if (point.x > 1 && point.x < 1279 && point.y > 1 && point.y < 799) {
+      return point;
+    }
+  }
+  throw new Error("no five-square proof target projects inside the viewport");
 }
 
 async function measureFrames(page) {
@@ -133,8 +141,10 @@ async function measureFrames(page) {
 }
 
 async function walkRoute(page, from, to, pace, captureName = null) {
-  await waitForEarlyBeat(page);
   const target = await groundCellPoint(page, from, to);
+  await page.mouse.move(target.x, target.y);
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
+  await assertCustomCursor(page, "default");
   await page.mouse.click(target.x, target.y);
   assert.equal(await stageAttribute(page, "data-walk-state"), "draft");
   assert.equal(await stageAttribute(page, "data-walk-pace"), pace);
@@ -150,6 +160,8 @@ async function walkRoute(page, from, to, pace, captureName = null) {
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "committed",
   );
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "waiting");
+  await assertCustomCursor(page, "wait");
   assert.equal(await stageAttribute(page, "data-walk-pace"), pace);
   await page.waitForFunction(
     (cell) => document.querySelector("#feel-stage")?.dataset.caretakerCell === cell,
@@ -165,6 +177,8 @@ async function walkRoute(page, from, to, pace, captureName = null) {
     "WALK EXPERIMENT — LOCAL, NOT AUTHORITY",
   );
   assert.deepEqual(parseCell(await stageAttribute(page, "data-caretaker-cell")), to);
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
+  await assertCustomCursor(page, "default");
   await assertCaretakerCentred(page);
 }
 
@@ -218,13 +232,32 @@ try {
   );
   const initial = parseCell(await stageAttribute(page, "data-caretaker-cell"));
   await assertCaretakerCentred(page);
+  assert.equal(await page.locator(".walk-beat-meter").count(), 0);
+
+  const authorable = { i: initial.i + 3, j: initial.j };
+  const authorablePoint = await groundCellPoint(page, initial, authorable);
+  await page.mouse.move(authorablePoint.x, authorablePoint.y);
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
+  await assertCustomCursor(page, "default");
+
+  const refused = await visibleGroundCellPoint(page, initial, [
+    { i: initial.i + 5, j: initial.j },
+    { i: initial.i, j: initial.j + 5 },
+    { i: initial.i + 5, j: initial.j + 5 },
+    { i: initial.i - 5, j: initial.j + 5 },
+    { i: initial.i - 5, j: initial.j },
+    { i: initial.i, j: initial.j - 5 },
+  ]);
+  await page.mouse.move(refused.x, refused.y);
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "refused");
+  await assertCustomCursor(page, "not-allowed");
 
   const measurement = await measureFrames(page);
   assert.ok(Number.isFinite(measurement.calls) && measurement.calls > 0);
   assert.ok(Number.isFinite(measurement.averageRafMilliseconds));
   assert.ok(Number.isFinite(measurement.averageRenderMilliseconds));
 
-  const sprintEnd = { i: initial.i + 3, j: initial.j };
+  const sprintEnd = authorable;
   await walkRoute(page, initial, sprintEnd, "sprint", "walk-preview.png");
   await page.screenshot({ path: path.join(captureRoot, "walk-landed.png") });
 
