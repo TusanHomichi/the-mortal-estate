@@ -65,6 +65,7 @@ describe("candidate feel manifest", () => {
       nominal_height: 1.8,
       sway: true,
       mirror: true,
+      facing: "view",
     });
 
     const parsed = parseFeelManifest(planted);
@@ -111,6 +112,7 @@ describe("candidate feel manifest", () => {
       nominal_height: 1,
       sway: false,
       mirror: false,
+      facing: "view",
     });
     packet.spaces.room.portals = [
       { cell: [1, 0], to: { space: "room", cell: [2, 2] } },
@@ -128,6 +130,7 @@ describe("candidate feel manifest", () => {
       nominal_height: 1,
       sway: false,
       mirror: false,
+      facing: "view",
     });
     expect(() => parseFeelManifest(planted)).toThrow(/unlisted kind: toString/);
   });
@@ -142,6 +145,7 @@ describe("candidate feel manifest", () => {
       nominal_height: 1.38,
       sway: false,
       mirror: false,
+      facing: "view",
     });
     expect(() => parseFeelManifest(planted)).toThrow(/start places the caretaker/);
   });
@@ -150,6 +154,35 @@ describe("candidate feel manifest", () => {
     const planted = validManifest();
     planted.compatibility = true;
     expect(() => parseFeelManifest(planted)).toThrow(/unknown or missing top-level fields/);
+  });
+
+  it("refuses a prop placement without facing", () => {
+    const planted = validManifest() as {
+      spaces: { room: { props: Record<string, unknown>[] } };
+    };
+    planted.spaces.room.props.push({
+      kind: "hearth",
+      cell_anchor: [1, 1],
+      nominal_height: 1.6,
+      sway: false,
+      mirror: false,
+    });
+    expect(() => parseFeelManifest(planted)).toThrow(/prop placement is invalid/);
+  });
+
+  it("refuses a prop placement naming an unknown facing", () => {
+    const planted = validManifest() as {
+      spaces: { room: { props: Record<string, unknown>[] } };
+    };
+    planted.spaces.room.props.push({
+      kind: "hearth",
+      cell_anchor: [1, 1],
+      nominal_height: 1.6,
+      sway: false,
+      mirror: false,
+      facing: "camera-ish",
+    });
+    expect(() => parseFeelManifest(planted)).toThrow(/unknown facing: camera-ish/);
   });
 
   it("refuses a digest mismatch", async () => {

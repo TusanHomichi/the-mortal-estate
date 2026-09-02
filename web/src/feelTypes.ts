@@ -59,6 +59,7 @@ export interface PropPlacement {
   nominal_height: number;
   sway: boolean;
   mirror: boolean;
+  facing: "view" | "+z" | "+x";
 }
 
 export interface RoofPlacement {

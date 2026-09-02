@@ -10,6 +10,7 @@ import {
   type FeelSpace,
   type PortalPlacement,
   type PortalTarget,
+  type PropPlacement,
   type RoofPlacement,
   type VerifiedAssetPacket,
   type WallRun,
@@ -42,6 +43,10 @@ function isVector(value: unknown, length: number): value is number[] {
 
 function isIntegerVector(value: unknown, length: number): value is number[] {
   return Array.isArray(value) && value.length === length && value.every(isInteger);
+}
+
+function isPropFacing(value: unknown): value is PropPlacement["facing"] {
+  return value === "view" || value === "+z" || value === "+x";
 }
 
 function isSafePngPath(value: unknown): value is string {
@@ -263,7 +268,14 @@ function parseSpace(
   const props = value.props.map((candidate) => {
     if (
       !isRecord(candidate) ||
-      !hasExactKeys(candidate, ["kind", "cell_anchor", "nominal_height", "sway", "mirror"]) ||
+      !hasExactKeys(candidate, [
+        "kind",
+        "cell_anchor",
+        "nominal_height",
+        "sway",
+        "mirror",
+        "facing",
+      ]) ||
       typeof candidate.kind !== "string" ||
       !isVector(candidate.cell_anchor, 2) ||
       !isFiniteNumber(candidate.nominal_height) ||
@@ -272,6 +284,11 @@ function parseSpace(
       typeof candidate.mirror !== "boolean"
     ) {
       throw new Error("a candidate feel prop placement is invalid");
+    }
+    if (!isPropFacing(candidate.facing)) {
+      throw new Error(
+        `a candidate feel prop placement names an unknown facing: ${String(candidate.facing)}`,
+      );
     }
     if (!Object.hasOwn(assets.props, candidate.kind)) {
       throw new Error(`a candidate feel prop placement names an unlisted kind: ${candidate.kind}`);
@@ -285,6 +302,7 @@ function parseSpace(
       nominal_height: candidate.nominal_height,
       sway: candidate.sway,
       mirror: candidate.mirror,
+      facing: candidate.facing,
     };
   });
 

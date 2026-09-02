@@ -21,7 +21,7 @@ import {
   type Material,
   type OrthographicCamera,
 } from "three";
-import { CAMERA_OFFSET, projectedHeightCoverTiles } from "../camera";
+import { projectedHeightCoverTiles } from "../camera";
 import type { FeelSpace, PropPlacement, WallRun } from "../feelTypes";
 import { buildGroundGeometry } from "../groundGeometry";
 import type { Preset } from "../presets";
@@ -41,6 +41,7 @@ import type { Cell } from "../walk/layoutPassability";
 import { occludingRuns } from "../walk/wallOcclusion";
 import { nearWallRunIndices } from "./interiorWalls";
 import { paletteFor, type ScenePalette } from "./palette";
+import { propCardTransform } from "./propCards";
 import {
   configureTexture,
   geometryFromData,
@@ -86,7 +87,6 @@ const WALL_FADED_PLASTER_OPACITY = 0.34;
 const WALL_FADED_TIMBER_OPACITY = 0.48;
 const WALL_FADED_RENDER_ORDER = 10;
 const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
-const BILLBOARD_YAW = Math.atan2(CAMERA_OFFSET.x, CAMERA_OFFSET.z);
 
 function wallMaterials(
   textures: Map<string, DecodedTexture>,
@@ -166,14 +166,9 @@ function addContactShadow(group: Group, x: number, z: number, height: number): M
     }),
   );
   shadow.name = "ContactShadow";
-  shadow.rotation.x = -Math.PI / 2;
   shadow.position.set(x, 0.004, z);
   group.add(shadow);
   return shadow;
-}
-
-export function applyPropPlacementMirror(mesh: Mesh, placement: Pick<PropPlacement, "mirror">): void {
-  mesh.scale.x = placement.mirror ? -1 : 1;
 }
 
 function seededRandom(seed = 0x544d455f): () => number {
@@ -459,6 +454,7 @@ export class SpaceScene {
         nominal_height: CARETAKER_NOMINAL_HEIGHT,
         sway: false,
         mirror: false,
+        facing: "view",
       },
     ];
     const lanternPosition = space.light_sources.lantern_glass === null
@@ -507,15 +503,23 @@ export class SpaceScene {
       if (material instanceof ShaderMaterial) this.swayMaterials.push(material);
       const mesh = new Mesh(geometry, material);
       mesh.name = `Prop_${prop.kind}`;
-      applyPropPlacementMirror(mesh, prop);
-      mesh.position.set(prop.cell_anchor[0], prop.nominal_height / 2, prop.cell_anchor[1]);
-      mesh.rotation.set(0, BILLBOARD_YAW, 0);
+      const transform = propCardTransform(prop);
+      mesh.scale.x = transform.scaleX;
+      mesh.position.set(transform.position.x, transform.position.y, transform.position.z);
+      mesh.rotation.set(0, transform.rotationY, 0);
       mesh.castShadow = true;
       const contactShadow = addContactShadow(
         this.group,
-        prop.cell_anchor[0],
-        prop.cell_anchor[1],
+        transform.position.x,
+        transform.position.z,
         prop.nominal_height,
+      );
+      const shadowRotation = transform.contactShadowRotation;
+      contactShadow.rotation.set(
+        shadowRotation.x,
+        shadowRotation.y,
+        shadowRotation.z,
+        shadowRotation.order,
       );
       this.group.add(mesh);
       if (prop.kind === "caretaker") caretaker = { card: mesh, contactShadow };

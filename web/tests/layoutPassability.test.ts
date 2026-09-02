@@ -96,6 +96,7 @@ describe("packet-layout passability", () => {
             nominal_height: 2,
             sway: true,
             mirror: true,
+            facing: "view",
           },
         ],
       ),
