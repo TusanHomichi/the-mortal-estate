@@ -5,6 +5,21 @@ export const CAMERA_TARGET_HEIGHT = 1.22;
 export const CAMERA_OFFSET = new Vector3(8, 6.531973, 8);
 const CAMERA_REFERENCE_VIEWPORT_HEIGHT = 800;
 
+/**
+ * A comparison zoom for the owner's viewport ruling: each step multiplies the
+ * frame's world height by this ratio, negative steps outward. Step 0 is the
+ * ruled frame; every other step is a candidate under review, not a default.
+ */
+export const CAMERA_ZOOM_STEP_RATIO = 1.25;
+export const CAMERA_ZOOM_STEP_LIMIT = 3;
+
+export function cameraVerticalSize(zoomStep: number): number {
+  if (!Number.isInteger(zoomStep) || Math.abs(zoomStep) > CAMERA_ZOOM_STEP_LIMIT) {
+    throw new Error(`zoom step ${zoomStep} is outside the comparison range`);
+  }
+  return CAMERA_VERTICAL_SIZE_1280X800 * CAMERA_ZOOM_STEP_RATIO ** -zoomStep;
+}
+
 export interface FeelCameraFocus {
   i: number;
   j: number;
@@ -14,9 +29,10 @@ export function createFeelCamera(
   width: number,
   height: number,
   initialFocus: FeelCameraFocus,
+  zoomStep = 0,
 ): OrthographicCamera {
   const aspect = width / height;
-  const halfHeight = CAMERA_VERTICAL_SIZE_1280X800 / 2;
+  const halfHeight = cameraVerticalSize(zoomStep) / 2;
   const camera = new OrthographicCamera(
     -halfHeight * aspect,
     halfHeight * aspect,
@@ -37,8 +53,13 @@ export function focusFeelCamera(camera: OrthographicCamera, cell: FeelCameraFocu
   camera.updateMatrixWorld(true);
 }
 
-export function resizeFeelCamera(camera: OrthographicCamera, width: number, height: number): void {
-  const halfHeight = CAMERA_VERTICAL_SIZE_1280X800 / 2;
+export function resizeFeelCamera(
+  camera: OrthographicCamera,
+  width: number,
+  height: number,
+  zoomStep = 0,
+): void {
+  const halfHeight = cameraVerticalSize(zoomStep) / 2;
   const halfWidth = halfHeight * (width / height);
   camera.left = -halfWidth;
   camera.right = halfWidth;

@@ -13,7 +13,7 @@ import {
 } from "three";
 import { createFeelCamera, focusFeelCamera, resizeFeelCamera } from "./camera";
 import type { PortalTarget, VerifiedAssetPacket } from "./feelTypes";
-import type { Preset } from "./presets";
+import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
 import { SpaceScene } from "./space/SpaceScene";
 import { decodeTextures } from "./space/textures";
@@ -35,6 +35,11 @@ declare global {
   interface Window {
     __tmeFeel?: FeelDevHook;
   }
+}
+
+export interface FeelViewOptions {
+  /** Comparison zoom steps from the ruled frame; 0 is the ruled frame. */
+  zoomStep: number;
 }
 
 export interface FeelSceneHandle {
@@ -75,6 +80,7 @@ export async function startFeelScene(
   stage: HTMLElement,
   packet: VerifiedAssetPacket,
   presets: readonly Preset[],
+  view: FeelViewOptions = { zoomStep: 0 },
 ): Promise<FeelSceneHandle> {
   const canvas = document.createElement("canvas");
   canvas.setAttribute("aria-hidden", "true");
@@ -99,7 +105,12 @@ export async function startFeelScene(
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
   const initialCell = { i: packet.manifest.start.cell[0], j: packet.manifest.start.cell[1] };
-  const camera = createFeelCamera(window.innerWidth, window.innerHeight, initialCell);
+  const camera = createFeelCamera(
+    window.innerWidth,
+    window.innerHeight,
+    initialCell,
+    view.zoomStep,
+  );
   const clock = new Clock();
   const startedAt = performance.now() / 1000;
   let activeSpace: SpaceScene | null = null;
@@ -137,7 +148,10 @@ export async function startFeelScene(
     scene.add(nextSpace.group);
     const presetLabel = document.querySelector<HTMLElement>("#preset-label");
     if (presetLabel !== null) {
-      presetLabel.textContent = nextSpace.weatherEnabled ? presets.join(" · ") : "INTERIOR";
+      presetLabel.textContent = describeView(
+        nextSpace.weatherEnabled ? presets.join(" · ") : "INTERIOR",
+        view.zoomStep,
+      );
     }
     if (nextSpace.weatherEnabled && presets.includes("fog")) {
       activeFog = makeFogOverlay();
@@ -190,7 +204,7 @@ export async function startFeelScene(
 
   const resize = (): void => {
     renderer.setSize(window.innerWidth, window.innerHeight, false);
-    resizeFeelCamera(camera, window.innerWidth, window.innerHeight);
+    resizeFeelCamera(camera, window.innerWidth, window.innerHeight, view.zoomStep);
   };
   window.addEventListener("resize", resize);
   draw();

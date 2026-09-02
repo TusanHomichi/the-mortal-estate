@@ -381,6 +381,11 @@ of one, two, or three squares are labelled walk, run, or sprint.
 Its cursor is a plain pale arrow when ready, gains an hourglass while a route is
 committed, and gains a diagonal refusal bar over an unauthorable square; the
 scene has no beat meter.
+A `zoom` query value of a whole number from −3 to 3 scales the frame's world
+height by a quarter per step, negative outward, so two tabs can show the ruled
+frame beside a candidate; it is a comparison aid for the owner's viewport
+ruling, the ruled frame remains the default, and the label names any step in
+force.
 Packet-derived passability now reserves every wall tile from occupancy while
 leaving its door tile crossable.
 Schema-2 fixtures build wall-attached structure from batched material geometry,
