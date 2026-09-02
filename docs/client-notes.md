@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-02
-revision: 15
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera. Pending owner acceptance at the phase stop points.
+revision: 16
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.
 public_safe: true
-summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, cursor, outdoor wind, exterior wall fade, and proof surfaces.
+summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
   - web/**
   - client/**
@@ -400,6 +400,23 @@ Every packet prop placement carries a finite `elevation` from zero through six
 world units. The card centre is that floor-relative anchor plus half its nominal
 height for view-facing and wall-plane cards alike; a placement without the key
 is refused rather than treated as floor-standing.
+Light touches a card's shape through two things that ship together
+(`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
+sheet** beside its colour sheet — `normal: {file, sha256}`, verified like any
+asset, decoded as data rather than colour, and required to match the colour
+sheet's pixel size — whose vectors are world-aligned in the card's own frame
+(red right, green up, blue toward the viewer; a surface facing straight up is
+`(0, 1, 0)`), so a mirrored placement mirrors its normals through the card's
+tangent and the sheet is never flipped by hand. Only a prop row may carry one;
+a row without one is a flat card. And every card's direct light, key and
+practical alike, uses one **wrapped diffuse**, `(N·L + w) / (1 + w)` with
+`w = 0.5` (a width of 1 silvered the iron fence under the night key in the
+2026-09-03 capture pair), patched into three's physical material at its own Lambert line and
+written into the wind card shader directly, so a card lit from the side or
+behind keeps a readable shadow side instead of going black. The patch refuses
+to build if a three upgrade moves that line. The kit cards' sheets come from a
+normal pass of the same render that produced their colour; the caretaker's is
+derived from its silhouette until the character pipeline renders it.
 Packet-derived passability now reserves every wall tile from occupancy while
 leaving its door tile crossable.
 Schema-2 fixtures build wall-attached structure from batched material geometry,

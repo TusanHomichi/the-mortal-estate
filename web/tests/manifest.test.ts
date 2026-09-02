@@ -74,8 +74,51 @@ describe("candidate feel manifest", () => {
     expect(parsed.assets.props.tree_rare).toEqual({
       file: "prop-tree-rare.png",
       sha256: digest,
+      normal: null,
     });
     expect(parsed.spaces.room?.props.at(-1)).toMatchObject({ kind: "tree_rare", mirror: true });
+  });
+
+  it("accepts a prop card's normal sheet beside its colour sheet", () => {
+    const planted = validManifest() as { assets: { props: Record<string, unknown> } };
+    planted.assets.props.caretaker = {
+      file: "prop-caretaker.png",
+      sha256: digest,
+      normal: { file: "prop-caretaker-normal.png", sha256: "1".repeat(64) },
+    };
+
+    const parsed = parseFeelManifest(planted);
+    expect(parsed.assets.props.caretaker).toEqual({
+      file: "prop-caretaker.png",
+      sha256: digest,
+      normal: { file: "prop-caretaker-normal.png", sha256: "1".repeat(64) },
+    });
+  });
+
+  it("refuses a normal sheet on anything but a prop card", () => {
+    const planted = validManifest() as { assets: { terrain: Record<string, unknown> } };
+    planted.assets.terrain.grass = {
+      ...row,
+      normal: { file: "terrain-grass-normal.png", sha256: digest },
+    };
+    expect(() => parseFeelManifest(planted)).toThrow(/only a prop card may/);
+  });
+
+  it("refuses a normal sheet with unknown fields or naming the colour sheet", () => {
+    const withExtra = validManifest() as { assets: { props: Record<string, unknown> } };
+    withExtra.assets.props.caretaker = {
+      ...row,
+      normal: { file: "prop-caretaker-normal.png", sha256: digest, scale: 1 },
+    };
+    expect(() => parseFeelManifest(withExtra)).toThrow(/prop normal sheet has unknown or missing fields/);
+
+    const sameFile = validManifest() as { assets: { props: Record<string, unknown> } };
+    sameFile.assets.props.caretaker = { ...row, normal: { ...row } };
+    expect(() => parseFeelManifest(sameFile)).toThrow(/names its own colour sheet/);
+
+    const nullNormal = validManifest() as { assets: { props: Record<string, unknown> } };
+    nullNormal.assets.props.caretaker = { ...row, normal: null };
+    expect(() => parseFeelManifest(nullNormal)).toThrow(/prop normal sheet has unknown or missing fields/);
   });
 
   it("refuses schema 1 by name", () => {

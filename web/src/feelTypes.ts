@@ -31,9 +31,14 @@ export const REQUIRED_ROOFS = [
   "shingle_eave",
 ] as const;
 
-export interface AssetRow {
+export interface AssetFile {
   file: string;
   sha256: string;
+}
+
+/** A prop card may carry a normal sheet beside its colour sheet; nothing else may. */
+export interface AssetRow extends AssetFile {
+  normal: AssetFile | null;
 }
 
 export type AssetRows = Record<string, AssetRow>;

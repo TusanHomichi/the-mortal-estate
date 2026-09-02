@@ -4,6 +4,7 @@ import {
   REQUIRED_ROOFS,
   REQUIRED_TERRAIN,
   REQUIRED_WALLS,
+  type AssetFile,
   type AssetGroup,
   type AssetRow,
   type FeelManifest,
@@ -57,17 +58,35 @@ function isSafePngPath(value: unknown): value is string {
   return parts.every((part) => part.length > 0 && part !== "." && part !== "..");
 }
 
-function parseAssetRow(value: unknown): AssetRow {
+function parseAssetFile(value: unknown, what: string): AssetFile {
   if (!isRecord(value) || !hasExactKeys(value, ["file", "sha256"])) {
-    throw new Error("a candidate feel asset row has unknown or missing fields");
+    throw new Error(`a candidate feel ${what} has unknown or missing fields`);
   }
   if (!isSafePngPath(value.file) || typeof value.sha256 !== "string") {
-    throw new Error("a candidate feel asset row is invalid");
+    throw new Error(`a candidate feel ${what} is invalid`);
   }
   if (!SHA256_PATTERN.test(value.sha256)) {
-    throw new Error("a candidate feel asset digest is invalid");
+    throw new Error(`a candidate feel ${what} digest is invalid`);
   }
   return { file: value.file, sha256: value.sha256 };
+}
+
+function parseAssetRow(value: unknown, group: AssetGroup): AssetRow {
+  if (!isRecord(value) || !Object.hasOwn(value, "normal")) {
+    return { ...parseAssetFile(value, "asset row"), normal: null };
+  }
+  if (group !== "props") {
+    throw new Error(`a candidate feel ${group} asset row carries a normal sheet; only a prop card may`);
+  }
+  if (!hasExactKeys(value, ["file", "sha256", "normal"])) {
+    throw new Error("a candidate feel prop asset row has unknown or missing fields");
+  }
+  const colour = parseAssetFile({ file: value.file, sha256: value.sha256 }, "asset row");
+  const normal = parseAssetFile(value.normal, "prop normal sheet");
+  if (normal.file === colour.file) {
+    throw new Error("a candidate feel prop normal sheet names its own colour sheet");
+  }
+  return { ...colour, normal };
 }
 
 function parseAssetGroup(value: unknown, name: AssetGroup): Record<string, AssetRow> {
@@ -75,7 +94,7 @@ function parseAssetGroup(value: unknown, name: AssetGroup): Record<string, Asset
     throw new Error(`the candidate feel ${name} group is empty`);
   }
   return Object.fromEntries(
-    Object.entries(value).map(([assetName, row]) => [assetName, parseAssetRow(row)]),
+    Object.entries(value).map(([assetName, row]) => [assetName, parseAssetRow(row, name)]),
   );
 }
 
@@ -511,18 +530,22 @@ export async function fetchVerifiedAssetPacket(
   const manifest = parseFeelManifest(source);
   const assets = new Map<string, { bytes: ArrayBuffer; file: string }>();
   const verifiedFiles = new Map<string, ArrayBuffer>();
+  const verified = async (key: string, file: AssetFile): Promise<void> => {
+    const identity = `${file.file}:${file.sha256}`;
+    let bytes = verifiedFiles.get(identity);
+    if (bytes === undefined) {
+      const response = await fetcher(`${prefix}${file.file}`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`${key}: asset file is missing`);
+      bytes = await response.arrayBuffer();
+      await verifySha256(bytes, file.sha256);
+      verifiedFiles.set(identity, bytes);
+    }
+    assets.set(key, { bytes, file: file.file });
+  };
   for (const group of ASSET_GROUPS) {
     for (const [name, row] of Object.entries(manifest.assets[group])) {
-      const identity = `${row.file}:${row.sha256}`;
-      let bytes = verifiedFiles.get(identity);
-      if (bytes === undefined) {
-        const response = await fetcher(`${prefix}${row.file}`, { cache: "no-store" });
-        if (!response.ok) throw new Error(`${group}/${name}: asset file is missing`);
-        bytes = await response.arrayBuffer();
-        await verifySha256(bytes, row.sha256);
-        verifiedFiles.set(identity, bytes);
-      }
-      assets.set(`${group}/${name}`, { bytes, file: row.file });
+      await verified(`${group}/${name}`, row);
+      if (row.normal !== null) await verified(`${group}/${name}/normal`, row.normal);
     }
   }
   return { manifest, assets };

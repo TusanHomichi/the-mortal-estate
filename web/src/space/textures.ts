@@ -3,6 +3,7 @@ import {
   BufferGeometry,
   LinearFilter,
   LinearMipmapLinearFilter,
+  NoColorSpace,
   RepeatWrapping,
   SRGBColorSpace,
   Texture,
@@ -55,7 +56,8 @@ export async function decodeTextures(
       });
       const texture = new Texture(bitmap);
       texture.name = key;
-      texture.colorSpace = SRGBColorSpace;
+      // A normal sheet is data, not colour; it must not be sRGB-decoded.
+      texture.colorSpace = isNormalSheetKey(key) ? NoColorSpace : SRGBColorSpace;
       texture.wrapS = RepeatWrapping;
       texture.wrapT = RepeatWrapping;
       texture.magFilter = LinearFilter;
@@ -66,6 +68,10 @@ export async function decodeTextures(
     }),
   );
   return decoded;
+}
+
+export function isNormalSheetKey(key: string): boolean {
+  return key.endsWith("/normal");
 }
 
 export function requiredTexture(
