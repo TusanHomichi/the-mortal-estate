@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 23
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; no renderer, asset set, or production pipeline is accepted.
+revision: 24
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -466,6 +466,14 @@ the roof gains its missing weight — steeper pitch, deeper eave, a darker and
 larger-scaled shingle swatch; and the two painted references are accepted as
 placement and scale targets at the review-candidate tier only, never as
 masters. Masters come from this project's own build once it matches them.
+
+**Interior camera ruling (owner, 2026-09-02).** Outdoors the camera is the
+player's: centred on the caretaker and re-centred on each landing. Inside a
+building the camera belongs to the space: it is centred on the room and
+stops following the character, so a room that fits the frame is seen whole,
+as the painted references frame it. It follows the player again on the way
+out. The rule keys on the space, not the player's position: a dedicated
+interior is the space that carries no weather.
 
 Anything that belongs to a building — a hearth, a doorway, a window, a shelf —
 is built from material swatches over math like the walls, because it is seen at

@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { Vector3 } from "three";
 import {
   CAMERA_TARGET_HEIGHT,
+  cameraFocusFor,
+  cameraFollowsCaretaker,
+  spaceCameraFocus,
   CAMERA_ZOOM_STEP_RATIO,
   cameraVerticalSize,
   createFeelCamera,
@@ -29,6 +32,21 @@ describe("the ruled feel camera", () => {
     expect(cameraVerticalSize(1)).toBeCloseTo(cameraVerticalSize(0) / CAMERA_ZOOM_STEP_RATIO, 9);
     expect(() => cameraVerticalSize(4)).toThrow(/outside the comparison range/);
     expect(() => cameraVerticalSize(0.5)).toThrow(/outside the comparison range/);
+  });
+
+  it("inside a building the camera belongs to the space; outside it follows the caretaker", () => {
+    const interior = { grid_extents: { i: 9, j: 5 }, weather: false };
+    const exterior = { grid_extents: { i: 30, j: 22 }, weather: true };
+    expect(spaceCameraFocus(interior.grid_extents)).toEqual({ i: 4, j: 2 });
+    expect(cameraFollowsCaretaker(interior)).toBe(false);
+    expect(cameraFollowsCaretaker(exterior)).toBe(true);
+    expect(cameraFocusFor(interior, { i: 4, j: 3 })).toEqual({ i: 4, j: 2 });
+    expect(cameraFocusFor(interior, { i: 1, j: 1 })).toEqual({ i: 4, j: 2 });
+    expect(cameraFocusFor(exterior, { i: 13, j: 11 })).toEqual({ i: 13, j: 11 });
+    const camera = createFeelCamera(1280, 800, spaceCameraFocus(interior.grid_extents));
+    const projected = new Vector3(4, CAMERA_TARGET_HEIGHT, 2).project(camera);
+    expect(projected.x).toBeCloseTo(0, 12);
+    expect(projected.y).toBeCloseTo(0, 12);
   });
 
   it("the focus cell projects to the viewport centre for any cell", () => {

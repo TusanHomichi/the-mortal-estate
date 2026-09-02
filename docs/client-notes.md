@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 14
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool. Pending owner acceptance at the phase stop points.
+revision: 15
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera. Pending owner acceptance at the phase stop points.
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -382,7 +382,11 @@ This is the opposite of `GridWorldView`'s
 spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
 permission for presentation to remain fluid between beats is permission, not a
 requirement.
-The camera stays centred on the caretaker and re-centres on each landing; routes
+Outdoors the camera stays centred on the caretaker and re-centres on each
+landing; inside a building it belongs to the space — centred on the room's
+grid and unmoved by landings — and follows the caretaker again on the way out
+(owner ruling, 2026-09-02; `cameraFocusFor` in `web/src/camera.ts`, proven by
+the walk proof's portal crossing). Routes
 of one, two, or three squares are labelled walk, run, or sprint.
 Its cursor is a plain pale arrow when ready, gains an hourglass while a route is
 committed, and gains a diagonal refusal bar over an unauthorable square; the

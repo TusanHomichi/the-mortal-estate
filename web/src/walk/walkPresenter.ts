@@ -61,6 +61,8 @@ export interface WalkPresenterOptions {
   initialCell: Cell;
   updateWallFade: (playerCell: Cell, now: number) => number;
   onCellChanged: (previous: Cell, next: Cell) => void;
+  /** Whether the camera re-centres on the caretaker at each landing (false inside a building). */
+  cameraFollowsCaretaker: boolean;
   onPortalLanding: (target: PortalTarget, facing: 1 | -1) => void;
   startedAt: number;
 }
@@ -332,7 +334,10 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       };
     }
     if (!sameCell(state.caretakerCell, next.caretakerCell)) {
-      focusFeelCamera(camera, next.caretakerCell);
+      if (options.cameraFollowsCaretaker) {
+        focusFeelCamera(camera, next.caretakerCell);
+        stage.dataset.cameraFocus = `${next.caretakerCell.i},${next.caretakerCell.j}`;
+      }
       options.onCellChanged(state.caretakerCell, next.caretakerCell);
     }
     state = next;

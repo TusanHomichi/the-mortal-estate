@@ -11,7 +11,13 @@ import {
   NoToneMapping,
   SRGBColorSpace,
 } from "three";
-import { createFeelCamera, focusFeelCamera, resizeFeelCamera } from "./camera";
+import {
+  cameraFocusFor,
+  cameraFollowsCaretaker,
+  createFeelCamera,
+  focusFeelCamera,
+  resizeFeelCamera,
+} from "./camera";
 import type { PortalTarget, VerifiedAssetPacket } from "./feelTypes";
 import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
@@ -130,7 +136,9 @@ export async function startFeelScene(
     activeFog?.dispose();
     activeFog = null;
 
-    focusFeelCamera(camera, targetCell);
+    const focus = cameraFocusFor(space, targetCell);
+    focusFeelCamera(camera, focus);
+    stage.dataset.cameraFocus = `${focus.i},${focus.j}`;
     const nextSpace = new SpaceScene({
       name: target.space,
       space,
@@ -168,6 +176,7 @@ export async function startFeelScene(
       updateWallFade: (cell, now) => nextSpace.updateWallFade(cell, now),
       onCellChanged: (previous, next) => nextSpace.focusLighting(previous, next),
       onPortalLanding: swapSpace,
+      cameraFollowsCaretaker: cameraFollowsCaretaker(space),
       startedAt,
     });
   };
