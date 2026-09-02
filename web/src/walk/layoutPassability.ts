@@ -1,12 +1,13 @@
 /**
  * Presentation-only passability for the browser feel scene's walk experiment.
  *
- * This guesses walkability from the candidate packet's cells, wall runs, door
- * interval, and prop placement. It is local, non-authoritative, and must never
- * be used by the real client, which may present only walkability received from
- * authority (docs/boundary-map.md#15-fail-closed-terrain-composition).
+ * This guesses walkability from one candidate space's layout. It is local,
+ * non-authoritative, and must never be used by the real client, which may
+ * present only walkability received from authority
+ * (docs/boundary-map.md#15-fail-closed-terrain-composition).
  */
-import type { FeelLayout, WallRun } from "../feelTypes";
+import type { FeelSpace, WallRun } from "../feelTypes";
+import { gridCellKey, wallAndDoorTiles } from "../space/layoutTiles";
 
 export interface Cell {
   i: number;
@@ -18,6 +19,7 @@ export interface LayoutPassability {
   readonly blocked: ReadonlySet<string>;
   readonly wallTiles: ReadonlySet<string>;
   readonly doorTiles: ReadonlySet<string>;
+  readonly roofTiles: ReadonlySet<string>;
   readonly wallRuns: readonly WallRun[];
 }
 
@@ -25,69 +27,36 @@ const NON_TREE_NON_WALKABLE_PROPS = new Set([
   "lantern_post",
   "shrine_table",
   "grave_marker",
+  "hearth",
 ]);
 
-export function cellKey(cell: Cell): string {
-  return `${cell.i},${cell.j}`;
-}
+export const cellKey = gridCellKey;
 
 export function sameCell(left: Cell, right: Cell): boolean {
   return left.i === right.i && left.j === right.j;
 }
 
-function tileUnderRun(run: WallRun, panel: number): Cell {
-  return run.axis === "x"
-    ? { i: run.start[0] + panel + 0.5, j: run.start[1] - 0.5 }
-    : { i: run.start[0] - 0.5, j: run.start[1] + panel + 0.5 };
-}
-
-function panelIsDoor(run: WallRun, panel: number): boolean {
-  if (run.door_interval === null) return false;
-  const centre = panel + 0.5;
-  return centre >= run.door_interval[0] && centre <= run.door_interval[1];
-}
-
-function meetingCorner(left: WallRun, right: WallRun): Cell | null {
-  if (left.axis === right.axis) return null;
-  const runX = left.axis === "x" ? left : right;
-  const runZ = left.axis === "z" ? left : right;
-  const intersectionX = runZ.start[0];
-  const intersectionZ = runX.start[1];
-  const liesOnXRun =
-    intersectionX >= runX.start[0] && intersectionX <= runX.start[0] + runX.cells;
-  const liesOnZRun =
-    intersectionZ >= runZ.start[1] && intersectionZ <= runZ.start[1] + runZ.cells;
-  return liesOnXRun && liesOnZRun
-    ? { i: intersectionX - 0.5, j: intersectionZ - 0.5 }
-    : null;
-}
-
-export function passabilityFrom(layout: FeelLayout): LayoutPassability {
-  const cells = new Set(layout.cells.map((cell) => cellKey(cell)));
+export function passabilityFrom(space: FeelSpace): LayoutPassability {
+  const cells = new Set(space.cells.map((cell) => cellKey(cell)));
   const blocked = new Set<string>();
-  const wallTiles = new Set<string>();
-  const doorCandidates = new Set<string>();
-  for (const run of layout.wall_runs) {
-    for (let panel = 0; panel < run.cells; panel += 1) {
-      const key = cellKey(tileUnderRun(run, panel));
-      if (!cells.has(key)) continue;
-      if (panelIsDoor(run, panel)) doorCandidates.add(key);
-      else wallTiles.add(key);
-    }
-  }
-  for (let left = 0; left < layout.wall_runs.length; left += 1) {
-    for (let right = left + 1; right < layout.wall_runs.length; right += 1) {
-      const corner = meetingCorner(layout.wall_runs[left]!, layout.wall_runs[right]!);
-      if (corner === null) continue;
-      const key = cellKey(corner);
-      if (cells.has(key)) wallTiles.add(key);
-    }
-  }
-  const doorTiles = new Set(
-    [...doorCandidates].filter((key) => !wallTiles.has(key)),
+  const { wallTiles, doorTiles } = wallAndDoorTiles(space.wall_runs, cells);
+  const portalTiles = new Set(
+    space.portals.map((portal) => cellKey({ i: portal.cell[0], j: portal.cell[1] })),
   );
+  const roofTiles = new Set<string>();
+  for (const roof of space.roofs) {
+    for (let j = roof.footprint.j0; j <= roof.footprint.j1; j += 1) {
+      for (let i = roof.footprint.i0; i <= roof.footprint.i1; i += 1) {
+        const key = cellKey({ i, j });
+        if (cells.has(key)) roofTiles.add(key);
+      }
+    }
+  }
   for (const key of wallTiles) blocked.add(key);
-  for (const prop of layout.props) {
+  for (const key of roofTiles) {
+    if (!portalTiles.has(key)) blocked.add(key);
+  }
+  for (const prop of space.props) {
     if (!prop.kind.startsWith("tree") && !NON_TREE_NON_WALKABLE_PROPS.has(prop.kind)) continue;
     const occupied = {
       i: Math.round(prop.cell_anchor[0]),
@@ -95,7 +64,7 @@ export function passabilityFrom(layout: FeelLayout): LayoutPassability {
     };
     if (cells.has(cellKey(occupied))) blocked.add(cellKey(occupied));
   }
-  return { cells, blocked, wallTiles, doorTiles, wallRuns: layout.wall_runs };
+  return { cells, blocked, wallTiles, doorTiles, roofTiles, wallRuns: space.wall_runs };
 }
 
 function doorContains(run: WallRun, runPosition: number): boolean {

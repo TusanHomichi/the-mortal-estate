@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { FeelLayout, WallRun } from "../src/feelTypes";
+import type { FeelSpace, WallRun } from "../src/feelTypes";
 import { canStep, passabilityFrom } from "../src/walk/layoutPassability";
 
-function layout(wallRuns: WallRun[] = [], props: FeelLayout["props"] = []): FeelLayout {
+function layout(wallRuns: WallRun[] = [], props: FeelSpace["props"] = []): FeelSpace {
   return {
     grid_extents: { i: 3, j: 3 },
     cells: Array.from({ length: 9 }, (_, index) => ({
@@ -11,8 +11,11 @@ function layout(wallRuns: WallRun[] = [], props: FeelLayout["props"] = []): Feel
       material: "ground",
     })),
     wall_runs: wallRuns,
+    roofs: [],
     props,
-    light_sources: { lantern_glass: [0, 0, 0], candles: [] },
+    light_sources: { lantern_glass: null, candles: [] },
+    weather: false,
+    portals: [],
   };
 }
 
@@ -98,5 +101,24 @@ describe("packet-layout passability", () => {
       ),
     );
     expect(canStep(passability, { i: 0, j: 1 }, { i: 1, j: 1 })).toBe(false);
+  });
+
+  it("every roof-footprint tile blocks except its portal tile", () => {
+    const roofed = layout([
+      { ...WALL, door_interval: [1.4, 1.6] },
+    ]);
+    roofed.roofs = [{
+      footprint: { i0: 0, j0: 0, i1: 2, j1: 1 },
+      ridge_axis: "x",
+      eave_height: 2,
+      ridge_height: 3,
+      material: "shingle",
+    }];
+    roofed.portals = [{ cell: [1, 1], to: { space: "room", cell: [1, 2] } }];
+
+    const passability = passabilityFrom(roofed);
+    expect(passability.roofTiles).toEqual(new Set(["0,0", "1,0", "2,0", "0,1", "1,1", "2,1"]));
+    expect(passability.blocked.has("0,0")).toBe(true);
+    expect(passability.blocked.has("1,1")).toBe(false);
   });
 });

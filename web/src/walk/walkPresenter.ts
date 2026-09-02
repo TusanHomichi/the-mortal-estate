@@ -18,12 +18,11 @@ import {
   Scene,
   SRGBColorSpace,
   Vector3,
-  type DirectionalLight,
-  type Object3D,
   type OrthographicCamera,
 } from "three";
 import { CAMERA_TARGET_HEIGHT, focusFeelCamera } from "../camera";
-import type { FeelLayout } from "../feelTypes";
+import type { FeelSpace, PortalTarget } from "../feelTypes";
+import { portalLandingFor } from "../space/portals";
 import { BeatClock, WALK_STAND_IN_BEAT_SECONDS } from "./beat";
 import {
   WALK_CURSOR_HOTSPOT,
@@ -56,12 +55,13 @@ export interface WalkPresenterOptions {
   canvas: HTMLCanvasElement;
   scene: Scene;
   camera: OrthographicCamera;
-  layout: FeelLayout;
+  spaceName: string;
+  space: FeelSpace;
   caretaker: CaretakerObjects;
   initialCell: Cell;
-  keyLight: DirectionalLight;
-  keyTarget: Object3D;
   updateWallFade: (playerCell: Cell, now: number) => number;
+  onCellChanged: (previous: Cell, next: Cell) => void;
+  onPortalLanding: (target: PortalTarget, facing: 1 | -1) => void;
   startedAt: number;
 }
 
@@ -168,13 +168,11 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     canvas,
     scene,
     camera,
-    layout,
+    space,
     caretaker,
-    keyLight,
-    keyTarget,
     updateWallFade,
   } = options;
-  const passability = passabilityFrom(layout);
+  const passability = passabilityFrom(space);
   const standInClock = new BeatClock(options.startedAt);
   const homeScaleX = Math.abs(caretaker.card.scale.x || 1);
   const cardHeight = caretaker.card.position.y;
@@ -199,6 +197,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   let landedFootprints: LandedFootprints | null = null;
   let hoverCell: Cell | null = null;
   stage.dataset.walkClockStartedAt = String(options.startedAt);
+  stage.dataset.walkSpace = options.spaceName;
   stage.dataset.walkFadedRuns = String(
     updateWallFade(state.caretakerCell, options.startedAt),
   );
@@ -333,15 +332,8 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       };
     }
     if (!sameCell(state.caretakerCell, next.caretakerCell)) {
-      const deltaI = next.caretakerCell.i - state.caretakerCell.i;
-      const deltaJ = next.caretakerCell.j - state.caretakerCell.j;
       focusFeelCamera(camera, next.caretakerCell);
-      keyLight.position.x += deltaI;
-      keyLight.position.z += deltaJ;
-      keyTarget.position.x += deltaI;
-      keyTarget.position.z += deltaJ;
-      keyLight.updateMatrixWorld(true);
-      keyTarget.updateMatrixWorld(true);
+      options.onCellChanged(state.caretakerCell, next.caretakerCell);
     }
     state = next;
     reflectState();
@@ -350,7 +342,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const nowSeconds = (): number => performance.now() / 1000;
 
   const pointerCell = (event: MouseEvent | PointerEvent): Cell | null =>
-    cellUnderPointer(camera, canvas, event.clientX, event.clientY, layout.grid_extents);
+    cellUnderPointer(camera, canvas, event.clientX, event.clientY, space.grid_extents);
 
   const onPointerMove = (event: PointerEvent): void => {
     hoverCell = pointerCell(event);
@@ -395,7 +387,16 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   return {
     update: (now: number): void => {
       const advanced = advanceWalk(state, now);
-      if (advanced !== state) transition(advanced, now);
+      if (advanced !== state) {
+        const landing = state.committed === null
+          ? null
+          : portalLandingFor(space, state.committed.route);
+        if (landing !== null) {
+          options.onPortalLanding(landing, caretaker.card.scale.x < 0 ? -1 : 1);
+          return;
+        }
+        transition(advanced, now);
+      }
       stage.dataset.walkFadedRuns = String(updateWallFade(state.caretakerCell, now));
 
       if (landedFootprints !== null) {
@@ -434,6 +435,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.walkCursor;
       delete stage.dataset.walkOutline;
       delete stage.dataset.walkClockStartedAt;
+      delete stage.dataset.walkSpace;
       delete stage.dataset.walkFadedRuns;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;

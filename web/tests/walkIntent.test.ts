@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { FeelLayout } from "../src/feelTypes";
+import type { FeelSpace } from "../src/feelTypes";
 import { BeatClock } from "../src/walk/beat";
 import { passabilityFrom } from "../src/walk/layoutPassability";
 import {
@@ -13,7 +13,7 @@ import {
   walkIntentKind,
 } from "../src/walk/walkIntent";
 
-const layout: FeelLayout = {
+const layout: FeelSpace = {
   grid_extents: { i: 5, j: 5 },
   cells: Array.from({ length: 25 }, (_, index) => ({
     i: index % 5,
@@ -21,8 +21,11 @@ const layout: FeelLayout = {
     material: "ground",
   })),
   wall_runs: [],
+  roofs: [],
   props: [],
-  light_sources: { lantern_glass: [0, 0, 0], candles: [] },
+  light_sources: { lantern_glass: null, candles: [] },
+  weather: false,
+  portals: [],
 };
 const passability = passabilityFrom(layout);
 const clock = new BeatClock(0);

@@ -1,13 +1,21 @@
 import {
   ASSET_GROUPS,
   REQUIRED_PROPS,
+  REQUIRED_ROOFS,
+  REQUIRED_TERRAIN,
   REQUIRED_WALLS,
   type AssetGroup,
   type AssetRow,
   type FeelManifest,
+  type FeelSpace,
+  type PortalPlacement,
+  type PortalTarget,
+  type RoofPlacement,
   type VerifiedAssetPacket,
   type WallRun,
 } from "./feelTypes";
+import { wallAndDoorTiles } from "./space/layoutTiles";
+import { cellKey, passabilityFrom } from "./walk/layoutPassability";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 
@@ -30,6 +38,10 @@ function isInteger(value: unknown): value is number {
 
 function isVector(value: unknown, length: number): value is number[] {
   return Array.isArray(value) && value.length === length && value.every(isFiniteNumber);
+}
+
+function isIntegerVector(value: unknown, length: number): value is number[] {
+  return Array.isArray(value) && value.length === length && value.every(isInteger);
 }
 
 function isSafePngPath(value: unknown): value is string {
@@ -61,6 +73,18 @@ function parseAssetGroup(value: unknown, name: AssetGroup): Record<string, Asset
   );
 }
 
+function requireAssets(
+  assets: FeelManifest["assets"],
+  group: AssetGroup,
+  names: readonly string[],
+): void {
+  for (const name of names) {
+    if (!Object.hasOwn(assets[group], name)) {
+      throw new Error(`the candidate feel ${group} set is missing ${name}`);
+    }
+  }
+}
+
 function parseWallRun(value: unknown): WallRun {
   if (
     !isRecord(value) ||
@@ -83,15 +107,108 @@ function parseWallRun(value: unknown): WallRun {
     }
     door = [start, end];
   }
-  return { axis: value.axis, start: [value.start[0]!, value.start[1]!], cells: value.cells, door_interval: door };
+  return {
+    axis: value.axis,
+    start: [value.start[0]!, value.start[1]!],
+    cells: value.cells,
+    door_interval: door,
+  };
 }
 
-function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): FeelManifest["layout"] {
+function parseRoof(
+  value: unknown,
+  extents: { i: number; j: number },
+  assets: FeelManifest["assets"],
+): RoofPlacement {
   if (
     !isRecord(value) ||
-    !hasExactKeys(value, ["grid_extents", "cells", "wall_runs", "props", "light_sources"])
+    !hasExactKeys(value, ["footprint", "ridge_axis", "eave_height", "ridge_height", "material"]) ||
+    !isRecord(value.footprint) ||
+    !hasExactKeys(value.footprint, ["i0", "j0", "i1", "j1"]) ||
+    !isInteger(value.footprint.i0) ||
+    !isInteger(value.footprint.j0) ||
+    !isInteger(value.footprint.i1) ||
+    !isInteger(value.footprint.j1) ||
+    (value.ridge_axis !== "x" && value.ridge_axis !== "z") ||
+    !isFiniteNumber(value.eave_height) ||
+    !isFiniteNumber(value.ridge_height) ||
+    value.eave_height <= 0 ||
+    value.ridge_height <= value.eave_height ||
+    value.material !== "shingle"
   ) {
-    throw new Error("the candidate feel layout has unknown or missing fields");
+    throw new Error("a candidate feel roof is invalid");
+  }
+  const footprint = {
+    i0: value.footprint.i0,
+    j0: value.footprint.j0,
+    i1: value.footprint.i1,
+    j1: value.footprint.j1,
+  };
+  if (
+    footprint.i0 < 0 ||
+    footprint.j0 < 0 ||
+    footprint.i1 < footprint.i0 ||
+    footprint.j1 < footprint.j0 ||
+    footprint.i1 >= extents.i ||
+    footprint.j1 >= extents.j
+  ) {
+    throw new Error("a candidate feel roof footprint is outside its space");
+  }
+  for (const suffix of ["slope", "ridge", "eave"] as const) {
+    if (!Object.hasOwn(assets.roofs, `${value.material}_${suffix}`)) {
+      throw new Error(`a candidate feel roof names an incomplete material: ${value.material}`);
+    }
+  }
+  return {
+    footprint,
+    ridge_axis: value.ridge_axis,
+    eave_height: value.eave_height,
+    ridge_height: value.ridge_height,
+    material: value.material,
+  };
+}
+
+function parsePortalTarget(value: unknown, context: string): PortalTarget {
+  if (
+    !isRecord(value) ||
+    !hasExactKeys(value, ["space", "cell"]) ||
+    typeof value.space !== "string" ||
+    value.space.length === 0 ||
+    !isIntegerVector(value.cell, 2)
+  ) {
+    throw new Error(`the candidate feel ${context} is invalid`);
+  }
+  return { space: value.space, cell: [value.cell[0]!, value.cell[1]!] };
+}
+
+function parsePortal(value: unknown): PortalPlacement {
+  if (!isRecord(value) || !hasExactKeys(value, ["cell", "to"]) || !isIntegerVector(value.cell, 2)) {
+    throw new Error("a candidate feel portal is invalid");
+  }
+  return {
+    cell: [value.cell[0]!, value.cell[1]!],
+    to: parsePortalTarget(value.to, "portal target"),
+  };
+}
+
+function parseSpace(
+  value: unknown,
+  assets: FeelManifest["assets"],
+): FeelSpace {
+  if (
+    !isRecord(value) ||
+    !hasExactKeys(value, [
+      "grid_extents",
+      "cells",
+      "wall_runs",
+      "roofs",
+      "props",
+      "light_sources",
+      "weather",
+      "portals",
+    ])
+  ) {
+    throw new Error("a candidate feel space has unknown or missing fields");
   }
   const extents = value.grid_extents;
   if (
@@ -104,11 +221,11 @@ function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): Fe
   ) {
     throw new Error("the candidate feel grid extents are invalid");
   }
-  if (!Array.isArray(value.cells) || value.cells.length !== extents.i * extents.j) {
-    throw new Error("the candidate feel material plan must name every cell exactly once");
-  }
   const extentI = extents.i;
   const extentJ = extents.j;
+  if (!Array.isArray(value.cells) || value.cells.length !== extentI * extentJ) {
+    throw new Error("the candidate feel material plan must name every cell exactly once");
+  }
   const seen = new Set<string>();
   const cells = value.cells.map((candidate) => {
     if (
@@ -130,21 +247,19 @@ function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): Fe
     ) {
       throw new Error("the candidate feel material plan has an invalid or duplicate cell");
     }
-    if (!Object.hasOwn(manifestAssets.terrain, candidate.material)) {
+    if (!Object.hasOwn(assets.terrain, candidate.material)) {
       throw new Error("a candidate feel cell names an unknown material");
     }
     seen.add(key);
     return { i: candidate.i, j: candidate.j, material: candidate.material };
   });
 
-  if (!Array.isArray(value.wall_runs) || value.wall_runs.length === 0) {
-    throw new Error("the candidate feel layout carries no wall runs");
-  }
+  if (!Array.isArray(value.wall_runs)) throw new Error("a candidate feel space has invalid wall runs");
   const wallRuns = value.wall_runs.map(parseWallRun);
+  if (!Array.isArray(value.roofs)) throw new Error("a candidate feel space has invalid roofs");
+  const roofs = value.roofs.map((roof) => parseRoof(roof, { i: extentI, j: extentJ }, assets));
 
-  if (!Array.isArray(value.props) || value.props.length === 0) {
-    throw new Error("the candidate feel layout carries no props");
-  }
+  if (!Array.isArray(value.props)) throw new Error("a candidate feel space has invalid props");
   const props = value.props.map((candidate) => {
     if (
       !isRecord(candidate) ||
@@ -158,8 +273,11 @@ function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): Fe
     ) {
       throw new Error("a candidate feel prop placement is invalid");
     }
-    if (!Object.hasOwn(manifestAssets.props, candidate.kind)) {
+    if (!Object.hasOwn(assets.props, candidate.kind)) {
       throw new Error(`a candidate feel prop placement names an unlisted kind: ${candidate.kind}`);
+    }
+    if (candidate.kind === "caretaker") {
+      throw new Error("a candidate feel caretaker placement is refused; start places the caretaker");
     }
     return {
       kind: candidate.kind,
@@ -174,47 +292,104 @@ function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): Fe
   if (
     !isRecord(lights) ||
     !hasExactKeys(lights, ["lantern_glass", "candles"]) ||
-    !isVector(lights.lantern_glass, 3) ||
+    (lights.lantern_glass !== null && !isVector(lights.lantern_glass, 3)) ||
     !Array.isArray(lights.candles) ||
     !lights.candles.every((candle) => isVector(candle, 3))
   ) {
     throw new Error("the candidate feel light positions are invalid");
+  }
+  if (typeof value.weather !== "boolean" || !Array.isArray(value.portals)) {
+    throw new Error("the candidate feel space weather or portals are invalid");
+  }
+  const portals = value.portals.map(parsePortal);
+  if (new Set(portals.map((portal) => `${portal.cell[0]},${portal.cell[1]}`)).size !== portals.length) {
+    throw new Error("a candidate feel space has duplicate portal cells");
   }
 
   return {
     grid_extents: { i: extentI, j: extentJ },
     cells,
     wall_runs: wallRuns,
+    roofs,
     props,
     light_sources: {
-      lantern_glass: [...lights.lantern_glass] as [number, number, number],
+      lantern_glass: lights.lantern_glass === null
+        ? null
+        : [...lights.lantern_glass] as [number, number, number],
       candles: lights.candles.map((candle) => [...candle] as [number, number, number]),
     },
+    weather: value.weather,
+    portals,
   };
 }
 
+function validateLanding(
+  spaces: Record<string, FeelSpace>,
+  target: PortalTarget,
+  context: string,
+): void {
+  const space = spaces[target.space];
+  if (space === undefined) {
+    throw new Error(`the candidate feel ${context} names an absent space: ${target.space}`);
+  }
+  const key = cellKey({ i: target.cell[0], j: target.cell[1] });
+  const passability = passabilityFrom(space);
+  if (!passability.cells.has(key) || passability.blocked.has(key)) {
+    throw new Error(`the candidate feel ${context} cell is not walkable: ${target.space}/${key}`);
+  }
+}
+
+function validateSpaces(spaces: Record<string, FeelSpace>, start: PortalTarget): void {
+  validateLanding(spaces, start, "start");
+  for (const [spaceName, space] of Object.entries(spaces)) {
+    const cells = new Set(space.cells.map(cellKey));
+    const { doorTiles } = wallAndDoorTiles(space.wall_runs, cells);
+    for (const portal of space.portals) {
+      const sourceKey = cellKey({ i: portal.cell[0], j: portal.cell[1] });
+      if (!doorTiles.has(sourceKey)) {
+        throw new Error(`the candidate feel portal is not a door tile: ${spaceName}/${sourceKey}`);
+      }
+      validateLanding(spaces, portal.to, "portal target");
+    }
+  }
+}
+
 export function parseFeelManifest(value: unknown): FeelManifest {
-  if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "layout"])) {
+  if (isRecord(value) && value.schema_version === 1) {
+    throw new Error("candidate feel manifest schema 1 is retired and refused");
+  }
+  if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "start", "spaces"])) {
     throw new Error("the candidate feel manifest has unknown or missing top-level fields");
   }
-  if (value.schema_version !== 1 || !isRecord(value.assets)) {
+  if (value.schema_version !== 2 || !isRecord(value.assets)) {
     throw new Error("the candidate feel manifest schema version or assets are invalid");
   }
   if (!hasExactKeys(value.assets, ASSET_GROUPS)) {
     throw new Error("the candidate feel asset groups are incomplete");
   }
-  const assets = {
+  const assets: FeelManifest["assets"] = {
     terrain: parseAssetGroup(value.assets.terrain, "terrain"),
     walls: parseAssetGroup(value.assets.walls, "walls"),
     props: parseAssetGroup(value.assets.props, "props"),
+    roofs: parseAssetGroup(value.assets.roofs, "roofs"),
   };
-  for (const required of REQUIRED_WALLS) {
-    if (!Object.hasOwn(assets.walls, required)) throw new Error(`the candidate feel wall set is missing ${required}`);
+  requireAssets(assets, "terrain", REQUIRED_TERRAIN);
+  requireAssets(assets, "walls", REQUIRED_WALLS);
+  requireAssets(assets, "props", REQUIRED_PROPS);
+  requireAssets(assets, "roofs", REQUIRED_ROOFS);
+
+  const start = parsePortalTarget(value.start, "start");
+  if (!isRecord(value.spaces) || Object.keys(value.spaces).length === 0) {
+    throw new Error("the candidate feel manifest carries no spaces");
   }
-  for (const required of REQUIRED_PROPS) {
-    if (!Object.hasOwn(assets.props, required)) throw new Error(`the candidate feel prop set is missing ${required}`);
-  }
-  return { schema_version: 1, assets, layout: parseLayout(value.layout, assets) };
+  const spaces = Object.fromEntries(
+    Object.entries(value.spaces).map(([name, space]) => {
+      if (name.length === 0) throw new Error("a candidate feel space has no name");
+      return [name, parseSpace(space, assets)];
+    }),
+  );
+  validateSpaces(spaces, start);
+  return { schema_version: 2, assets, start, spaces };
 }
 
 function bytesToHex(bytes: Uint8Array): string {

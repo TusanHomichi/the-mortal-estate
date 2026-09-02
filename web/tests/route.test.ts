@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { FeelLayout, WallRun } from "../src/feelTypes";
+import type { FeelSpace, WallRun } from "../src/feelTypes";
 import { passabilityFrom } from "../src/walk/layoutPassability";
 import { authorRoute } from "../src/walk/route";
 
-function field(walls: WallRun[] = []): FeelLayout {
+function field(walls: WallRun[] = []): FeelSpace {
   return {
     grid_extents: { i: 7, j: 7 },
     cells: Array.from({ length: 49 }, (_, index) => ({
@@ -12,8 +12,11 @@ function field(walls: WallRun[] = []): FeelLayout {
       material: "ground",
     })),
     wall_runs: walls,
+    roofs: [],
     props: [],
-    light_sources: { lantern_glass: [0, 0, 0], candles: [] },
+    light_sources: { lantern_glass: null, candles: [] },
+    weather: false,
+    portals: [],
   };
 }
 

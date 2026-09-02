@@ -1,101 +1,29 @@
 import {
-  AmbientLight,
-  BufferAttribute,
-  BufferGeometry,
   Clock,
-  Color,
-  DirectionalLight,
-  DoubleSide,
-  DynamicDrawUsage,
-  InstancedMesh,
-  LinearFilter,
-  LinearMipmapLinearFilter,
-  Matrix4,
   Mesh,
-  MeshBasicMaterial,
-  MeshStandardMaterial,
-  NoToneMapping,
-  Object3D,
   OrthographicCamera,
   PlaneGeometry,
-  PointLight,
-  RepeatWrapping,
   Scene,
   ShaderMaterial,
-  ShadowMaterial,
-  SRGBColorSpace,
-  Texture,
-  Vector3,
   Vector4,
   WebGLRenderer,
+  NoToneMapping,
+  SRGBColorSpace,
 } from "three";
-import {
-  CAMERA_OFFSET,
-  createFeelCamera,
-  projectedHeightCoverTiles,
-  resizeFeelCamera,
-} from "./camera";
-import type {
-  FeelManifest,
-  PropPlacement,
-  VerifiedAssetPacket,
-  WallRun,
-} from "./feelTypes";
-import { buildGroundGeometry } from "./groundGeometry";
+import { createFeelCamera, focusFeelCamera, resizeFeelCamera } from "./camera";
+import type { PortalTarget, VerifiedAssetPacket } from "./feelTypes";
 import type { Preset } from "./presets";
-import {
-  fogFragmentShader,
-  fogVertexShader,
-  groundFragmentShader,
-  groundVertexShader,
-  swayFragmentShader,
-  swayVertexShader,
-} from "./shaders";
-import {
-  buildWallProfile,
-  WALL_PROFILE,
-  type GeometryData,
-  type WallMaterial,
-} from "./wallGeometry";
+import { fogFragmentShader, fogVertexShader } from "./shaders";
+import { SpaceScene } from "./space/SpaceScene";
+import { decodeTextures } from "./space/textures";
 import type { Cell } from "./walk/layoutPassability";
-import { occludingRuns } from "./walk/wallOcclusion";
-import { createWalkPresenter } from "./walk/walkPresenter";
+import { createWalkPresenter, type WalkPresenter } from "./walk/walkPresenter";
 
-interface DecodedTexture {
-  texture: Texture;
-  width: number;
-  height: number;
-}
-
-interface ScenePalette {
-  background: Color;
-  ambient: Color;
-  ambientIntensity: number;
-  key: Color;
-  keyIntensity: number;
-  lanternIntensity: number;
-  candleIntensity: number;
-  practicalShaderStrength: number;
-}
-
-interface RainSystem {
-  mesh: InstancedMesh;
-  update: (elapsed: number) => void;
-}
-
-interface WallRunPresentation {
-  run: WallRun;
-  materials: Record<WallMaterial, MeshStandardMaterial>;
-  fadeableMeshes: Mesh[];
-  fadeAmount: number;
-  fadeStartedAt: number;
-  fadeStartedFrom: number;
-  fadeTarget: number;
-}
-
-interface WallFadeController {
-  update(playerCell: Cell, now: number): number;
-  plasterOpacity(runIndex: number): number | null;
+interface FogOverlay {
+  scene: Scene;
+  camera: OrthographicCamera;
+  material: ShaderMaterial;
+  dispose(): void;
 }
 
 interface FeelDevHook {
@@ -114,496 +42,10 @@ export interface FeelSceneHandle {
   stop: () => void;
 }
 
-const WARM_LIGHT = new Color("#ffb457");
-const RAIN_COUNT = 1080;
-export const WALL_FADE_DURATION_SECONDS = 0.35;
-export const WALL_FADED_PLASTER_OPACITY = 0.34; // owner: "might could have a little more fade" (2026-09-02)
-export const WALL_FADED_TIMBER_OPACITY = 0.48;
-const WALL_FADED_RENDER_ORDER = 10;
-const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
-
-function paletteFor(presets: readonly Preset[]): ScenePalette {
-  return presets.includes("dusk")
-    ? {
-        background: new Color("#4b394d"),
-        ambient: new Color("#d2ddf0"),
-        ambientIntensity: 1.2,
-        key: new Color("#c5d9ff"),
-        keyIntensity: 1.5,
-        lanternIntensity: 65,
-        candleIntensity: 7,
-        practicalShaderStrength: 5,
-      }
-    : {
-        background: new Color("#091426"),
-        ambient: new Color("#f2f7ff"),
-        ambientIntensity: 1.2,
-        key: new Color("#a9caff"),
-        keyIntensity: 1,
-        lanternIntensity: 55,
-        candleIntensity: 5,
-        practicalShaderStrength: 4,
-      };
-}
-
-async function decodeTextures(packet: VerifiedAssetPacket): Promise<Map<string, DecodedTexture>> {
-  const decoded = new Map<string, DecodedTexture>();
-  await Promise.all(
-    [...packet.assets.entries()].map(async ([key, asset]) => {
-      // ImageBitmap uploads ignore Texture.flipY in WebGL. Flip while decoding
-      // so Three receives the same orientation as its ordinary image loader.
-      const bitmap = await createImageBitmap(new Blob([asset.bytes], { type: "image/png" }), {
-        imageOrientation: "flipY",
-      });
-      const texture = new Texture(bitmap);
-      texture.name = key;
-      texture.colorSpace = SRGBColorSpace;
-      texture.wrapS = RepeatWrapping;
-      texture.wrapT = RepeatWrapping;
-      texture.magFilter = LinearFilter;
-      texture.minFilter = LinearMipmapLinearFilter;
-      texture.generateMipmaps = true;
-      texture.needsUpdate = true;
-      decoded.set(key, { texture, width: bitmap.width, height: bitmap.height });
-    }),
-  );
-  return decoded;
-}
-
-function requiredTexture(textures: Map<string, DecodedTexture>, key: string): DecodedTexture {
-  const texture = textures.get(key);
-  if (texture === undefined) throw new Error(`verified texture ${key} was not decoded`);
-  return texture;
-}
-
-function geometryFromData(data: GeometryData): BufferGeometry {
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new BufferAttribute(new Float32Array(data.positions), 3));
-  geometry.setAttribute("uv", new BufferAttribute(new Float32Array(data.uvs), 2));
-  geometry.setIndex(data.indices);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
-function configureTexture(texture: Texture, anisotropy: number): void {
-  texture.anisotropy = anisotropy;
-  texture.needsUpdate = true;
-}
-
-function addGround(
-  scene: Scene,
-  manifest: FeelManifest,
-  textures: Map<string, DecodedTexture>,
-  presets: readonly Preset[],
-  palette: ScenePalette,
-  anisotropy: number,
-): void {
-  const rainy = presets.includes("rain");
-  const ambient = palette.ambient.clone().multiplyScalar(palette.ambientIntensity);
-  const key = palette.key.clone().multiplyScalar(palette.keyIntensity * 0.44);
-  const cellsByMaterial = new Map<string, typeof manifest.layout.cells>();
-  for (const cell of manifest.layout.cells) {
-    const cells = cellsByMaterial.get(cell.material) ?? [];
-    cells.push(cell);
-    cellsByMaterial.set(cell.material, cells);
-  }
-  for (const [materialName, cells] of cellsByMaterial) {
-    const swatch = requiredTexture(textures, `terrain/${materialName}`).texture;
-    configureTexture(swatch, anisotropy);
-    const material = new ShaderMaterial({
-      name: `ground-${materialName}`,
-      uniforms: {
-        swatch: { value: swatch },
-        swatchPeriod: { value: 3 },
-        jointWidth: { value: 0.028 },
-        wetness: { value: rainy ? 1 : 0 },
-        timeTint: {
-          value: presets.includes("dusk")
-            ? new Color(0.94, 0.94, 0.94)
-            : materialName === "grass"
-              ? new Color(0.6, 0.72, 0.9)
-              : new Color(0.74, 0.82, 0.96),
-        },
-        ambientColour: { value: ambient },
-        keyColour: { value: key },
-        keyDirection: { value: new Vector3(-0.52, 0.79, -0.33).normalize() },
-      },
-      vertexShader: groundVertexShader,
-      fragmentShader: groundFragmentShader,
-    });
-    const data = buildGroundGeometry(cells);
-    const geometry = new BufferGeometry();
-    geometry.setAttribute("position", new BufferAttribute(new Float32Array(data.positions), 3));
-    geometry.setAttribute("uv", new BufferAttribute(new Float32Array(data.uvs), 2));
-    geometry.setAttribute(
-      "cellOrigin",
-      new BufferAttribute(new Float32Array(data.cellOrigins), 2),
-    );
-    geometry.setIndex(data.indices);
-    geometry.computeVertexNormals();
-    geometry.computeBoundingSphere();
-    const mesh = new Mesh(geometry, material);
-    mesh.name = `Ground_${materialName}`;
-    mesh.receiveShadow = false;
-    scene.add(mesh);
-  }
-
-  const extents = manifest.layout.grid_extents;
-  const shadowPlane = new Mesh(
-    new PlaneGeometry(extents.i, extents.j),
-    new ShadowMaterial({ color: 0x02050b, opacity: 0.34 }),
-  );
-  shadowPlane.name = "GroundShadowReceiver";
-  shadowPlane.rotation.x = -Math.PI / 2;
-  shadowPlane.position.set((extents.i - 1) / 2, -0.003, (extents.j - 1) / 2);
-  shadowPlane.receiveShadow = true;
-  scene.add(shadowPlane);
-}
-
-function wallMaterials(
-  textures: Map<string, DecodedTexture>,
-  anisotropy: number,
-): Record<WallMaterial, MeshStandardMaterial> {
-  const build = (name: WallMaterial, cutout = false): MeshStandardMaterial => {
-    const map = requiredTexture(textures, `walls/${name}`).texture;
-    configureTexture(map, anisotropy);
-    return new MeshStandardMaterial({
-      name: `wall-${name}`,
-      map,
-      roughness: 0.86,
-      metalness: 0,
-      alphaTest: cutout ? 0.12 : 0,
-      side: cutout ? DoubleSide : undefined,
-    });
-  };
-  return {
-    plinth: build("plinth"),
-    plaster: build("plaster"),
-    sill: build("sill"),
-    post: build("post"),
-    door: build("door", true),
-    cap_front: build("cap_front"),
-    cap_top: build("cap_top"),
-  };
-}
-
-function cloneWallMaterials(
-  shared: Record<WallMaterial, MeshStandardMaterial>,
-  runIndex: number,
-): Record<WallMaterial, MeshStandardMaterial> {
-  return Object.fromEntries(
-    (Object.entries(shared) as [WallMaterial, MeshStandardMaterial][]).map(
-      ([name, material]) => {
-        const clone = material.clone();
-        clone.name = `wall-run-${runIndex}-${name}`;
-        return [name, clone];
-      },
-    ),
-  ) as Record<WallMaterial, MeshStandardMaterial>;
-}
-
-function easeOutCubic(progress: number): number {
-  return 1 - (1 - progress) ** 3;
-}
-
-function fadeAmountAt(run: WallRunPresentation, now: number): number {
-  if (run.fadeAmount === run.fadeTarget) return run.fadeTarget;
-  const progress = Math.min(
-    1,
-    Math.max(0, (now - run.fadeStartedAt) / WALL_FADE_DURATION_SECONDS),
-  );
-  return (
-    run.fadeStartedFrom +
-    (run.fadeTarget - run.fadeStartedFrom) * easeOutCubic(progress)
-  );
-}
-
-function applyWallFade(run: WallRunPresentation, amount: number): void {
-  const faded = amount > 0;
-  for (const [name, material] of Object.entries(run.materials) as [
-    WallMaterial,
-    MeshStandardMaterial,
-  ][]) {
-    if (name === "plinth") continue;
-    const fadedOpacity = name === "plaster"
-      ? WALL_FADED_PLASTER_OPACITY
-      : WALL_FADED_TIMBER_OPACITY;
-    material.opacity = 1 + (fadedOpacity - 1) * amount;
-    if (material.transparent !== faded) {
-      material.transparent = faded;
-      material.needsUpdate = true;
-    }
-    material.depthWrite = !faded;
-  }
-  for (const mesh of run.fadeableMeshes) {
-    mesh.renderOrder = faded ? WALL_FADED_RENDER_ORDER : 0;
-  }
-}
-
-function addWalls(
-  scene: Scene,
-  manifest: FeelManifest,
-  textures: Map<string, DecodedTexture>,
-  anisotropy: number,
-): WallFadeController {
-  const sharedMaterials = wallMaterials(textures, anisotropy);
-  const runs: WallRunPresentation[] = manifest.layout.wall_runs.map(
-    (run, runIndex) => ({
-      run,
-      materials: cloneWallMaterials(sharedMaterials, runIndex),
-      fadeableMeshes: [],
-      fadeAmount: 0,
-      fadeStartedAt: 0,
-      fadeStartedFrom: 0,
-      fadeTarget: 0,
-    }),
-  );
-  for (const part of buildWallProfile(manifest.layout.wall_runs)) {
-    const run = runs[part.runIndex];
-    if (run === undefined) {
-      throw new Error(`wall part ${part.label} names absent run ${part.runIndex}`);
-    }
-    const mesh = new Mesh(geometryFromData(part.geometry), run.materials[part.material]);
-    mesh.name = `WallRun_${part.runIndex}_${part.label}`;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    if (part.material !== "plinth") run.fadeableMeshes.push(mesh);
-    scene.add(mesh);
-  }
-
-  return {
-    update: (playerCell: Cell, now: number): number => {
-      const selected = new Set(
-        occludingRuns(manifest.layout.wall_runs, playerCell, WALL_COVER_TILES),
-      );
-      let fadedRuns = 0;
-      for (const run of runs) {
-        const target = selected.has(run.run) ? 1 : 0;
-        if (target === 1) fadedRuns += 1;
-        if (target !== run.fadeTarget) {
-          const current = fadeAmountAt(run, now);
-          run.fadeAmount = current;
-          run.fadeStartedFrom = current;
-          run.fadeStartedAt = now;
-          run.fadeTarget = target;
-        }
-        run.fadeAmount = fadeAmountAt(run, now);
-        applyWallFade(run, run.fadeAmount);
-      }
-      return fadedRuns;
-    },
-    plasterOpacity: (runIndex: number): number | null =>
-      runs[runIndex]?.materials.plaster.opacity ?? null,
-  };
-}
-
-function addContactShadow(scene: Scene, x: number, z: number, height: number): Mesh {
-  const shadow = new Mesh(
-    new PlaneGeometry(
-      Math.min(Math.max(height * 0.34, 0.24), 0.72),
-      Math.min(Math.max(height * 0.13, 0.1), 0.28),
-    ),
-    new MeshBasicMaterial({
-      color: 0x000000,
-      opacity: 0.46,
-      transparent: true,
-      depthWrite: false,
-    }),
-  );
-  shadow.name = "ContactShadow";
-  shadow.rotation.x = -Math.PI / 2;
-  shadow.position.set(x, 0.004, z);
-  scene.add(shadow);
-  return shadow;
-}
-
-export function applyPropPlacementMirror(mesh: Mesh, placement: PropPlacement): void {
-  mesh.scale.x = placement.mirror ? -1 : 1;
-}
-
-function addProps(
-  scene: Scene,
-  manifest: FeelManifest,
-  textures: Map<string, DecodedTexture>,
-  presets: readonly Preset[],
-  palette: ScenePalette,
-  anisotropy: number,
-  lanternPosition: Vector3,
-): {
-  billboards: Mesh[];
-  swayMaterials: ShaderMaterial[];
-  caretaker: { card: Mesh; contactShadow: Mesh };
-} {
-  const billboards: Mesh[] = [];
-  const swayMaterials: ShaderMaterial[] = [];
-  let caretaker: { card: Mesh; contactShadow: Mesh } | null = null;
-  for (const prop of manifest.layout.props) {
-    const source = requiredTexture(textures, `props/${prop.kind}`);
-    configureTexture(source.texture, anisotropy);
-    const width = prop.nominal_height * (source.width / source.height);
-    const geometry = new PlaneGeometry(width, prop.nominal_height);
-    const material = prop.sway
-      ? new ShaderMaterial({
-          name: `sway-${prop.kind}`,
-          uniforms: {
-            albedoTexture: { value: source.texture },
-            elapsed: { value: 0 },
-            windStrength: { value: presets.includes("wind") ? 1 : 0.12 },
-            timeOffset: { value: prop.cell_anchor[0] * 0.73 + prop.cell_anchor[1] * 1.13 },
-            ambientColour: {
-              value: palette.ambient.clone().multiplyScalar(palette.ambientIntensity),
-            },
-            keyColour: { value: palette.key.clone().multiplyScalar(palette.keyIntensity * 0.34) },
-            lanternPosition: { value: lanternPosition },
-            lanternColour: { value: WARM_LIGHT.clone() },
-            lanternStrength: { value: palette.practicalShaderStrength },
-          },
-          vertexShader: swayVertexShader,
-          fragmentShader: swayFragmentShader,
-          transparent: true,
-          alphaTest: 0.12,
-          side: DoubleSide,
-        })
-      : new MeshStandardMaterial({
-          name: `prop-${prop.kind}`,
-          map: source.texture,
-          transparent: true,
-          alphaTest: 0.12,
-          roughness: 0.88,
-          metalness: 0,
-          side: DoubleSide,
-        });
-    if (material instanceof ShaderMaterial) swayMaterials.push(material);
-    const mesh = new Mesh(geometry, material);
-    mesh.name = `Prop_${prop.kind}`;
-    applyPropPlacementMirror(mesh, prop);
-    mesh.position.set(prop.cell_anchor[0], prop.nominal_height / 2, prop.cell_anchor[1]);
-    mesh.castShadow = true;
-    mesh.customDepthMaterial = undefined;
-    const contactShadow = addContactShadow(
-      scene,
-      prop.cell_anchor[0],
-      prop.cell_anchor[1],
-      prop.nominal_height,
-    );
-    scene.add(mesh);
-    billboards.push(mesh);
-    if (prop.kind === "caretaker") caretaker = { card: mesh, contactShadow };
-  }
-  if (caretaker === null) throw new Error("the feel layout carries no caretaker for the walk experiment");
-  return { billboards, swayMaterials, caretaker };
-}
-
-function addLights(
-  scene: Scene,
-  manifest: FeelManifest,
-  presets: readonly Preset[],
-  palette: ScenePalette,
-  focusCell: { i: number; j: number },
-): {
-  lantern: PointLight;
-  lanternBase: number;
-  keyLight: DirectionalLight;
-  keyTarget: Object3D;
-} {
-  scene.add(new AmbientLight(palette.ambient, palette.ambientIntensity));
-  const key = new DirectionalLight(palette.key, palette.keyIntensity);
-  key.name = presets.includes("dusk") ? "WarmHorizonKey" : "CoolMoonlight";
-  const keyOffset = presets.includes("dusk")
-    ? new Vector3(-10.5, 6, 6.5)
-    : new Vector3(3.5, 12, -10.5);
-  key.target.position.set(focusCell.i, 0, focusCell.j);
-  key.position.copy(key.target.position).add(keyOffset);
-  key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.camera.left = -10;
-  key.shadow.camera.right = 10;
-  key.shadow.camera.top = 10;
-  key.shadow.camera.bottom = -10;
-  key.shadow.camera.near = 0.1;
-  key.shadow.camera.far = 40;
-  key.shadow.bias = -0.00025;
-  scene.add(key, key.target);
-
-  const lanternBase = palette.lanternIntensity;
-  const lantern = new PointLight(WARM_LIGHT, lanternBase, 6, 2);
-  lantern.name = "LanternGlow";
-  lantern.position.fromArray(manifest.layout.light_sources.lantern_glass);
-  lantern.castShadow = true;
-  lantern.shadow.mapSize.set(512, 512);
-  scene.add(lantern);
-  manifest.layout.light_sources.candles.forEach((position, index) => {
-    const candle = new PointLight(WARM_LIGHT, palette.candleIntensity, 2.2, 2);
-    candle.name = `Candle_${index}`;
-    candle.position.fromArray(position);
-    scene.add(candle);
-  });
-  return { lantern, lanternBase, keyLight: key, keyTarget: key.target };
-}
-
-function initialCaretakerCell(manifest: FeelManifest): { i: number; j: number } {
-  const caretaker = manifest.layout.props.find((prop) => prop.kind === "caretaker");
-  if (caretaker === undefined) {
-    throw new Error("the feel layout carries no caretaker for the walk experiment");
-  }
-  return { i: Math.round(caretaker.cell_anchor[0]), j: Math.round(caretaker.cell_anchor[1]) };
-}
-
-function seededRandom(seed = 0x544d455f): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-    return state / 0x100000000;
-  };
-}
-
-function addRain(scene: Scene, camera: OrthographicCamera): RainSystem {
-  const geometry = new PlaneGeometry(0.012, 0.1);
-  const material = new MeshBasicMaterial({
-    color: new Color(0.65, 0.77, 0.94),
-    opacity: 0.42,
-    transparent: true,
-    depthWrite: false,
-    side: DoubleSide,
-  });
-  const mesh = new InstancedMesh(geometry, material, RAIN_COUNT);
-  mesh.name = "RainStreaks";
-  mesh.instanceMatrix.setUsage(DynamicDrawUsage);
-  mesh.frustumCulled = false;
-  const random = seededRandom();
-  const drops = Array.from({ length: RAIN_COUNT }, () => ({
-    x: -3 + random() * 14,
-    z: -3 + random() * 14,
-    phase: random() * 6.5,
-    speed: 7.5 + random() * 1.7,
-  }));
-  const dummy = new Object3D();
-  const slant = new Matrix4().makeRotationZ(-0.17);
-  const update = (elapsed: number): void => {
-    for (let index = 0; index < drops.length; index += 1) {
-      const drop = drops[index]!;
-      const y = 6 - ((drop.phase + elapsed * drop.speed) % 6.5);
-      dummy.position.set(drop.x + elapsed * 0.18, y, drop.z + elapsed * 0.09);
-      dummy.quaternion.copy(camera.quaternion);
-      dummy.updateMatrix();
-      dummy.matrix.multiply(slant);
-      mesh.setMatrixAt(index, dummy.matrix);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-  };
-  update(0);
-  scene.add(mesh);
-  return { mesh, update };
-}
-
-function makeFogOverlay(): {
-  scene: Scene;
-  camera: OrthographicCamera;
-  material: ShaderMaterial;
-} {
+function makeFogOverlay(): FogOverlay {
   const scene = new Scene();
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const geometry = new PlaneGeometry(2, 2);
   const material = new ShaderMaterial({
     uniforms: {
       elapsed: { value: 0 },
@@ -615,21 +57,17 @@ function makeFogOverlay(): {
     depthTest: false,
     depthWrite: false,
   });
-  scene.add(new Mesh(new PlaneGeometry(2, 2), material));
-  return { scene, camera, material };
-}
-
-/**
- * Every card faces the orthographic view direction, not the camera's position.
- * Under an orthographic camera all view rays are parallel, so a card turned
- * toward the camera point instead is foreshortened by however far it sits from
- * the camera's axis — a tree at the edge of the frame read as seen edge-on.
- * One shared yaw also keeps the cards still when the camera re-centres.
- */
-const BILLBOARD_YAW = Math.atan2(CAMERA_OFFSET.x, CAMERA_OFFSET.z);
-
-function faceTheView(mesh: Mesh): void {
-  mesh.rotation.set(0, BILLBOARD_YAW, 0);
+  scene.add(new Mesh(geometry, material));
+  return {
+    scene,
+    camera,
+    material,
+    dispose: () => {
+      geometry.dispose();
+      material.dispose();
+      scene.clear();
+    },
+  };
 }
 
 export async function startFeelScene(
@@ -651,81 +89,94 @@ export async function startFeelScene(
   const renderer = new WebGLRenderer({ canvas, context, antialias: true });
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = NoToneMapping;
-  const palette = paletteFor(presets);
   renderer.shadowMap.enabled = true;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
-  const manifest = packet.manifest;
   const textures = await decodeTextures(packet);
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
-  scene.background = palette.background;
-  const initialCell = initialCaretakerCell(manifest);
+  const initialCell = { i: packet.manifest.start.cell[0], j: packet.manifest.start.cell[1] };
   const camera = createFeelCamera(window.innerWidth, window.innerHeight, initialCell);
-  const lanternPosition = new Vector3().fromArray(manifest.layout.light_sources.lantern_glass);
-
-  addGround(scene, manifest, textures, presets, palette, anisotropy);
-  const wallFade = addWalls(scene, manifest, textures, anisotropy);
-  const { lantern, lanternBase, keyLight, keyTarget } = addLights(
-    scene,
-    manifest,
-    presets,
-    palette,
-    initialCell,
-  );
-  const { billboards, swayMaterials, caretaker } = addProps(
-    scene,
-    manifest,
-    textures,
-    presets,
-    palette,
-    anisotropy,
-    lanternPosition,
-  );
-  billboards.forEach(faceTheView);
-  const rain = presets.includes("rain") ? addRain(scene, camera) : null;
-  const fog = presets.includes("fog") ? makeFogOverlay() : null;
   const clock = new Clock();
-  const walkPresenter = createWalkPresenter({
-    stage,
-    canvas,
-    scene,
-    camera,
-    layout: manifest.layout,
-    caretaker,
-    initialCell,
-    keyLight,
-    keyTarget,
-    updateWallFade: wallFade.update,
-    startedAt: performance.now() / 1000,
-  });
-  const devHook: FeelDevHook | null = import.meta.env["DEV"]
-    ? { wallRunPlasterOpacity: wallFade.plasterOpacity }
-    : null;
-  if (devHook !== null) window.__tmeFeel = devHook;
+  const startedAt = performance.now() / 1000;
+  let activeSpace: SpaceScene | null = null;
+  let activePresenter: WalkPresenter | null = null;
+  let activeFog: FogOverlay | null = null;
   let animationFrame = 0;
   let stopped = false;
+
+  const swapSpace = (target: PortalTarget, facing: 1 | -1): void => {
+    const space = packet.manifest.spaces[target.space];
+    if (space === undefined) {
+      throw new Error(`portal landing names absent verified space ${target.space}`);
+    }
+    const targetCell: Cell = { i: target.cell[0], j: target.cell[1] };
+    activePresenter?.stop();
+    activeSpace?.dispose();
+    activeFog?.dispose();
+    activeFog = null;
+
+    focusFeelCamera(camera, targetCell);
+    const nextSpace = new SpaceScene({
+      name: target.space,
+      space,
+      textures,
+      presets,
+      anisotropy,
+      camera,
+      caretakerCell: targetCell,
+      caretakerFacing: facing,
+    });
+    activeSpace = nextSpace;
+    scene.background = nextSpace.background;
+    scene.add(nextSpace.group);
+    const presetLabel = document.querySelector<HTMLElement>("#preset-label");
+    if (presetLabel !== null) {
+      presetLabel.textContent = nextSpace.weatherEnabled ? presets.join(" · ") : "INTERIOR";
+    }
+    if (nextSpace.weatherEnabled && presets.includes("fog")) {
+      activeFog = makeFogOverlay();
+    }
+    activePresenter = createWalkPresenter({
+      stage,
+      canvas,
+      scene,
+      camera,
+      spaceName: target.space,
+      space,
+      caretaker: nextSpace.caretaker,
+      initialCell: targetCell,
+      updateWallFade: (cell, now) => nextSpace.updateWallFade(cell, now),
+      onCellChanged: (previous, next) => nextSpace.focusLighting(previous, next),
+      onPortalLanding: swapSpace,
+      startedAt,
+    });
+  };
+
+  swapSpace(packet.manifest.start, 1);
+
+  const devHook: FeelDevHook | null = import.meta.env["DEV"]
+    ? {
+        wallRunPlasterOpacity: (runIndex) =>
+          activeSpace?.wallRunPlasterOpacity(runIndex) ?? null,
+      }
+    : null;
+  if (devHook !== null) window.__tmeFeel = devHook;
 
   const draw = (): void => {
     if (stopped) return;
     const elapsed = clock.getElapsedTime();
-    const noise = Math.sin(elapsed * 5.7 + 1.731) * 0.055 + Math.sin(elapsed * 11.3 + 2.943) * 0.025;
-    lantern.intensity = lanternBase * (1 + noise);
-    swayMaterials.forEach((material) => {
-      material.uniforms.elapsed!.value = elapsed;
-      material.uniforms.lanternStrength!.value = palette.practicalShaderStrength * (1 + noise);
-    });
-    rain?.update(elapsed);
-    walkPresenter.update(performance.now() / 1000);
+    activeSpace?.update(elapsed);
+    activePresenter?.update(performance.now() / 1000);
     renderer.setRenderTarget(null);
     renderer.clear();
     const renderStartedAt = performance.now();
     renderer.render(scene, camera);
-    if (fog !== null) {
-      fog.material.uniforms.elapsed!.value = elapsed;
+    if (activeFog !== null) {
+      activeFog.material.uniforms.elapsed!.value = elapsed;
       renderer.autoClear = false;
-      renderer.render(fog.scene, fog.camera);
+      renderer.render(activeFog.scene, activeFog.camera);
       renderer.autoClear = true;
     }
     stage.dataset.renderCalls = String(renderer.info.render.calls);
@@ -746,10 +197,11 @@ export async function startFeelScene(
       stopped = true;
       cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
-      walkPresenter.stop();
-      if (devHook !== null && window.__tmeFeel === devHook) {
-        delete window.__tmeFeel;
-      }
+      activePresenter?.stop();
+      activeSpace?.dispose();
+      activeFog?.dispose();
+      for (const decoded of textures.values()) decoded.texture.dispose();
+      if (devHook !== null && window.__tmeFeel === devHook) delete window.__tmeFeel;
       delete stage.dataset.renderCalls;
       delete stage.dataset.renderMilliseconds;
       renderer.dispose();

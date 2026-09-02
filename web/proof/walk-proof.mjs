@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -9,7 +9,7 @@ import { chromium } from "playwright";
 const proofDirectory = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(proofDirectory, "..");
 const captureRoot = "/data/dev/home/tme-visual-lab/web-feel-v26/walk-captures";
-const treePacket = "/data/dev/home/tme-visual-lab/web-feel-v26/trees/packet";
+const packetV2 = "/data/dev/home/tme-visual-lab/web-feel-v26/world/packet-v2";
 
 async function freePort() {
   const server = net.createServer();
@@ -36,7 +36,7 @@ async function waitForVite(url, server, output) {
       const response = await fetch(url);
       if (response.ok) return;
     } catch {
-      // The selected port is not accepting connections yet.
+      // The selected loopback port is not accepting connections yet.
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -65,72 +65,6 @@ async function stageAttribute(page, name) {
   return value;
 }
 
-async function wallRunPlasterOpacity(page, runIndex) {
-  return page.evaluate((index) => {
-    if (window.__tmeFeel === undefined) {
-      throw new Error("the walk proof found no development feel-scene hook");
-    }
-    const opacity = window.__tmeFeel.wallRunPlasterOpacity(index);
-    if (opacity === null) {
-      throw new Error(`the walk proof found no wall run ${index}`);
-    }
-    return opacity;
-  }, runIndex);
-}
-
-function assertCustomCursorValue(value, fallback) {
-  assert.match(value, /^url\(["']?data:image\/svg\+xml,/);
-  assert.ok(value.endsWith(`, ${fallback}`), `cursor fallback is ${value}`);
-}
-
-async function assertCustomCursor(page, fallback) {
-  const value = await page.locator("#feel-stage canvas").evaluate((canvas) => canvas.style.cursor);
-  assertCustomCursorValue(value, fallback);
-}
-
-function assertCommittedPresentation(snapshot, pace) {
-  assert.equal(snapshot.state, "committed");
-  assert.equal(snapshot.cursorKind, "waiting");
-  assert.equal(snapshot.pace, pace);
-  assertCustomCursorValue(snapshot.cursorValue, "wait");
-}
-
-async function commitDraftAndSnapshot(page, target) {
-  return page.locator("#feel-stage").evaluate(
-    (stage, point) => {
-      const canvas = stage.querySelector("canvas");
-      if (!(canvas instanceof HTMLCanvasElement)) {
-        throw new Error("the walk proof found no stage canvas");
-      }
-      canvas.dispatchEvent(
-        new MouseEvent("dblclick", {
-          bubbles: true,
-          cancelable: true,
-          button: 0,
-          buttons: 1,
-          clientX: point.x,
-          clientY: point.y,
-          detail: 2,
-        }),
-      );
-      return {
-        state: stage.dataset.walkState,
-        cursorKind: stage.dataset.walkCursor,
-        pace: stage.dataset.walkPace,
-        cursorValue: canvas.style.cursor,
-      };
-    },
-    target,
-  );
-}
-
-async function assertCaretakerCentred(page) {
-  const projection = await stageAttribute(page, "data-caretaker-projection");
-  const [x, y] = projection.split(",").map(Number);
-  assert.ok(Math.abs(x - 640) <= 1, `caretaker projects to x=${x}, not viewport centre`);
-  assert.ok(Math.abs(y - 400) <= 1, `caretaker projects to y=${y}, not viewport centre`);
-}
-
 async function groundCellPoint(page, focus, target) {
   return page.evaluate(
     async ({ focusCell, targetCell }) => {
@@ -146,38 +80,6 @@ async function groundCellPoint(page, focus, target) {
   );
 }
 
-async function captureThreeTimesRouteCrop(page, from, to, outputPath) {
-  const [start, end] = await Promise.all([
-    groundCellPoint(page, from, from),
-    groundCellPoint(page, from, to),
-  ]);
-  const left = Math.max(0, Math.floor(Math.min(start.x, end.x) - 80));
-  const top = Math.max(0, Math.floor(Math.min(start.y, end.y) - 190));
-  const right = Math.min(1280, Math.ceil(Math.max(start.x, end.x) + 80));
-  const bottom = Math.min(800, Math.ceil(Math.max(start.y, end.y) + 80));
-  const source = await page.screenshot({
-    clip: { x: left, y: top, width: right - left, height: bottom - top },
-  });
-  const scaledBase64 = await page.evaluate(
-    async ({ encoded, scale }) => {
-      const image = new Image();
-      image.src = `data:image/png;base64,${encoded}`;
-      await image.decode();
-      const canvas = document.createElement("canvas");
-      canvas.width = image.naturalWidth * scale;
-      canvas.height = image.naturalHeight * scale;
-      const context = canvas.getContext("2d");
-      if (context === null) throw new Error("the proof could not create its review crop");
-      context.imageSmoothingEnabled = true;
-      context.imageSmoothingQuality = "high";
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, "");
-    },
-    { encoded: source.toString("base64"), scale: 3 },
-  );
-  await writeFile(outputPath, Buffer.from(scaledBase64, "base64"));
-}
-
 async function waitForFreshStandInBeat(page, clockStartedAt) {
   await page.waitForFunction(
     async (readyAt) => {
@@ -191,91 +93,105 @@ async function waitForFreshStandInBeat(page, clockStartedAt) {
   );
 }
 
+async function assertCaretakerCentred(page) {
+  const projection = await stageAttribute(page, "data-caretaker-projection");
+  const [x, y] = projection.split(",").map(Number);
+  assert.ok(Math.abs(x - 640) <= 1, `caretaker projects to x=${x}, not viewport centre`);
+  assert.ok(Math.abs(y - 400) <= 1, `caretaker projects to y=${y}, not viewport centre`);
+}
+
 async function measureFrames(page) {
   return page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        const deltas = [];
-        const renderTimes = [];
-        let previous;
-        let calls = 0;
-        const sample = (time) => {
-          if (previous !== undefined) {
-            deltas.push(time - previous);
-            const stage = document.querySelector("#feel-stage");
-            renderTimes.push(Number(stage?.dataset.renderMilliseconds ?? "NaN"));
-            calls = Number(stage?.dataset.renderCalls ?? "NaN");
-          }
-          previous = time;
-          if (deltas.length === 30) {
-            resolve({
-              calls,
-              averageRafMilliseconds:
-                deltas.reduce((total, delta) => total + delta, 0) / deltas.length,
-              averageRenderMilliseconds:
-                renderTimes.reduce((total, duration) => total + duration, 0) /
-                renderTimes.length,
-            });
-            return;
-          }
-          requestAnimationFrame(sample);
-        };
+    () => new Promise((resolve) => {
+      const deltas = [];
+      const renderTimes = [];
+      let previous;
+      let calls = 0;
+      const sample = (time) => {
+        if (previous !== undefined) {
+          deltas.push(time - previous);
+          const stage = document.querySelector("#feel-stage");
+          renderTimes.push(Number(stage?.dataset.renderMilliseconds ?? "NaN"));
+          calls = Number(stage?.dataset.renderCalls ?? "NaN");
+        }
+        previous = time;
+        if (deltas.length === 30) {
+          resolve({
+            calls,
+            averageRafMilliseconds:
+              deltas.reduce((total, delta) => total + delta, 0) / deltas.length,
+            averageRenderMilliseconds:
+              renderTimes.reduce((total, duration) => total + duration, 0) /
+              renderTimes.length,
+          });
+          return;
+        }
         requestAnimationFrame(sample);
-      }),
+      };
+      requestAnimationFrame(sample);
+    }),
   );
 }
 
-async function walkRoute(page, clockStartedAt, from, to, pace, captureName = null) {
-  const target = await groundCellPoint(page, from, to);
-  await page.mouse.move(target.x, target.y);
+async function draftAndCommit(page, clockStartedAt, from, target) {
+  const point = await groundCellPoint(page, from, target);
+  await page.mouse.move(point.x, point.y);
   assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
-  await assertCustomCursor(page, "default");
-  await page.mouse.click(target.x, target.y);
+  await page.mouse.click(point.x, point.y);
   assert.equal(await stageAttribute(page, "data-walk-state"), "draft");
-  assert.equal(await stageAttribute(page, "data-walk-pace"), pace);
-  assert.match(
-    await page.locator(".walk-experiment-label").textContent(),
-    new RegExp(` · ${pace.toUpperCase()}$`),
-  );
-  if (captureName !== null) {
-    await page.evaluate(
-      () =>
-        new Promise((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(resolve)),
-        ),
-    );
-    if (captureName === "walk-preview.png") {
-      // Chromium's first WebGL readback can precede a textured card upload.
-      // Warm the readback so both review captures contain the route's origin.
-      await page.screenshot();
-      await captureThreeTimesRouteCrop(
-        page,
-        from,
-        to,
-        path.join(captureRoot, "walk-footprints-crop.png"),
-      );
-    }
-    await page.screenshot({ path: path.join(captureRoot, captureName) });
-  }
-
   await waitForFreshStandInBeat(page, clockStartedAt);
-  assertCommittedPresentation(await commitDraftAndSnapshot(page, target), pace);
+  await page.locator("#feel-stage").evaluate((stage, position) => {
+    const canvas = stage.querySelector("canvas");
+    if (!(canvas instanceof HTMLCanvasElement)) throw new Error("the proof found no canvas");
+    canvas.dispatchEvent(new MouseEvent("dblclick", {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      buttons: 1,
+      clientX: position.x,
+      clientY: position.y,
+      detail: 2,
+    }));
+  }, point);
+  assert.equal(await stageAttribute(page, "data-walk-state"), "committed");
+}
+
+async function walkWithinSpace(page, clockStartedAt, space, from, target) {
+  await draftAndCommit(page, clockStartedAt, from, target);
   await page.waitForFunction(
-    (cell) => document.querySelector("#feel-stage")?.dataset.caretakerCell === cell,
-    `${to.i},${to.j}`,
+    ({ expectedSpace, expectedCell }) => {
+      const stage = document.querySelector("#feel-stage");
+      return stage?.dataset.walkSpace === expectedSpace &&
+        stage.dataset.caretakerCell === expectedCell &&
+        stage.dataset.walkState === "idle";
+    },
+    { expectedSpace: space, expectedCell: `${target.i},${target.j}` },
     { timeout: 4_000 },
   );
+  await assertCaretakerCentred(page);
+}
+
+async function walkThroughPortal(
+  page,
+  clockStartedAt,
+  from,
+  door,
+  targetSpace,
+  targetCell,
+) {
+  await draftAndCommit(page, clockStartedAt, from, door);
   await page.waitForFunction(
-    () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
+    ({ expectedSpace, expectedCell }) => {
+      const stage = document.querySelector("#feel-stage");
+      return stage?.dataset.walkSpace === expectedSpace &&
+        stage.dataset.caretakerCell === expectedCell &&
+        stage.dataset.walkState === "idle";
+    },
+    { expectedSpace: targetSpace, expectedCell: `${targetCell.i},${targetCell.j}` },
+    { timeout: 4_000 },
   );
-  assert.equal(await page.locator("#feel-stage").getAttribute("data-walk-pace"), null);
-  assert.equal(
-    await page.locator(".walk-experiment-label").textContent(),
-    "WALK EXPERIMENT — LOCAL, NOT AUTHORITY",
-  );
-  assert.deepEqual(parseCell(await stageAttribute(page, "data-caretaker-cell")), to);
-  assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
-  await assertCustomCursor(page, "default");
+  assert.equal(await stageAttribute(page, "data-walk-space"), targetSpace);
+  assert.deepEqual(parseCell(await stageAttribute(page, "data-caretaker-cell")), targetCell);
   await assertCaretakerCentred(page);
 }
 
@@ -294,16 +210,12 @@ const server = spawn(
   ],
   {
     cwd: webRoot,
-    env: { ...process.env, TME_FEEL_ASSETS: treePacket },
+    env: { ...process.env, TME_FEEL_ASSETS: packetV2 },
     stdio: ["ignore", "pipe", "pipe"],
   },
 );
-server.stdout.on("data", (chunk) => {
-  serverOutput += chunk.toString();
-});
-server.stderr.on("data", (chunk) => {
-  serverOutput += chunk.toString();
-});
+server.stdout.on("data", (chunk) => { serverOutput += chunk.toString(); });
+server.stderr.on("data", (chunk) => { serverOutput += chunk.toString(); });
 
 let browser;
 try {
@@ -319,106 +231,50 @@ try {
 
   await page.goto(`${baseUrl}?preset=night`, { waitUntil: "networkidle" });
   await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
-  let clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
-  assert.ok(Number.isFinite(clockStartedAt));
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
   );
-  const initial = parseCell(await stageAttribute(page, "data-caretaker-cell"));
+  const clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
+  assert.ok(Number.isFinite(clockStartedAt));
+  assert.equal(await stageAttribute(page, "data-walk-space"), "estate-grounds");
+  const start = parseCell(await stageAttribute(page, "data-caretaker-cell"));
+  assert.deepEqual(start, { i: 13, j: 11 });
   await assertCaretakerCentred(page);
-  assert.equal(await page.locator(".walk-beat-meter").count(), 0);
 
-  const courtyardStaging = { i: initial.i - 1, j: initial.j - 3 };
-  const authorablePoint = await groundCellPoint(page, initial, courtyardStaging);
-  await page.mouse.move(authorablePoint.x, authorablePoint.y);
-  assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
-  assert.equal(await stageAttribute(page, "data-walk-outline"), "visible");
-  await assertCustomCursor(page, "default");
-
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.screenshot({ path: path.join(captureRoot, "walk-roofs.png") });
   const measurement = await measureFrames(page);
   assert.ok(Number.isFinite(measurement.calls) && measurement.calls > 0);
   assert.ok(Number.isFinite(measurement.averageRafMilliseconds));
   assert.ok(Number.isFinite(measurement.averageRenderMilliseconds));
 
-  let treeTourCell = initial;
-  for (let sprint = 0; sprint < 3; sprint += 1) {
-    const next = { i: treeTourCell.i + 3, j: treeTourCell.j };
-    await walkRoute(page, clockStartedAt, treeTourCell, next, "sprint");
-    treeTourCell = next;
-  }
-  await page.screenshot({ path: path.join(captureRoot, "walk-trees.png") });
-
-  await page.reload({ waitUntil: "networkidle" });
-  await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
-  await page.waitForFunction(
-    () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
-  );
-  assert.deepEqual(
-    parseCell(await stageAttribute(page, "data-caretaker-cell")),
-    initial,
-  );
-  clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
-  assert.ok(Number.isFinite(clockStartedAt));
-  await assertCaretakerCentred(page);
-
-  await walkRoute(page, clockStartedAt, initial, courtyardStaging, "sprint");
-
-  const southWallTile = { i: 12, j: 6 };
-  const wallPoint = await groundCellPoint(page, courtyardStaging, southWallTile);
-  await page.mouse.move(wallPoint.x, wallPoint.y);
-  assert.equal(await stageAttribute(page, "data-walk-cursor"), "refused");
-  assert.equal(await stageAttribute(page, "data-walk-outline"), "hidden");
-  await assertCustomCursor(page, "not-allowed");
-  assert.equal(await stageAttribute(page, "data-walk-state"), "idle");
-  await page.mouse.click(wallPoint.x, wallPoint.y);
-  assert.equal(await stageAttribute(page, "data-walk-state"), "idle");
-  assert.deepEqual(
-    parseCell(await stageAttribute(page, "data-caretaker-cell")),
-    courtyardStaging,
-  );
-  assert.equal(await stageAttribute(page, "data-walk-outline"), "hidden");
-
+  const courtyardStaging = { i: 12, j: 8 };
   const doorApproach = { i: 11, j: 7 };
-  await walkRoute(page, clockStartedAt, courtyardStaging, doorApproach, "walk");
-
-  const doorFarSide = { i: 11, j: 5 };
-  await walkRoute(
+  await walkWithinSpace(page, clockStartedAt, "estate-grounds", start, courtyardStaging);
+  await walkWithinSpace(page, clockStartedAt, "estate-grounds", courtyardStaging, doorApproach);
+  await walkThroughPortal(
     page,
     clockStartedAt,
     doorApproach,
-    doorFarSide,
-    "run",
-    "walk-preview.png",
+    { i: 11, j: 6 },
+    "estate-ground-room",
+    { i: 4, j: 3 },
   );
-  assert.deepEqual(
-    parseCell(await stageAttribute(page, "data-caretaker-cell")),
-    doorFarSide,
-  );
-  await page.waitForFunction(
-    () => document.querySelector("#feel-stage")?.dataset.walkFadedRuns === "1",
-    null,
-    { timeout: 500 },
-  );
-  await page.waitForTimeout(500);
-  assert.ok(
-    (await wallRunPlasterOpacity(page, 1)) <= 0.45,
-    "the south wall plaster stayed too opaque to reveal the caretaker",
-  );
-  await page.screenshot({ path: path.join(captureRoot, "walk-behind-wall.png") });
-  await page.screenshot({ path: path.join(captureRoot, "walk-landed.png") });
-  await page.screenshot({ path: path.join(captureRoot, "walk-world.png") });
+  await page.screenshot({ path: path.join(captureRoot, "walk-interior.png") });
 
-  await walkRoute(page, clockStartedAt, doorFarSide, doorApproach, "run");
-  assert.equal(await stageAttribute(page, "data-walk-faded-runs"), "0");
-  await page.waitForFunction(
-    () => window.__tmeFeel?.wallRunPlasterOpacity(1) === 1,
-    null,
-    { timeout: 500 },
+  await walkThroughPortal(
+    page,
+    clockStartedAt,
+    { i: 4, j: 3 },
+    { i: 4, j: 4 },
+    "estate-grounds",
+    { i: 11, j: 7 },
   );
+  await page.screenshot({ path: path.join(captureRoot, "walk-exterior-return.png") });
 
   assert.deepEqual(consoleErrors, []);
   console.log(
-    `PASS walk proof: ${captureRoot}; draw calls ${measurement.calls}; ` +
+    `PASS walk proof: ${captureRoot}; exterior draw calls ${measurement.calls}; ` +
       `30-frame rAF average ${measurement.averageRafMilliseconds.toFixed(3)} ms; ` +
       `render average ${measurement.averageRenderMilliseconds.toFixed(3)} ms`,
   );

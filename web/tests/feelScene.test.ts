@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Mesh } from "three";
-import { applyPropPlacementMirror } from "../src/feelScene";
+import { applyPropPlacementMirror } from "../src/space/SpaceScene";
 import type { PropPlacement } from "../src/feelTypes";
 
 function placement(mirror: boolean): PropPlacement {
