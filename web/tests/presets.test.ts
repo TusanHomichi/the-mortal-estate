@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parsePresets, presetsFromUrl } from "../src/presets";
+import { parsePresets, presetsFromUrl, windPresetSettings } from "../src/presets";
 
 describe("URL feel presets", () => {
   it("defaults to night", () => {
@@ -15,5 +15,16 @@ describe("URL feel presets", () => {
       "dusk",
       "fog",
     ]);
+  });
+
+  it("keeps a faint idle wind and strengthens wind and rain presets", () => {
+    const calm = windPresetSettings(["night"], true);
+    const rain = windPresetSettings(["rain"], true);
+    const wind = windPresetSettings(["wind"], true);
+    expect(calm.strength).toBeGreaterThan(0);
+    expect(rain.strength).toBeGreaterThan(calm.strength);
+    expect(wind.strength).toBeGreaterThan(rain.strength);
+    expect(wind.gustPeriod).toBe(9);
+    expect(windPresetSettings(["wind", "rain"], false).strength).toBe(calm.strength);
   });
 });

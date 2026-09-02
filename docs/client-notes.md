@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-02
-revision: 11
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 11 records structural fixtures in the browser feel scene. Pending owner acceptance at the phase stop points.
+revision: 12
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 12 records shared outdoor wind and instanced grass in the browser feel scene. Pending owner acceptance at the phase stop points.
 public_safe: true
-summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, the browser feel surface's spaces, portals, fixtures, cursor, and exterior wall fade, and the proof surfaces.
+summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, the browser feel surface's spaces, portals, fixtures, cursor, outdoor wind, and exterior wall fade, and the proof surfaces.
 routes:
   - web/**
   - client/**
@@ -386,6 +386,10 @@ leaving its door tile crossable.
 Schema-2 fixtures build wall-attached structure from batched material geometry,
 block their tile, and own their practical light; only the fire inside the hearth
 remains a view-facing card.
+Outdoor tree and grass cards share one world-position-phased wind field; decoded
+art supplies the canopy weight that lets leaves stir apart from rooted trunks,
+and deterministic grass clumps remain one non-blocking, non-shadowing instanced
+draw that dedicated interiors omit.
 Walls that would cover the caretaker's tile fade without moving the camera or
 changing their accepted height; the selection rule lives in
 `web/src/walk/wallOcclusion.ts`.

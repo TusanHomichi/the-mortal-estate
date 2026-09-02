@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-02
-revision: 21
-status: Owner-accepted visual target. Revision 21 records structural geometry and 3D-sourced character cards; no renderer, asset set, or production pipeline is accepted.
+revision: 22
+status: Owner-accepted visual target. Revision 22 records rooted, shared-field wind for vegetation cards; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
-summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
+summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
   - web/**
   - client/presentation/**
@@ -459,6 +459,11 @@ and rigged in 3D, rendered at the ruled camera angle into sprite sheets with the
 pixel-cluster treatment, and shipped as cards; the raw mesh never enters the
 scene, while how many frames are rendered follows the still-open question of
 whether figures animate at all (owner ruling, 2026-09-02).
+
+Vegetation cards take motion from one world-space wind field, phase from their
+position rather than a shared loop, and hold the root while art-derived canopy
+weight lets leaves move apart from trunk; grass follows the same rooted rule
+(owner ruling, 2026-09-02).
 
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory

@@ -1,5 +1,6 @@
 import {
   Clock,
+  DataTexture,
   Mesh,
   OrthographicCamera,
   PlaneGeometry,
@@ -94,6 +95,7 @@ export async function startFeelScene(
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const textures = await decodeTextures(packet);
+  const windWeightTextures = new Map<string, DataTexture>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
   const initialCell = { i: packet.manifest.start.cell[0], j: packet.manifest.start.cell[1] };
@@ -122,6 +124,7 @@ export async function startFeelScene(
       name: target.space,
       space,
       textures,
+      windWeightTextures,
       presets,
       anisotropy,
       camera,
@@ -129,6 +132,7 @@ export async function startFeelScene(
       caretakerFacing: facing,
     });
     activeSpace = nextSpace;
+    stage.dataset.grassInstances = String(nextSpace.grassInstanceCount);
     scene.background = nextSpace.background;
     scene.add(nextSpace.group);
     const presetLabel = document.querySelector<HTMLElement>("#preset-label");
@@ -201,9 +205,11 @@ export async function startFeelScene(
       activeSpace?.dispose();
       activeFog?.dispose();
       for (const decoded of textures.values()) decoded.texture.dispose();
+      for (const texture of windWeightTextures.values()) texture.dispose();
       if (devHook !== null && window.__tmeFeel === devHook) delete window.__tmeFeel;
       delete stage.dataset.renderCalls;
       delete stage.dataset.renderMilliseconds;
+      delete stage.dataset.grassInstances;
       renderer.dispose();
     },
   };

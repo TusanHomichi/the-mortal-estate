@@ -3,13 +3,16 @@ import {
   AmbientLight,
   BufferAttribute,
   BufferGeometry,
+  ClampToEdgeWrapping,
   Color,
+  DataTexture,
   DirectionalLight,
   DoubleSide,
   DynamicDrawUsage,
   Group,
   InstancedBufferAttribute,
   InstancedMesh,
+  LinearFilter,
   Matrix4,
   Mesh,
   MeshBasicMaterial,
@@ -17,14 +20,18 @@ import {
   Object3D,
   PlaneGeometry,
   PointLight,
+  RedFormat,
   ShaderMaterial,
   ShadowMaterial,
+  UnsignedByteType,
+  Vector2,
   Vector3,
   type Material,
   type OrthographicCamera,
 } from "three";
 import { CAMERA_OFFSET, projectedHeightCoverTiles } from "../camera";
 import type { FeelSpace, PropPlacement, WallRun } from "../feelTypes";
+import { GRASS_CLUMP_HEIGHT, scatterGrassClumps } from "../grassClumps";
 import { buildGroundGeometry } from "../groundGeometry";
 import {
   buildHearthGeometry,
@@ -33,7 +40,7 @@ import {
   hearthLightPosition,
   type HearthMaterial,
 } from "../hearthGeometry";
-import type { Preset } from "../presets";
+import { windPresetSettings, type Preset, type WindPresetSettings } from "../presets";
 import {
   buildRoofGeometry,
   mergeGeometryData,
@@ -47,9 +54,10 @@ import {
   hearthFireFragmentShader,
   hearthFireVertexShader,
   hearthFlicker,
-  swayFragmentShader,
-  swayVertexShader,
+  windFragmentShader,
+  windVertexShader,
 } from "../shaders";
+import { buildWindWeight } from "../windWeight";
 import { buildWallProfile, WALL_PROFILE, type WallMaterial } from "../wallGeometry";
 import type { Cell } from "../walk/layoutPassability";
 import { occludingRuns } from "../walk/wallOcclusion";
@@ -93,6 +101,7 @@ export interface SpaceSceneOptions {
   name: string;
   space: FeelSpace;
   textures: Map<string, DecodedTexture>;
+  windWeightTextures: Map<string, DataTexture>;
   presets: readonly Preset[];
   anisotropy: number;
   camera: OrthographicCamera;
@@ -108,6 +117,47 @@ const WALL_FADED_PLASTER_OPACITY = 0.34;
 const WALL_FADED_TIMBER_OPACITY = 0.48;
 const WALL_FADED_RENDER_ORDER = 10;
 const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
+
+interface SharedWindUniforms {
+  elapsed: { value: number };
+  windDirection: { value: Vector2 };
+  windStrength: { value: number };
+  gustPeriod: { value: number };
+}
+
+function cachedWindWeightTexture(
+  cache: Map<string, DataTexture>,
+  kind: string,
+  source: DecodedTexture,
+): DataTexture {
+  const cached = cache.get(kind);
+  if (cached !== undefined) return cached;
+  if (source.pixels === null) {
+    throw new Error(`wind texture ${kind} was decoded without readable pixels`);
+  }
+  const weights = buildWindWeight(
+    { width: source.width, height: source.height, data: source.pixels },
+    kind,
+  );
+  const texture = new DataTexture(
+    weights,
+    source.width,
+    source.height,
+    RedFormat,
+    UnsignedByteType,
+  );
+  texture.name = `wind-weight-${kind}`;
+  texture.flipY = true;
+  texture.wrapS = ClampToEdgeWrapping;
+  texture.wrapT = ClampToEdgeWrapping;
+  texture.magFilter = LinearFilter;
+  texture.minFilter = LinearFilter;
+  texture.generateMipmaps = false;
+  texture.unpackAlignment = 1;
+  texture.needsUpdate = true;
+  cache.set(kind, texture);
+  return texture;
+}
 
 function wallMaterials(
   textures: Map<string, DecodedTexture>,
@@ -252,9 +302,12 @@ export class SpaceScene {
   readonly caretaker: CaretakerObjects;
   readonly background: Color;
   readonly weatherEnabled: boolean;
+  readonly grassInstanceCount: number;
 
   private readonly palette: ScenePalette;
-  private readonly swayMaterials: ShaderMaterial[] = [];
+  private readonly windMaterials: ShaderMaterial[] = [];
+  private readonly windSettings: WindPresetSettings;
+  private readonly windUniforms: SharedWindUniforms;
   private readonly wallRuns: WallRunPresentation[] = [];
   private readonly hearths: HearthPresentation[] = [];
   private readonly keyLight: DirectionalLight;
@@ -270,6 +323,13 @@ export class SpaceScene {
     this.weatherEnabled = space.weather;
     this.interior = space.roofs.length === 0;
     this.palette = paletteFor(presets, space.weather);
+    this.windSettings = windPresetSettings(presets, space.weather);
+    this.windUniforms = {
+      elapsed: { value: 0 },
+      windDirection: { value: new Vector2(...this.windSettings.direction).normalize() },
+      windStrength: { value: this.windSettings.strength },
+      gustPeriod: { value: this.windSettings.gustPeriod },
+    };
     this.background = this.palette.background;
     this.addGround();
     this.addWalls();
@@ -282,6 +342,7 @@ export class SpaceScene {
     this.lanternBase = lights.lanternBase;
     this.caretaker = this.addProps();
     this.caretaker.card.scale.x = options.caretakerFacing * Math.abs(this.caretaker.card.scale.x);
+    this.grassInstanceCount = this.addGrass();
     this.rain = space.weather && presets.includes("rain")
       ? addRain(this.group, options.camera, space.grid_extents)
       : null;
@@ -598,40 +659,18 @@ export class SpaceScene {
         facing: "view",
       },
     ];
-    const lanternPosition = space.light_sources.lantern_glass === null
-      ? new Vector3(0, 0, 0)
-      : new Vector3().fromArray(space.light_sources.lantern_glass);
     for (const prop of placements) {
       const source = requiredTexture(textures, `props/${prop.kind}`);
       configureTexture(source.texture, anisotropy);
       const width = prop.nominal_height * (source.width / source.height);
       const geometry = new PlaneGeometry(width, prop.nominal_height);
       const material = prop.sway
-        ? new ShaderMaterial({
-            name: `sway-${prop.kind}`,
-            uniforms: {
-              albedoTexture: { value: source.texture },
-              elapsed: { value: 0 },
-              windStrength: {
-                value: space.weather && this.options.presets.includes("wind") ? 1 : 0.12,
-              },
-              timeOffset: { value: prop.cell_anchor[0] * 0.73 + prop.cell_anchor[1] * 1.13 },
-              ambientColour: {
-                value: this.palette.ambient.clone().multiplyScalar(this.palette.ambientIntensity),
-              },
-              keyColour: {
-                value: this.palette.key.clone().multiplyScalar(this.palette.keyIntensity * 0.34),
-              },
-              lanternPosition: { value: lanternPosition },
-              lanternColour: { value: WARM_LIGHT.clone() },
-              lanternStrength: { value: this.palette.practicalShaderStrength },
-            },
-            vertexShader: swayVertexShader,
-            fragmentShader: swayFragmentShader,
-            transparent: true,
-            alphaTest: 0.12,
-            side: DoubleSide,
-          })
+        ? this.createWindMaterial(
+            prop.kind,
+            source,
+            new Vector2(prop.cell_anchor[0], prop.cell_anchor[1]),
+            `wind-${prop.kind}`,
+          )
         : new MeshStandardMaterial({
             name: `prop-${prop.kind}`,
             map: source.texture,
@@ -641,7 +680,6 @@ export class SpaceScene {
             metalness: 0,
             side: DoubleSide,
           });
-      if (material instanceof ShaderMaterial) this.swayMaterials.push(material);
       const mesh = new Mesh(geometry, material);
       mesh.name = `Prop_${prop.kind}`;
       const transform = propCardTransform(prop);
@@ -667,6 +705,83 @@ export class SpaceScene {
     }
     if (caretaker === null) throw new Error("the space scene failed to place its caretaker");
     return caretaker;
+  }
+
+  private createWindMaterial(
+    kind: string,
+    source: DecodedTexture,
+    worldAnchor: Vector2,
+    name: string,
+  ): ShaderMaterial {
+    const lanternPosition = this.options.space.light_sources.lantern_glass === null
+      ? new Vector3(0, 0, 0)
+      : new Vector3().fromArray(this.options.space.light_sources.lantern_glass);
+    const material = new ShaderMaterial({
+      name,
+      uniforms: {
+        albedoTexture: { value: source.texture },
+        windWeightTexture: {
+          value: cachedWindWeightTexture(
+            this.options.windWeightTextures,
+            kind,
+            source,
+          ),
+        },
+        elapsed: this.windUniforms.elapsed,
+        windDirection: this.windUniforms.windDirection,
+        windStrength: this.windUniforms.windStrength,
+        gustPeriod: this.windUniforms.gustPeriod,
+        worldAnchor: { value: worldAnchor },
+        ambientColour: {
+          value: this.palette.ambient.clone().multiplyScalar(this.palette.ambientIntensity),
+        },
+        keyColour: {
+          value: this.palette.key.clone().multiplyScalar(this.palette.keyIntensity * 0.34),
+        },
+        lanternPosition: { value: lanternPosition },
+        lanternColour: { value: WARM_LIGHT.clone() },
+        lanternStrength: { value: this.palette.practicalShaderStrength },
+      },
+      vertexShader: windVertexShader,
+      fragmentShader: windFragmentShader,
+      transparent: true,
+      alphaTest: 0.12,
+      side: DoubleSide,
+    });
+    this.windMaterials.push(material);
+    return material;
+  }
+
+  private addGrass(): number {
+    const clumps = scatterGrassClumps(this.options.space);
+    if (clumps.length === 0) return 0;
+    const source = requiredTexture(this.options.textures, "props/grass_clump");
+    configureTexture(source.texture, this.options.anisotropy);
+    const width = GRASS_CLUMP_HEIGHT * (source.width / source.height);
+    const geometry = new PlaneGeometry(width, GRASS_CLUMP_HEIGHT);
+    const material = this.createWindMaterial(
+      "grass_clump",
+      source,
+      new Vector2(),
+      "wind-grass-clumps",
+    );
+    const mesh = new InstancedMesh(geometry, material, clumps.length);
+    mesh.name = "GrassClumps";
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.frustumCulled = false;
+    const cardRotation = Math.atan2(CAMERA_OFFSET.x, CAMERA_OFFSET.z);
+    const dummy = new Object3D();
+    clumps.forEach((clump, index) => {
+      dummy.position.set(clump.x, GRASS_CLUMP_HEIGHT * clump.scale * 0.5, clump.z);
+      dummy.rotation.set(0, cardRotation, 0);
+      dummy.scale.set((clump.mirror ? -1 : 1) * clump.scale, clump.scale, 1);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(index, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    this.group.add(mesh);
+    return clumps.length;
   }
 
   focusLighting(previous: Cell, next: Cell): void {
@@ -707,11 +822,14 @@ export class SpaceScene {
   }
 
   update(elapsed: number): void {
+    this.windUniforms.elapsed.value = elapsed;
+    this.windUniforms.windDirection.value.set(...this.windSettings.direction).normalize();
+    this.windUniforms.windStrength.value = this.windSettings.strength;
+    this.windUniforms.gustPeriod.value = this.windSettings.gustPeriod;
     const noise = Math.sin(elapsed * 5.7 + 1.731) * 0.055 +
       Math.sin(elapsed * 11.3 + 2.943) * 0.025;
     if (this.lantern !== null) this.lantern.intensity = this.lanternBase * (1 + noise);
-    for (const material of this.swayMaterials) {
-      material.uniforms.elapsed!.value = elapsed;
+    for (const material of this.windMaterials) {
       material.uniforms.lanternStrength!.value =
         this.palette.practicalShaderStrength * (1 + noise);
     }

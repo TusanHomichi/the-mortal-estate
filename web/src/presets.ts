@@ -17,3 +17,23 @@ export function parsePresets(raw: string | null | undefined): Preset[] {
 export function presetsFromUrl(url: URL): Preset[] {
   return parsePresets(url.searchParams.get("preset"));
 }
+
+export interface WindPresetSettings {
+  strength: number;
+  gustPeriod: number;
+  direction: readonly [number, number];
+}
+
+export function windPresetSettings(
+  presets: readonly Preset[],
+  weatherEnabled: boolean,
+): WindPresetSettings {
+  const base = 0.16;
+  const wind = weatherEnabled && presets.includes("wind") ? 0.84 : 0;
+  const rain = weatherEnabled && presets.includes("rain") ? 0.18 : 0;
+  return {
+    strength: base + wind + rain,
+    gustPeriod: 9,
+    direction: [0.86, 0.51],
+  };
+}

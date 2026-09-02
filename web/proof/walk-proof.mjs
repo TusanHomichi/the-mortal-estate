@@ -1,15 +1,18 @@
 import assert from "node:assert/strict";
-import { mkdir } from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { chromium } from "playwright";
 
 const proofDirectory = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(proofDirectory, "..");
 const captureRoot = "/data/dev/home/tme-visual-lab/web-feel-v26/walk-captures";
 const packetV2 = "/data/dev/home/tme-visual-lab/web-feel-v26/world/packet-v2";
+const sequenceFrames = path.join(captureRoot, ".wind-sequence-frames");
+const execFileAsync = promisify(execFile);
 
 async function freePort() {
   const server = net.createServer();
@@ -133,6 +136,43 @@ async function measureFrames(page) {
   );
 }
 
+async function captureWindSequence(page) {
+  await rm(sequenceFrames, { recursive: true, force: true });
+  await mkdir(sequenceFrames, { recursive: true });
+  const startedAt = await page.evaluate(() => performance.now());
+  for (let index = 0; index < 12; index += 1) {
+    await page.waitForFunction(
+      ({ start, target }) => performance.now() - start >= target,
+      { start: startedAt, target: index * 250 },
+    );
+    await page.screenshot({
+      path: path.join(sequenceFrames, `wind-frame-${String(index).padStart(2, "0")}.png`),
+    });
+  }
+  const output = path.join(captureRoot, "walk-wind-sequence.webp");
+  await execFileAsync("ffmpeg", [
+    "-loglevel", "error",
+    "-y",
+    "-framerate", "4",
+    "-i", path.join(sequenceFrames, "wind-frame-%02d.png"),
+    "-frames:v", "12",
+    "-an",
+    "-c:v", "libwebp_anim",
+    "-quality", "82",
+    "-loop", "0",
+    output,
+  ]);
+  const { stdout } = await execFileAsync("magick", [
+    "identify",
+    "-format", "%n %T\n",
+    output,
+  ]);
+  const frames = stdout.trim().split("\n");
+  assert.equal(frames.length, 12);
+  assert.ok(frames.every((frame) => frame === "12 25"));
+  await rm(sequenceFrames, { recursive: true, force: true });
+}
+
 async function draftAndCommit(page, clockStartedAt, from, target) {
   const point = await groundCellPoint(page, from, target);
   await page.mouse.move(point.x, point.y);
@@ -229,7 +269,7 @@ try {
   });
   page.on("pageerror", (error) => consoleErrors.push(`page: ${error.message}`));
 
-  await page.goto(`${baseUrl}?preset=night`, { waitUntil: "networkidle" });
+  await page.goto(`${baseUrl}?preset=wind`, { waitUntil: "networkidle" });
   await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
@@ -237,11 +277,15 @@ try {
   const clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
   assert.ok(Number.isFinite(clockStartedAt));
   assert.equal(await stageAttribute(page, "data-walk-space"), "estate-grounds");
+  const grassInstances = Number(await stageAttribute(page, "data-grass-instances"));
+  assert.ok(grassInstances > 0 && grassInstances <= 1_800);
   const start = parseCell(await stageAttribute(page, "data-caretaker-cell"));
   assert.deepEqual(start, { i: 13, j: 11 });
   await assertCaretakerCentred(page);
 
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.screenshot({ path: path.join(captureRoot, "walk-wind.png") });
+  await captureWindSequence(page);
   await page.screenshot({ path: path.join(captureRoot, "walk-roofs.png") });
   const measurement = await measureFrames(page);
   assert.ok(Number.isFinite(measurement.calls) && measurement.calls > 0);
@@ -261,6 +305,7 @@ try {
     { i: 4, j: 3 },
   );
   await page.screenshot({ path: path.join(captureRoot, "walk-interior.png") });
+  assert.equal(await stageAttribute(page, "data-grass-instances"), "0");
 
   await walkThroughPortal(
     page,
@@ -271,14 +316,17 @@ try {
     { i: 11, j: 7 },
   );
   await page.screenshot({ path: path.join(captureRoot, "walk-exterior-return.png") });
+  assert.equal(Number(await stageAttribute(page, "data-grass-instances")), grassInstances);
 
   assert.deepEqual(consoleErrors, []);
   console.log(
-    `PASS walk proof: ${captureRoot}; exterior draw calls ${measurement.calls}; ` +
+    `PASS walk proof: ${captureRoot}; ${grassInstances} grass clumps; ` +
+      `exterior draw calls ${measurement.calls}; ` +
       `30-frame rAF average ${measurement.averageRafMilliseconds.toFixed(3)} ms; ` +
       `render average ${measurement.averageRenderMilliseconds.toFixed(3)} ms`,
   );
 } finally {
   await browser?.close();
   await stopServer(server);
+  await rm(sequenceFrames, { recursive: true, force: true });
 }

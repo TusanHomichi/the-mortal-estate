@@ -14,16 +14,43 @@ export interface DecodedTexture {
   texture: Texture;
   width: number;
   height: number;
+  pixels: Uint8ClampedArray | null;
 }
 
 export async function decodeTextures(
   packet: VerifiedAssetPacket,
 ): Promise<Map<string, DecodedTexture>> {
   const decoded = new Map<string, DecodedTexture>();
+  const windTextureKeys = new Set(
+    Object.values(packet.manifest.spaces).flatMap((space) =>
+      space.props
+        .filter((prop) => prop.sway)
+        .map((prop) => `props/${prop.kind}`)
+    ),
+  );
+  if (packet.assets.has("props/grass_clump")) windTextureKeys.add("props/grass_clump");
   await Promise.all(
     [...packet.assets.entries()].map(async ([key, asset]) => {
+      const blob = new Blob([asset.bytes], { type: "image/png" });
+      let pixels: Uint8ClampedArray | null = null;
+      if (windTextureKeys.has(key)) {
+        const readableBitmap = await createImageBitmap(blob);
+        const canvas = document.createElement("canvas");
+        canvas.width = readableBitmap.width;
+        canvas.height = readableBitmap.height;
+        const canvasContext = canvas.getContext("2d", { willReadFrequently: true });
+        if (canvasContext === null) throw new Error(`decoded texture ${key} has no 2D context`);
+        canvasContext.drawImage(readableBitmap, 0, 0);
+        pixels = canvasContext.getImageData(
+          0,
+          0,
+          readableBitmap.width,
+          readableBitmap.height,
+        ).data;
+        readableBitmap.close();
+      }
       // ImageBitmap uploads ignore Texture.flipY in WebGL. Flip while decoding.
-      const bitmap = await createImageBitmap(new Blob([asset.bytes], { type: "image/png" }), {
+      const bitmap = await createImageBitmap(blob, {
         imageOrientation: "flipY",
       });
       const texture = new Texture(bitmap);
@@ -35,7 +62,7 @@ export async function decodeTextures(
       texture.minFilter = LinearMipmapLinearFilter;
       texture.generateMipmaps = true;
       texture.needsUpdate = true;
-      decoded.set(key, { texture, width: bitmap.width, height: bitmap.height });
+      decoded.set(key, { texture, width: bitmap.width, height: bitmap.height, pixels });
     }),
   );
   return decoded;

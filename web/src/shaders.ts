@@ -41,36 +41,84 @@ export const groundFragmentShader = /* glsl */ `
   }
 `;
 
-export const swayVertexShader = /* glsl */ `
+const windFieldGlsl = /* glsl */ `
+  float windField(vec2 worldXZ, float time) {
+    vec2 direction = normalize(windDirection);
+    float along = dot(worldXZ, direction);
+    float across = dot(worldXZ, vec2(-direction[1], direction[0]));
+    float firstOctave = sin(along * 1.37 + across * 0.41 - time * 0.83);
+    float secondOctave = sin(along * 2.71 - across * 1.19 - time * 1.43 + 1.8);
+    float gust = 0.72 + 0.28 * sin(6.2831853 * time / max(gustPeriod, 0.1) + along * 0.13);
+    return (firstOctave * 0.68 + secondOctave * 0.32) * gust;
+  }
+`;
+
+export const windVertexShader = /* glsl */ `
   uniform float elapsed;
+  uniform vec2 windDirection;
   uniform float windStrength;
-  uniform float timeOffset;
+  uniform float gustPeriod;
+  uniform vec2 worldAnchor;
   varying vec2 vUv;
+  varying vec2 vWindAnchor;
   varying vec3 vWorldPosition;
+
+  ${windFieldGlsl}
 
   void main() {
     vUv = uv;
-    vec3 moved = position;
-    float crown = smoothstep(0.18, 1.0, 1.0 - uv.y);
-    moved.x += sin(elapsed * 1.15 + timeOffset + moved.y * 1.7) * windStrength * 0.055 * crown;
-    vec4 worldPosition = modelMatrix * vec4(moved, 1.0);
+    vec4 worldPosition;
+    vec2 anchor;
+    #ifdef USE_INSTANCING
+      worldPosition = modelMatrix * instanceMatrix * vec4(position, 1.0);
+      vec4 instanceAnchor = modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      anchor = vec2(instanceAnchor[0], instanceAnchor[2]);
+    #else
+      worldPosition = modelMatrix * vec4(position, 1.0);
+      anchor = worldAnchor;
+    #endif
+    float heightTerm = smoothstep(0.0, 1.0, uv[1]);
+    float displacement = windField(anchor, elapsed) * windStrength * 0.075 * heightTerm;
+    worldPosition[0] += windDirection[0] * displacement;
+    worldPosition[2] += windDirection[1] * displacement;
+    vWindAnchor = anchor;
     vWorldPosition = vec3(worldPosition);
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
   }
 `;
 
-export const swayFragmentShader = /* glsl */ `
+export const windFragmentShader = /* glsl */ `
   uniform sampler2D albedoTexture;
+  uniform sampler2D windWeightTexture;
+  uniform float elapsed;
+  uniform vec2 windDirection;
+  uniform float windStrength;
+  uniform float gustPeriod;
   uniform vec3 ambientColour;
   uniform vec3 keyColour;
   uniform vec3 lanternPosition;
   uniform vec3 lanternColour;
   uniform float lanternStrength;
   varying vec2 vUv;
+  varying vec2 vWindAnchor;
   varying vec3 vWorldPosition;
 
+  ${windFieldGlsl}
+
   void main() {
-    vec4 texel = texture2D(albedoTexture, vUv);
+    float weight = texture2D(windWeightTexture, vUv)[0];
+    vec2 fieldPosition = vWindAnchor + vec2((vUv[0] - 0.5) * 0.7, vUv[1] * 0.5);
+    float field = windField(fieldPosition, elapsed);
+    vec2 imageDirection = normalize(vec2(
+      windDirection[0] * 0.82 + windDirection[1] * 0.48,
+      windDirection[1] * 0.18 + 0.02
+    ));
+    vec2 sampleUv = clamp(
+      vUv + imageDirection * field * windStrength * weight * 0.014,
+      vec2(0.002),
+      vec2(0.998)
+    );
+    vec4 texel = texture2D(albedoTexture, sampleUv);
     if (texel.a < 0.12) discard;
     float lanternDistance = length(vWorldPosition - lanternPosition);
     float lantern = lanternStrength / (1.0 + lanternDistance * lanternDistance * 2.4);
