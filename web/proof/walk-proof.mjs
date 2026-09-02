@@ -68,6 +68,19 @@ async function stageAttribute(page, name) {
   return value;
 }
 
+async function wallRunPlasterOpacity(page, runIndex) {
+  return page.evaluate((index) => {
+    if (window.__tmeFeel === undefined) {
+      throw new Error("the walk proof found no development feel-scene hook");
+    }
+    const opacity = window.__tmeFeel.wallRunPlasterOpacity(index);
+    if (opacity === null) {
+      throw new Error(`the walk proof found no wall run ${index}`);
+    }
+    return opacity;
+  }, runIndex);
+}
+
 function assertCustomCursorValue(value, fallback) {
   assert.match(value, /^url\(["']?data:image\/svg\+xml,/);
   assert.ok(value.endsWith(`, ${fallback}`), `cursor fallback is ${value}`);
@@ -368,8 +381,27 @@ try {
     parseCell(await stageAttribute(page, "data-caretaker-cell")),
     doorFarSide,
   );
+  await page.waitForFunction(
+    () => document.querySelector("#feel-stage")?.dataset.walkFadedRuns === "1",
+    null,
+    { timeout: 500 },
+  );
+  await page.waitForTimeout(500);
+  assert.ok(
+    (await wallRunPlasterOpacity(page, 1)) <= 0.45,
+    "the south wall plaster stayed too opaque to reveal the caretaker",
+  );
+  await page.screenshot({ path: path.join(captureRoot, "walk-behind-wall.png") });
   await page.screenshot({ path: path.join(captureRoot, "walk-landed.png") });
   await page.screenshot({ path: path.join(captureRoot, "walk-world.png") });
+
+  await walkRoute(page, clockStartedAt, doorFarSide, doorApproach, "run");
+  assert.equal(await stageAttribute(page, "data-walk-faded-runs"), "0");
+  await page.waitForFunction(
+    () => window.__tmeFeel?.wallRunPlasterOpacity(1) === 1,
+    null,
+    { timeout: 500 },
+  );
 
   assert.deepEqual(consoleErrors, []);
   console.log(

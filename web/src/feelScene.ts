@@ -29,8 +29,13 @@ import {
   Vector4,
   WebGLRenderer,
 } from "three";
-import { CAMERA_OFFSET, createFeelCamera, resizeFeelCamera } from "./camera";
-import type { FeelManifest, VerifiedAssetPacket } from "./feelTypes";
+import {
+  CAMERA_OFFSET,
+  createFeelCamera,
+  projectedHeightCoverTiles,
+  resizeFeelCamera,
+} from "./camera";
+import type { FeelManifest, VerifiedAssetPacket, WallRun } from "./feelTypes";
 import { buildGroundGeometry } from "./groundGeometry";
 import type { Preset } from "./presets";
 import {
@@ -41,7 +46,14 @@ import {
   swayFragmentShader,
   swayVertexShader,
 } from "./shaders";
-import { buildWallProfile, type GeometryData, type WallMaterial } from "./wallGeometry";
+import {
+  buildWallProfile,
+  WALL_PROFILE,
+  type GeometryData,
+  type WallMaterial,
+} from "./wallGeometry";
+import type { Cell } from "./walk/layoutPassability";
+import { occludingRuns } from "./walk/wallOcclusion";
 import { createWalkPresenter } from "./walk/walkPresenter";
 
 interface DecodedTexture {
@@ -66,6 +78,31 @@ interface RainSystem {
   update: (elapsed: number) => void;
 }
 
+interface WallRunPresentation {
+  run: WallRun;
+  materials: Record<WallMaterial, MeshStandardMaterial>;
+  fadeableMeshes: Mesh[];
+  fadeAmount: number;
+  fadeStartedAt: number;
+  fadeStartedFrom: number;
+  fadeTarget: number;
+}
+
+interface WallFadeController {
+  update(playerCell: Cell, now: number): number;
+  plasterOpacity(runIndex: number): number | null;
+}
+
+interface FeelDevHook {
+  wallRunPlasterOpacity(runIndex: number): number | null;
+}
+
+declare global {
+  interface Window {
+    __tmeFeel?: FeelDevHook;
+  }
+}
+
 export interface FeelSceneHandle {
   renderer: WebGLRenderer;
   camera: OrthographicCamera;
@@ -74,6 +111,11 @@ export interface FeelSceneHandle {
 
 const WARM_LIGHT = new Color("#ffb457");
 const RAIN_COUNT = 1080;
+export const WALL_FADE_DURATION_SECONDS = 0.35;
+export const WALL_FADED_PLASTER_OPACITY = 0.42;
+export const WALL_FADED_TIMBER_OPACITY = 0.55;
+const WALL_FADED_RENDER_ORDER = 10;
+const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
 
 function paletteFor(presets: readonly Preset[]): ScenePalette {
   return presets.includes("dusk")
@@ -218,7 +260,7 @@ function wallMaterials(
   textures: Map<string, DecodedTexture>,
   anisotropy: number,
 ): Record<WallMaterial, MeshStandardMaterial> {
-  const build = (name: WallMaterial, alpha = false): MeshStandardMaterial => {
+  const build = (name: WallMaterial, cutout = false): MeshStandardMaterial => {
     const map = requiredTexture(textures, `walls/${name}`).texture;
     configureTexture(map, anisotropy);
     return new MeshStandardMaterial({
@@ -226,9 +268,8 @@ function wallMaterials(
       map,
       roughness: 0.86,
       metalness: 0,
-      alphaTest: alpha ? 0.12 : 0,
-      transparent: alpha,
-      side: alpha ? DoubleSide : undefined,
+      alphaTest: cutout ? 0.12 : 0,
+      side: cutout ? DoubleSide : undefined,
     });
   };
   return {
@@ -242,20 +283,114 @@ function wallMaterials(
   };
 }
 
+function cloneWallMaterials(
+  shared: Record<WallMaterial, MeshStandardMaterial>,
+  runIndex: number,
+): Record<WallMaterial, MeshStandardMaterial> {
+  return Object.fromEntries(
+    (Object.entries(shared) as [WallMaterial, MeshStandardMaterial][]).map(
+      ([name, material]) => {
+        const clone = material.clone();
+        clone.name = `wall-run-${runIndex}-${name}`;
+        return [name, clone];
+      },
+    ),
+  ) as Record<WallMaterial, MeshStandardMaterial>;
+}
+
+function easeOutCubic(progress: number): number {
+  return 1 - (1 - progress) ** 3;
+}
+
+function fadeAmountAt(run: WallRunPresentation, now: number): number {
+  if (run.fadeAmount === run.fadeTarget) return run.fadeTarget;
+  const progress = Math.min(
+    1,
+    Math.max(0, (now - run.fadeStartedAt) / WALL_FADE_DURATION_SECONDS),
+  );
+  return (
+    run.fadeStartedFrom +
+    (run.fadeTarget - run.fadeStartedFrom) * easeOutCubic(progress)
+  );
+}
+
+function applyWallFade(run: WallRunPresentation, amount: number): void {
+  const faded = amount > 0;
+  for (const [name, material] of Object.entries(run.materials) as [
+    WallMaterial,
+    MeshStandardMaterial,
+  ][]) {
+    if (name === "plinth") continue;
+    const fadedOpacity = name === "plaster"
+      ? WALL_FADED_PLASTER_OPACITY
+      : WALL_FADED_TIMBER_OPACITY;
+    material.opacity = 1 + (fadedOpacity - 1) * amount;
+    if (material.transparent !== faded) {
+      material.transparent = faded;
+      material.needsUpdate = true;
+    }
+    material.depthWrite = !faded;
+  }
+  for (const mesh of run.fadeableMeshes) {
+    mesh.renderOrder = faded ? WALL_FADED_RENDER_ORDER : 0;
+  }
+}
+
 function addWalls(
   scene: Scene,
   manifest: FeelManifest,
   textures: Map<string, DecodedTexture>,
   anisotropy: number,
-): void {
-  const materials = wallMaterials(textures, anisotropy);
+): WallFadeController {
+  const sharedMaterials = wallMaterials(textures, anisotropy);
+  const runs: WallRunPresentation[] = manifest.layout.wall_runs.map(
+    (run, runIndex) => ({
+      run,
+      materials: cloneWallMaterials(sharedMaterials, runIndex),
+      fadeableMeshes: [],
+      fadeAmount: 0,
+      fadeStartedAt: 0,
+      fadeStartedFrom: 0,
+      fadeTarget: 0,
+    }),
+  );
   for (const part of buildWallProfile(manifest.layout.wall_runs)) {
-    const mesh = new Mesh(geometryFromData(part.geometry), materials[part.material]);
-    mesh.name = part.label;
+    const run = runs[part.runIndex];
+    if (run === undefined) {
+      throw new Error(`wall part ${part.label} names absent run ${part.runIndex}`);
+    }
+    const mesh = new Mesh(geometryFromData(part.geometry), run.materials[part.material]);
+    mesh.name = `WallRun_${part.runIndex}_${part.label}`;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
+    if (part.material !== "plinth") run.fadeableMeshes.push(mesh);
     scene.add(mesh);
   }
+
+  return {
+    update: (playerCell: Cell, now: number): number => {
+      const selected = new Set(
+        occludingRuns(manifest.layout.wall_runs, playerCell, WALL_COVER_TILES),
+      );
+      let fadedRuns = 0;
+      for (const run of runs) {
+        const target = selected.has(run.run) ? 1 : 0;
+        if (target === 1) fadedRuns += 1;
+        if (target !== run.fadeTarget) {
+          const current = fadeAmountAt(run, now);
+          run.fadeAmount = current;
+          run.fadeStartedFrom = current;
+          run.fadeStartedAt = now;
+          run.fadeTarget = target;
+        }
+        run.fadeAmount = fadeAmountAt(run, now);
+        applyWallFade(run, run.fadeAmount);
+      }
+      return fadedRuns;
+    },
+    plasterOpacity: (runIndex: number): number | null =>
+      runs[runIndex]?.materials.plaster.opacity ?? null,
+  };
 }
 
 function addContactShadow(scene: Scene, x: number, z: number, height: number): Mesh {
@@ -521,7 +656,7 @@ export async function startFeelScene(
   const lanternPosition = new Vector3().fromArray(manifest.layout.light_sources.lantern_glass);
 
   addGround(scene, manifest, textures, presets, palette, anisotropy);
-  addWalls(scene, manifest, textures, anisotropy);
+  const wallFade = addWalls(scene, manifest, textures, anisotropy);
   const { lantern, lanternBase, keyLight, keyTarget } = addLights(
     scene,
     manifest,
@@ -552,8 +687,13 @@ export async function startFeelScene(
     initialCell,
     keyLight,
     keyTarget,
+    updateWallFade: wallFade.update,
     startedAt: performance.now() / 1000,
   });
+  const devHook: FeelDevHook | null = import.meta.env["DEV"]
+    ? { wallRunPlasterOpacity: wallFade.plasterOpacity }
+    : null;
+  if (devHook !== null) window.__tmeFeel = devHook;
   let animationFrame = 0;
   let stopped = false;
 
@@ -597,6 +737,9 @@ export async function startFeelScene(
       cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
       walkPresenter.stop();
+      if (devHook !== null && window.__tmeFeel === devHook) {
+        delete window.__tmeFeel;
+      }
       delete stage.dataset.renderCalls;
       delete stage.dataset.renderMilliseconds;
       renderer.dispose();

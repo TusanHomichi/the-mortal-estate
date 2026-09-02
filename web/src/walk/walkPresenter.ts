@@ -61,6 +61,7 @@ export interface WalkPresenterOptions {
   initialCell: Cell;
   keyLight: DirectionalLight;
   keyTarget: Object3D;
+  updateWallFade: (playerCell: Cell, now: number) => number;
   startedAt: number;
 }
 
@@ -162,7 +163,17 @@ function makeHoverOutline(): LineLoop<BufferGeometry, LineBasicMaterial> {
 }
 
 export function createWalkPresenter(options: WalkPresenterOptions): WalkPresenter {
-  const { stage, canvas, scene, camera, layout, caretaker, keyLight, keyTarget } = options;
+  const {
+    stage,
+    canvas,
+    scene,
+    camera,
+    layout,
+    caretaker,
+    keyLight,
+    keyTarget,
+    updateWallFade,
+  } = options;
   const passability = passabilityFrom(layout);
   const standInClock = new BeatClock(options.startedAt);
   const homeScaleX = Math.abs(caretaker.card.scale.x || 1);
@@ -188,6 +199,9 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   let landedFootprints: LandedFootprints | null = null;
   let hoverCell: Cell | null = null;
   stage.dataset.walkClockStartedAt = String(options.startedAt);
+  stage.dataset.walkFadedRuns = String(
+    updateWallFade(state.caretakerCell, options.startedAt),
+  );
 
   const clearFootprints = (): void => {
     for (const footprint of footprints) {
@@ -382,6 +396,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     update: (now: number): void => {
       const advanced = advanceWalk(state, now);
       if (advanced !== state) transition(advanced, now);
+      stage.dataset.walkFadedRuns = String(updateWallFade(state.caretakerCell, now));
 
       if (landedFootprints !== null) {
         const fade = Math.max(
@@ -419,6 +434,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.walkCursor;
       delete stage.dataset.walkOutline;
       delete stage.dataset.walkClockStartedAt;
+      delete stage.dataset.walkFadedRuns;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;
     },

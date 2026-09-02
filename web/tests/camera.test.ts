@@ -5,7 +5,9 @@ import {
   createFeelCamera,
   focusFeelCamera,
   projectedCellDiamondWidth,
+  projectedHeightCoverTiles,
 } from "../src/camera";
+import { WALL_PROFILE } from "../src/wallGeometry";
 
 describe("the ruled feel camera", () => {
   it("projects one cell to a 224-pixel-wide diamond at 1280 by 800", () => {
@@ -26,5 +28,9 @@ describe("the ruled feel camera", () => {
       expect(projected.x).toBeCloseTo(0, 12);
       expect(projected.y).toBeCloseTo(0, 12);
     }
+  });
+
+  it("derives a wall's ground cover from the ruled camera and profile", () => {
+    expect(projectedHeightCoverTiles(WALL_PROFILE.capTop)).toBeCloseTo(5.39, 2);
   });
 });

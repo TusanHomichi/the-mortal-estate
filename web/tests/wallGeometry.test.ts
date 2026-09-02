@@ -21,6 +21,8 @@ describe("wall profile geometry", () => {
       expect(part.geometry.indices.length % 3, part.label).toBe(0);
     }
     expect(parts.some((part) => part.label === "corner-post")).toBe(true);
+    expect(parts.find((part) => part.label === "cap-front-z")?.runIndex).toBe(0);
+    expect(parts.find((part) => part.label === "cap-front-x")?.runIndex).toBe(1);
     expect(parts.filter((part) => part.label.startsWith("post-"))).toHaveLength(15);
     expect(parts.filter((part) => part.label.startsWith("brace-"))).toHaveLength(5);
   });
