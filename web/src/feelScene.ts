@@ -29,7 +29,7 @@ import {
   Vector4,
   WebGLRenderer,
 } from "three";
-import { createFeelCamera, resizeFeelCamera } from "./camera";
+import { CAMERA_OFFSET, createFeelCamera, resizeFeelCamera } from "./camera";
 import type { FeelManifest, VerifiedAssetPacket } from "./feelTypes";
 import { buildGroundGeometry } from "./groundGeometry";
 import type { Preset } from "./presets";
@@ -474,8 +474,17 @@ function makeFogOverlay(): {
   return { scene, camera, material };
 }
 
-function lookAtCameraAroundY(mesh: Mesh, camera: OrthographicCamera): void {
-  mesh.lookAt(camera.position.x, mesh.position.y, camera.position.z);
+/**
+ * Every card faces the orthographic view direction, not the camera's position.
+ * Under an orthographic camera all view rays are parallel, so a card turned
+ * toward the camera point instead is foreshortened by however far it sits from
+ * the camera's axis — a tree at the edge of the frame read as seen edge-on.
+ * One shared yaw also keeps the cards still when the camera re-centres.
+ */
+const BILLBOARD_YAW = Math.atan2(CAMERA_OFFSET.x, CAMERA_OFFSET.z);
+
+function faceTheView(mesh: Mesh): void {
+  mesh.rotation.set(0, BILLBOARD_YAW, 0);
 }
 
 export async function startFeelScene(
@@ -529,7 +538,7 @@ export async function startFeelScene(
     anisotropy,
     lanternPosition,
   );
-  billboards.forEach((billboard) => lookAtCameraAroundY(billboard, camera));
+  billboards.forEach(faceTheView);
   const rain = presets.includes("rain") ? addRain(scene, camera) : null;
   const fog = presets.includes("fog") ? makeFogOverlay() : null;
   const clock = new Clock();
