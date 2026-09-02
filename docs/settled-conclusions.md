@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-08-31
-revision: 12
-status: Authored at genesis plan Phase 7; a live index that grows as slices close. Revision 12 records the owner-selected orthographic 2:1 dimetric projection and retires the screen-square elevation and pixel-cell assumptions it supersedes.
+last_updated: 2026-09-02
+revision: 13
+status: Authored at genesis plan Phase 7; a live index that grows as slices close. Revision 13 records the owner-ruled whole-route landing in the browser feel surface while keeping its allowance and pace reopened.
 public_safe: true
 summary: The anti-rework index — closed conclusions about this project's code, method, visual projection, and relational scale; their owners; and what reopening one costs.
 always: true
@@ -39,6 +39,7 @@ the wrong place for something that is deliberately open — see
 | Tile assembly | A restrained material joint may remain visible between logical square world cells after they project as 2:1 diamonds. Adjacent cell interiors share material and scale grammar but need not continue pixel-perfectly. Exact raster source resolution, native diamond bounds, tile-edge length, and joint width remain representative-scene calibration; the retired 64 × 64 screen-cell contract carries no authority. | [presentation direction](presentation-direction.md#tile-assembly-ruling) — owner rulings 2026-08-30 and 2026-08-31 |
 | Cutaway building assembly | Building floors, wall runs, and openings use the same cell ruler. Active play is roof-off by default; a separately controllable roof layer never owns footprint, wall height, door scale, occupancy, interaction, or sorting. | [presentation direction](presentation-direction.md#tile-assembly-ruling) — owner ruling 2026-08-30 |
 | Ground-contact anchoring | Actors keep one authoritative feet/contact anchor at the centre of one logical square ground cell. Their volumetric world-up bodies may cover neighboring projected diamonds. A doorway threshold remains a separate presentation point. Visual extent and draw order never redefine occupancy, collision, walkability, or semantic targeting. | [presentation direction](presentation-direction.md#tile-assembly-ruling) — owner rulings 2026-08-30 and 2026-08-31 |
+| Movement lands on the beat | A move is a player-authored direct route of one to three squares that lands whole on the next strike of the beat; the figure stands on its square until then, and nothing slides between squares. A route that cannot be authored is refused, never re-routed. The route allowance and pace remain reopened under D2. | [presentation direction](presentation-direction.md#the-in-engine-feel-scene) — owner ruling 2026-09-02 |
 | Relative visual scale | The logical terrain cell is one shared ruler, not one object size. Adult humans are the review baseline; buildings must read as occupiable volumes larger than people, and subjects intended as large must be visibly taller/more massive when measured under the accepted projection at the same ground contact and display scale. Exact dimensions remain authored and test-calibrated. | [presentation direction](presentation-direction.md#relative-scale-ruling) — owner rulings 2026-08-30 and 2026-08-31 |
 | One world | One canonical persistent world; no player-selectable divergent copies. Enforced in the schema by a singleton index, not only in code. | [server notes](server-notes.md#the-world-instance-and-what-it-is-for) — owner ruling D4 |
 | Logical time | The rules clock is logical rounds, deliberately independent of wall-clock seconds. Wall time belongs to the server, and the cadence is one value in one place. | [boundary map](boundary-map.md#14-deterministic-logical-time) |

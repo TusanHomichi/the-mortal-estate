@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 5
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 5 records the browser feel scene's bounded local walk experiment. Pending owner acceptance at the phase stop points.
+revision: 6
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 6 records the owner-ruled whole-route landing in the browser feel scene's bounded local walk experiment. Pending owner acceptance at the phase stop points.
 public_safe: true
 summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, and the proof surfaces.
 routes:
@@ -360,13 +360,19 @@ renderer is free to remove behind the same seam.
 
 ### The web feel scene's walk experiment
 
-The browser feel scene can locally preview a packet-derived path with footprints,
-commit it on a double click, and spread the caretaker's steps across a beat; its
-packet-layout passability and pulse-cadence clock are both disposable local
-stand-ins rather than received authority, and the pure claims live in
-`web/tests/` while `web/proof/walk-proof.mjs` drives and captures the real tab. A
-later single-click preview remains visible beside the committed route without
-stopping it; recommitting replaces only the future route after the current step.
+The browser feel scene's local experiment lets one click draft a direct route of
+one to three squares; an impassable step or farther target clears the draft
+instead of finding another way. A second click on that square or a double click
+commits it, another square re-drafts it, and Escape or right-click clears both a
+draft and an unlanded commitment. The caretaker stands on its current square
+until the next strike of one shared local beat, then the route lands whole;
+drafting remains free and a replacement commitment keeps that strike. Its
+packet-layout passability and three-second clock are disposable local stand-ins,
+with pure claims in `web/tests/` and the real-tab proof in
+`web/proof/walk-proof.mjs`. This is the opposite of `GridWorldView`'s
+spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
+permission for presentation to remain fluid between beats is permission, not a
+requirement.
 
 ### The preparation band and feedback inside its beat
 

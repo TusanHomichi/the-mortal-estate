@@ -7,6 +7,12 @@
  */
 export const WALK_STAND_IN_BEAT_SECONDS = 3;
 
+/**
+ * This experiment defaults to three authored route squares. The allowance is
+ * reopened under owner ruling D2; it is not a settled gameplay value.
+ */
+export const WALK_MAX_ROUTE_SQUARES = 3;
+
 export class BeatClock {
   readonly startedAt: number;
 
@@ -21,5 +27,12 @@ export class BeatClock {
 
   beatsElapsed(now: number): number {
     return Math.floor(Math.max(0, now - this.startedAt) / WALK_STAND_IN_BEAT_SECONDS);
+  }
+
+  nextStrikeAfter(now: number): number {
+    const completedBeats = Math.floor(
+      Math.max(0, now - this.startedAt) / WALK_STAND_IN_BEAT_SECONDS,
+    );
+    return this.startedAt + (completedBeats + 1) * WALK_STAND_IN_BEAT_SECONDS;
   }
 }

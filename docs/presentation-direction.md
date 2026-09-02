@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 15
-status: Owner-accepted visual target. Revision 15 records the browser feel scene's local walk experiment under the same bounded, non-authoritative rule; no renderer, asset set, or production pipeline is accepted.
+revision: 16
+status: Owner-accepted visual target. Revision 16 records how movement lands in the browser feel scene's bounded, non-authoritative walk experiment; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -431,7 +431,9 @@ scene earns a place behind `WorldViewSeam` is decided by the production rule
 above, not by this section.
 
 The browser feel scene now carries a local walk experiment under the same
-non-authoritative rule.
+non-authoritative rule. Its movement lands on the beat: a drafted route of one
+to three squares lands whole when the beat strikes, and nothing slides between
+squares (owner ruling, 2026-09-02).
 
 Its construction follows the lab's conclusions rather than re-deriving them:
 the camera is orthographic at 45-degree yaw and 30-degree elevation, sized so

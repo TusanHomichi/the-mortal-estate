@@ -86,10 +86,10 @@ try {
   await page.waitForFunction(() => document.querySelector("#feel-stage")?.dataset.walkState === "idle");
   assert.equal(await page.locator("#feel-stage").getAttribute("data-caretaker-cell"), "5,5");
 
-  const [target, repreviewTarget] = await page.evaluate(async () => {
+  const [target, refusedTarget] = await page.evaluate(async () => {
     const { createFeelCamera } = await import("/src/camera.ts");
     const camera = createFeelCamera(innerWidth, innerHeight, { i: 12, j: 9 });
-    return [[2, 5], [4, 3]].map(([i, j]) => {
+    return [[2, 5], [0, 5]].map(([i, j]) => {
       const projected = camera.position.clone().set(i, 0, j).project(camera);
       return {
         x: (projected.x + 1) * innerWidth * 0.5,
@@ -98,33 +98,38 @@ try {
     });
   });
 
+  await page.mouse.click(refusedTarget.x, refusedTarget.y);
+  assert.equal(await page.locator("#feel-stage").getAttribute("data-walk-state"), "idle");
+
+  await page.waitForFunction(() => {
+    const transform = document.querySelector(".walk-beat-meter__fill")?.style.transform ?? "";
+    const match = /^scaleX\(([^)]+)\)$/.exec(transform);
+    return match !== null && Number(match[1]) < 0.12;
+  });
   await page.mouse.click(target.x, target.y);
-  assert.equal(await page.locator("#feel-stage").getAttribute("data-walk-state"), "preview");
+  assert.equal(await page.locator("#feel-stage").getAttribute("data-walk-state"), "draft");
   await page.screenshot({ path: path.join(captureRoot, "walk-preview.png") });
 
+  await page.waitForFunction(() => {
+    const transform = document.querySelector(".walk-beat-meter__fill")?.style.transform ?? "";
+    const match = /^scaleX\(([^)]+)\)$/.exec(transform);
+    return match !== null && Number(match[1]) < 0.12;
+  });
   const start = parseCell((await page.locator("#feel-stage").getAttribute("data-caretaker-cell")) ?? "");
   await page.mouse.dblclick(target.x, target.y);
   await page.waitForFunction(() => document.querySelector("#feel-stage")?.dataset.walkState === "committed");
-  const committedAt = performance.now();
-  await page.waitForTimeout(800);
-  await page.mouse.click(repreviewTarget.x, repreviewTarget.y);
-  assert.equal(await page.locator("#feel-stage").getAttribute("data-walk-state"), "committed");
-  await page.screenshot({ path: path.join(captureRoot, "walk-repreview.png") });
-
-  await page.waitForTimeout(Math.max(0, 3_400 - (performance.now() - committedAt)));
-  const afterOneBeat = parseCell((await page.locator("#feel-stage").getAttribute("data-caretaker-cell")) ?? "");
-  assert.equal(Math.max(Math.abs(afterOneBeat[0] - start[0]), Math.abs(afterOneBeat[1] - start[1])), 1);
-  await page.screenshot({ path: path.join(captureRoot, "walk-step.png") });
+  await page.waitForTimeout(1_000);
+  const beforeStrike = parseCell((await page.locator("#feel-stage").getAttribute("data-caretaker-cell")) ?? "");
+  assert.deepEqual(beforeStrike, start);
 
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.caretakerCell === "2,5",
     undefined,
-    { timeout: 15_000 },
+    { timeout: 4_000 },
   );
-  assert.equal(await page.locator("#feel-stage").getAttribute("data-walk-state"), "preview");
-  await page.keyboard.press("Escape");
   await page.waitForFunction(() => document.querySelector("#feel-stage")?.dataset.walkState === "idle");
   assert.equal(await page.locator("#feel-stage").getAttribute("data-caretaker-cell"), "2,5");
+  await page.screenshot({ path: path.join(captureRoot, "walk-landed.png") });
   assert.deepEqual(consoleErrors, []);
   console.log(`PASS walk proof: ${captureRoot}`);
 } finally {

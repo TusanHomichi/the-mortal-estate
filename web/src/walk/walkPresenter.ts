@@ -6,31 +6,30 @@
  * intentionally the walk feature's only Three.js and DOM boundary.
  */
 import {
+  BufferGeometry,
   CanvasTexture,
   Color,
+  Float32BufferAttribute,
   LineBasicMaterial,
   LineLoop,
   Mesh,
   MeshBasicMaterial,
   PlaneGeometry,
-  SRGBColorSpace,
   Scene,
-  BufferGeometry,
-  Float32BufferAttribute,
+  SRGBColorSpace,
   type OrthographicCamera,
 } from "three";
 import type { FeelLayout } from "../feelTypes";
-import { BeatClock } from "./beat";
+import { BeatClock, WALK_STAND_IN_BEAT_SECONDS } from "./beat";
 import { footprintsFromPath } from "./footprints";
-import { findPath } from "./pathfinding";
-import { cellUnderPointer } from "./pointer";
 import { passabilityFrom, type Cell } from "./layoutPassability";
+import { cellUnderPointer } from "./pointer";
+import { authorRoute } from "./route";
 import {
   advanceWalk,
   cancelWalk,
   createWalkIntent,
   doubleClick,
-  planningOrigin,
   presentedCaretakerPosition,
   singleClick,
   walkIntentKind,
@@ -57,19 +56,29 @@ export interface WalkPresenter {
   stop(): void;
 }
 
+type FootprintKind = "draft" | "committed" | "landed";
+
 interface DrawnFootprint {
   mesh: Mesh<PlaneGeometry, MeshBasicMaterial>;
-  pathIndex: number;
-  kind: "preview" | "committed";
+  kind: FootprintKind;
 }
 
-const PREVIEW_COLOUR = new Color("#9eb5ca");
+interface LandedFootprints {
+  route: Cell[];
+  landedAt: number;
+}
+
+const DRAFT_COLOUR = new Color("#9eb5ca");
 const COMMITTED_COLOUR = new Color("#c8c3b8");
 
 function caretakerCell(layout: FeelLayout): Cell {
   const caretaker = layout.props.find((prop) => prop.kind === "caretaker");
   if (caretaker === undefined) throw new Error("the walk experiment needs one caretaker placement");
   return { i: Math.round(caretaker.cell_anchor[0]), j: Math.round(caretaker.cell_anchor[1]) };
+}
+
+function routeIdentity(route: readonly Cell[] | null): string {
+  return route?.map((cell) => `${cell.i},${cell.j}`).join(";") ?? "";
 }
 
 function makeSoleTexture(): CanvasTexture {
@@ -110,7 +119,7 @@ function makeHoverOutline(): LineLoop<BufferGeometry, LineBasicMaterial> {
     geometry,
     new LineBasicMaterial({ color: 0xa6b8c9, transparent: true, opacity: 0.72 }),
   );
-  outline.name = "WalkReachableCell";
+  outline.name = "WalkAuthorableCell";
   outline.visible = false;
   outline.renderOrder = 4;
   return outline;
@@ -144,6 +153,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   let state = createWalkIntent(caretakerCell(layout));
   let footprints: DrawnFootprint[] = [];
   let footprintIdentity = "";
+  let landedFootprints: LandedFootprints | null = null;
   let hoverCell: Cell | null = null;
 
   const clearFootprints = (): void => {
@@ -156,12 +166,12 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   };
 
   const drawFootprints = (
-    path: readonly Cell[],
-    kind: DrawnFootprint["kind"],
+    route: readonly Cell[],
+    kind: FootprintKind,
     colour: Color,
     opacity: number,
   ): void => {
-    for (const pair of footprintsFromPath(path)) {
+    for (const pair of footprintsFromPath(route)) {
       for (const point of [pair.left, pair.right]) {
         const material = new MeshBasicMaterial({
           map: soleTexture,
@@ -173,33 +183,34 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
           polygonOffsetFactor: -2,
         });
         const mesh = new Mesh(new PlaneGeometry(0.12, 0.2), material);
-        const kindName = kind === "preview" ? "Preview" : "Committed";
-        mesh.name = `Walk${kindName}Footprint_${pair.pathIndex}`;
+        mesh.name = `Walk${kind[0]!.toUpperCase()}${kind.slice(1)}Footprint_${pair.pathIndex}`;
         mesh.rotation.x = -Math.PI / 2;
         mesh.rotation.z = -pair.angle;
-        mesh.position.set(point.x, kind === "preview" ? 0.007 : 0.006, point.z);
-        mesh.renderOrder = kind === "preview" ? 4 : 3;
+        mesh.position.set(point.x, kind === "draft" ? 0.007 : 0.006, point.z);
+        mesh.renderOrder = kind === "draft" ? 4 : 3;
         scene.add(mesh);
-        footprints.push({ mesh, pathIndex: pair.pathIndex, kind });
+        footprints.push({ mesh, kind });
       }
     }
   };
 
   const syncFootprints = (): void => {
-    const committedIdentity = state.committed?.path
-      .map((cell) => `${cell.i},${cell.j}`)
-      .join(";") ?? "";
-    const previewIdentity =
-      state.preview?.map((cell) => `${cell.i},${cell.j}`).join(";") ?? "";
-    const identity = `${committedIdentity}|${previewIdentity}`;
+    const identity = [
+      routeIdentity(landedFootprints?.route ?? null),
+      routeIdentity(state.committed?.route ?? null),
+      routeIdentity(state.draft),
+    ].join("|");
     if (identity === footprintIdentity) return;
     footprintIdentity = identity;
     clearFootprints();
-    if (state.committed !== null) {
-      drawFootprints(state.committed.path, "committed", COMMITTED_COLOUR, 0.85);
+    if (landedFootprints !== null) {
+      drawFootprints(landedFootprints.route, "landed", COMMITTED_COLOUR, 0.85);
     }
-    if (state.preview !== null) {
-      drawFootprints(state.preview, "preview", PREVIEW_COLOUR, 0.45);
+    if (state.committed !== null) {
+      drawFootprints(state.committed.route, "committed", COMMITTED_COLOUR, 0.85);
+    }
+    if (state.draft !== null) {
+      drawFootprints(state.draft, "draft", DRAFT_COLOUR, 0.45);
     }
   };
 
@@ -208,19 +219,41 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       hoverOutline.visible = false;
       return;
     }
-    const reachable = findPath(passability, planningOrigin(state), hoverCell) !== null;
-    hoverOutline.visible = reachable;
-    if (reachable) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
+    const authorable = authorRoute(passability, state.caretakerCell, hoverCell) !== null;
+    hoverOutline.visible = authorable;
+    if (authorable) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
+  };
+
+  const applyFacing = (): void => {
+    if (state.committed === null) return;
+    const route = state.committed.route;
+    const directionI = route[route.length - 1]!.i - route[0]!.i;
+    if (directionI < 0) caretaker.card.scale.x = -homeScaleX;
+    if (directionI > 0) caretaker.card.scale.x = homeScaleX;
   };
 
   const reflectState = (): void => {
+    const position = presentedCaretakerPosition(state);
+    caretaker.card.position.set(position.i, cardHeight, position.j);
+    caretaker.contactShadow.position.set(position.i, shadowHeight, position.j);
+    applyFacing();
     stage.dataset.walkState = walkIntentKind(state);
     stage.dataset.caretakerCell = `${state.caretakerCell.i},${state.caretakerCell.j}`;
     syncFootprints();
     updateHover();
   };
 
-  const transition = (next: WalkIntentState): void => {
+  const transition = (next: WalkIntentState, now: number): void => {
+    if (
+      state.committed !== null &&
+      next.committed === null &&
+      now >= state.committed.landsAt
+    ) {
+      landedFootprints = {
+        route: state.committed.route.map((cell) => ({ ...cell })),
+        landedAt: state.committed.landsAt,
+      };
+    }
     state = next;
     reflectState();
   };
@@ -242,20 +275,24 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     if (event.button !== 0 || event.detail !== 1) return;
     const target = pointerCell(event);
     if (target === null) return;
-    transition(singleClick(state, passability, target, nowSeconds()));
+    const now = nowSeconds();
+    transition(singleClick(state, passability, target, standInClock, now), now);
   };
   const onDoubleClick = (event: MouseEvent): void => {
     if (event.button !== 0) return;
     event.preventDefault();
-    transition(doubleClick(state, passability, nowSeconds()));
+    const now = nowSeconds();
+    transition(doubleClick(state, standInClock, now), now);
   };
   const onContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
-    transition(cancelWalk(state, passability, nowSeconds()));
+    const now = nowSeconds();
+    transition(cancelWalk(state, now), now);
   };
   const onKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== "Escape") return;
-    transition(cancelWalk(state, passability, nowSeconds()));
+    const now = nowSeconds();
+    transition(cancelWalk(state, now), now);
   };
 
   canvas.addEventListener("pointermove", onPointerMove);
@@ -268,31 +305,22 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
 
   return {
     update: (now: number): void => {
-      const advanced = advanceWalk(state, passability, now);
-      if (advanced !== state) transition(advanced);
-      const position = presentedCaretakerPosition(state, now);
-      caretaker.card.position.set(position.i, cardHeight, position.j);
-      caretaker.contactShadow.position.set(position.i, shadowHeight, position.j);
-      if (state.activeStep !== null) {
-        const directionI = state.activeStep.to.i - state.activeStep.from.i;
-        if (directionI < 0) caretaker.card.scale.x = -homeScaleX;
-        if (directionI > 0) caretaker.card.scale.x = homeScaleX;
-      }
+      const advanced = advanceWalk(state, now);
+      if (advanced !== state) transition(advanced, now);
 
-      const beat = state.activeStep === null ? standInClock : new BeatClock(state.activeStep.startedAt);
-      const phase = beat.phase(now);
-      meterFill.style.transform = `scaleX(${phase})`;
+      meterFill.style.transform = `scaleX(${standInClock.phase(now)})`;
 
-      if (state.committed !== null) {
+      if (landedFootprints !== null) {
+        const fade = Math.max(
+          0,
+          1 - (now - landedFootprints.landedAt) / WALK_STAND_IN_BEAT_SECONDS,
+        );
         for (const footprint of footprints) {
-          if (footprint.kind !== "committed") continue;
-          if (footprint.pathIndex < state.committed.stepIndex - 1) {
-            footprint.mesh.material.opacity = 0;
-          } else if (footprint.pathIndex === state.committed.stepIndex - 1) {
-            footprint.mesh.material.opacity = 0.85 * (1 - phase);
-          } else {
-            footprint.mesh.material.opacity = 0.85;
-          }
+          if (footprint.kind === "landed") footprint.mesh.material.opacity = 0.85 * fade;
+        }
+        if (fade === 0) {
+          landedFootprints = null;
+          syncFootprints();
         }
       }
     },

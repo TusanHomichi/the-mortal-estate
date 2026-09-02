@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { FeelLayout } from "../src/feelTypes";
-import { WALK_STAND_IN_BEAT_SECONDS } from "../src/walk/beat";
+import { BeatClock } from "../src/walk/beat";
 import { passabilityFrom } from "../src/walk/layoutPassability";
 import {
   advanceWalk,
+  cancelWalk,
+  createWalkIntent,
   doubleClick,
   presentedCaretakerPosition,
   singleClick,
-  createWalkIntent,
   walkIntentKind,
 } from "../src/walk/walkIntent";
 
@@ -23,72 +24,85 @@ const layout: FeelLayout = {
   light_sources: { lantern_glass: [0, 0, 0], candles: [] },
 };
 const passability = passabilityFrom(layout);
+const clock = new BeatClock(0);
+
+function draftRoute(now = 1) {
+  return singleClick(
+    createWalkIntent({ i: 0, j: 0 }),
+    passability,
+    { i: 3, j: 0 },
+    clock,
+    now,
+  );
+}
 
 describe("the local walk-intent state machine", () => {
-  it("a single click previews and does not move", () => {
-    const state = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 3, j: 0 }, 10);
-    expect(walkIntentKind(state)).toBe("preview");
+  it("a draft does not move the figure", () => {
+    const state = draftRoute();
+    expect(walkIntentKind(state)).toBe("draft");
     expect(state.caretakerCell).toEqual({ i: 0, j: 0 });
-    expect(state.activeStep).toBeNull();
+    expect(presentedCaretakerPosition(state)).toEqual({ i: 0, j: 0 });
   });
 
-  it("a double click commits the previewed path", () => {
-    const preview = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 2, j: 0 }, 10);
-    const state = doubleClick(preview, passability, 11);
+  it("a double click commits the drafted route", () => {
+    const state = doubleClick(draftRoute(), clock, 1.2);
     expect(walkIntentKind(state)).toBe("committed");
-    expect(state.activeStep).toMatchObject({ from: { i: 0, j: 0 }, to: { i: 1, j: 0 } });
+    expect(state.committed?.route.at(-1)).toEqual({ i: 3, j: 0 });
+    expect(state.committed?.landsAt).toBe(3);
   });
 
-  it("advances exactly one cell per injected beat and never from outside time", () => {
-    const preview = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 3, j: 0 }, 10);
-    const committed = doubleClick(preview, passability, 10);
-    expect(
-      advanceWalk(
-        committed,
-        passability,
-        10 + WALK_STAND_IN_BEAT_SECONDS - 0.001,
-      ).caretakerCell,
-    ).toEqual({ i: 0, j: 0 });
-    expect(
-      advanceWalk(committed, passability, 10 + WALK_STAND_IN_BEAT_SECONDS).caretakerCell,
-    ).toEqual({ i: 1, j: 0 });
-    expect(
-      advanceWalk(committed, passability, 10 + WALK_STAND_IN_BEAT_SECONDS * 2)
-        .caretakerCell,
-    ).toEqual({ i: 2, j: 0 });
-    expect(committed.caretakerCell).toEqual({ i: 0, j: 0 });
+  it("a committed route lands whole at the next strike, not before", () => {
+    const committed = doubleClick(draftRoute(), clock, 1.2);
+    expect(advanceWalk(committed, 2.999).caretakerCell).toEqual({ i: 0, j: 0 });
+    const landed = advanceWalk(committed, 3);
+    expect(landed.caretakerCell).toEqual({ i: 3, j: 0 });
+    expect(landed.committed).toBeNull();
   });
 
-  it("a re-preview during a walk starts from the next cell", () => {
-    const preview = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 3, j: 0 }, 10);
-    const committed = doubleClick(preview, passability, 10);
-    const replacement = singleClick(committed, passability, { i: 2, j: 2 }, 11);
-    expect(walkIntentKind(replacement)).toBe("committed");
-    expect(replacement.committed?.path).toEqual(committed.committed?.path);
-    expect(replacement.preview?.[0]).toEqual({ i: 1, j: 0 });
+  it("the presented position is never between squares", () => {
+    const committed = doubleClick(draftRoute(), clock, 1.2);
+    expect(presentedCaretakerPosition(advanceWalk(committed, 2.5))).toEqual({ i: 0, j: 0 });
+    expect(presentedCaretakerPosition(advanceWalk(committed, 3))).toEqual({ i: 3, j: 0 });
   });
 
-  it("a re-preview during a walk keeps the walk going", () => {
-    const preview = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 3, j: 0 }, 10);
-    const committed = doubleClick(preview, passability, 10);
-    const replacement = singleClick(committed, passability, { i: 2, j: 2 }, 11);
-    const advanced = advanceWalk(replacement, passability, 10 + WALK_STAND_IN_BEAT_SECONDS);
-    expect(advanced.caretakerCell).toEqual({ i: 1, j: 0 });
-    expect(advanced.activeStep).toMatchObject({ from: { i: 1, j: 0 }, to: { i: 2, j: 0 } });
-    expect(advanced.committed).not.toBeNull();
-    expect(advanced.preview).not.toBeNull();
+  it("a second single click on the drafted square commits", () => {
+    const draft = draftRoute();
+    const committed = singleClick(draft, passability, { i: 3, j: 0 }, clock, 1.5);
+    expect(walkIntentKind(committed)).toBe("committed");
+    expect(committed.draft).toBeNull();
+    expect(committed.committed?.landsAt).toBe(3);
   });
 
-  it("the in-progress step completes while a replacement path is previewed and recommitted", () => {
-    const preview = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 3, j: 0 }, 10);
-    const committed = doubleClick(preview, passability, 10);
-    const replacement = singleClick(committed, passability, { i: 2, j: 2 }, 11);
-    const beforeLanding = presentedCaretakerPosition(replacement, 12);
-    const recommitted = doubleClick(replacement, passability, 12);
-    const landed = advanceWalk(recommitted, passability, 10 + WALK_STAND_IN_BEAT_SECONDS);
-    expect(beforeLanding.i).toBeGreaterThan(0);
-    expect(beforeLanding.i).toBeLessThan(1);
-    expect(landed.caretakerCell).toEqual({ i: 1, j: 0 });
-    expect(landed.activeStep?.from).toEqual({ i: 1, j: 0 });
+  it("a replacement committed before landing keeps the same strike", () => {
+    const first = doubleClick(draftRoute(), clock, 1.2);
+    const replacementDraft = singleClick(first, passability, { i: 2, j: 2 }, clock, 2);
+    const replacement = doubleClick(replacementDraft, clock, 2.2);
+    expect(replacement.committed?.route.at(-1)).toEqual({ i: 2, j: 2 });
+    expect(replacement.committed?.landsAt).toBe(first.committed?.landsAt);
+  });
+
+  it("a commit after landing lands at the following strike, never the same one", () => {
+    const first = doubleClick(draftRoute(), clock, 1.2);
+    const landed = advanceWalk(first, 3);
+    const secondDraft = singleClick(landed, passability, { i: 4, j: 0 }, clock, 3);
+    const second = doubleClick(secondDraft, clock, 3);
+    expect(second.committed?.landsAt).toBe(6);
+  });
+
+  it("Escape clears an unlanded committed route", () => {
+    const committed = doubleClick(draftRoute(), clock, 1.2);
+    const cancelled = cancelWalk(committed, 2);
+    expect(cancelled.committed).toBeNull();
+    expect(cancelled.draft).toBeNull();
+    expect(cancelled.caretakerCell).toEqual({ i: 0, j: 0 });
+    expect(walkIntentKind(cancelled)).toBe("idle");
+  });
+
+  it("an unauthorable click clears the draft without disturbing a pending landing", () => {
+    const committed = doubleClick(draftRoute(), clock, 1.2);
+    const withDraft = singleClick(committed, passability, { i: 2, j: 2 }, clock, 2);
+    const refused = singleClick(withDraft, passability, { i: 4, j: 4 }, clock, 2.1);
+    expect(refused.draft).toBeNull();
+    expect(refused.committed).toEqual(committed.committed);
   });
 });
