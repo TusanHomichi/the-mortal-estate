@@ -8,6 +8,7 @@ import {
   type AssetRow,
   type FeelManifest,
   type FeelSpace,
+  type FixturePlacement,
   type PortalPlacement,
   type PortalTarget,
   type PropPlacement,
@@ -196,6 +197,52 @@ function parsePortal(value: unknown): PortalPlacement {
   };
 }
 
+function wallRunSupportsFixture(
+  run: WallRun,
+  fixture: FixturePlacement,
+): boolean {
+  const [i, j] = fixture.cell;
+  const axisPosition = fixture.against === "north" ? i : j;
+  const runStart = fixture.against === "north" ? run.start[0] : run.start[1];
+  const local = axisPosition - runStart;
+  const onLine = fixture.against === "north"
+    ? run.axis === "x" && run.start[1] === j - 0.5
+    : run.axis === "z" && run.start[0] === i - 0.5;
+  if (!onLine || local < 0 || local > run.cells) return false;
+  return run.door_interval === null ||
+    local < run.door_interval[0] || local > run.door_interval[1];
+}
+
+function parseFixture(
+  value: unknown,
+  wallRuns: readonly WallRun[],
+  cells: ReadonlySet<string>,
+): FixturePlacement {
+  if (
+    !isRecord(value) ||
+    !hasExactKeys(value, ["kind", "cell", "against"]) ||
+    value.kind !== "hearth" ||
+    !isIntegerVector(value.cell, 2) ||
+    (value.against !== "north" && value.against !== "west")
+  ) {
+    throw new Error("a candidate feel fixture is invalid");
+  }
+  const fixture: FixturePlacement = {
+    kind: "hearth",
+    cell: [value.cell[0]!, value.cell[1]!],
+    against: value.against,
+  };
+  if (!cells.has(cellKey({ i: fixture.cell[0], j: fixture.cell[1] }))) {
+    throw new Error("a candidate feel fixture cell is outside its space");
+  }
+  if (!wallRuns.some((run) => wallRunSupportsFixture(run, fixture))) {
+    throw new Error(
+      `a candidate feel ${fixture.kind} fixture has no ${fixture.against} wall run on its line`,
+    );
+  }
+  return fixture;
+}
+
 function parseSpace(
   value: unknown,
   assets: FeelManifest["assets"],
@@ -208,6 +255,7 @@ function parseSpace(
       "wall_runs",
       "roofs",
       "props",
+      "fixtures",
       "light_sources",
       "weather",
       "portals",
@@ -258,6 +306,7 @@ function parseSpace(
     seen.add(key);
     return { i: candidate.i, j: candidate.j, material: candidate.material };
   });
+  const cellKeys = new Set(cells.map(cellKey));
 
   if (!Array.isArray(value.wall_runs)) throw new Error("a candidate feel space has invalid wall runs");
   const wallRuns = value.wall_runs.map(parseWallRun);
@@ -290,11 +339,14 @@ function parseSpace(
         `a candidate feel prop placement names an unknown facing: ${String(candidate.facing)}`,
       );
     }
-    if (!Object.hasOwn(assets.props, candidate.kind)) {
-      throw new Error(`a candidate feel prop placement names an unlisted kind: ${candidate.kind}`);
-    }
     if (candidate.kind === "caretaker") {
       throw new Error("a candidate feel caretaker placement is refused; start places the caretaker");
+    }
+    if (candidate.kind === "hearth") {
+      throw new Error("a candidate feel hearth prop placement is retired and refused; use a fixture");
+    }
+    if (!Object.hasOwn(assets.props, candidate.kind)) {
+      throw new Error(`a candidate feel prop placement names an unlisted kind: ${candidate.kind}`);
     }
     return {
       kind: candidate.kind,
@@ -305,6 +357,17 @@ function parseSpace(
       facing: candidate.facing,
     };
   });
+
+  if (!Array.isArray(value.fixtures)) {
+    throw new Error("a candidate feel space has invalid fixtures");
+  }
+  const fixtures = value.fixtures.map((fixture) => parseFixture(fixture, wallRuns, cellKeys));
+  if (new Set(fixtures.map((fixture) => cellKey({ i: fixture.cell[0], j: fixture.cell[1] }))).size !== fixtures.length) {
+    throw new Error("a candidate feel space has duplicate fixture cells");
+  }
+  if (fixtures.length > 0 && !Object.hasOwn(assets.walls, "fieldstone")) {
+    throw new Error("the candidate feel walls set is missing fieldstone required by fixtures");
+  }
 
   const lights = value.light_sources;
   if (
@@ -330,6 +393,7 @@ function parseSpace(
     wall_runs: wallRuns,
     roofs,
     props,
+    fixtures,
     light_sources: {
       lantern_glass: lights.lantern_glass === null
         ? null

@@ -23,6 +23,7 @@ const layout: FeelSpace = {
   wall_runs: [],
   roofs: [],
   props: [],
+  fixtures: [],
   light_sources: { lantern_glass: null, candles: [] },
   weather: false,
   portals: [],

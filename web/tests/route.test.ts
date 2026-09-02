@@ -14,6 +14,7 @@ function field(walls: WallRun[] = []): FeelSpace {
     wall_runs: walls,
     roofs: [],
     props: [],
+    fixtures: [],
     light_sources: { lantern_glass: null, candles: [] },
     weather: false,
     portals: [],

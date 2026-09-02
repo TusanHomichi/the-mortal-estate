@@ -1,4 +1,5 @@
 import {
+  AdditiveBlending,
   AmbientLight,
   BufferAttribute,
   BufferGeometry,
@@ -7,6 +8,7 @@ import {
   DoubleSide,
   DynamicDrawUsage,
   Group,
+  InstancedBufferAttribute,
   InstancedMesh,
   Matrix4,
   Mesh,
@@ -21,9 +23,16 @@ import {
   type Material,
   type OrthographicCamera,
 } from "three";
-import { projectedHeightCoverTiles } from "../camera";
+import { CAMERA_OFFSET, projectedHeightCoverTiles } from "../camera";
 import type { FeelSpace, PropPlacement, WallRun } from "../feelTypes";
 import { buildGroundGeometry } from "../groundGeometry";
+import {
+  buildHearthGeometry,
+  HEARTH_PROFILE,
+  hearthFireAnchor,
+  hearthLightPosition,
+  type HearthMaterial,
+} from "../hearthGeometry";
 import type { Preset } from "../presets";
 import {
   buildRoofGeometry,
@@ -33,6 +42,11 @@ import {
 import {
   groundFragmentShader,
   groundVertexShader,
+  hearthEmberFragmentShader,
+  hearthEmberVertexShader,
+  hearthFireFragmentShader,
+  hearthFireVertexShader,
+  hearthFlicker,
   swayFragmentShader,
   swayVertexShader,
 } from "../shaders";
@@ -61,6 +75,13 @@ interface WallRunPresentation {
 
 interface RainSystem {
   update(elapsed: number): void;
+}
+
+interface HearthPresentation {
+  fireMaterial: ShaderMaterial;
+  emberMaterial: ShaderMaterial;
+  light: PointLight;
+  lightBase: number;
 }
 
 export interface CaretakerObjects {
@@ -235,6 +256,7 @@ export class SpaceScene {
   private readonly palette: ScenePalette;
   private readonly swayMaterials: ShaderMaterial[] = [];
   private readonly wallRuns: WallRunPresentation[] = [];
+  private readonly hearths: HearthPresentation[] = [];
   private readonly keyLight: DirectionalLight;
   private readonly keyTarget: Object3D;
   private readonly lantern: PointLight | null;
@@ -252,6 +274,7 @@ export class SpaceScene {
     this.addGround();
     this.addWalls();
     this.addRoofs();
+    this.addFixtures();
     const lights = this.addLights(caretakerCell);
     this.keyLight = lights.key;
     this.keyTarget = lights.target;
@@ -394,6 +417,124 @@ export class SpaceScene {
     }
   }
 
+  private addFixtures(): void {
+    const { space, textures, anisotropy } = this.options;
+    if (space.fixtures.length === 0) return;
+
+    const partsByMaterial = new Map<
+      HearthMaterial,
+      ReturnType<typeof buildHearthGeometry>[number]["geometry"][]
+    >();
+    for (const part of buildHearthGeometry(space.fixtures)) {
+      const geometries = partsByMaterial.get(part.material) ?? [];
+      geometries.push(part.geometry);
+      partsByMaterial.set(part.material, geometries);
+    }
+    const fieldstone = requiredTexture(textures, "walls/fieldstone").texture;
+    const timber = requiredTexture(textures, "walls/post").texture;
+    configureTexture(fieldstone, anisotropy);
+    configureTexture(timber, anisotropy);
+    for (const [materialName, geometries] of partsByMaterial) {
+      const material = new MeshStandardMaterial({
+        name: `hearth-${materialName}`,
+        map: materialName === "post" ? timber : fieldstone,
+        color: materialName === "fieldstone_dark"
+          ? new Color(0.35, 0.35, 0.35)
+          : undefined,
+        roughness: materialName === "post" ? 0.86 : 0.94,
+        metalness: 0,
+      });
+      const mesh = new Mesh(geometryFromData(mergeGeometryData(geometries)), material);
+      mesh.name = `HearthBatch_${materialName}`;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      this.group.add(mesh);
+    }
+
+    const source = requiredTexture(textures, "props/fire");
+    configureTexture(source.texture, anisotropy);
+    const cardRotation = Math.atan2(CAMERA_OFFSET.x, CAMERA_OFFSET.z);
+    space.fixtures.forEach((fixture, fixtureIndex) => {
+      const anchor = hearthFireAnchor(fixture);
+      const fireGeometry = new PlaneGeometry(
+        HEARTH_PROFILE.fireHeight * (source.width / source.height),
+        HEARTH_PROFILE.fireHeight,
+      );
+      const fireMaterial = new ShaderMaterial({
+        name: `hearth-fire-${fixtureIndex}`,
+        uniforms: {
+          albedoTexture: { value: source.texture },
+          elapsed: { value: 0 },
+          flicker: { value: 1 },
+        },
+        vertexShader: hearthFireVertexShader,
+        fragmentShader: hearthFireFragmentShader,
+        transparent: true,
+        alphaTest: 0.12,
+        side: DoubleSide,
+      });
+      const fire = new Mesh(fireGeometry, fireMaterial);
+      fire.name = `HearthFire_${fixtureIndex}`;
+      fire.position.fromArray(anchor.position);
+      fire.rotation.y = cardRotation;
+      this.group.add(fire);
+
+      const emberGeometry = new PlaneGeometry(1, 1);
+      const emberCount = 24;
+      const phases = new Float32Array(emberCount);
+      const drifts = new Float32Array(emberCount);
+      const rises = new Float32Array(emberCount);
+      emberGeometry.setAttribute("emberPhase", new InstancedBufferAttribute(phases, 1));
+      emberGeometry.setAttribute("emberDrift", new InstancedBufferAttribute(drifts, 1));
+      emberGeometry.setAttribute("emberRise", new InstancedBufferAttribute(rises, 1));
+      const emberMaterial = new ShaderMaterial({
+        name: `hearth-embers-${fixtureIndex}`,
+        uniforms: {
+          elapsed: { value: 0 },
+          fixtureLateral: { value: new Vector3().fromArray(anchor.lateral) },
+        },
+        vertexShader: hearthEmberVertexShader,
+        fragmentShader: hearthEmberFragmentShader,
+        transparent: true,
+        depthWrite: false,
+        blending: AdditiveBlending,
+        side: DoubleSide,
+      });
+      const embers = new InstancedMesh(emberGeometry, emberMaterial, emberCount);
+      embers.name = `HearthEmbers_${fixtureIndex}`;
+      embers.instanceMatrix.setUsage(DynamicDrawUsage);
+      embers.frustumCulled = false;
+      const random = seededRandom(0x48454152 + fixtureIndex);
+      const dummy = new Object3D();
+      for (let index = 0; index < emberCount; index += 1) {
+        phases[index] = index / emberCount;
+        drifts[index] = (random() * 2 - 1) * 0.035;
+        rises[index] = 0.4 + random() * 0.18;
+        const lateral = (random() * 2 - 1) * (HEARTH_PROFILE.fireboxWidth * 0.36);
+        dummy.position.set(
+          anchor.position[0] + anchor.lateral[0] * lateral,
+          HEARTH_PROFILE.fireboxSill + 0.025,
+          anchor.position[2] + anchor.lateral[2] * lateral,
+        );
+        dummy.rotation.y = cardRotation;
+        dummy.scale.set(0.012 + random() * 0.012, 0.025 + random() * 0.025, 1);
+        dummy.updateMatrix();
+        embers.setMatrixAt(index, dummy.matrix);
+      }
+      embers.instanceMatrix.needsUpdate = true;
+      this.group.add(embers);
+
+      const lightBase = this.palette.candleIntensity * 2.8;
+      const light = new PointLight(WARM_LIGHT, lightBase, 3.4, 2);
+      light.name = `HearthGlow_${fixtureIndex}`;
+      light.position.fromArray(hearthLightPosition(fixture));
+      light.castShadow = true;
+      light.shadow.mapSize.set(512, 512);
+      this.group.add(light);
+      this.hearths.push({ fireMaterial, emberMaterial, light, lightBase });
+    });
+  }
+
   private addLights(focusCell: Cell): {
     key: DirectionalLight;
     target: Object3D;
@@ -523,17 +664,6 @@ export class SpaceScene {
       );
       this.group.add(mesh);
       if (prop.kind === "caretaker") caretaker = { card: mesh, contactShadow };
-      if (prop.kind === "hearth") {
-        const hearthLight = new PointLight(
-          WARM_LIGHT,
-          this.palette.candleIntensity * 3,
-          3.4,
-          2,
-        );
-        hearthLight.name = "HearthGlow";
-        hearthLight.position.set(prop.cell_anchor[0], 0.55, prop.cell_anchor[1]);
-        this.group.add(hearthLight);
-      }
     }
     if (caretaker === null) throw new Error("the space scene failed to place its caretaker");
     return caretaker;
@@ -584,6 +714,13 @@ export class SpaceScene {
       material.uniforms.elapsed!.value = elapsed;
       material.uniforms.lanternStrength!.value =
         this.palette.practicalShaderStrength * (1 + noise);
+    }
+    const fireFlicker = hearthFlicker(elapsed);
+    for (const hearth of this.hearths) {
+      hearth.fireMaterial.uniforms.elapsed!.value = elapsed;
+      hearth.fireMaterial.uniforms.flicker!.value = fireFlicker;
+      hearth.emberMaterial.uniforms.elapsed!.value = elapsed;
+      hearth.light.intensity = hearth.lightBase * fireFlicker;
     }
     this.rain?.update(elapsed);
   }

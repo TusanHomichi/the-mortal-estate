@@ -79,6 +79,83 @@ export const swayFragmentShader = /* glsl */ `
   }
 `;
 
+export const hearthFireVertexShader = /* glsl */ `
+  uniform float elapsed;
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    vec3 moved = position;
+    float crown = smoothstep(0.0, 1.0, uv.y);
+    moved.x += (
+      sin(elapsed * 2.15 + moved.y * 8.0) * 0.018 +
+      sin(elapsed * 3.73 + moved.y * 13.0 + 1.4) * 0.009
+    ) * crown;
+    moved.y += (
+      sin(elapsed * 1.91 + 0.7) * 0.018 +
+      sin(elapsed * 3.17 + 2.1) * 0.008
+    ) * crown;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(moved, 1.0);
+  }
+`;
+
+export const hearthFireFragmentShader = /* glsl */ `
+  uniform sampler2D albedoTexture;
+  uniform float elapsed;
+  uniform float flicker;
+  varying vec2 vUv;
+
+  void main() {
+    float crown = smoothstep(0.0, 1.0, vUv.y);
+    vec2 distortion = vec2(
+      sin(vUv.y * 19.0 - elapsed * 2.7) +
+        sin(vUv.y * 37.0 + elapsed * 4.1 + 1.6),
+      sin(vUv.x * 23.0 - elapsed * 3.3) * 0.55
+    ) * vec2(0.008, 0.005) * crown;
+    vec4 texel = texture2D(albedoTexture, vUv + distortion);
+    if (texel.a < 0.12) discard;
+    vec3 rim = vec3(1.0, 0.31, 0.055) * crown * 0.07;
+    gl_FragColor = vec4(texel.rgb * flicker + rim * texel.a, texel.a);
+  }
+`;
+
+export const hearthEmberVertexShader = /* glsl */ `
+  attribute float emberPhase;
+  attribute float emberDrift;
+  attribute float emberRise;
+  uniform float elapsed;
+  uniform vec3 fixtureLateral;
+  varying float vLife;
+  varying vec2 vUv;
+
+  void main() {
+    float age = fract(elapsed / 1.6 + emberPhase);
+    vLife = 1.0 - age;
+    vUv = uv;
+    vec4 worldPosition = modelMatrix * instanceMatrix * vec4(position, 1.0);
+    float curl = sin(age * 6.2831853 + emberPhase * 17.0) * emberDrift;
+    worldPosition += vec4(fixtureLateral * curl * age, 0.0);
+    worldPosition.y += age * emberRise;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+  }
+`;
+
+export const hearthEmberFragmentShader = /* glsl */ `
+  varying float vLife;
+  varying vec2 vUv;
+
+  void main() {
+    float roundness = 1.0 - smoothstep(0.18, 0.5, length(vUv - 0.5));
+    gl_FragColor = vec4(vec3(1.0, 0.39, 0.075), vLife * vLife * roundness * 0.72);
+  }
+`;
+
+export function hearthFlicker(elapsed: number): number {
+  return 1 +
+    Math.sin(elapsed * 2.17 + 1.731) * 0.055 +
+    Math.sin(elapsed * 4.31 + 2.943) * 0.025;
+}
+
 export const fogVertexShader = /* glsl */ `
   varying vec2 vUv;
   void main() {

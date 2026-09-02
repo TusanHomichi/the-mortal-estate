@@ -22,7 +22,7 @@ export const REQUIRED_PROPS = [
   "lantern_post",
   "shrine_table",
   "grave_marker",
-  "hearth",
+  "fire",
 ] as const;
 
 export const REQUIRED_ROOFS = [
@@ -62,6 +62,14 @@ export interface PropPlacement {
   facing: "view" | "+z" | "+x";
 }
 
+export interface HearthFixturePlacement {
+  kind: "hearth";
+  cell: [number, number];
+  against: "north" | "west";
+}
+
+export type FixturePlacement = HearthFixturePlacement;
+
 export interface RoofPlacement {
   footprint: { i0: number; j0: number; i1: number; j1: number };
   ridge_axis: WallAxis;
@@ -86,6 +94,7 @@ export interface FeelSpace {
   wall_runs: WallRun[];
   roofs: RoofPlacement[];
   props: PropPlacement[];
+  fixtures: FixturePlacement[];
   light_sources: {
     lantern_glass: [number, number, number] | null;
     candles: [number, number, number][];

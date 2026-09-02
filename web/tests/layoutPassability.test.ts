@@ -13,6 +13,7 @@ function layout(wallRuns: WallRun[] = [], props: FeelSpace["props"] = []): FeelS
     wall_runs: wallRuns,
     roofs: [],
     props,
+    fixtures: [],
     light_sources: { lantern_glass: null, candles: [] },
     weather: false,
     portals: [],
@@ -121,5 +122,13 @@ describe("packet-layout passability", () => {
     expect(passability.roofTiles).toEqual(new Set(["0,0", "1,0", "2,0", "0,1", "1,1", "2,1"]));
     expect(passability.blocked.has("0,0")).toBe(true);
     expect(passability.blocked.has("1,1")).toBe(false);
+  });
+
+  it("a fixture blocks its tile", () => {
+    const room = layout([WALL]);
+    room.fixtures = [{ kind: "hearth", cell: [1, 1], against: "north" }];
+    const passability = passabilityFrom(room);
+    expect(passability.blocked.has("1,1")).toBe(true);
+    expect(canStep(passability, { i: 1, j: 0 }, { i: 1, j: 1 })).toBe(false);
   });
 });

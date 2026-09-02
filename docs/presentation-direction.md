@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-02
-revision: 20
-status: Owner-accepted visual target. Revision 20 records dedicated interiors and always-on exterior roofs; no renderer, asset set, or production pipeline is accepted.
+revision: 21
+status: Owner-accepted visual target. Revision 21 records structural geometry and 3D-sourced character cards; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
-summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
+summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
   - web/**
   - client/presentation/**
@@ -449,6 +449,16 @@ door, cap front and cap top) so courses never seam; standing subjects are
 world-up billboards anchored at their cell centres at their nominal heights;
 and the scene's only warmth comes from actual light sources — the lantern and
 candles — as the owner ruled in the lab.
+
+Anything that belongs to a building — a hearth, a doorway, a window, a shelf —
+is built from material swatches over math like the walls, because it is seen at
+an angle and must have a side; free-standing things — a person, a tree, a table,
+a stone — are painted cards at the camera angle, placed clear of walls, and a
+flat wall-plane card is for genuinely flat things only. Characters are modelled
+and rigged in 3D, rendered at the ruled camera angle into sprite sheets with the
+pixel-cluster treatment, and shipped as cards; the raw mesh never enters the
+scene, while how many frames are rendered follows the still-open question of
+whether figures animate at all (owner ruling, 2026-09-02).
 
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory

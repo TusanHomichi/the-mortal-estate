@@ -27,7 +27,6 @@ const NON_TREE_NON_WALKABLE_PROPS = new Set([
   "lantern_post",
   "shrine_table",
   "grave_marker",
-  "hearth",
 ]);
 
 export const cellKey = gridCellKey;
@@ -63,6 +62,10 @@ export function passabilityFrom(space: FeelSpace): LayoutPassability {
       j: Math.round(prop.cell_anchor[1]),
     };
     if (cells.has(cellKey(occupied))) blocked.add(cellKey(occupied));
+  }
+  for (const fixture of space.fixtures) {
+    const occupied = cellKey({ i: fixture.cell[0], j: fixture.cell[1] });
+    if (cells.has(occupied)) blocked.add(occupied);
   }
   return { cells, blocked, wallTiles, doorTiles, roofTiles, wallRuns: space.wall_runs };
 }

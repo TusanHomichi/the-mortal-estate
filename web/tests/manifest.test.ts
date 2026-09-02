@@ -37,6 +37,7 @@ function validManifest(): Record<string, unknown> {
         ],
         roofs: [],
         props: [],
+        fixtures: [],
         light_sources: { lantern_glass: null, candles: [[0, 0.5, 0]] },
         weather: false,
         portals: [],
@@ -102,22 +103,63 @@ describe("candidate feel manifest", () => {
     expect(() => parseFeelManifest(packet)).toThrow(/names an absent space: cellar/);
   });
 
-  it("refuses a portal target that is blocked", () => {
+  it("refuses a portal target that is blocked by a fixture", () => {
     const packet = validManifest() as {
-      spaces: { room: { portals: unknown[]; props: unknown[] } };
+      assets: { walls: Record<string, unknown> };
+      spaces: { room: { portals: unknown[]; fixtures: unknown[] } };
     };
-    packet.spaces.room.props.push({
-      kind: "hearth",
-      cell_anchor: [2, 2],
-      nominal_height: 1,
-      sway: false,
-      mirror: false,
-      facing: "view",
-    });
+    packet.assets.walls.fieldstone = row;
+    packet.spaces.room.fixtures.push({ kind: "hearth", cell: [0, 1], against: "north" });
     packet.spaces.room.portals = [
-      { cell: [1, 0], to: { space: "room", cell: [2, 2] } },
+      { cell: [1, 0], to: { space: "room", cell: [0, 1] } },
     ];
     expect(() => parseFeelManifest(packet)).toThrow(/portal target cell is not walkable/);
+  });
+
+  it("accepts a hearth fixture against a wall run", () => {
+    const packet = validManifest() as {
+      assets: { walls: Record<string, unknown> };
+      spaces: { room: { fixtures: unknown[] } };
+    };
+    packet.assets.walls.fieldstone = row;
+    packet.spaces.room.fixtures.push({ kind: "hearth", cell: [0, 1], against: "north" });
+    expect(parseFeelManifest(packet).spaces.room?.fixtures).toEqual([
+      { kind: "hearth", cell: [0, 1], against: "north" },
+    ]);
+  });
+
+  it("requires fieldstone when a fixture exists", () => {
+    const packet = validManifest() as {
+      spaces: { room: { fixtures: unknown[] } };
+    };
+    packet.spaces.room.fixtures.push({ kind: "hearth", cell: [0, 1], against: "north" });
+    expect(() => parseFeelManifest(packet)).toThrow(/missing fieldstone required by fixtures/);
+  });
+
+  it("refuses an unknown fixture kind", () => {
+    const packet = validManifest() as {
+      spaces: { room: { fixtures: unknown[] } };
+    };
+    packet.spaces.room.fixtures.push({ kind: "fountain", cell: [1, 1], against: "north" });
+    expect(() => parseFeelManifest(packet)).toThrow(/fixture is invalid/);
+  });
+
+  it("refuses an unknown fixture wall direction", () => {
+    const packet = validManifest() as {
+      spaces: { room: { fixtures: unknown[] } };
+    };
+    packet.spaces.room.fixtures.push({ kind: "hearth", cell: [0, 1], against: "south" });
+    expect(() => parseFeelManifest(packet)).toThrow(/fixture is invalid/);
+  });
+
+  it("refuses a fixture against an absent wall line", () => {
+    const packet = validManifest() as {
+      assets: { walls: Record<string, unknown> };
+      spaces: { room: { fixtures: unknown[] } };
+    };
+    packet.assets.walls.fieldstone = row;
+    packet.spaces.room.fixtures.push({ kind: "hearth", cell: [2, 2], against: "west" });
+    expect(() => parseFeelManifest(packet)).toThrow(/has no west wall run on its line/);
   });
 
   it("refuses a placement naming an unlisted prop kind", () => {
@@ -161,7 +203,7 @@ describe("candidate feel manifest", () => {
       spaces: { room: { props: Record<string, unknown>[] } };
     };
     planted.spaces.room.props.push({
-      kind: "hearth",
+      kind: "tree",
       cell_anchor: [1, 1],
       nominal_height: 1.6,
       sway: false,
@@ -175,7 +217,7 @@ describe("candidate feel manifest", () => {
       spaces: { room: { props: Record<string, unknown>[] } };
     };
     planted.spaces.room.props.push({
-      kind: "hearth",
+      kind: "tree",
       cell_anchor: [1, 1],
       nominal_height: 1.6,
       sway: false,
@@ -183,6 +225,23 @@ describe("candidate feel manifest", () => {
       facing: "camera-ish",
     });
     expect(() => parseFeelManifest(planted)).toThrow(/unknown facing: camera-ish/);
+  });
+
+  it("refuses a retired hearth prop placement even if its asset is listed", () => {
+    const planted = validManifest() as {
+      assets: { props: Record<string, unknown> };
+      spaces: { room: { props: Record<string, unknown>[] } };
+    };
+    planted.assets.props.hearth = row;
+    planted.spaces.room.props.push({
+      kind: "hearth",
+      cell_anchor: [1, 1],
+      nominal_height: 1.6,
+      sway: false,
+      mirror: false,
+      facing: "+z",
+    });
+    expect(() => parseFeelManifest(planted)).toThrow(/hearth prop placement is retired and refused/);
   });
 
   it("refuses a digest mismatch", async () => {
