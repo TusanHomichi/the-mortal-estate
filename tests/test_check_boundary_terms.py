@@ -8,7 +8,10 @@ mechanism without proving it on the thing it protects.
 from __future__ import annotations
 
 import os
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from boundary_test_support import (
     SYNTHETIC_TERMS,
@@ -16,12 +19,16 @@ from boundary_test_support import (
     running_as_root,
 )
 
+import boundary_common
 import check_boundary_terms
 from boundary_common import (
     EXIT_FAIL_CLOSED,
     EXIT_OK,
     EXIT_VIOLATION,
+    PRIVATE_TERMS_RELATIVE,
     ConfigError,
+    linked_worktree_main_root,
+    private_terms_path,
 )
 
 
@@ -167,3 +174,69 @@ class FailClosed(BoundaryTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LinkedWorktreeDenylist(BoundaryTestCase):
+    """A linked worktree proves the real denylist through its main checkout."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.main = Path(tempfile.mkdtemp(prefix="tme-main-")).resolve()
+        (self.main / ".git" / "worktrees" / "bridge").mkdir(parents=True)
+        self.addCleanup(lambda: __import__("shutil").rmtree(self.main, ignore_errors=True))
+
+    def make_worktree(self) -> Path:
+        worktree = Path(tempfile.mkdtemp(prefix="tme-wt-")).resolve()
+        self.addCleanup(lambda: __import__("shutil").rmtree(worktree, ignore_errors=True))
+        (worktree / ".git").write_text(
+            f"gitdir: {self.main / '.git' / 'worktrees' / 'bridge'}\n", encoding="utf-8"
+        )
+        return worktree
+
+    def test_a_linked_worktree_names_its_main_checkout(self) -> None:
+        self.assertEqual(linked_worktree_main_root(self.make_worktree()), self.main)
+
+    def test_a_primary_checkout_is_not_a_linked_worktree(self) -> None:
+        self.assertIsNone(linked_worktree_main_root(self.repo.path))
+        self.assertIsNone(linked_worktree_main_root(self.main))
+
+    def test_a_foreign_git_file_is_not_a_linked_worktree(self) -> None:
+        worktree = self.make_worktree()
+        (worktree / ".git").write_text("gitdir: /elsewhere/not-a-worktree\n", encoding="utf-8")
+        self.assertIsNone(linked_worktree_main_root(worktree))
+
+    def test_the_worktrees_own_denylist_wins(self) -> None:
+        worktree = self.make_worktree()
+        for root in (worktree, self.main):
+            (root / PRIVATE_TERMS_RELATIVE).parent.mkdir(parents=True)
+            (root / PRIVATE_TERMS_RELATIVE).write_text("zorbelquux\n", encoding="utf-8")
+        self.assertEqual(private_terms_path(worktree), worktree / PRIVATE_TERMS_RELATIVE)
+
+    def test_a_worktree_without_a_denylist_uses_the_main_checkouts(self) -> None:
+        worktree = self.make_worktree()
+        shared = self.main / PRIVATE_TERMS_RELATIVE
+        shared.parent.mkdir(parents=True)
+        shared.write_text("zorbelquux\n", encoding="utf-8")
+        self.assertEqual(private_terms_path(worktree), shared)
+
+    def test_neither_present_returns_the_local_path_to_fail_closed_on(self) -> None:
+        worktree = self.make_worktree()
+        self.assertEqual(private_terms_path(worktree), worktree / PRIVATE_TERMS_RELATIVE)
+
+    def test_the_check_scans_with_the_main_checkouts_terms(self) -> None:
+        shared = self.main / PRIVATE_TERMS_RELATIVE
+        shared.parent.mkdir(parents=True)
+        shared.write_text("zorbelquux\n", encoding="utf-8")
+        self.repo.write("notes.md", "the zorbelquux returns\n")
+        self.repo.track("notes.md")
+        with patch.object(boundary_common, "linked_worktree_main_root", return_value=self.main):
+            code, output = self.run_check(check_boundary_terms.main)
+        self.assertEqual(code, EXIT_VIOLATION, output)
+        self.assertIn("zorbelquux", output)
+
+    def test_the_check_still_fails_closed_with_no_denylist_anywhere(self) -> None:
+        self.repo.write("notes.md", "plain\n")
+        self.repo.track("notes.md")
+        with patch.object(boundary_common, "linked_worktree_main_root", return_value=self.main):
+            code, output = self.run_check(check_boundary_terms.main)
+        self.assertEqual(code, EXIT_FAIL_CLOSED, output)

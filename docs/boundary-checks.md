@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-08-19
-revision: 1
-status: Built at Phase 3, before any payload; pending owner acceptance at G3.
+last_updated: 2026-09-02
+revision: 2
+status: Built at Phase 3, before any payload; revision 2 records how a linked worktree reaches the private denylist. Pending owner acceptance at G3.
 public_safe: true
 summary: The public-boundary checks — what each defends, its fail-closed semantics, and the P9 mutant kills that qualify it to block.
 routes:
@@ -118,6 +118,15 @@ surfaces. This project inverts that:
   has no `.boundary/` root and every run of the banned-term check exits 3 until
   the owner provisions the file out of band. That is the intended first
   experience, not a setup bug.
+- **A linked worktree reaches the main checkout's file.** A worktree made with
+  `git worktree add` has no `.boundary/` of its own; rather than a hand copy
+  per worktree, `boundary_common.private_terms_path` reads the worktree's
+  `.git` file, finds the main checkout it belongs to, and uses that
+  checkout's denylist when the worktree has none. A worktree's own file, if
+  present, wins; with neither present the check still fails closed. Both the
+  check and the verification runner's `private-terms` capability resolve
+  through that one function, and `tests/test_check_boundary_terms.py` proves
+  the resolution and the fail-closed case.
 - **A synthetic fixture proves the mechanism.**
   `tests/fixtures/synthetic-terms.txt` carries invented nonsense terms. Every
   test — loading, matching, word boundaries, separator tolerance, filename

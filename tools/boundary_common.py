@@ -69,6 +69,53 @@ def resolve_root(argument: str | None) -> Path:
     return Path(result.strip()).resolve()
 
 
+#: The private denylist, relative to a checkout root. Git-ignored, never
+#: carried; see docs/boundary-checks.md, "The private-terms convention".
+PRIVATE_TERMS_RELATIVE = ".boundary/banned-terms.txt"
+
+
+def linked_worktree_main_root(root: Path) -> Path | None:
+    """Return the main checkout's root when ``root`` is a linked git worktree.
+
+    A linked worktree carries a ``.git`` *file* naming its private git
+    directory, ``<main>/.git/worktrees/<name>``; the main checkout is three
+    levels up from that. Anything else — a primary checkout, a bare layout,
+    a foreign ``.git`` file — yields ``None``. Read from the file, never by
+    asking git, so the answer is the same in every environment.
+    """
+    git_file = root / ".git"
+    if not git_file.is_file():
+        return None
+    text = git_file.read_text(encoding="utf-8").strip()
+    if not text.startswith("gitdir:"):
+        return None
+    gitdir = Path(text[len("gitdir:"):].strip())
+    if not gitdir.is_absolute():
+        gitdir = (root / gitdir).resolve()
+    if gitdir.parent.name != "worktrees" or gitdir.parent.parent.name != ".git":
+        return None
+    return gitdir.parent.parent.parent
+
+
+def private_terms_path(root: Path) -> Path:
+    """The denylist a checkout should use.
+
+    The checkout's own ``.boundary/banned-terms.txt`` wins. A linked worktree
+    without one uses its main checkout's, so a worktree proves the real terms
+    without a hand copy. When neither exists the local path is returned and
+    the caller fails closed on it, exactly as a fresh clone does.
+    """
+    local = root / PRIVATE_TERMS_RELATIVE
+    if local.is_file():
+        return local
+    main_root = linked_worktree_main_root(root)
+    if main_root is not None:
+        shared = main_root / PRIVATE_TERMS_RELATIVE
+        if shared.is_file():
+            return shared
+    return local
+
+
 def carried_files(root: Path) -> list[str]:
     """Return every file git carries or would carry, as sorted relative paths.
 

@@ -57,14 +57,16 @@ from boundary_common import (  # noqa: E402
     Finding,
     carried_files,
     fail_closed,
+    PRIVATE_TERMS_RELATIVE,
     load_list_file,
+    private_terms_path,
     read_text,
     report,
     resolve_root,
 )
 
 CHECK_NAME = "banned-terms"
-DEFAULT_TERMS_PATH = ".boundary/banned-terms.txt"
+DEFAULT_TERMS_PATH = PRIVATE_TERMS_RELATIVE
 
 
 def compile_terms(terms: list[str]) -> list[tuple[str, re.Pattern[str]]]:
@@ -119,7 +121,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--terms",
         default=None,
-        help=f"term data file (default: <root>/{DEFAULT_TERMS_PATH})",
+        help=(
+            f"term data file (default: <root>/{DEFAULT_TERMS_PATH}, or the main "
+            "checkout's when <root> is a linked worktree without its own)"
+        ),
     )
     arguments = parser.parse_args(argv)
 
@@ -128,7 +133,7 @@ def main(argv: list[str] | None = None) -> int:
         terms_path = (
             Path(arguments.terms).resolve()
             if arguments.terms
-            else root / DEFAULT_TERMS_PATH
+            else private_terms_path(root)
         )
         findings = scan(root, terms_path)
     except ConfigError as error:

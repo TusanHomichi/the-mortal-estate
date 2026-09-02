@@ -1,0 +1,100 @@
+// The one way a proof or a capture serves the feel scene: Vite on a free
+// loopback port, the candidate packet from the environment, the server's
+// whole process group stopped afterwards. Nothing here asserts anything
+// about the scene; it only gets a real tab in front of it.
+import { spawn } from "node:child_process";
+import net from "node:net";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+export const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+/** Exit 3 — the verification runner's INCOMPLETE — with the reason on stderr. */
+export function refuseUnavailable(reason) {
+  console.error(`UNAVAILABLE: ${reason}`);
+  process.exit(3);
+}
+
+/** The candidate packet directory, or a refusal: a tracked path is never a default. */
+export function requirePacket() {
+  const packet = process.env.TME_FEEL_ASSETS?.trim() ?? "";
+  if (packet === "") {
+    refuseUnavailable("TME_FEEL_ASSETS is not set; it must name the candidate packet directory");
+  }
+  return path.resolve(packet);
+}
+
+export async function freePort() {
+  const server = net.createServer();
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", resolve);
+  });
+  const address = server.address();
+  if (address === null || typeof address !== "object") throw new Error("no loopback port");
+  const { port } = address;
+  await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
+  return port;
+}
+
+async function waitForVite(url, server, output) {
+  const deadline = Date.now() + 15_000;
+  while (Date.now() < deadline) {
+    if (server.exitCode !== null) {
+      throw new Error(`Vite exited before serving:\n${output()}`);
+    }
+    try {
+      const response = await fetch(url);
+      if (response.ok) return;
+    } catch {
+      // The selected loopback port is not accepting connections yet.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error(`Vite did not serve in time:\n${output()}`);
+}
+
+/** Stop the server's whole process group: Vite's own children outlive a plain kill. */
+async function stopServer(server) {
+  if (server.exitCode !== null) return;
+  const signal = (name) => {
+    try {
+      process.kill(-server.pid, name);
+    } catch {
+      server.kill(name);
+    }
+  };
+  signal("SIGTERM");
+  const stopped = await Promise.race([
+    new Promise((resolve) => server.once("exit", () => resolve(true))),
+    new Promise((resolve) => setTimeout(() => resolve(false), 2_000)),
+  ]);
+  if (!stopped && server.exitCode === null) signal("SIGKILL");
+}
+
+/** Serve the scene from `packet`; resolve once a tab can load it. */
+export async function startVite(packet) {
+  const port = await freePort();
+  const baseUrl = `http://127.0.0.1:${port}/`;
+  let serverOutput = "";
+  const server = spawn(
+    process.execPath,
+    [path.join(webRoot, "node_modules/vite/bin/vite.js"), "--host", "127.0.0.1", "--port", String(port), "--strictPort"],
+    {
+      cwd: webRoot,
+      env: { ...process.env, TME_FEEL_ASSETS: packet },
+      stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
+    },
+  );
+  server.stdout.on("data", (chunk) => { serverOutput += chunk.toString(); });
+  server.stderr.on("data", (chunk) => { serverOutput += chunk.toString(); });
+  const output = () => serverOutput;
+  try {
+    await waitForVite(baseUrl, server, output);
+  } catch (error) {
+    await stopServer(server);
+    throw error;
+  }
+  return { baseUrl, server, output, stop: () => stopServer(server) };
+}

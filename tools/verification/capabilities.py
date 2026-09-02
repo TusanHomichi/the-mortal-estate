@@ -12,10 +12,17 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Mapping
 
 from .model import Capability
+
+TOOLS = Path(__file__).resolve().parents[1]
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+from boundary_common import PRIVATE_TERMS_RELATIVE, private_terms_path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -24,8 +31,9 @@ ROOT = Path(__file__).resolve().parents[2]
 GODOT_VERSION = "4.7.2.stable.official.ed1daf0bf"
 
 #: The private denylist. Absent on every clean clone by design; see
-#: docs/boundary-checks.md, "The private-terms convention".
-PRIVATE_TERMS = ".boundary/banned-terms.txt"
+#: docs/boundary-checks.md, "The private-terms convention". The relative path
+#: is owned by boundary_common so the check and this probe cannot disagree.
+PRIVATE_TERMS = PRIVATE_TERMS_RELATIVE
 
 #: The tracked nonsense-word fixture the banned-terms mechanism degrades onto.
 SYNTHETIC_TERMS = "tools/ci-synthetic-banned-terms.txt"
@@ -106,14 +114,16 @@ def _probe_postgres(environ: Mapping[str, str]) -> tuple[bool, str]:
 
 
 def _probe_private_terms(_environ: Mapping[str, str]) -> tuple[bool, str]:
-    path = ROOT / PRIVATE_TERMS
+    path = private_terms_path(ROOT)
     if not path.is_file() or not os.access(path, os.R_OK):
         return (
             False,
             f"{PRIVATE_TERMS} is absent; the banned-terms mechanism will run against the "
             f"tracked synthetic fixture and asserts nothing about the real denylist",
         )
-    return True, f"{PRIVATE_TERMS} is present"
+    if path == ROOT / PRIVATE_TERMS:
+        return True, f"{PRIVATE_TERMS} is present"
+    return True, f"{PRIVATE_TERMS} is present in this linked worktree's main checkout ({path})"
 
 
 def _probe_display(environ: Mapping[str, str]) -> tuple[bool, str]:

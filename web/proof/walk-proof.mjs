@@ -1,60 +1,21 @@
 import assert from "node:assert/strict";
 import { mkdir, rm } from "node:fs/promises";
-import net from "node:net";
+import os from "node:os";
 import path from "node:path";
-import { execFile, spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { chromium } from "playwright";
+import { requirePacket, startVite } from "./serve.mjs";
 
-const proofDirectory = path.dirname(fileURLToPath(import.meta.url));
-const webRoot = path.resolve(proofDirectory, "..");
-const captureRoot = "/data/dev/home/tme-visual-lab/web-feel-v26/walk-captures";
-const packetV2 = "/data/dev/home/tme-visual-lab/web-feel-v26/world/packet-v2";
+// The packet under proof comes from the environment, never a tracked path; the
+// captures go where the owner asks (the capture-output capability) or to a
+// temporary directory that the summary line names.
+const packet = requirePacket();
+const captureRoot = path.resolve(
+  process.env.TME_CAPTURE_OUTPUT?.trim() || path.join(os.tmpdir(), "tme-walk-proof"),
+);
 const sequenceFrames = path.join(captureRoot, ".wind-sequence-frames");
 const execFileAsync = promisify(execFile);
-
-async function freePort() {
-  const server = net.createServer();
-  await new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", resolve);
-  });
-  const address = server.address();
-  assert(address !== null && typeof address === "object");
-  const port = address.port;
-  await new Promise((resolve, reject) =>
-    server.close((error) => (error ? reject(error) : resolve())),
-  );
-  return port;
-}
-
-async function waitForVite(url, server, output) {
-  const deadline = Date.now() + 15_000;
-  while (Date.now() < deadline) {
-    if (server.exitCode !== null) {
-      throw new Error(`Vite exited before serving the proof:\n${output()}`);
-    }
-    try {
-      const response = await fetch(url);
-      if (response.ok) return;
-    } catch {
-      // The selected loopback port is not accepting connections yet.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  throw new Error(`Vite did not serve the proof in time:\n${output()}`);
-}
-
-async function stopServer(server) {
-  if (server.exitCode !== null) return;
-  server.kill("SIGTERM");
-  const stopped = await Promise.race([
-    new Promise((resolve) => server.once("exit", () => resolve(true))),
-    new Promise((resolve) => setTimeout(() => resolve(false), 2_000)),
-  ]);
-  if (!stopped && server.exitCode === null) server.kill("SIGKILL");
-}
 
 function parseCell(value) {
   assert.match(value, /^-?\d+,-?\d+$/);
@@ -235,31 +196,11 @@ async function walkThroughPortal(
   await assertCaretakerCentred(page);
 }
 
-const port = await freePort();
-const baseUrl = `http://127.0.0.1:${port}/`;
-let serverOutput = "";
-const server = spawn(
-  process.execPath,
-  [
-    path.join(webRoot, "node_modules/vite/bin/vite.js"),
-    "--host",
-    "127.0.0.1",
-    "--port",
-    String(port),
-    "--strictPort",
-  ],
-  {
-    cwd: webRoot,
-    env: { ...process.env, TME_FEEL_ASSETS: packetV2 },
-    stdio: ["ignore", "pipe", "pipe"],
-  },
-);
-server.stdout.on("data", (chunk) => { serverOutput += chunk.toString(); });
-server.stderr.on("data", (chunk) => { serverOutput += chunk.toString(); });
+const vite = await startVite(packet);
+const baseUrl = vite.baseUrl;
 
 let browser;
 try {
-  await waitForVite(baseUrl, server, () => serverOutput);
   await mkdir(captureRoot, { recursive: true });
   browser = await chromium.launch({ executablePath: chromium.executablePath(), headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
@@ -327,6 +268,6 @@ try {
   );
 } finally {
   await browser?.close();
-  await stopServer(server);
+  await vite.stop();
   await rm(sequenceFrames, { recursive: true, force: true });
 }
