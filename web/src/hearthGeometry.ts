@@ -19,7 +19,8 @@ export const HEARTH_PROFILE = Object.freeze({
   hearthstoneDepth: 0.32,
   fireHeight: 0.5,
   fireFrontInset: 0.1,
-  lightHeight: 0.55,
+  lightHeight: 0.38,
+  lightFrontOffset: 0.06,
 });
 
 export type HearthMaterial = "fieldstone" | "fieldstone_dark" | "post";
@@ -192,6 +193,6 @@ export function hearthLightPosition(fixture: FixturePlacement): [number, number,
     fixture,
     0,
     HEARTH_PROFILE.lightHeight,
-    HEARTH_PROFILE.breastDepth - HEARTH_PROFILE.fireFrontInset,
+    HEARTH_PROFILE.breastDepth + HEARTH_PROFILE.lightFrontOffset,
   );
 }

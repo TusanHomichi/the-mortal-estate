@@ -79,16 +79,30 @@ describe("hearth fixture geometry", () => {
     expect(parts.filter((part) => part.material === "post")).toHaveLength(2);
   });
 
-  it("rotates the same kit to the west wall and keeps its light in the firebox", () => {
+  it("puts the fire light in front of the north breast instead of inside it", () => {
+    const breast = buildHearthGeometry([NORTH]).find((part) => part.label === "breast")!;
+    const breastBounds = bounds(breast.geometry.positions);
+    const light = hearthLightPosition(NORTH);
+
+    expect(light).toEqual([
+      NORTH.cell[0],
+      HEARTH_PROFILE.lightHeight,
+      NORTH.cell[1] - 0.5 + HEARTH_PROFILE.breastDepth + HEARTH_PROFILE.lightFrontOffset,
+    ]);
+    expect(light[2]).toBeGreaterThan(breastBounds.maxZ);
+  });
+
+  it("rotates the same kit to the west wall and keeps its light in front", () => {
     const west: FixturePlacement = { kind: "hearth", cell: [2, 3], against: "west" };
     const breast = buildHearthGeometry([west]).find((part) => part.label === "breast")!;
     const breastBounds = bounds(breast.geometry.positions);
     expect(breastBounds.minX).toBeCloseTo(west.cell[0] - 0.5);
     expect(breastBounds.maxX).toBeCloseTo(west.cell[0] - 0.5 + HEARTH_PROFILE.breastDepth);
     expect(hearthLightPosition(west)).toEqual([
-      west.cell[0] - 0.5 + HEARTH_PROFILE.breastDepth - HEARTH_PROFILE.fireFrontInset,
+      west.cell[0] - 0.5 + HEARTH_PROFILE.breastDepth + HEARTH_PROFILE.lightFrontOffset,
       HEARTH_PROFILE.lightHeight,
       west.cell[1],
     ]);
+    expect(hearthLightPosition(west)[0]).toBeGreaterThan(breastBounds.maxX);
   });
 });

@@ -1,6 +1,8 @@
 import { Color } from "three";
 import type { Preset } from "../presets";
 
+export const INTERIOR_AMBIENT_INTENSITY = 0.68;
+
 export interface ScenePalette {
   background: Color;
   ambient: Color;
@@ -20,7 +22,7 @@ export function paletteFor(
     return {
       background: new Color("#07101d"),
       ambient: new Color("#e8efff"),
-      ambientIntensity: 0.82,
+      ambientIntensity: INTERIOR_AMBIENT_INTENSITY,
       key: new Color("#9db7dc"),
       keyIntensity: 0.72,
       lanternIntensity: 0,

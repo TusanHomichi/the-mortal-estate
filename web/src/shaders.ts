@@ -162,8 +162,8 @@ export const hearthFireFragmentShader = /* glsl */ `
     ) * vec2(0.008, 0.005) * crown;
     vec4 texel = texture2D(albedoTexture, vUv + distortion);
     if (texel.a < 0.12) discard;
-    vec3 rim = vec3(1.0, 0.31, 0.055) * crown * 0.07;
-    gl_FragColor = vec4(texel.rgb * flicker + rim * texel.a, texel.a);
+    vec3 emissiveColour = texel.rgb + vec3(1.0, 0.31, 0.055) * crown * 0.07 * texel.a;
+    gl_FragColor = vec4(emissiveColour * flicker, texel.a);
   }
 `;
 
@@ -200,8 +200,8 @@ export const hearthEmberFragmentShader = /* glsl */ `
 
 export function hearthFlicker(elapsed: number): number {
   return 1 +
-    Math.sin(elapsed * 2.17 + 1.731) * 0.055 +
-    Math.sin(elapsed * 4.31 + 2.943) * 0.025;
+    Math.sin(elapsed * 2.17 + 1.731) * 0.08 +
+    Math.sin(elapsed * 4.31 + 2.943) * 0.04;
 }
 
 export const fogVertexShader = /* glsl */ `

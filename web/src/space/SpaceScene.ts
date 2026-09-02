@@ -117,6 +117,8 @@ const WALL_FADED_PLASTER_OPACITY = 0.34;
 const WALL_FADED_TIMBER_OPACITY = 0.48;
 const WALL_FADED_RENDER_ORDER = 10;
 const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
+const HEARTH_LIGHT_CANDLE_MULTIPLIER = 4;
+const HEARTH_LIGHT_DISTANCE = 4.5;
 
 interface SharedWindUniforms {
   elapsed: { value: number };
@@ -585,12 +587,16 @@ export class SpaceScene {
       embers.instanceMatrix.needsUpdate = true;
       this.group.add(embers);
 
-      const lightBase = this.palette.candleIntensity * 2.8;
-      const light = new PointLight(WARM_LIGHT, lightBase, 3.4, 2);
-      light.name = `HearthGlow_${fixtureIndex}`;
+      const lightBase = this.palette.candleIntensity * HEARTH_LIGHT_CANDLE_MULTIPLIER;
+      const light = new PointLight(WARM_LIGHT, lightBase, HEARTH_LIGHT_DISTANCE, 2);
+      light.name = `HearthFireLight_${fixtureIndex}`;
       light.position.fromArray(hearthLightPosition(fixture));
       light.castShadow = true;
       light.shadow.mapSize.set(512, 512);
+      light.shadow.camera.near = 0.05;
+      light.shadow.camera.far = HEARTH_LIGHT_DISTANCE;
+      light.shadow.bias = -0.0005;
+      light.shadow.normalBias = 0.015;
       this.group.add(light);
       this.hearths.push({ fireMaterial, emberMaterial, light, lightBase });
     });
