@@ -7,6 +7,7 @@ function placement(mirror: boolean, facing: PropPlacement["facing"] = "view"): P
   return {
     kind: "tree_broad",
     cell_anchor: [0, 0],
+    elevation: 0,
     nominal_height: 2,
     sway: true,
     mirror,
@@ -28,6 +29,16 @@ describe("feel-scene prop placement", () => {
     expect(transform.rotationY).toBe(0);
     expect(transform.position.x).toBe(4);
     expect(transform.position.z).toBe(1 - 0.5 + WALL_CARD_OFFSET);
+  });
+
+  it("adds the authored elevation to view-facing and wall-mounted card centres", () => {
+    for (const facing of ["view", "+z", "+x"] as const) {
+      const transform = propCardTransform({
+        ...placement(false, facing),
+        elevation: 1.25,
+      });
+      expect(transform.position.y).toBe(2.25);
+    }
   });
 
   it("places a +x card just in front of its west wall with its shadow on the base line", () => {

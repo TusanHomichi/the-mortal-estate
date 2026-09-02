@@ -63,6 +63,7 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "tree_rare",
       cell_anchor: [0, 0],
+      elevation: 0,
       nominal_height: 1.8,
       sway: true,
       mirror: true,
@@ -169,6 +170,7 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "toString",
       cell_anchor: [0, 0],
+      elevation: 0,
       nominal_height: 1,
       sway: false,
       mirror: false,
@@ -184,6 +186,7 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "caretaker",
       cell_anchor: [1, 1],
+      elevation: 0,
       nominal_height: 1.38,
       sway: false,
       mirror: false,
@@ -205,11 +208,45 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "tree",
       cell_anchor: [1, 1],
+      elevation: 0,
       nominal_height: 1.6,
       sway: false,
       mirror: false,
     });
     expect(() => parseFeelManifest(planted)).toThrow(/prop placement is invalid/);
+  });
+
+  it("refuses a prop placement without elevation by name", () => {
+    const planted = validManifest() as {
+      spaces: { room: { props: Record<string, unknown>[] } };
+    };
+    planted.spaces.room.props.push({
+      kind: "tree",
+      cell_anchor: [1, 1],
+      nominal_height: 1.6,
+      sway: false,
+      mirror: false,
+      facing: "view",
+    });
+    expect(() => parseFeelManifest(planted)).toThrow(/without elevation is refused/);
+  });
+
+  it("refuses a non-finite or out-of-range prop elevation", () => {
+    for (const elevation of [Number.NaN, Number.POSITIVE_INFINITY, -0.01, 6.01]) {
+      const planted = validManifest() as {
+        spaces: { room: { props: Record<string, unknown>[] } };
+      };
+      planted.spaces.room.props.push({
+        kind: "tree",
+        cell_anchor: [1, 1],
+        elevation,
+        nominal_height: 1.6,
+        sway: false,
+        mirror: false,
+        facing: "view",
+      });
+      expect(() => parseFeelManifest(planted)).toThrow(/prop placement is invalid/);
+    }
   });
 
   it("refuses a prop placement naming an unknown facing", () => {
@@ -219,6 +256,7 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "tree",
       cell_anchor: [1, 1],
+      elevation: 0,
       nominal_height: 1.6,
       sway: false,
       mirror: false,
@@ -236,6 +274,7 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "hearth",
       cell_anchor: [1, 1],
+      elevation: 0,
       nominal_height: 1.6,
       sway: false,
       mirror: false,

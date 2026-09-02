@@ -56,6 +56,7 @@ export interface WallRun {
 export interface PropPlacement {
   kind: string;
   cell_anchor: [number, number];
+  elevation: number;
   nominal_height: number;
   sway: boolean;
   mirror: boolean;

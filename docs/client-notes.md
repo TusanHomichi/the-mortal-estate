@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-02
-revision: 12
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 12 records shared outdoor wind and instanced grass in the browser feel scene. Pending owner acceptance at the phase stop points.
+revision: 13
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor. Pending owner acceptance at the phase stop points.
 public_safe: true
-summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, the browser feel surface's spaces, portals, fixtures, cursor, outdoor wind, and exterior wall fade, and the proof surfaces.
+summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
   - web/**
   - client/**
@@ -386,6 +386,10 @@ height by a quarter per step, negative outward, so two tabs can show the ruled
 frame beside a candidate; it is a comparison aid for the owner's viewport
 ruling, the ruled frame remains the default, and the label names any step in
 force.
+Every packet prop placement carries a finite `elevation` from zero through six
+world units. The card centre is that floor-relative anchor plus half its nominal
+height for view-facing and wall-plane cards alike; a placement without the key
+is refused rather than treated as floor-standing.
 Packet-derived passability now reserves every wall tile from occupancy while
 leaving its door tile crossable.
 Schema-2 fixtures build wall-attached structure from batched material geometry,

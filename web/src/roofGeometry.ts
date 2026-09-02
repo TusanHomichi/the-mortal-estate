@@ -1,7 +1,10 @@
 import type { RoofPlacement } from "./feelTypes";
 import type { GeometryData } from "./wallGeometry";
 
-export const ROOF_OVERHANG = 0.15;
+export const ROOF_PITCH_RISE_MULTIPLIER = 1.35;
+export const ROOF_OVERHANG = 0.28;
+export const ROOF_SHINGLE_SLOPE_UV_SCALE = 1.6;
+export const ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER = 0.8;
 const RIDGE_HALF_WIDTH = 0.06;
 const STRIP_HALF_HEIGHT = 0.04;
 const EAVE_HALF_WIDTH = 0.055;
@@ -123,13 +126,15 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
   const across0 = roof.ridge_axis === "x" ? z0 : x0;
   const across1 = roof.ridge_axis === "x" ? z1 : x1;
   const ridge = (across0 + across1) / 2;
+  const ridgeHeight = roof.eave_height +
+    (roof.ridge_height - roof.eave_height) * ROOF_PITCH_RISE_MULTIPLIER;
   const toWorld = roof.ridge_axis === "x"
     ? (a: number, y: number, b: number): Vertex => [a, y, b]
     : (a: number, y: number, b: number): Vertex => [b, y, a];
   const alongLength = along1 - along0;
   const slopeLength = Math.hypot(
     ridge - across0,
-    roof.ridge_height - roof.eave_height,
+    ridgeHeight - roof.eave_height,
   );
 
   const lowerSlope = emptyGeometry();
@@ -138,8 +143,8 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
     [
       toWorld(along0, roof.eave_height, across0),
       toWorld(along1, roof.eave_height, across0),
-      toWorld(along1, roof.ridge_height, ridge),
-      toWorld(along0, roof.ridge_height, ridge),
+      toWorld(along1, ridgeHeight, ridge),
+      toWorld(along0, ridgeHeight, ridge),
     ],
     alongLength,
     slopeLength,
@@ -148,8 +153,8 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
   pushQuad(
     upperSlope,
     [
-      toWorld(along0, roof.ridge_height, ridge),
-      toWorld(along1, roof.ridge_height, ridge),
+      toWorld(along0, ridgeHeight, ridge),
+      toWorld(along1, ridgeHeight, ridge),
       toWorld(along1, roof.eave_height, across1),
       toWorld(along0, roof.eave_height, across1),
     ],
@@ -163,10 +168,10 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
     [
       toWorld(along0, roof.eave_height, across1),
       toWorld(along0, roof.eave_height, across0),
-      toWorld(along0, roof.ridge_height, ridge),
+      toWorld(along0, ridgeHeight, ridge),
     ],
     across1 - across0,
-    roof.ridge_height - roof.eave_height,
+    ridgeHeight - roof.eave_height,
   );
   const gableEnd = emptyGeometry();
   pushTriangle(
@@ -174,10 +179,10 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
     [
       toWorld(along1, roof.eave_height, across0),
       toWorld(along1, roof.eave_height, across1),
-      toWorld(along1, roof.ridge_height, ridge),
+      toWorld(along1, ridgeHeight, ridge),
     ],
     across1 - across0,
-    roof.ridge_height - roof.eave_height,
+    ridgeHeight - roof.eave_height,
   );
 
   const parts: RoofGeometryPart[] = [
@@ -191,8 +196,8 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
         along1,
         ridge - RIDGE_HALF_WIDTH,
         ridge + RIDGE_HALF_WIDTH,
-        roof.ridge_height - STRIP_HALF_HEIGHT,
-        roof.ridge_height + STRIP_HALF_HEIGHT,
+        ridgeHeight - STRIP_HALF_HEIGHT,
+        ridgeHeight + STRIP_HALF_HEIGHT,
         toWorld,
       ),
     },
@@ -235,7 +240,7 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
           across0,
           roof.eave_height,
           ridge,
-          roof.ridge_height,
+          ridgeHeight,
           toWorld,
         ),
       },
@@ -245,7 +250,7 @@ export function buildRoofGeometry(roof: RoofPlacement): RoofGeometryPart[] {
         geometry: rakeStrip(
           along,
           ridge,
-          roof.ridge_height,
+          ridgeHeight,
           across1,
           roof.eave_height,
           toWorld,

@@ -44,6 +44,8 @@ import { windPresetSettings, type Preset, type WindPresetSettings } from "../pre
 import {
   buildRoofGeometry,
   mergeGeometryData,
+  ROOF_SHINGLE_SLOPE_UV_SCALE,
+  ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER,
   type RoofMaterial,
 } from "../roofGeometry";
 import {
@@ -117,8 +119,8 @@ const WALL_FADED_PLASTER_OPACITY = 0.34;
 const WALL_FADED_TIMBER_OPACITY = 0.48;
 const WALL_FADED_RENDER_ORDER = 10;
 const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
-const HEARTH_LIGHT_CANDLE_MULTIPLIER = 4;
-const HEARTH_LIGHT_DISTANCE = 4.5;
+export const HEARTH_LIGHT_INTENSITY_MULTIPLIER = 8;
+export const HEARTH_LIGHT_DISTANCE = 7.5;
 
 interface SharedWindUniforms {
   elapsed: { value: number };
@@ -463,9 +465,20 @@ export class SpaceScene {
     for (const [key, batch] of batches) {
       const map = requiredTexture(textures, batch.textureKey).texture;
       configureTexture(map, anisotropy);
+      if (batch.material === "shingle_slope") {
+        map.repeat.setScalar(1 / ROOF_SHINGLE_SLOPE_UV_SCALE);
+        map.needsUpdate = true;
+      }
       const material = new MeshStandardMaterial({
         name: `roof-${key}`,
         map,
+        color: batch.material === "shingle_slope"
+          ? new Color(
+              ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER,
+              ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER,
+              ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER,
+            )
+          : undefined,
         roughness: batch.material.startsWith("shingle_") ? 0.92 : 0.86,
         side: DoubleSide,
       });
@@ -587,7 +600,7 @@ export class SpaceScene {
       embers.instanceMatrix.needsUpdate = true;
       this.group.add(embers);
 
-      const lightBase = this.palette.candleIntensity * HEARTH_LIGHT_CANDLE_MULTIPLIER;
+      const lightBase = this.palette.candleIntensity * HEARTH_LIGHT_INTENSITY_MULTIPLIER;
       const light = new PointLight(WARM_LIGHT, lightBase, HEARTH_LIGHT_DISTANCE, 2);
       light.name = `HearthFireLight_${fixtureIndex}`;
       light.position.fromArray(hearthLightPosition(fixture));
@@ -659,6 +672,7 @@ export class SpaceScene {
       {
         kind: "caretaker",
         cell_anchor: [caretakerCell.i, caretakerCell.j],
+        elevation: 0,
         nominal_height: CARETAKER_NOMINAL_HEIGHT,
         sway: false,
         mirror: false,

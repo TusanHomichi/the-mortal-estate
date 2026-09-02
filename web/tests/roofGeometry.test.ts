@@ -3,6 +3,9 @@ import {
   buildRoofGeometry,
   mergeGeometryData,
   ROOF_OVERHANG,
+  ROOF_PITCH_RISE_MULTIPLIER,
+  ROOF_SHINGLE_SLOPE_UV_SCALE,
+  ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER,
 } from "../src/roofGeometry";
 import type { RoofPlacement } from "../src/feelTypes";
 
@@ -27,8 +30,12 @@ describe("pitched roof geometry", () => {
     expect(Math.min(...coordinates(positions, 0))).toBeCloseTo(-0.5 - ROOF_OVERHANG);
     expect(Math.max(...coordinates(positions, 0))).toBeCloseTo(2.5 + ROOF_OVERHANG);
     expect(coordinates(positions, 1)).toContain(roof.eave_height);
-    expect(coordinates(positions, 1)).toContain(roof.ridge_height);
+    expect(coordinates(positions, 1)).toContain(
+      roof.eave_height + (roof.ridge_height - roof.eave_height) * ROOF_PITCH_RISE_MULTIPLIER,
+    );
     expect(Math.max(...slopes[0]!.geometry.uvs)).toBeGreaterThan(3);
+    expect(ROOF_SHINGLE_SLOPE_UV_SCALE).toBe(1.6);
+    expect(ROOF_SHINGLE_SLOPE_VALUE_MULTIPLIER).toBe(0.8);
   });
 
   it("adds the ridge, both eaves, two plaster gables, and four timber rakes", () => {
@@ -45,7 +52,9 @@ describe("pitched roof geometry", () => {
     const positions = slopes.flatMap((part) => part.geometry.positions);
     expect(Math.min(...coordinates(positions, 2))).toBeCloseTo(0.5 - ROOF_OVERHANG);
     expect(Math.max(...coordinates(positions, 2))).toBeCloseTo(4.5 + ROOF_OVERHANG);
-    expect(coordinates(positions, 1)).toContain(roof.ridge_height);
+    expect(coordinates(positions, 1)).toContain(
+      roof.eave_height + (roof.ridge_height - roof.eave_height) * ROOF_PITCH_RISE_MULTIPLIER,
+    );
   });
 
   it("offsets indices when roof parts are batched", () => {
