@@ -42,6 +42,7 @@ import {
   swayVertexShader,
 } from "./shaders";
 import { buildWallProfile, type GeometryData, type WallMaterial } from "./wallGeometry";
+import { createWalkPresenter } from "./walk/walkPresenter";
 
 interface DecodedTexture {
   texture: Texture;
@@ -244,7 +245,7 @@ function addWalls(
   }
 }
 
-function addContactShadow(scene: Scene, x: number, z: number, height: number): void {
+function addContactShadow(scene: Scene, x: number, z: number, height: number): Mesh {
   const shadow = new Mesh(
     new PlaneGeometry(
       Math.min(Math.max(height * 0.34, 0.24), 0.72),
@@ -261,6 +262,7 @@ function addContactShadow(scene: Scene, x: number, z: number, height: number): v
   shadow.rotation.x = -Math.PI / 2;
   shadow.position.set(x, 0.004, z);
   scene.add(shadow);
+  return shadow;
 }
 
 function addProps(
@@ -271,9 +273,14 @@ function addProps(
   palette: ScenePalette,
   anisotropy: number,
   lanternPosition: Vector3,
-): { billboards: Mesh[]; swayMaterials: ShaderMaterial[] } {
+): {
+  billboards: Mesh[];
+  swayMaterials: ShaderMaterial[];
+  caretaker: { card: Mesh; contactShadow: Mesh };
+} {
   const billboards: Mesh[] = [];
   const swayMaterials: ShaderMaterial[] = [];
+  let caretaker: { card: Mesh; contactShadow: Mesh } | null = null;
   for (const prop of manifest.layout.props) {
     const source = requiredTexture(textures, `props/${prop.kind}`);
     configureTexture(source.texture, anisotropy);
@@ -316,11 +323,18 @@ function addProps(
     mesh.position.set(prop.cell_anchor[0], prop.nominal_height / 2, prop.cell_anchor[1]);
     mesh.castShadow = true;
     mesh.customDepthMaterial = undefined;
-    addContactShadow(scene, prop.cell_anchor[0], prop.cell_anchor[1], prop.nominal_height);
+    const contactShadow = addContactShadow(
+      scene,
+      prop.cell_anchor[0],
+      prop.cell_anchor[1],
+      prop.nominal_height,
+    );
     scene.add(mesh);
     billboards.push(mesh);
+    if (prop.kind === "caretaker") caretaker = { card: mesh, contactShadow };
   }
-  return { billboards, swayMaterials };
+  if (caretaker === null) throw new Error("the feel layout carries no caretaker for the walk experiment");
+  return { billboards, swayMaterials, caretaker };
 }
 
 function addLights(
@@ -473,7 +487,7 @@ export async function startFeelScene(
   addGround(scene, manifest, textures, presets, palette, anisotropy);
   addWalls(scene, manifest, textures, anisotropy);
   const { lantern, lanternBase } = addLights(scene, manifest, presets, palette);
-  const { billboards, swayMaterials } = addProps(
+  const { billboards, swayMaterials, caretaker } = addProps(
     scene,
     manifest,
     textures,
@@ -486,6 +500,15 @@ export async function startFeelScene(
   const rain = presets.includes("rain") ? addRain(scene, camera) : null;
   const fog = presets.includes("fog") ? makeFogOverlay() : null;
   const clock = new Clock();
+  const walkPresenter = createWalkPresenter({
+    stage,
+    canvas,
+    scene,
+    camera,
+    layout: manifest.layout,
+    caretaker,
+    startedAt: performance.now() / 1000,
+  });
   let animationFrame = 0;
   let stopped = false;
 
@@ -499,6 +522,7 @@ export async function startFeelScene(
       material.uniforms.lanternStrength!.value = palette.practicalShaderStrength * (1 + noise);
     });
     rain?.update(elapsed);
+    walkPresenter.update(performance.now() / 1000);
     renderer.setRenderTarget(null);
     renderer.clear();
     renderer.render(scene, camera);
@@ -524,6 +548,7 @@ export async function startFeelScene(
       stopped = true;
       cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
+      walkPresenter.stop();
       renderer.dispose();
     },
   };

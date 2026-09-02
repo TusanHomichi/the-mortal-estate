@@ -1,10 +1,11 @@
 ---
-last_updated: 2026-09-01
-revision: 14
-status: Owner-accepted visual target. Revision 14 records the in-engine feel scene as a bounded experiment beside the world-view seam, and the candidate-asset rule it runs under; no renderer, asset set, or production pipeline is accepted.
+last_updated: 2026-09-02
+revision: 15
+status: Owner-accepted visual target. Revision 15 records the browser feel scene's local walk experiment under the same bounded, non-authoritative rule; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
-summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, and the production rule and paused-experiment context used to judge future presentation evidence.
+summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
+  - web/**
   - client/presentation/**
   - content/test-corpus/**
 ---
@@ -428,6 +429,9 @@ authoritative frame, emits no targets, sends no command, and replaces nothing.
 `GridWorldView` remains the current world view. Whether anything in the feel
 scene earns a place behind `WorldViewSeam` is decided by the production rule
 above, not by this section.
+
+The browser feel scene now carries a local walk experiment under the same
+non-authoritative rule.
 
 Its construction follows the lab's conclusions rather than re-deriving them:
 the camera is orthographic at 45-degree yaw and 30-degree elevation, sized so

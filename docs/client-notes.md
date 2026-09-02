@@ -1,10 +1,11 @@
 ---
-last_updated: 2026-08-27
-revision: 4
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; pending owner acceptance at the phase stop points.
+last_updated: 2026-09-02
+revision: 5
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 5 records the browser feel scene's bounded local walk experiment. Pending owner acceptance at the phase stop points.
 public_safe: true
-summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and the lattice view that implements it, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, and the proof surfaces.
+summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, and the proof surfaces.
 routes:
+  - web/**
   - client/**
   - tools/run_client_live_proof.py
   - tools/run_pulse_capture.py
@@ -356,6 +357,16 @@ put a row of squares under the banner when the lattice fits its area tightly. So
 the terrain still steps discretely on the beat while the markers standing on it
 travel — an honest limitation of a diagnostic lattice, and one a pixel-native
 renderer is free to remove behind the same seam.
+
+### The web feel scene's walk experiment
+
+The browser feel scene can locally preview a packet-derived path with footprints,
+commit it on a double click, and spread the caretaker's steps across a beat; its
+packet-layout passability and pulse-cadence clock are both disposable local
+stand-ins rather than received authority, and the pure claims live in
+`web/tests/` while `web/proof/walk-proof.mjs` drives and captures the real tab. A
+later single-click preview remains visible beside the committed route without
+stopping it; recommitting replaces only the future route after the current step.
 
 ### The preparation band and feedback inside its beat
 
