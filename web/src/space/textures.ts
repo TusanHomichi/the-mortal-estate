@@ -67,7 +67,32 @@ export async function decodeTextures(
       decoded.set(key, { texture, width: bitmap.width, height: bitmap.height, pixels });
     }),
   );
+  assertNormalSheetsMatch(decoded);
   return decoded;
+}
+
+/**
+ * Every normal sheet must be the pixel size of the colour sheet it belongs
+ * to. Checked once, here, before any space is built: a mismatch refuses the
+ * packet up front instead of surfacing when a portal swaps to the space that
+ * uses it, after the previous space has already been disposed.
+ */
+export function assertNormalSheetsMatch(
+  textures: ReadonlyMap<string, { width: number; height: number }>,
+): void {
+  for (const [key, normal] of textures) {
+    if (!isNormalSheetKey(key)) continue;
+    const colourKey = key.slice(0, -"/normal".length);
+    const colour = textures.get(colourKey);
+    if (colour === undefined) {
+      throw new Error(`the normal sheet ${key} has no colour sheet ${colourKey}`);
+    }
+    if (colour.width !== normal.width || colour.height !== normal.height) {
+      throw new Error(
+        `the normal sheet ${key} is ${normal.width}x${normal.height} but its colour sheet is ${colour.width}x${colour.height}`,
+      );
+    }
+  }
 }
 
 export function isNormalSheetKey(key: string): boolean {
