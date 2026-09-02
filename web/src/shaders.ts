@@ -1,3 +1,5 @@
+import { cardWrappedDiffuseGlsl } from "./space/cardLighting";
+
 export const groundVertexShader = /* glsl */ `
   attribute vec2 cellOrigin;
   varying vec2 vUv;
@@ -62,6 +64,9 @@ export const windVertexShader = /* glsl */ `
   varying vec2 vUv;
   varying vec2 vWindAnchor;
   varying vec3 vWorldPosition;
+  varying vec3 vTangent;
+  varying vec3 vBitangent;
+  varying vec3 vNormal;
 
   ${windFieldGlsl}
 
@@ -69,14 +74,22 @@ export const windVertexShader = /* glsl */ `
     vUv = uv;
     vec4 worldPosition;
     vec2 anchor;
+    mat3 cardFrame;
     #ifdef USE_INSTANCING
       worldPosition = modelMatrix * instanceMatrix * vec4(position, 1.0);
       vec4 instanceAnchor = modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
       anchor = vec2(instanceAnchor[0], instanceAnchor[2]);
+      cardFrame = mat3(modelMatrix) * mat3(instanceMatrix);
     #else
       worldPosition = modelMatrix * vec4(position, 1.0);
       anchor = worldAnchor;
+      cardFrame = mat3(modelMatrix);
     #endif
+    // The card's own axes in world space. A mirrored card has a negative x
+    // scale, so its tangent flips here and a normal sheet mirrors with it.
+    vTangent = normalize(cardFrame * vec3(1.0, 0.0, 0.0));
+    vBitangent = normalize(cardFrame * vec3(0.0, 1.0, 0.0));
+    vNormal = normalize(cardFrame * vec3(0.0, 0.0, 1.0));
     float heightTerm = smoothstep(0.0, 1.0, uv[1]);
     float displacement = windField(anchor, elapsed) * windStrength * 0.075 * heightTerm;
     worldPosition[0] += windDirection[0] * displacement;
@@ -90,20 +103,28 @@ export const windVertexShader = /* glsl */ `
 export const windFragmentShader = /* glsl */ `
   uniform sampler2D albedoTexture;
   uniform sampler2D windWeightTexture;
+  #ifdef CARD_NORMAL_MAP
+    uniform sampler2D normalTexture;
+  #endif
   uniform float elapsed;
   uniform vec2 windDirection;
   uniform float windStrength;
   uniform float gustPeriod;
   uniform vec3 ambientColour;
   uniform vec3 keyColour;
+  uniform vec3 keyDirection;
   uniform vec3 lanternPosition;
   uniform vec3 lanternColour;
   uniform float lanternStrength;
   varying vec2 vUv;
   varying vec2 vWindAnchor;
   varying vec3 vWorldPosition;
+  varying vec3 vTangent;
+  varying vec3 vBitangent;
+  varying vec3 vNormal;
 
   ${windFieldGlsl}
+  ${cardWrappedDiffuseGlsl}
 
   void main() {
     float weight = texture2D(windWeightTexture, vUv)[0];
@@ -120,9 +141,22 @@ export const windFragmentShader = /* glsl */ `
     );
     vec4 texel = texture2D(albedoTexture, sampleUv);
     if (texel.a < 0.12) discard;
-    float lanternDistance = length(vWorldPosition - lanternPosition);
-    float lantern = lanternStrength / (1.0 + lanternDistance * lanternDistance * 2.4);
-    vec3 lighting = ambientColour + keyColour * 0.48 + lanternColour * lantern;
+    vec3 normal = normalize(vNormal);
+    #ifdef CARD_NORMAL_MAP
+      vec3 sheetNormal = texture2D(normalTexture, sampleUv).xyz * 2.0 - 1.0;
+      normal = normalize(
+        normalize(vTangent) * sheetNormal.x +
+        normalize(vBitangent) * sheetNormal.y +
+        normal * sheetNormal.z
+      );
+    #endif
+    vec3 toLantern = lanternPosition - vWorldPosition;
+    float lanternDistance = length(toLantern);
+    float lanternFalloff = lanternStrength / (1.0 + lanternDistance * lanternDistance * 2.4);
+    float lantern = lanternFalloff * cardWrappedDiffuse(normal, toLantern / max(lanternDistance, 0.001));
+    vec3 lighting = ambientColour +
+      keyColour * cardWrappedDiffuse(normal, keyDirection) +
+      lanternColour * lantern;
     gl_FragColor = vec4(texel.rgb * lighting, texel.a);
   }
 `;

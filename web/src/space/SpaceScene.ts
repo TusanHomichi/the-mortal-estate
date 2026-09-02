@@ -64,6 +64,7 @@ import { buildWallProfile, WALL_PROFILE, type WallMaterial } from "../wallGeomet
 import type { Cell } from "../walk/layoutPassability";
 import { occludingRuns } from "../walk/wallOcclusion";
 import { nearWallRunIndices } from "./interiorWalls";
+import { applyCardLighting } from "./cardLighting";
 import { paletteFor, type ScenePalette } from "./palette";
 import { propCardTransform } from "./propCards";
 import {
@@ -316,6 +317,8 @@ export class SpaceScene {
   private readonly hearths: HearthPresentation[] = [];
   private readonly keyLight: DirectionalLight;
   private readonly keyTarget: Object3D;
+  /** World direction toward the key light; constant while it tracks focus. */
+  private readonly keyDirection: Vector3;
   private readonly lantern: PointLight | null;
   private readonly lanternBase: number;
   private readonly rain: RainSystem | null;
@@ -342,6 +345,7 @@ export class SpaceScene {
     const lights = this.addLights(caretakerCell);
     this.keyLight = lights.key;
     this.keyTarget = lights.target;
+    this.keyDirection = lights.direction;
     this.lantern = lights.lantern;
     this.lanternBase = lights.lanternBase;
     this.caretaker = this.addProps();
@@ -618,6 +622,7 @@ export class SpaceScene {
   private addLights(focusCell: Cell): {
     key: DirectionalLight;
     target: Object3D;
+    direction: Vector3;
     lantern: PointLight | null;
     lanternBase: number;
   } {
@@ -659,6 +664,7 @@ export class SpaceScene {
     return {
       key,
       target: key.target,
+      direction: keyOffset.clone().normalize(),
       lantern,
       lanternBase: this.palette.lanternIntensity,
     };
@@ -682,24 +688,37 @@ export class SpaceScene {
     for (const prop of placements) {
       const source = requiredTexture(textures, `props/${prop.kind}`);
       configureTexture(source.texture, anisotropy);
+      const normal = textures.get(`props/${prop.kind}/normal`) ?? null;
+      if (normal !== null) {
+        if (normal.width !== source.width || normal.height !== source.height) {
+          throw new Error(`the ${prop.kind} normal sheet does not match its colour sheet's size`);
+        }
+        configureTexture(normal.texture, anisotropy);
+      }
       const width = prop.nominal_height * (source.width / source.height);
       const geometry = new PlaneGeometry(width, prop.nominal_height);
-      const material = prop.sway
-        ? this.createWindMaterial(
-            prop.kind,
-            source,
-            new Vector2(prop.cell_anchor[0], prop.cell_anchor[1]),
-            `wind-${prop.kind}`,
-          )
-        : new MeshStandardMaterial({
-            name: `prop-${prop.kind}`,
-            map: source.texture,
-            transparent: true,
-            alphaTest: 0.12,
-            roughness: 0.88,
-            metalness: 0,
-            side: DoubleSide,
-          });
+      let material: ShaderMaterial | MeshStandardMaterial;
+      if (prop.sway) {
+        material = this.createWindMaterial(
+          prop.kind,
+          source,
+          normal,
+          new Vector2(prop.cell_anchor[0], prop.cell_anchor[1]),
+          `wind-${prop.kind}`,
+        );
+      } else {
+        material = new MeshStandardMaterial({
+          name: `prop-${prop.kind}`,
+          map: source.texture,
+          normalMap: normal?.texture ?? null,
+          transparent: true,
+          alphaTest: 0.12,
+          roughness: 0.88,
+          metalness: 0,
+          side: DoubleSide,
+        });
+        applyCardLighting(material);
+      }
       const mesh = new Mesh(geometry, material);
       mesh.name = `Prop_${prop.kind}`;
       const transform = propCardTransform(prop);
@@ -730,6 +749,7 @@ export class SpaceScene {
   private createWindMaterial(
     kind: string,
     source: DecodedTexture,
+    normal: DecodedTexture | null,
     worldAnchor: Vector2,
     name: string,
   ): ShaderMaterial {
@@ -738,8 +758,11 @@ export class SpaceScene {
       : new Vector3().fromArray(this.options.space.light_sources.lantern_glass);
     const material = new ShaderMaterial({
       name,
+      defines: normal === null ? {} : { CARD_NORMAL_MAP: "" },
       uniforms: {
         albedoTexture: { value: source.texture },
+        normalTexture: { value: normal?.texture ?? null },
+        keyDirection: { value: this.keyDirection.clone() },
         windWeightTexture: {
           value: cachedWindWeightTexture(
             this.options.windWeightTextures,
@@ -782,6 +805,7 @@ export class SpaceScene {
     const material = this.createWindMaterial(
       "grass_clump",
       source,
+      null,
       new Vector2(),
       "wind-grass-clumps",
     );
