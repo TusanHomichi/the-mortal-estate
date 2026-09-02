@@ -44,7 +44,9 @@ on:
     branches: [main]
 
 env:
-  # The current pins are verified, not assumed. The workspace was originally
+  # The current pins are verified, not assumed. On 2026-08-27 the official
+  # releases named checkout v7.0.1 and setup-python v7.0.0; this workflow pins
+  # their supported v7 majors. The workspace was originally
   # proven on Rust 1.96.0 and Python 3.14 on 2026-08-19; issue #25 raised the
   # Rust baseline on 2026-08-26. The workflow pin, rust-toolchain.toml, and the
   # workspace rust-version are held together by tests/test_ci_workflow.py.
@@ -72,7 +74,7 @@ jobs:
     name: the complete lane, except the clean-clone proof
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The markdown link check and the boundary checks ask git what the
           # tree carries. A shallow checkout is fine; a detached blobless one
@@ -87,11 +89,11 @@ jobs:
       - name: install the pinned Rust toolchain
         run: bash .github/install-rust.sh
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
           cache: npm
@@ -116,7 +118,7 @@ jobs:
     name: a clean copy builds and tests with no private root
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -126,7 +128,7 @@ jobs:
       - name: install the pinned Rust toolchain
         run: bash .github/install-rust.sh
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 

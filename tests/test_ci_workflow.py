@@ -42,8 +42,23 @@ BUDGET_SCRIPT_NAME = ".github/disk-budget.sh"
 #: a job that costs real disk.
 INSTALL_SCRIPT_NAME = ".github/install-rust.sh"
 
+#: Current Node 24 action majors, selected from their official releases on
+#: 2026-08-27 (checkout, setup-python) and 2026-09-02 (setup-node). A future
+#: runtime migration changes these deliberately.
+CHECKOUT_ACTION = "actions/checkout@v7"
+SETUP_PYTHON_ACTION = "actions/setup-python@v7"
+SETUP_NODE_ACTION = "actions/setup-node@v7"
+
+#: Exactly the action steps each job may use, in order. A job that gains a
+#: step, or a workflow that gains a job, must say so here.
+EXPECTED_ACTION_STEPS = {
+    "verify": (CHECKOUT_ACTION, SETUP_PYTHON_ACTION, SETUP_NODE_ACTION),
+    "cleanclone": (CHECKOUT_ACTION, SETUP_PYTHON_ACTION),
+}
+
 RUNNER = "tools/run_verification.py"
 _RUN_LINE = re.compile(r"^\s*run:\s*(python3 " + re.escape(RUNNER) + r".*?)\s*$")
+_USES_LINE = re.compile(r"^\s*-\s+uses:\s*(\S+)\s*$")
 _JOB_HEADER = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_-]*):\s*$")
 _ENV_ENTRY = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_]*):\s*(.*?)\s*$")
 _SCOPE = re.compile(r"--scope\s+(\S+)")
@@ -109,6 +124,16 @@ def runner_commands(block: list[str]) -> list[str]:
     return commands
 
 
+def action_uses(block: list[str]) -> tuple[str, ...]:
+    """Every action reference from an actual `uses:` step, in workflow order."""
+    found = []
+    for line in block:
+        match = _USES_LINE.match(line)
+        if match is not None:
+            found.append(match.group(1))
+    return tuple(found)
+
+
 def scopes_of(command: str) -> tuple[str, ...]:
     return tuple(_SCOPE.findall(command))
 
@@ -133,6 +158,19 @@ class TheWorkflowIsReadable(unittest.TestCase):
 
     def test_at_least_one_job_runs_the_runner(self) -> None:
         self.assertTrue(any(runner_commands(block) for block in job_blocks().values()))
+
+    def test_every_action_reference_is_a_single_uses_line(self) -> None:
+        for name, block in job_blocks().items():
+            for line in block:
+                if line.strip().startswith("- uses:"):
+                    self.assertIsNotNone(_USES_LINE.match(line), f"{name}: {line!r}")
+
+    def test_action_reader_ignores_a_comment_that_names_the_expected_pin(self) -> None:
+        block = [
+            "      # uses: actions/checkout@v7",
+            "      - uses: actions/checkout@v8",
+        ]
+        self.assertEqual(action_uses(block), ("actions/checkout@v8",))
 
 
 class TheJobsCoverTheCompleteLane(unittest.TestCase):
@@ -189,6 +227,22 @@ class TheJobsCoverTheCompleteLane(unittest.TestCase):
                 if "--list" in command:
                     continue
                 self.assertIn("--allow-unavailable", command, name)
+
+
+class TheActionRuntimePinsAreCurrent(unittest.TestCase):
+    """Every job uses exactly its reviewed Node 24 action majors, once each."""
+
+    def test_the_workflow_has_exactly_the_jobs_the_table_names(self) -> None:
+        self.assertEqual(set(job_blocks()), set(EXPECTED_ACTION_STEPS))
+
+    def test_every_job_uses_exactly_the_reviewed_action_steps(self) -> None:
+        for name, block in job_blocks().items():
+            self.assertEqual(action_uses(block), EXPECTED_ACTION_STEPS[name], name)
+
+    def test_no_reviewed_action_is_on_a_retired_major(self) -> None:
+        for action in {a for steps in EXPECTED_ACTION_STEPS.values() for a in steps}:
+            major = int(action.rsplit("@v", 1)[1])
+            self.assertGreaterEqual(major, 7, action)
 
 
 class TheDiskBudgetIsVisible(unittest.TestCase):
