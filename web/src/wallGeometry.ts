@@ -31,6 +31,7 @@ export interface GeometryData {
 
 export interface WallGeometryPart {
   label: string;
+  runIndex: number;
   material: WallMaterial;
   geometry: GeometryData;
 }
@@ -98,12 +99,12 @@ function runBounds(
         maxX: startX + along1,
         minY: y0,
         maxY: y1,
-        minZ: startZ - thickness / 2,
-        maxZ: startZ + thickness / 2,
+        minZ: startZ - thickness,
+        maxZ: startZ,
       }
     : {
-        minX: startX - thickness / 2,
-        maxX: startX + thickness / 2,
+        minX: startX - thickness,
+        maxX: startX,
         minY: y0,
         maxY: y1,
         minZ: startZ + along0,
@@ -114,6 +115,7 @@ function runBounds(
 function addRunCuboid(
   parts: WallGeometryPart[],
   run: WallRun,
+  runIndex: number,
   label: string,
   material: WallMaterial,
   along0: number,
@@ -125,6 +127,7 @@ function addRunCuboid(
   if (along1 <= along0) return;
   parts.push({
     label,
+    runIndex,
     material,
     geometry: cuboid(
       runBounds(run, along0, along1, y0, y1, thickness),
@@ -154,7 +157,12 @@ function transformGeometry(
   return { positions, uvs: [...geometry.uvs], indices: [...geometry.indices] };
 }
 
-function addBrace(parts: WallGeometryPart[], run: WallRun, panel: number): void {
+function addBrace(
+  parts: WallGeometryPart[],
+  run: WallRun,
+  runIndex: number,
+  panel: number,
+): void {
   const heightSpan = WALL_PROFILE.capBottom - WALL_PROFILE.sillTop - 0.12;
   const alongSpan = 0.76;
   const length = Math.hypot(alongSpan, heightSpan);
@@ -171,7 +179,7 @@ function addBrace(parts: WallGeometryPart[], run: WallRun, panel: number): void 
   const centreAlong = panel + 0.5;
   const centreY = (WALL_PROFILE.sillTop + WALL_PROFILE.capBottom) / 2;
   const [startX, startZ] = run.start;
-  const front = WALL_PROFILE.thickness / 2 + 0.018;
+  const front = 0.018;
   const geometry = transformGeometry(local, (x, y, z) => {
     if (run.axis === "x") {
       const rotatedX = x * Math.cos(-angle) - y * Math.sin(-angle);
@@ -182,7 +190,7 @@ function addBrace(parts: WallGeometryPart[], run: WallRun, panel: number): void 
     const rotatedZ = y * Math.sin(angle) + z * Math.cos(angle);
     return [startX + front + x, centreY + rotatedY, startZ + centreAlong + rotatedZ];
   });
-  parts.push({ label: `brace-${run.axis}-${panel}`, material: "post", geometry });
+  parts.push({ label: `brace-${run.axis}-${panel}`, runIndex, material: "post", geometry });
 }
 
 function panelIsDoor(run: WallRun, panel: number): boolean {
@@ -191,15 +199,15 @@ function panelIsDoor(run: WallRun, panel: number): boolean {
   return centre >= run.door_interval[0] && centre <= run.door_interval[1];
 }
 
-function addCapTop(parts: WallGeometryPart[], run: WallRun): void {
+function addCapTop(parts: WallGeometryPart[], run: WallRun, runIndex: number): void {
   const [startX, startZ] = run.start;
-  const half = WALL_PROFILE.thickness / 2;
+  const thickness = WALL_PROFILE.thickness;
   const y = WALL_PROFILE.capTop + 0.001;
   const geometry = emptyGeometry();
   if (run.axis === "x") {
     pushFace(
       geometry,
-      [[startX, y, startZ + half], [startX + run.cells, y, startZ + half], [startX + run.cells, y, startZ - half], [startX, y, startZ - half]],
+      [[startX, y, startZ], [startX + run.cells, y, startZ], [startX + run.cells, y, startZ - thickness], [startX, y, startZ - thickness]],
       0,
       run.cells / 4,
       0,
@@ -208,21 +216,26 @@ function addCapTop(parts: WallGeometryPart[], run: WallRun): void {
   } else {
     pushFace(
       geometry,
-      [[startX - half, y, startZ], [startX + half, y, startZ], [startX + half, y, startZ + run.cells], [startX - half, y, startZ + run.cells]],
+      [[startX - thickness, y, startZ], [startX, y, startZ], [startX, y, startZ + run.cells], [startX - thickness, y, startZ + run.cells]],
       0,
       run.cells / 4,
       0,
       1,
     );
   }
-  parts.push({ label: `cap-top-${run.axis}`, material: "cap_top", geometry });
+  parts.push({ label: `cap-top-${run.axis}`, runIndex, material: "cap_top", geometry });
 }
 
-function addDoor(parts: WallGeometryPart[], run: WallRun, interval: [number, number]): void {
+function addDoor(
+  parts: WallGeometryPart[],
+  run: WallRun,
+  runIndex: number,
+  interval: [number, number],
+): void {
   const [u0, u1] = interval;
   const centre = (u0 + u1) / 2;
   const [startX, startZ] = run.start;
-  const front = WALL_PROFILE.thickness / 2 + 0.002;
+  const front = 0.002;
   const geometry = emptyGeometry();
   if (run.axis === "x") {
     pushFace(
@@ -243,12 +256,13 @@ function addDoor(parts: WallGeometryPart[], run: WallRun, interval: [number, num
       1,
     );
   }
-  parts.push({ label: `door-${run.axis}`, material: "door", geometry });
+  parts.push({ label: `door-${run.axis}`, runIndex, material: "door", geometry });
   const lintel0 = Math.floor(centre) + WALL_PROFILE.doorLintelInset;
   const lintel1 = Math.floor(centre) + 1 - WALL_PROFILE.doorLintelInset;
   addRunCuboid(
     parts,
     run,
+    runIndex,
     `door-lintel-${run.axis}`,
     "cap_front",
     lintel0,
@@ -270,22 +284,23 @@ function segmentsWithoutDoor(run: WallRun): [number, number][] {
 
 export function buildWallProfile(runs: readonly WallRun[]): WallGeometryPart[] {
   const parts: WallGeometryPart[] = [];
-  for (const run of runs) {
+  for (const [runIndex, run] of runs.entries()) {
     for (const [u0, u1] of segmentsWithoutDoor(run)) {
-      addRunCuboid(parts, run, `plinth-${run.axis}-${u0}`, "plinth", u0, u1, 0, WALL_PROFILE.plinthTop);
-      addRunCuboid(parts, run, `plaster-${run.axis}-${u0}`, "plaster", u0, u1, WALL_PROFILE.plinthTop, WALL_PROFILE.capBottom);
-      addRunCuboid(parts, run, `sill-${run.axis}-${u0}`, "sill", u0, u1, WALL_PROFILE.plinthTop, WALL_PROFILE.sillTop, WALL_PROFILE.thickness + 0.014);
+      addRunCuboid(parts, run, runIndex, `plinth-${run.axis}-${u0}`, "plinth", u0, u1, 0, WALL_PROFILE.plinthTop);
+      addRunCuboid(parts, run, runIndex, `plaster-${run.axis}-${u0}`, "plaster", u0, u1, WALL_PROFILE.plinthTop, WALL_PROFILE.capBottom);
+      addRunCuboid(parts, run, runIndex, `sill-${run.axis}-${u0}`, "sill", u0, u1, WALL_PROFILE.plinthTop, WALL_PROFILE.sillTop, WALL_PROFILE.thickness + 0.014);
     }
     if (run.door_interval !== null) {
-      addRunCuboid(parts, run, `plaster-over-door-${run.axis}`, "plaster", run.door_interval[0], run.door_interval[1], WALL_PROFILE.doorHeight, WALL_PROFILE.capBottom);
-      addDoor(parts, run, run.door_interval);
+      addRunCuboid(parts, run, runIndex, `plaster-over-door-${run.axis}`, "plaster", run.door_interval[0], run.door_interval[1], WALL_PROFILE.doorHeight, WALL_PROFILE.capBottom);
+      addDoor(parts, run, runIndex, run.door_interval);
     }
-    addRunCuboid(parts, run, `cap-front-${run.axis}`, "cap_front", 0, run.cells, WALL_PROFILE.capBottom, WALL_PROFILE.capTop);
-    addCapTop(parts, run);
+    addRunCuboid(parts, run, runIndex, `cap-front-${run.axis}`, "cap_front", 0, run.cells, WALL_PROFILE.capBottom, WALL_PROFILE.capTop);
+    addCapTop(parts, run, runIndex);
     for (let boundary = 1; boundary <= run.cells; boundary += 1) {
       addRunCuboid(
         parts,
         run,
+        runIndex,
         `post-${run.axis}-${boundary}`,
         "post",
         boundary - WALL_PROFILE.postWidth / 2,
@@ -296,7 +311,9 @@ export function buildWallProfile(runs: readonly WallRun[]): WallGeometryPart[] {
       );
     }
     for (let panel = 0; panel < run.cells; panel += 1) {
-      if (panel % 3 === 1 && !panelIsDoor(run, panel)) addBrace(parts, run, panel);
+      if (panel % 3 === 1 && !panelIsDoor(run, panel)) {
+        addBrace(parts, run, runIndex, panel);
+      }
     }
   }
   const first = runs[0];
@@ -305,15 +322,16 @@ export function buildWallProfile(runs: readonly WallRun[]): WallGeometryPart[] {
     const width = WALL_PROFILE.cornerPostWidth;
     parts.push({
       label: "corner-post",
+      runIndex: 0,
       material: "post",
       geometry: cuboid(
         {
-          minX: x - width / 2,
-          maxX: x + width / 2,
+          minX: x - width,
+          maxX: x,
           minY: WALL_PROFILE.sillTop,
           maxY: WALL_PROFILE.capBottom,
-          minZ: z - width / 2,
-          maxZ: z + width / 2,
+          minZ: z - width,
+          maxZ: z,
         },
         0,
         1,

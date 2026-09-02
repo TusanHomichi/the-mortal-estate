@@ -1,10 +1,11 @@
 ---
-last_updated: 2026-08-27
-revision: 4
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; pending owner acceptance at the phase stop points.
+last_updated: 2026-09-02
+revision: 12
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 12 records shared outdoor wind and instanced grass in the browser feel scene. Pending owner acceptance at the phase stop points.
 public_safe: true
-summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and the lattice view that implements it, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, and the proof surfaces.
+summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, the browser feel surface's spaces, portals, fixtures, cursor, outdoor wind, and exterior wall fade, and the proof surfaces.
 routes:
+  - web/**
   - client/**
   - tools/run_client_live_proof.py
   - tools/run_pulse_capture.py
@@ -335,6 +336,9 @@ every text scale. `client/tests/test_input_bindings.gd` asserts it —
 has, and it fails on both the layout and the trim setting that shipped the
 defect.
 
+That meter belongs to the retained Godot shell; by the 2026-09-02 ruling, the
+browser feel surface draws no pulse outside combat.
+
 ### Movement across the beat
 
 `GridWorldView` spreads a step over the beat instead of snapping it. A marker's
@@ -356,6 +360,46 @@ put a row of squares under the banner when the lattice fits its area tightly. So
 the terrain still steps discretely on the beat while the markers standing on it
 travel — an honest limitation of a diagnostic lattice, and one a pixel-native
 renderer is free to remove behind the same seam.
+
+### The web feel scene's walk experiment
+
+The browser feel scene's local experiment lets one click draft a direct route of
+one to three squares; an impassable step or farther target clears the draft
+instead of finding another way. A second click on that square or a double click
+commits it, another square re-drafts it, and Escape or right-click clears both a
+draft and an unlanded commitment. The caretaker stands on its current square
+until the next strike of one shared local beat, then the route lands whole;
+drafting remains free and a replacement commitment keeps that strike. Its
+packet-layout passability and three-second clock are disposable local stand-ins,
+with pure claims in `web/tests/` and the real-tab proof in
+`web/proof/walk-proof.mjs`. This is the opposite of `GridWorldView`'s
+spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
+permission for presentation to remain fluid between beats is permission, not a
+requirement.
+The camera stays centred on the caretaker and re-centres on each landing; routes
+of one, two, or three squares are labelled walk, run, or sprint.
+Its cursor is a plain pale arrow when ready, gains an hourglass while a route is
+committed, and gains a diagonal refusal bar over an unauthorable square; the
+scene has no beat meter.
+Packet-derived passability now reserves every wall tile from occupancy while
+leaving its door tile crossable.
+Schema-2 fixtures build wall-attached structure from batched material geometry,
+block their tile, and own their practical light; only the fire inside the hearth
+remains a view-facing card.
+Outdoor tree and grass cards share one world-position-phased wind field; decoded
+art supplies the canopy weight that lets leaves stir apart from rooted trunks,
+and deterministic grass clumps remain one non-blocking, non-shadowing instanced
+draw that dedicated interiors omit.
+Walls that would cover the caretaker's tile fade without moving the camera or
+changing their accepted height; the selection rule lives in
+`web/src/walk/wallOcclusion.ts`.
+The schema-2 packet makes the scene a set of disposable spaces joined by door
+portals: landing on the last door square swaps to the target space and tile on
+the same strike, while rebuilding presentation-only passability, hover,
+occlusion, and camera focus. Closed exterior footprints keep pitched roofs as
+always-on dressing and block every covered tile except a portal; dedicated
+interiors carry no roofs or weather, render their camera-near walls only through
+the sill, and use their own props and practical lights.
 
 ### The preparation band and feedback inside its beat
 

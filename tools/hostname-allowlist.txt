@@ -67,3 +67,4 @@ mutant-port.zz     # mutant: host recognized by its :port suffix
 45.77.12.9         # mutant: non-loopback, non-documentation IPv4 literal
 records.mutant-estate.org    # mutant: bare host, proving tier 3 still fires
 archive.mutant-estate.world  # mutant: excluded label, proving tier 1 still fires
+www.w3.org         # the SVG namespace URI in web/src/walk/cursors.ts (cursor artwork)

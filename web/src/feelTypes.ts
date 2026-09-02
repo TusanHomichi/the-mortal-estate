@@ -1,5 +1,7 @@
-export const ASSET_GROUPS = ["terrain", "walls", "props"] as const;
+export const ASSET_GROUPS = ["terrain", "walls", "props", "roofs"] as const;
 export type AssetGroup = (typeof ASSET_GROUPS)[number];
+
+export const REQUIRED_TERRAIN = ["grass", "stone", "earth", "floor_planks"] as const;
 
 export const REQUIRED_WALLS = [
   "plinth",
@@ -14,9 +16,19 @@ export const REQUIRED_WALLS = [
 export const REQUIRED_PROPS = [
   "caretaker",
   "tree",
+  "tree_slim",
+  "tree_broad",
+  "tree_bare",
   "lantern_post",
   "shrine_table",
   "grave_marker",
+  "fire",
+] as const;
+
+export const REQUIRED_ROOFS = [
+  "shingle_slope",
+  "shingle_ridge",
+  "shingle_eave",
 ] as const;
 
 export interface AssetRow {
@@ -46,23 +58,56 @@ export interface PropPlacement {
   cell_anchor: [number, number];
   nominal_height: number;
   sway: boolean;
+  mirror: boolean;
+  facing: "view" | "+z" | "+x";
 }
 
-export interface FeelLayout {
+export interface HearthFixturePlacement {
+  kind: "hearth";
+  cell: [number, number];
+  against: "north" | "west";
+}
+
+export type FixturePlacement = HearthFixturePlacement;
+
+export interface RoofPlacement {
+  footprint: { i0: number; j0: number; i1: number; j1: number };
+  ridge_axis: WallAxis;
+  eave_height: number;
+  ridge_height: number;
+  material: string;
+}
+
+export interface PortalTarget {
+  space: string;
+  cell: [number, number];
+}
+
+export interface PortalPlacement {
+  cell: [number, number];
+  to: PortalTarget;
+}
+
+export interface FeelSpace {
   grid_extents: { i: number; j: number };
   cells: CellPlan[];
   wall_runs: WallRun[];
+  roofs: RoofPlacement[];
   props: PropPlacement[];
+  fixtures: FixturePlacement[];
   light_sources: {
-    lantern_glass: [number, number, number];
+    lantern_glass: [number, number, number] | null;
     candles: [number, number, number][];
   };
+  weather: boolean;
+  portals: PortalPlacement[];
 }
 
 export interface FeelManifest {
-  schema_version: 1;
+  schema_version: 2;
   assets: Record<AssetGroup, AssetRows>;
-  layout: FeelLayout;
+  start: PortalTarget;
+  spaces: Record<string, FeelSpace>;
 }
 
 export interface VerifiedAsset {

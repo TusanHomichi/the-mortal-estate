@@ -1,10 +1,11 @@
 ---
-last_updated: 2026-09-01
-revision: 14
-status: Owner-accepted visual target. Revision 14 records the in-engine feel scene as a bounded experiment beside the world-view seam, and the candidate-asset rule it runs under; no renderer, asset set, or production pipeline is accepted.
+last_updated: 2026-09-02
+revision: 22
+status: Owner-accepted visual target. Revision 22 records rooted, shared-field wind for vegetation cards; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
-summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, and the production rule and paused-experiment context used to judge future presentation evidence.
+summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
+  - web/**
   - client/presentation/**
   - content/test-corpus/**
 ---
@@ -24,9 +25,9 @@ high-oblique projection and screen-cell contract, both now superseded by
 Revision 12. Revision 7 records the relational scale discipline that survives
 that replacement and makes logical cells a common ruler rather than a common
 object size.
-Revision 8 records the building consequence: play can expose a roof-off cutaway,
-and footprint, wall, and opening modules — not a whole-building card — establish
-its scale. Revision 9 records the projection consequence: every elevated subject
+Revision 8 recorded the now-superseded roof-off consequence; its cell-ruler
+conclusion survives, so footprint, wall, opening, and roof modules — not a
+whole-building card — establish scale. Revision 9 records the projection consequence: every elevated subject
 uses one shared diagonal screen direction for height while the tile plane remains
 screen-aligned. Revision 10 makes the structural construction consequence
 explicit: base runs remain H/V and corresponding elevated vertices use that
@@ -138,11 +139,13 @@ terrain-cell contract. The joint's material colour may vary with the admitted
 material family, but its accepted native treatment may not drift asset by asset
 once calibration closes.
 
-Building floors and wall runs use that same cell ruler. Active play presents the
-roof-off cutaway by default so occupants, interior cells, and wall-relative
-height remain readable; separately controllable roof art may complete an
-exterior silhouette when the presentation calls for it. The roof does not own
-footprint, wall height, door scale, occupancy, interaction, or sorting facts.
+Building floors and wall runs use that same cell ruler. A wall run owns the tiles
+it stands on: the strip is drawn on each tile's camera-facing edge, the tile is
+never occupied, and a door tile is the crossing (owner ruling, 2026-09-02).
+Roofs are always-on exterior dressing on closed footprints and match the walls'
+motif. Entering a door loads the building's dedicated interior space; no
+roof-off cutaway or interior occlusion logic exists, and a roof owns no
+footprint, occupancy, or sorting fact.
 
 An actor — player or monster — remains anchored by its feet/contact point at the
 centre of exactly one authoritative square ground cell. Its body is not clipped
@@ -173,10 +176,10 @@ An adult human is the comparison baseline for visual-development review, not a
 new gameplay unit. Doors, windows, storeys, furniture, graves, vegetation, and
 other familiar cues must remain mutually believable around that baseline. A
 building must read as a tiled, occupiable volume capable of containing its
-intended occupants: its floor footprint, wall and corner runs, openings, and any
-optional roof layer must agree around the person. In the ordinary roof-off view,
-the footprint, wall height, and clear door opening establish scale directly; a
-detached whole-building card or roof silhouette does not. A monster intended to
+intended occupants: its floor footprint, wall and corner runs, openings, and
+always-on exterior roof must agree around the person. The dedicated interior's
+footprint, wall height, and clear door opening establish its scale directly; a
+detached whole-building card or exterior roof silhouette does not. A monster intended to
 read as large must stand unambiguously taller and carry more silhouette mass than
 the adult baseline when both share the same ground-contact line and display
 scale. The same rule applies to every authored size relationship: the picture
@@ -429,6 +432,13 @@ authoritative frame, emits no targets, sends no command, and replaces nothing.
 scene earns a place behind `WorldViewSeam` is decided by the production rule
 above, not by this section.
 
+The browser feel scene now carries a local walk experiment under the same
+non-authoritative rule. Its movement lands on the beat: a drafted route of one
+to three squares lands whole when the beat strikes, and nothing slides between
+squares (owner ruling, 2026-09-02). Readiness shows in the cursor; the scene
+draws no pulse. Walls that would hide the player's tile fade gently rather than
+the camera or the wall height changing (owner ruling, 2026-09-02).
+
 Its construction follows the lab's conclusions rather than re-deriving them:
 the camera is orthographic at 45-degree yaw and 30-degree elevation, sized so
 one ground cell projects as a 224-pixel-wide diamond at 1280 × 800; ground
@@ -439,6 +449,21 @@ door, cap front and cap top) so courses never seam; standing subjects are
 world-up billboards anchored at their cell centres at their nominal heights;
 and the scene's only warmth comes from actual light sources — the lantern and
 candles — as the owner ruled in the lab.
+
+Anything that belongs to a building — a hearth, a doorway, a window, a shelf —
+is built from material swatches over math like the walls, because it is seen at
+an angle and must have a side; free-standing things — a person, a tree, a table,
+a stone — are painted cards at the camera angle, placed clear of walls, and a
+flat wall-plane card is for genuinely flat things only. Characters are modelled
+and rigged in 3D, rendered at the ruled camera angle into sprite sheets with the
+pixel-cluster treatment, and shipped as cards; the raw mesh never enters the
+scene, while how many frames are rendered follows the still-open question of
+whether figures animate at all (owner ruling, 2026-09-02).
+
+Vegetation cards take motion from one world-space wind field, phase from their
+position rather than a shared loop, and hold the root while art-derived canopy
+weight lets leaves move apart from trunk; grass follows the same rooted rule
+(owner ruling, 2026-09-02).
 
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory
