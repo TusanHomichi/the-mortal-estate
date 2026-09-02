@@ -51,6 +51,12 @@ class ThePartition(unittest.TestCase):
         full = {step.key for step in resolve.steps_for(["full"])}
         self.assertTrue(portable < full)
 
+    def test_the_web_scope_is_in_full_and_runs_install_first(self) -> None:
+        web = [step.key for step in resolve.steps_for(["web"])]
+        full = {step.key for step in resolve.steps_for(["full"])}
+        self.assertEqual(web, ["web.install", "web.typecheck", "web.test", "web.build"])
+        self.assertTrue(set(web) <= full)
+
     def test_the_capture_lane_is_the_only_thing_outside_the_baseline(self) -> None:
         self.assertEqual(table.OUT_OF_BASELINE, {"capture"})
 

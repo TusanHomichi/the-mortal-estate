@@ -84,6 +84,10 @@ class TokenReading(unittest.TestCase):
         step = Step("x", "client", "x", ("$TME_GODOT", "--path", "client", "--import"))
         self.assertEqual(targets.step_targets(step), ["client"])
 
+    def test_the_npm_prefix_names_the_web_directory(self) -> None:
+        step = Step("web.x", "web", "x", ("npm", "--prefix", "web", "run", "build"))
+        self.assertEqual(targets.step_targets(step), ["web"])
+
 
 class TheRustSchedulerGoesThroughCargo(unittest.TestCase):
     """The regression guard for the defect that cost this slice a red run.

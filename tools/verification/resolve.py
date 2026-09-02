@@ -62,6 +62,7 @@ FAMILY_SCOPES: dict[str, tuple[str, ...]] = {
     "authoring": ("rust", "workbench", "python", "boundary"),
     "content": ("rust", "boundary"),
     "client": ("client",),
+    "web": ("web",),
     "workbench": ("workbench", "python"),
 }
 
@@ -77,6 +78,7 @@ FAMILY_REASONS: dict[str, str] = {
     ),
     "content": "authored content is validated by the Rust workspace",
     "client": "client paths select the headless client suite",
+    "web": "browser-client paths select only the web proof",
     "workbench": "Workbench paths select the Workbench proof and the Python suite",
 }
 
@@ -147,7 +149,8 @@ def steps_for(scopes: Sequence[str], *, root: Path = ROOT) -> tuple[Step, ...]:
     owners = expand(scopes)
     order = {owner: index for index, owner in enumerate(owners)}
     selected = [step for step in STEPS.values() if step.owner in order]
-    selected.sort(key=lambda step: (order[step.owner], step.key))
+    table_order = {key: index for index, key in enumerate(STEPS)}
+    selected.sort(key=lambda step: (order[step.owner], table_order[step.key]))
     return tuple(selected)
 
 
@@ -189,6 +192,8 @@ def classify(path: str) -> str | None:
         return "content"
     if path.startswith("client/"):
         return "client"
+    if path.startswith("web/"):
+        return "web"
     if path.startswith("tests/fixtures/"):
         return "python"
     return None
@@ -203,32 +208,28 @@ def select_changed_paths(paths: Sequence[str], *, root: Path = ROOT) -> Selectio
             escalated=True,
         )
     families: list[str] = []
+    escalations: list[str] = []
     for path in paths:
         if not _is_safe(path):
-            return Selection(
-                ("portable",), (f"malformed path {path!r} escalates to portable",), True
-            )
+            escalations.append(f"malformed path {path!r} escalates to portable")
+            continue
         if path in CONSERVATIVE_EXACT or path.startswith(CONSERVATIVE_PREFIXES):
-            return Selection(
-                ("portable",),
-                (f"{path} can change what every other path means; escalates to portable",),
-                True,
+            escalations.append(
+                f"{path} can change what every other path means; escalates to portable"
             )
+            continue
         if not (root / path).exists():
-            return Selection(
-                ("portable",),
-                (f"{path} was deleted or renamed; escalates to portable",),
-                True,
-            )
+            escalations.append(f"{path} was deleted or renamed; escalates to portable")
+            continue
         family = classify(path)
         if family is None:
-            return Selection(
-                ("portable",),
-                (f"unrecognised path {path} escalates to portable",),
-                True,
-            )
+            escalations.append(f"unrecognised path {path} escalates to portable")
+            continue
         if family not in families:
             families.append(family)
+
+    if escalations:
+        return _escalate(escalations, families)
 
     scopes: list[str] = ["meta"]
     reasons: list[str] = []
@@ -240,6 +241,31 @@ def select_changed_paths(paths: Sequence[str], *, root: Path = ROOT) -> Selectio
     selection = Selection(tuple(scopes), tuple(reasons))
     assert_fast_lane(selection, families)
     return selection
+
+
+def _escalate(escalations: Sequence[str], families: Sequence[str]) -> Selection:
+    """Escalation is a floor, not a ceiling.
+
+    The portable baseline runs because something changed that the resolver
+    will not reason about. Every lane the recognised paths beside it would
+    have selected on their own still runs too: a web or client proof must not
+    vanish because a workflow file changed in the same slice. Portable already
+    contains every capability-free lane, so only the capability-bearing ones
+    (`web`, `client`) can be added here.
+    """
+    baseline = frozenset(expand(("portable",)))
+    scopes: list[str] = ["portable"]
+    reasons: list[str] = list(escalations)
+    for family in families:
+        extra = [
+            scope
+            for scope in FAMILY_SCOPES[family]
+            if scope not in baseline and scope not in scopes
+        ]
+        if extra:
+            scopes.extend(extra)
+            reasons.append(f"{FAMILY_REASONS[family]}; kept beside the escalation")
+    return Selection(tuple(scopes), tuple(reasons), escalated=True)
 
 
 def assert_fast_lane(selection: Selection, families: Sequence[str]) -> None:

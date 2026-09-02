@@ -49,6 +49,7 @@ Everything `.gitignore` declares, and what each is for:
 | `.workbench/` | Workbench sessions: selection packets, masks, captures, the operation log, and — since V1 — **experiments and candidates**: previews, applied candidate masters, candidate projections, edited candidate assets, Apply receipts and rejection records | `tools/workbench/`, `tools/workbench_demo.py` |
 | `.boundary/` | The private banned-term denylist. Never committed, in any form | the owner, out of band |
 | `target/` | Cargo build output for **this** tree. A *proof* build is not this root — see below | cargo |
+| `web/node_modules/`, `web/dist/` | The browser client's installed dependencies and its build output. Restored from the committed lockfile by `npm ci`; never runtime input, never tracked | npm, `vite build` |
 | `Research/`, `placeholders/` | **Nothing.** Predecessor-private roots, ignored so a stray copy cannot be committed, and asserted absent from disk | nobody — `clean-room` proves they do not exist |
 
 ## The six requirements

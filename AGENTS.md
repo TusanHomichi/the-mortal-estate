@@ -75,7 +75,8 @@ crates/tme-protocol   the wire schema — the authority both sides mirror
 crates/tme-server     sessions, admission, scheduling, durable authority
 crates/tme-sim        deterministic gameplay proving over the same rules
 crates/tme-authoring  authored documents -> proven runtime content
-client/               the thin Godot shell
+web/                  the browser client — the feel surface, browser first
+client/               the retained Godot shell, cold pending its desktop role
 content/lands/        the authored lands, and the compiled world a server serves
 content/              validated authored content and the test corpus
 tools/                the verification runner, boundary checks, the Workbench,
@@ -125,9 +126,10 @@ After activation, the wire and durable data are protected by the policy in
 [docs/server-notes.md](docs/server-notes.md#the-external-boundary-when-it-activates).
 
 **The stack is chosen.** A Rust workspace for rules, wire DTOs, simulation,
-authoring, and one PostgreSQL-backed authoritative server; one thin Godot client;
-Python for repository checks, tools, and proof harnesses. Do not widen it without
-a decision that owns the widening.
+authoring, and one PostgreSQL-backed authoritative server; one thin browser
+client in TypeScript on Three.js (owner ruling 2026-09-02 — browser first);
+the retained Godot shell; Python for repository checks, tools, and proof
+harnesses. Do not widen it without a decision that owns the widening.
 
 **Design for adjustment.** One authoritative source per fact; adjustable values in
 validated content rather than code where practical; each calculation and mutation
@@ -167,7 +169,7 @@ The charter's four loops, as scopes:
 | Loop | Command | What it costs |
 | --- | --- | --- |
 | Live Workbench iteration | **no verification run at all** — using the Workbench requires none | milliseconds |
-| Focused checks on what changed | `--scope fast --changed-path <path> ...` | seconds; **no client run unless the client changed, and no workspace lane unless Rust changed** |
+| Focused checks on what changed | `--scope fast --changed-path <path> ...` | seconds; **no client or web run unless that client changed, and no workspace lane unless Rust changed** |
 | Exact gameplay preview capture | `--scope capture` (owner-invoked, outside the standing baseline) | minutes, and needs a display and a database |
 | Complete proof before merge | `--scope full` — what CI runs | the whole workspace |
 
@@ -175,6 +177,8 @@ The fast lane is defined by what it **excludes** and the complete lane by
 running everything; neither is allowed to drift toward the other, and a test
 asserts the step table's partition. Anything the fast lane does not recognise
 escalates to `portable` and says why — a guess is never cheaper than a build.
+Escalation is a floor, not a ceiling: the lanes the recognised paths beside it
+select (`web`, `client`) still run.
 
 One honest qualification, since Workbench V1: the Workbench reaches the authoring
 compiler's semantics through one command, because there is exactly one
@@ -184,8 +188,8 @@ not the workspace lane (no `fmt`, no `clippy`, no workspace test), and it is not
 free either. See [Workbench V1](docs/workbench-v1.md#the-cost-of-the-v1-loop-measured).
 
 The owner scopes that compose them, each runnable alone: `docs`, `boundary`,
-`python`, `rust`, `workbench`, `client`, `gated`, `cleanclone`, `meta`,
-`capture`.
+`python`, `rust`, `workbench`, `web`, `client`, `gated`, `cleanclone`,
+`meta`, `capture`.
 
 ### What the exit code means
 
@@ -206,6 +210,7 @@ private denylist. It is a stated limit, not a skip.
 
 | Capability | Supplied by |
 | --- | --- |
+| `node` | a `node` on `PATH` whose major version is 22 or later, plus `npm` — asked, never assumed. Absent, the `web` lane is `UNAVAILABLE` |
 | `godot` | `TME_GODOT`, naming a binary whose version is exactly `4.7.2.stable.official.ed1daf0bf` — asked, never assumed from the path |
 | `postgres` | `TME_PG_ADMIN_URL_FILE`, naming a readable file holding a superuser URL used only to create and drop scratch databases, plus `psql` |
 | `private-terms` | `.boundary/banned-terms.txt`. Absent, the banned-terms check **degrades** onto the tracked synthetic fixture: the mechanism still runs and still must pass, and the run says the real denylist was not proven |

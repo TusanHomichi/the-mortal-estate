@@ -1,10 +1,11 @@
 ---
-last_updated: 2026-08-26
-revision: 2
-status: Owner-authorized standing contract. Revision 2 advances the exact Godot baseline to 4.7.2 under the contract's full-re-proof rule.
+last_updated: 2026-09-02
+revision: 3
+status: Owner-authorized standing contract. Revision 3 records the browser-first ruling — the web client's baseline, its feel-surface role, and the retained Godot shell's standing — under the contract's full-re-proof rule.
 public_safe: true
 summary: The client's standing architecture contract — engine baseline, the three state domains, control and wire consumption, command reconciliation and the epoch cursor, the renderer seam, the accessibility floor, the desktop targets, and the five layers of client proof.
 routes:
+  - web/**
   - client/**
   - crates/tme-protocol/**
   - tests/fixtures/wire/**
@@ -63,7 +64,46 @@ handed that one account, so they cannot describe different beats. The
 implementation and its refusals are
 [client notes](client-notes.md#the-pulse-made-visible).
 
-## Engine baseline
+## The web client
+
+**Owner ruling, 2026-09-02: browser first.** The client that carries feel,
+and the first client the project develops, runs in a browser tab. `web/` is
+that client. Every rule in this document binds it exactly as it binds the
+Godot shell — authority, the three state domains, strict wire consumption,
+the epoch cursor, the renderer seam's four rules, the accessibility floor —
+because none of those rules was ever about an engine.
+
+Its baseline:
+
+- TypeScript on Vite, rendering with Three.js on WebGL2, on Node 22 for the
+  toolchain. Dependencies are pinned by the committed lockfile and restored
+  with `npm ci`; `web/node_modules/` and `web/dist/` are ignored roots
+  ([working-root policy](working-root-policy.md#the-roots)).
+- **No other runtime dependency without a decision** that owns it, with the
+  same licensing, maintenance, and proof obligations the Godot baseline
+  carried. A rendering-backend change (WebGPU) is a contract change, not a
+  drift.
+- The wire codec's intended route is **no mirror at all**: `crates/tme-protocol`
+  compiled to WebAssembly and called from TypeScript, so the schema authority
+  is consumed rather than re-implemented. Until that lands, the web client
+  carries no wire consumption, and any interim TypeScript codec is a verified
+  mirror proven against `tests/fixtures/wire/` exactly as the GDScript one is.
+- Presentation is judged at the `1280 × 800` minimum play surface in the tab.
+  Candidate art reaches the client only through a digest-bound packet named
+  out of band (`TME_FEEL_ASSETS` at the dev server), never a tracked path —
+  the same rule [presentation direction](presentation-direction.md#the-in-engine-feel-scene)
+  states for the Godot feel scene.
+- Verification is a lane of its own: the `web` scope in
+  `tools/run_verification.py`, gated on the `node` capability, running
+  install, typecheck, unit tests, and build; `UNAVAILABLE` without Node.
+
+**The Godot shell is retained and cold.** It remains the reference
+implementation of the codec, reconciliation, and HUD contracts, and its proof
+keeps running; it is no longer the feel surface, and no presentation
+investment goes into it unless a decision gives it a desktop role. Retiring
+it is its own decision.
+
+## Engine baseline (the retained Godot shell)
 
 - Godot `4.7.2.stable.official.ed1daf0bf`, project feature `4.7`.
 - The `gl_compatibility` renderer.
@@ -295,8 +335,10 @@ seed, a schema authority, a content source, or cross-platform proof
 
 Each of these needs a new explicit decision and its own proof:
 
-- replacing the engine, or widening the dependency baseline;
+- replacing the engine, or widening the dependency baseline — for the web
+  client, adding any runtime dependency or changing the rendering backend;
 - changing the renderer;
+- giving the retained Godot shell a desktop role, or retiring it;
 - persisting any credential (today: nothing is persisted);
 - admitting outside players, or activating external compatibility;
 - adding distribution infrastructure.

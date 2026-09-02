@@ -56,6 +56,17 @@ class TheFastLane(unittest.TestCase):
         self.assertIn("client.suite", keys)
         self.assertNotIn("rust.build", keys)
 
+    def test_a_web_change_selects_only_the_web_proof(self) -> None:
+        selection = resolve.select_changed_paths(["web/src/main.ts"])
+        keys = {step.key for step in resolve.steps_for(selection.scopes)}
+        self.assertEqual(selection.scopes, ("meta", "web"))
+        self.assertEqual(
+            {key for key in keys if not key.startswith("meta.")},
+            {"web.install", "web.typecheck", "web.test", "web.build"},
+        )
+        self.assertNotIn("rust.build", keys)
+        self.assertFalse({key for key in keys if key.startswith("client.")})
+
     def test_a_python_change_selects_the_suite_and_the_checks(self) -> None:
         selection = resolve.select_changed_paths(["tools/check_hostnames.py"])
         keys = {step.key for step in resolve.steps_for(selection.scopes)}
@@ -105,6 +116,32 @@ class Escalation(unittest.TestCase):
         selection = resolve.select_changed_paths([".cargo/config.toml"])
         self.assertTrue(selection.reasons and selection.reasons[0])
 
+    def test_an_escalation_alone_is_exactly_portable(self) -> None:
+        selection = resolve.select_changed_paths([".github/workflows/verify.yml"])
+        self.assertEqual(selection.scopes, ("portable",))
+
+    def test_an_escalation_keeps_the_lanes_the_other_paths_select(self) -> None:
+        """A workflow edit beside a web edit must not lose the web proof.
+
+        Portable is the floor of an escalation, not its ceiling: the
+        capability-bearing lane a recognised path selects still runs.
+        """
+        selection = resolve.select_changed_paths(
+            [".github/workflows/verify.yml", "web/package.json", "docs/boundary-map.md"]
+        )
+        self.assertTrue(selection.escalated)
+        self.assertEqual(selection.scopes, ("portable", "web"))
+        keys = {step.key for step in resolve.steps_for(selection.scopes)}
+        self.assertIn("web.build", keys)
+        self.assertIn("rust.build", keys)
+        self.assertTrue(any("escalates to portable" in reason for reason in selection.reasons))
+        self.assertTrue(any("kept beside the escalation" in reason for reason in selection.reasons))
+
+    def test_every_escalation_is_reported_not_just_the_first(self) -> None:
+        selection = resolve.select_changed_paths(["Cargo.lock", "LICENSE.txt", "../outside"])
+        self.assertTrue(selection.escalated)
+        self.assertEqual(len(selection.reasons), 3)
+
 
 class TheExclusionRule(unittest.TestCase):
     def test_an_expensive_scope_without_a_cause_is_refused(self) -> None:
@@ -126,7 +163,7 @@ class TheExclusionRule(unittest.TestCase):
     def test_the_forbidden_set_names_everything_expensive(self) -> None:
         self.assertEqual(
             table.FAST_FORBIDDEN_WITHOUT_CAUSE,
-            {"rust", "client", "gated", "cleanclone", "capture"},
+            {"rust", "web", "client", "gated", "cleanclone", "capture"},
         )
 
 
@@ -138,6 +175,7 @@ class Classification(unittest.TestCase):
             "crates/tme-server/src/main.rs": "rust",
             ".sqlx/query-abc.json": "rust",
             "client/presentation/grid_world_view.gd": "client",
+            "web/src/main.ts": "web",
             "tools/check_hostnames.py": "python",
             "tests/test_run_checks.py": "python",
             "tools/workbench/resolve.py": "workbench",

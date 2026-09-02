@@ -24,6 +24,9 @@ www.gnu.org  # AGPL-3.0 license text: <https://www.gnu.org/licenses/>
 # spelled with a reserved name without breaking dependency resolution.
 github.com
 crates.io    # named in the comment above; the registry the index URL belongs to
+registry.npmjs.org # npm writes canonical package tarball URLs into web/package-lock.json
+opencollective.com # npm writes package-maintainer funding metadata into web/package-lock.json
+tidelift.com       # npm writes package-maintainer funding metadata into web/package-lock.json
 
 # --- Real external hosts, in package repository configurations ---
 apt.postgresql.org # PostgreSQL APT repository URL in deploy prepare-packages

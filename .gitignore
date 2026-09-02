@@ -28,3 +28,8 @@ __pycache__/
 # scan every file git carries OR WOULD carry, so an unignored target/ puts tens
 # of thousands of build artifacts inside the boundary's own scan set.
 /target/
+
+# Browser-client dependencies and Vite build output. Both are reproducible
+# from web/package-lock.json and neither is runtime input or source.
+/web/node_modules/
+/web/dist/

@@ -43,12 +43,16 @@ _NOT_A_PATH = frozenset(
         "compileall",
         "python3",
         "cargo",
+        "npm",
         "git",
         "diff",
         "build",
         "test",
         "fmt",
         "clippy",
+        "ci",
+        "run",
+        "typecheck",
     }
 )
 
@@ -83,7 +87,7 @@ def step_targets(step: Step) -> list[str]:
         elif token.startswith("res://"):
             # The client's resource root is `client/`.
             targets.append("client/" + token[len("res://") :])
-        elif previous == "--path":
+        elif previous in {"--path", "--prefix"}:
             targets.append(token)
         elif _looks_like_path(token):
             targets.append(token)
