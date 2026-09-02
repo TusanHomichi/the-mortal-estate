@@ -43,9 +43,18 @@ BUDGET_SCRIPT_NAME = ".github/disk-budget.sh"
 INSTALL_SCRIPT_NAME = ".github/install-rust.sh"
 
 #: Current Node 24 action majors, selected from their official releases on
-#: 2026-08-27. A future runtime migration changes these deliberately.
+#: 2026-08-27 (checkout, setup-python) and 2026-09-02 (setup-node). A future
+#: runtime migration changes these deliberately.
 CHECKOUT_ACTION = "actions/checkout@v7"
 SETUP_PYTHON_ACTION = "actions/setup-python@v7"
+SETUP_NODE_ACTION = "actions/setup-node@v7"
+
+#: Exactly the action steps each job may use, in order. A job that gains a
+#: step, or a workflow that gains a job, must say so here.
+EXPECTED_ACTION_STEPS = {
+    "verify": (CHECKOUT_ACTION, SETUP_PYTHON_ACTION, SETUP_NODE_ACTION),
+    "cleanclone": (CHECKOUT_ACTION, SETUP_PYTHON_ACTION),
+}
 
 RUNNER = "tools/run_verification.py"
 _RUN_LINE = re.compile(r"^\s*run:\s*(python3 " + re.escape(RUNNER) + r".*?)\s*$")
@@ -221,15 +230,19 @@ class TheJobsCoverTheCompleteLane(unittest.TestCase):
 
 
 class TheActionRuntimePinsAreCurrent(unittest.TestCase):
-    """Every job uses the reviewed Node 24 action majors exactly once."""
+    """Every job uses exactly its reviewed Node 24 action majors, once each."""
+
+    def test_the_workflow_has_exactly_the_jobs_the_table_names(self) -> None:
+        self.assertEqual(set(job_blocks()), set(EXPECTED_ACTION_STEPS))
 
     def test_every_job_uses_exactly_the_reviewed_action_steps(self) -> None:
         for name, block in job_blocks().items():
-            self.assertEqual(
-                action_uses(block),
-                (CHECKOUT_ACTION, SETUP_PYTHON_ACTION),
-                name,
-            )
+            self.assertEqual(action_uses(block), EXPECTED_ACTION_STEPS[name], name)
+
+    def test_no_reviewed_action_is_on_a_retired_major(self) -> None:
+        for action in {a for steps in EXPECTED_ACTION_STEPS.values() for a in steps}:
+            major = int(action.rsplit("@v", 1)[1])
+            self.assertGreaterEqual(major, 7, action)
 
 
 class TheDiskBudgetIsVisible(unittest.TestCase):
