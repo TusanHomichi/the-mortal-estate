@@ -46,6 +46,7 @@ export interface PropPlacement {
   cell_anchor: [number, number];
   nominal_height: number;
   sway: boolean;
+  mirror: boolean;
 }
 
 export interface FeelLayout {

@@ -35,7 +35,12 @@ import {
   projectedHeightCoverTiles,
   resizeFeelCamera,
 } from "./camera";
-import type { FeelManifest, VerifiedAssetPacket, WallRun } from "./feelTypes";
+import type {
+  FeelManifest,
+  PropPlacement,
+  VerifiedAssetPacket,
+  WallRun,
+} from "./feelTypes";
 import { buildGroundGeometry } from "./groundGeometry";
 import type { Preset } from "./presets";
 import {
@@ -112,8 +117,8 @@ export interface FeelSceneHandle {
 const WARM_LIGHT = new Color("#ffb457");
 const RAIN_COUNT = 1080;
 export const WALL_FADE_DURATION_SECONDS = 0.35;
-export const WALL_FADED_PLASTER_OPACITY = 0.42;
-export const WALL_FADED_TIMBER_OPACITY = 0.55;
+export const WALL_FADED_PLASTER_OPACITY = 0.34; // owner: "might could have a little more fade" (2026-09-02)
+export const WALL_FADED_TIMBER_OPACITY = 0.48;
 const WALL_FADED_RENDER_ORDER = 10;
 const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
 
@@ -413,6 +418,10 @@ function addContactShadow(scene: Scene, x: number, z: number, height: number): M
   return shadow;
 }
 
+export function applyPropPlacementMirror(mesh: Mesh, placement: PropPlacement): void {
+  mesh.scale.x = placement.mirror ? -1 : 1;
+}
+
 function addProps(
   scene: Scene,
   manifest: FeelManifest,
@@ -468,6 +477,7 @@ function addProps(
     if (material instanceof ShaderMaterial) swayMaterials.push(material);
     const mesh = new Mesh(geometry, material);
     mesh.name = `Prop_${prop.kind}`;
+    applyPropPlacementMirror(mesh, prop);
     mesh.position.set(prop.cell_anchor[0], prop.nominal_height / 2, prop.cell_anchor[1]);
     mesh.castShadow = true;
     mesh.customDepthMaterial = undefined;

@@ -130,7 +130,7 @@ function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): Fe
     ) {
       throw new Error("the candidate feel material plan has an invalid or duplicate cell");
     }
-    if (!(candidate.material in manifestAssets.terrain)) {
+    if (!Object.hasOwn(manifestAssets.terrain, candidate.material)) {
       throw new Error("a candidate feel cell names an unknown material");
     }
     seen.add(key);
@@ -148,21 +148,25 @@ function parseLayout(value: unknown, manifestAssets: FeelManifest["assets"]): Fe
   const props = value.props.map((candidate) => {
     if (
       !isRecord(candidate) ||
-      !hasExactKeys(candidate, ["kind", "cell_anchor", "nominal_height", "sway"]) ||
+      !hasExactKeys(candidate, ["kind", "cell_anchor", "nominal_height", "sway", "mirror"]) ||
       typeof candidate.kind !== "string" ||
-      !(candidate.kind in manifestAssets.props) ||
       !isVector(candidate.cell_anchor, 2) ||
       !isFiniteNumber(candidate.nominal_height) ||
       candidate.nominal_height <= 0 ||
-      typeof candidate.sway !== "boolean"
+      typeof candidate.sway !== "boolean" ||
+      typeof candidate.mirror !== "boolean"
     ) {
       throw new Error("a candidate feel prop placement is invalid");
+    }
+    if (!Object.hasOwn(manifestAssets.props, candidate.kind)) {
+      throw new Error(`a candidate feel prop placement names an unlisted kind: ${candidate.kind}`);
     }
     return {
       kind: candidate.kind,
       cell_anchor: [candidate.cell_anchor[0]!, candidate.cell_anchor[1]!] as [number, number],
       nominal_height: candidate.nominal_height,
       sway: candidate.sway,
+      mirror: candidate.mirror,
     };
   });
 
@@ -205,10 +209,10 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     props: parseAssetGroup(value.assets.props, "props"),
   };
   for (const required of REQUIRED_WALLS) {
-    if (!(required in assets.walls)) throw new Error(`the candidate feel wall set is missing ${required}`);
+    if (!Object.hasOwn(assets.walls, required)) throw new Error(`the candidate feel wall set is missing ${required}`);
   }
   for (const required of REQUIRED_PROPS) {
-    if (!(required in assets.props)) throw new Error(`the candidate feel prop set is missing ${required}`);
+    if (!Object.hasOwn(assets.props, required)) throw new Error(`the candidate feel prop set is missing ${required}`);
   }
   return { schema_version: 1, assets, layout: parseLayout(value.layout, assets) };
 }

@@ -82,9 +82,20 @@ describe("packet-layout passability", () => {
     expect(canStep(passability, { i: 0, j: 0 }, { i: 1, j: 0 })).toBe(true);
   });
 
-  it("prop cells are blocked", () => {
+  it("every tree-prefixed prop kind blocks its cell", () => {
     const passability = passabilityFrom(
-      layout([], [{ kind: "tree", cell_anchor: [1.2, 0.8], nominal_height: 2, sway: true }]),
+      layout(
+        [],
+        [
+          {
+            kind: "tree_broad",
+            cell_anchor: [1.2, 0.8],
+            nominal_height: 2,
+            sway: true,
+            mirror: true,
+          },
+        ],
+      ),
     );
     expect(canStep(passability, { i: 0, j: 1 }, { i: 1, j: 1 })).toBe(false);
   });

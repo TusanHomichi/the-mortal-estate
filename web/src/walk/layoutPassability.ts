@@ -21,8 +21,7 @@ export interface LayoutPassability {
   readonly wallRuns: readonly WallRun[];
 }
 
-const NON_WALKABLE_PROPS = new Set([
-  "tree",
+const NON_TREE_NON_WALKABLE_PROPS = new Set([
   "lantern_post",
   "shrine_table",
   "grave_marker",
@@ -89,7 +88,7 @@ export function passabilityFrom(layout: FeelLayout): LayoutPassability {
   );
   for (const key of wallTiles) blocked.add(key);
   for (const prop of layout.props) {
-    if (!NON_WALKABLE_PROPS.has(prop.kind)) continue;
+    if (!prop.kind.startsWith("tree") && !NON_TREE_NON_WALKABLE_PROPS.has(prop.kind)) continue;
     const occupied = {
       i: Math.round(prop.cell_anchor[0]),
       j: Math.round(prop.cell_anchor[1]),

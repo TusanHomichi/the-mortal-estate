@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
-import { copyFile, cp, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { mkdir, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -10,9 +9,7 @@ import { chromium } from "playwright";
 const proofDirectory = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(proofDirectory, "..");
 const captureRoot = "/data/dev/home/tme-visual-lab/web-feel-v26/walk-captures";
-const assetRoot = "/data/dev/home/tme-visual-lab/engine-feel-v25/assets";
-const grownManifest =
-  "/data/dev/home/tme-visual-lab/web-feel-v26/world/feel-manifest.grown.json";
+const treePacket = "/data/dev/home/tme-visual-lab/web-feel-v26/trees/packet";
 
 async function freePort() {
   const server = net.createServer();
@@ -282,11 +279,6 @@ async function walkRoute(page, clockStartedAt, from, to, pace, captureName = nul
   await assertCaretakerCentred(page);
 }
 
-const scratchRoot = await mkdtemp(path.join(tmpdir(), "tme-walk-camera-"));
-const scratchPacket = path.join(scratchRoot, "packet");
-await cp(assetRoot, scratchPacket, { recursive: true });
-await copyFile(grownManifest, path.join(scratchPacket, "feel-manifest.json"));
-
 const port = await freePort();
 const baseUrl = `http://127.0.0.1:${port}/`;
 let serverOutput = "";
@@ -302,7 +294,7 @@ const server = spawn(
   ],
   {
     cwd: webRoot,
-    env: { ...process.env, TME_FEEL_ASSETS: scratchPacket },
+    env: { ...process.env, TME_FEEL_ASSETS: treePacket },
     stdio: ["ignore", "pipe", "pipe"],
   },
 );
@@ -327,7 +319,7 @@ try {
 
   await page.goto(`${baseUrl}?preset=night`, { waitUntil: "networkidle" });
   await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
-  const clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
+  let clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
   assert.ok(Number.isFinite(clockStartedAt));
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
@@ -347,6 +339,27 @@ try {
   assert.ok(Number.isFinite(measurement.calls) && measurement.calls > 0);
   assert.ok(Number.isFinite(measurement.averageRafMilliseconds));
   assert.ok(Number.isFinite(measurement.averageRenderMilliseconds));
+
+  let treeTourCell = initial;
+  for (let sprint = 0; sprint < 3; sprint += 1) {
+    const next = { i: treeTourCell.i + 3, j: treeTourCell.j };
+    await walkRoute(page, clockStartedAt, treeTourCell, next, "sprint");
+    treeTourCell = next;
+  }
+  await page.screenshot({ path: path.join(captureRoot, "walk-trees.png") });
+
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
+  await page.waitForFunction(
+    () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
+  );
+  assert.deepEqual(
+    parseCell(await stageAttribute(page, "data-caretaker-cell")),
+    initial,
+  );
+  clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
+  assert.ok(Number.isFinite(clockStartedAt));
+  await assertCaretakerCentred(page);
 
   await walkRoute(page, clockStartedAt, initial, courtyardStaging, "sprint");
 
@@ -412,5 +425,4 @@ try {
 } finally {
   await browser?.close();
   await stopServer(server);
-  await rm(scratchRoot, { recursive: true, force: true });
 }
