@@ -23,7 +23,7 @@ export interface PropCardTransform {
 export function propCardTransform(placement: PropPlacement): PropCardTransform {
   const [i, j] = placement.cell_anchor;
   const base = {
-    position: { x: i, y: placement.nominal_height / 2, z: j },
+    position: { x: i, y: placement.elevation + placement.nominal_height / 2, z: j },
     contactShadowRotation: { order: "YXZ" as const, x: -Math.PI / 2, y: 0, z: 0 },
     scaleX: placement.mirror ? -1 as const : 1 as const,
   };

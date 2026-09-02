@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 22
-status: Owner-accepted visual target. Revision 22 records rooted, shared-field wind for vegetation cards; no renderer, asset set, or production pipeline is accepted.
+revision: 23
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -441,7 +441,7 @@ the camera or the wall height changing (owner ruling, 2026-09-02).
 
 Its construction follows the lab's conclusions rather than re-deriving them:
 the camera is orthographic at 45-degree yaw and 30-degree elevation, sized so
-one ground cell projects as a 224-pixel-wide diamond at 1280 × 800; ground
+one ground cell projects as a 179-pixel-wide diamond at 1280 × 800; ground
 cells are flat quads carrying material swatches in continuous world-plane
 coordinates; walls are real geometry built from a member profile in world
 units (plinth, sill, plaster, posts at every cell boundary, braces, lintel and
@@ -449,6 +449,23 @@ door, cap front and cap top) so courses never seam; standing subjects are
 world-up billboards anchored at their cell centres at their nominal heights;
 and the scene's only warmth comes from actual light sources — the lantern and
 candles — as the owner ruled in the lab.
+
+**Viewport ruling (owner, 2026-09-02).** The frame is 6.31 world units tall
+at the 1280 × 800 minimum play surface — one comparison step out from the
+lab's 5.05-unit frame, which is superseded — so the whole closed footprint of
+a building, roof included, sits in frame and the player stands about a fifth
+of the frame height. The ruling was made against painted full-frame references
+of the courtyard and the ground room (lab, review-candidate tier) in which the
+player stands about a sixth of the frame height; a further step out is
+expected once cards are re-baked at a higher density, and the client's `zoom`
+comparison step stays for that judgment. Rulings made beside it: **prop scale
+is one metre to one world unit** for three-dimensional source models rendered
+to cards, superseding the lab's 0.79 mapping, because metre-true furniture
+read as dollhouse scale beside the references; **the wall profile stays** and
+the roof gains its missing weight — steeper pitch, deeper eave, a darker and
+larger-scaled shingle swatch; and the two painted references are accepted as
+placement and scale targets at the review-candidate tier only, never as
+masters. Masters come from this project's own build once it matches them.
 
 Anything that belongs to a building — a hearth, a doorway, a window, a shelf —
 is built from material swatches over math like the walls, because it is seen at

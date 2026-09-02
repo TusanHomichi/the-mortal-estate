@@ -315,11 +315,14 @@ function parseSpace(
 
   if (!Array.isArray(value.props)) throw new Error("a candidate feel space has invalid props");
   const props = value.props.map((candidate) => {
+    if (!isRecord(candidate) || !Object.hasOwn(candidate, "elevation")) {
+      throw new Error("a candidate feel prop placement without elevation is refused");
+    }
     if (
-      !isRecord(candidate) ||
       !hasExactKeys(candidate, [
         "kind",
         "cell_anchor",
+        "elevation",
         "nominal_height",
         "sway",
         "mirror",
@@ -327,6 +330,9 @@ function parseSpace(
       ]) ||
       typeof candidate.kind !== "string" ||
       !isVector(candidate.cell_anchor, 2) ||
+      !isFiniteNumber(candidate.elevation) ||
+      candidate.elevation < 0 ||
+      candidate.elevation > 6 ||
       !isFiniteNumber(candidate.nominal_height) ||
       candidate.nominal_height <= 0 ||
       typeof candidate.sway !== "boolean" ||
@@ -351,6 +357,7 @@ function parseSpace(
     return {
       kind: candidate.kind,
       cell_anchor: [candidate.cell_anchor[0]!, candidate.cell_anchor[1]!] as [number, number],
+      elevation: candidate.elevation,
       nominal_height: candidate.nominal_height,
       sway: candidate.sway,
       mirror: candidate.mirror,

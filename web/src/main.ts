@@ -1,7 +1,7 @@
 import "./style.css";
 import { startFeelScene } from "./feelScene";
 import { fetchVerifiedAssetPacket } from "./manifest";
-import { presetsFromUrl } from "./presets";
+import { describeView, presetsFromUrl, zoomStepFromUrl } from "./presets";
 
 const stage = document.querySelector<HTMLElement>("#feel-stage");
 const banner = document.querySelector<HTMLElement>("#scene-banner");
@@ -11,8 +11,10 @@ if (stage === null || banner === null || presetLabel === null) {
   throw new Error("the feel scene document is incomplete");
 }
 
-const presets = presetsFromUrl(new URL(window.location.href));
-presetLabel.textContent = presets.join(" · ");
+const pageUrl = new URL(window.location.href);
+const presets = presetsFromUrl(pageUrl);
+const zoomStep = zoomStepFromUrl(pageUrl);
+presetLabel.textContent = describeView(presets.join(" · "), zoomStep);
 
 function showRefusal(reason: string): void {
   stage!.dataset.sceneState = "refused";
@@ -24,7 +26,7 @@ function showRefusal(reason: string): void {
 async function main(): Promise<void> {
   try {
     const packet = await fetchVerifiedAssetPacket();
-    await startFeelScene(stage!, packet, presets);
+    await startFeelScene(stage!, packet, presets, { zoomStep });
     banner!.hidden = true;
     stage!.dataset.sceneState = "ready";
     document.body.dataset.sceneReady = "true";

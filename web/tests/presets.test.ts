@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { parsePresets, presetsFromUrl, windPresetSettings } from "../src/presets";
+import {
+  describeView,
+  parsePresets,
+  parseZoomStep,
+  presetsFromUrl,
+  windPresetSettings,
+  zoomStepFromUrl,
+} from "../src/presets";
 
 describe("URL feel presets", () => {
   it("defaults to night", () => {
@@ -15,6 +22,20 @@ describe("URL feel presets", () => {
       "dusk",
       "fog",
     ]);
+  });
+
+  it("reads a whole-number zoom step, clamps it, and treats anything else as the ruled frame", () => {
+    expect(parseZoomStep(null)).toBe(0);
+    expect(parseZoomStep("-1")).toBe(-1);
+    expect(parseZoomStep("+2")).toBe(2);
+    expect(parseZoomStep(" -9 ")).toBe(-3);
+    expect(parseZoomStep("1.5")).toBe(0);
+    expect(parseZoomStep("out")).toBe(0);
+    expect(zoomStepFromUrl(new URL("https://example.invalid/?preset=night&zoom=-1"))).toBe(-1);
+    expect(zoomStepFromUrl(new URL("https://example.invalid/?preset=night"))).toBe(0);
+    expect(describeView("night", 0)).toBe("night");
+    expect(describeView("night", -1)).toBe("night · zoom \u22121");
+    expect(describeView("INTERIOR", 2)).toBe("INTERIOR · zoom +2");
   });
 
   it("keeps a faint idle wind and strengthens wind and rain presets", () => {

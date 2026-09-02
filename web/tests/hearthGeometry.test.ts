@@ -60,6 +60,9 @@ describe("hearth fixture geometry", () => {
     expect(hearthFireAnchor(NORTH).position[2]).toBeCloseTo(
       breastBounds.maxZ - HEARTH_PROFILE.fireFrontInset,
     );
+    expect(hearthFireAnchor(NORTH).position[1]).toBeCloseTo(
+      HEARTH_PROFILE.fireboxSill + HEARTH_PROFILE.fireHeight / 2,
+    );
   });
 
   it("overhangs the breast with a wider timber mantel", () => {

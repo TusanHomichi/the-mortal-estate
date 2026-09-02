@@ -94,6 +94,7 @@ describe("packet-layout passability", () => {
           {
             kind: "tree_broad",
             cell_anchor: [1.2, 0.8],
+            elevation: 0,
             nominal_height: 2,
             sway: true,
             mirror: true,
