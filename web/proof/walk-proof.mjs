@@ -29,18 +29,22 @@ async function stageAttribute(page, name) {
   return value;
 }
 
-async function groundCellPoint(page, focus, target) {
+// The scene names its camera focus (the caretaker outdoors, the room's centre
+// inside a building); the click for a target cell is computed from that, not
+// from a guess about whom the camera follows.
+async function groundCellPoint(page, _focus, target) {
   return page.evaluate(
-    async ({ focusCell, targetCell }) => {
+    async ({ targetCell }) => {
       const { createFeelCamera } = await import("/src/camera.ts");
-      const camera = createFeelCamera(innerWidth, innerHeight, focusCell);
+      const [fi, fj] = document.querySelector("#feel-stage").dataset.cameraFocus.split(",").map(Number);
+      const camera = createFeelCamera(innerWidth, innerHeight, { i: fi, j: fj });
       const projected = camera.position.clone().set(targetCell.i, 0, targetCell.j).project(camera);
       return {
         x: (projected.x + 1) * innerWidth * 0.5,
         y: (1 - projected.y) * innerHeight * 0.5,
       };
     },
-    { focusCell: focus, targetCell: target },
+    { targetCell: target },
   );
 }
 
@@ -157,7 +161,7 @@ async function draftAndCommit(page, clockStartedAt, from, target) {
   assert.equal(await stageAttribute(page, "data-walk-state"), "committed");
 }
 
-async function walkWithinSpace(page, clockStartedAt, space, from, target) {
+async function walkWithinSpace(page, clockStartedAt, space, from, target, cameraFollows = true) {
   await draftAndCommit(page, clockStartedAt, from, target);
   await page.waitForFunction(
     ({ expectedSpace, expectedCell }) => {
@@ -169,7 +173,7 @@ async function walkWithinSpace(page, clockStartedAt, space, from, target) {
     { expectedSpace: space, expectedCell: `${target.i},${target.j}` },
     { timeout: 4_000 },
   );
-  await assertCaretakerCentred(page);
+  if (cameraFollows) await assertCaretakerCentred(page);
 }
 
 async function walkThroughPortal(
@@ -193,7 +197,15 @@ async function walkThroughPortal(
   );
   assert.equal(await stageAttribute(page, "data-walk-space"), targetSpace);
   assert.deepEqual(parseCell(await stageAttribute(page, "data-caretaker-cell")), targetCell);
-  await assertCaretakerCentred(page);
+}
+
+// Inside a building the camera belongs to the space (owner ruling, 2026-09-02):
+// the focus is the room's centre, and a landing does not move it.
+async function assertCameraBelongsToSpace(page, focus) {
+  assert.equal(await stageAttribute(page, "data-camera-focus"), `${focus.i},${focus.j}`);
+  const projection = await stageAttribute(page, "data-caretaker-projection");
+  const [x, y] = projection.split(",").map(Number);
+  assert.ok(Math.abs(x - 640) > 8 || Math.abs(y - 400) > 8, "the caretaker is centred, so the camera followed it indoors");
 }
 
 const vite = await startVite(packet);
@@ -247,6 +259,11 @@ try {
   );
   await page.screenshot({ path: path.join(captureRoot, "walk-interior.png") });
   assert.equal(await stageAttribute(page, "data-grass-instances"), "0");
+  const roomCentre = { i: 4, j: 2 };
+  await assertCameraBelongsToSpace(page, roomCentre);
+  await walkWithinSpace(page, clockStartedAt, "estate-ground-room", { i: 4, j: 3 }, { i: 3, j: 3 }, false);
+  await assertCameraBelongsToSpace(page, roomCentre);
+  await walkWithinSpace(page, clockStartedAt, "estate-ground-room", { i: 3, j: 3 }, { i: 4, j: 3 }, false);
 
   await walkThroughPortal(
     page,
@@ -256,6 +273,7 @@ try {
     "estate-grounds",
     { i: 11, j: 7 },
   );
+  await assertCaretakerCentred(page);
   await page.screenshot({ path: path.join(captureRoot, "walk-exterior-return.png") });
   assert.equal(Number(await stageAttribute(page, "data-grass-instances")), grassInstances);
 

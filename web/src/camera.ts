@@ -32,6 +32,31 @@ export interface FeelCameraFocus {
   j: number;
 }
 
+/** The minimum a space must say for the camera to know whom it belongs to. */
+export interface CameraSpace {
+  grid_extents: { i: number; j: number };
+  weather: boolean;
+}
+
+/** The centre of a space's grid, as a focus: cell (0,0) to (i-1, j-1). */
+export function spaceCameraFocus(extents: CameraSpace["grid_extents"]): FeelCameraFocus {
+  return { i: (extents.i - 1) / 2, j: (extents.j - 1) / 2 };
+}
+
+/**
+ * Whom the camera belongs to (owner ruling, 2026-09-02): inside a building
+ * the camera belongs to the space — centred on it, and it stops following
+ * the character; outside it stays centred on the player and re-centres on
+ * each landing. A dedicated interior is the space that carries no weather.
+ */
+export function cameraFollowsCaretaker(space: CameraSpace): boolean {
+  return space.weather;
+}
+
+export function cameraFocusFor(space: CameraSpace, caretakerCell: FeelCameraFocus): FeelCameraFocus {
+  return cameraFollowsCaretaker(space) ? caretakerCell : spaceCameraFocus(space.grid_extents);
+}
+
 export function createFeelCamera(
   width: number,
   height: number,
