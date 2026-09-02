@@ -373,6 +373,8 @@ with pure claims in `web/tests/` and the real-tab proof in
 spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
 permission for presentation to remain fluid between beats is permission, not a
 requirement.
+The camera stays centred on the caretaker and re-centres on each landing; routes
+of one, two, or three squares are labelled walk, run, or sprint.
 
 ### The preparation band and feedback inside its beat
 

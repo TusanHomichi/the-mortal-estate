@@ -3,11 +3,14 @@ import { createFeelCamera } from "../src/camera";
 import { cellUnderPointer } from "../src/walk/pointer";
 
 describe("orthographic pointer unprojection", () => {
-  it("the centre of the viewport maps to the camera's ground target cell", () => {
-    const camera = createFeelCamera(1280, 800, { i: 12, j: 9 });
+  it("the centre ray reaches the ground below the elevated focus", () => {
+    const camera = createFeelCamera(1280, 800, { i: 13, j: 11 });
     const canvas = {
       getBoundingClientRect: () => ({ left: 0, top: 0, width: 1280, height: 800 }),
     };
-    expect(cellUnderPointer(camera, canvas, 640, 400, { i: 12, j: 9 })).toEqual({ i: 3, j: 2 });
+    expect(cellUnderPointer(camera, canvas, 640, 400, { i: 30, j: 22 })).toEqual({
+      i: 12,
+      j: 10,
+    });
   });
 });

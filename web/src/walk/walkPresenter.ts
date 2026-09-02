@@ -17,12 +17,16 @@ import {
   PlaneGeometry,
   Scene,
   SRGBColorSpace,
+  Vector3,
+  type DirectionalLight,
+  type Object3D,
   type OrthographicCamera,
 } from "three";
+import { CAMERA_TARGET_HEIGHT, focusFeelCamera } from "../camera";
 import type { FeelLayout } from "../feelTypes";
 import { BeatClock, WALK_STAND_IN_BEAT_SECONDS } from "./beat";
 import { footprintsFromPath } from "./footprints";
-import { passabilityFrom, type Cell } from "./layoutPassability";
+import { passabilityFrom, sameCell, type Cell } from "./layoutPassability";
 import { cellUnderPointer } from "./pointer";
 import { authorRoute } from "./route";
 import {
@@ -32,6 +36,7 @@ import {
   doubleClick,
   presentedCaretakerPosition,
   singleClick,
+  walkPace,
   walkIntentKind,
   type WalkIntentState,
 } from "./walkIntent";
@@ -48,6 +53,9 @@ export interface WalkPresenterOptions {
   camera: OrthographicCamera;
   layout: FeelLayout;
   caretaker: CaretakerObjects;
+  initialCell: Cell;
+  keyLight: DirectionalLight;
+  keyTarget: Object3D;
   startedAt: number;
 }
 
@@ -70,12 +78,6 @@ interface LandedFootprints {
 
 const DRAFT_COLOUR = new Color("#9eb5ca");
 const COMMITTED_COLOUR = new Color("#c8c3b8");
-
-function caretakerCell(layout: FeelLayout): Cell {
-  const caretaker = layout.props.find((prop) => prop.kind === "caretaker");
-  if (caretaker === undefined) throw new Error("the walk experiment needs one caretaker placement");
-  return { i: Math.round(caretaker.cell_anchor[0]), j: Math.round(caretaker.cell_anchor[1]) };
-}
 
 function routeIdentity(route: readonly Cell[] | null): string {
   return route?.map((cell) => `${cell.i},${cell.j}`).join(";") ?? "";
@@ -126,7 +128,7 @@ function makeHoverOutline(): LineLoop<BufferGeometry, LineBasicMaterial> {
 }
 
 export function createWalkPresenter(options: WalkPresenterOptions): WalkPresenter {
-  const { stage, canvas, scene, camera, layout, caretaker } = options;
+  const { stage, canvas, scene, camera, layout, caretaker, keyLight, keyTarget } = options;
   const passability = passabilityFrom(layout);
   const standInClock = new BeatClock(options.startedAt);
   const homeScaleX = Math.abs(caretaker.card.scale.x || 1);
@@ -150,7 +152,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   meter.append(meterFill);
   stage.append(meter);
 
-  let state = createWalkIntent(caretakerCell(layout));
+  let state = createWalkIntent(options.initialCell);
   let footprints: DrawnFootprint[] = [];
   let footprintIdentity = "";
   let landedFootprints: LandedFootprints | null = null;
@@ -239,6 +241,17 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     applyFacing();
     stage.dataset.walkState = walkIntentKind(state);
     stage.dataset.caretakerCell = `${state.caretakerCell.i},${state.caretakerCell.j}`;
+    const pace = walkPace(state);
+    label.textContent = `WALK EXPERIMENT — LOCAL, NOT AUTHORITY${pace === null ? "" : ` · ${pace.toUpperCase()}`}`;
+    if (pace === null) delete stage.dataset.walkPace;
+    else stage.dataset.walkPace = pace;
+    const projection = new Vector3(
+      state.caretakerCell.i,
+      CAMERA_TARGET_HEIGHT,
+      state.caretakerCell.j,
+    ).project(camera);
+    const bounds = canvas.getBoundingClientRect();
+    stage.dataset.caretakerProjection = `${(projection.x + 1) * bounds.width * 0.5},${(1 - projection.y) * bounds.height * 0.5}`;
     syncFootprints();
     updateHover();
   };
@@ -253,6 +266,17 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
         route: state.committed.route.map((cell) => ({ ...cell })),
         landedAt: state.committed.landsAt,
       };
+    }
+    if (!sameCell(state.caretakerCell, next.caretakerCell)) {
+      const deltaI = next.caretakerCell.i - state.caretakerCell.i;
+      const deltaJ = next.caretakerCell.j - state.caretakerCell.j;
+      focusFeelCamera(camera, next.caretakerCell);
+      keyLight.position.x += deltaI;
+      keyLight.position.z += deltaJ;
+      keyTarget.position.x += deltaI;
+      keyTarget.position.z += deltaJ;
+      keyLight.updateMatrixWorld(true);
+      keyTarget.updateMatrixWorld(true);
     }
     state = next;
     reflectState();
@@ -339,7 +363,9 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       label.remove();
       meter.remove();
       delete stage.dataset.walkState;
+      delete stage.dataset.walkPace;
       delete stage.dataset.caretakerCell;
+      delete stage.dataset.caretakerProjection;
     },
   };
 }

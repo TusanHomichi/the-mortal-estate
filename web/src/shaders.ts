@@ -1,10 +1,13 @@
 export const groundVertexShader = /* glsl */ `
+  attribute vec2 cellOrigin;
   varying vec2 vUv;
+  varying vec2 vCellOrigin;
   varying vec3 vWorldPosition;
   varying vec3 vWorldNormal;
 
   void main() {
     vUv = uv;
+    vCellOrigin = cellOrigin;
     vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
     vWorldNormal = normalize(mat3(modelMatrix) * normal);
     gl_Position = projectionMatrix * viewMatrix * vec4(vWorldPosition, 1.0);
@@ -13,7 +16,6 @@ export const groundVertexShader = /* glsl */ `
 
 export const groundFragmentShader = /* glsl */ `
   uniform sampler2D swatch;
-  uniform vec2 cellOrigin;
   uniform float swatchPeriod;
   uniform float jointWidth;
   uniform float wetness;
@@ -22,11 +24,12 @@ export const groundFragmentShader = /* glsl */ `
   uniform vec3 keyColour;
   uniform vec3 keyDirection;
   varying vec2 vUv;
+  varying vec2 vCellOrigin;
   varying vec3 vWorldPosition;
   varying vec3 vWorldNormal;
 
   void main() {
-    vec2 worldUv = (cellOrigin + vUv - vec2(0.5)) / swatchPeriod;
+    vec2 worldUv = (vCellOrigin + vUv - vec2(0.5)) / swatchPeriod;
     vec3 base = texture2D(swatch, worldUv).rgb * timeTint;
     float edgeDistance = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
     float joint = smoothstep(0.0, jointWidth, edgeDistance);

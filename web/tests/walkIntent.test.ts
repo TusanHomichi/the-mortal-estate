@@ -9,6 +9,7 @@ import {
   doubleClick,
   presentedCaretakerPosition,
   singleClick,
+  walkPace,
   walkIntentKind,
 } from "../src/walk/walkIntent";
 
@@ -49,6 +50,20 @@ describe("the local walk-intent state machine", () => {
     expect(walkIntentKind(state)).toBe("committed");
     expect(state.committed?.route.at(-1)).toEqual({ i: 3, j: 0 });
     expect(state.committed?.landsAt).toBe(3);
+  });
+
+  it("derives walk, run, and sprint from a draft or committed route", () => {
+    const initial = createWalkIntent({ i: 0, j: 0 });
+    expect(walkPace(initial)).toBeNull();
+    for (const [squares, pace] of [
+      [1, "walk"],
+      [2, "run"],
+      [3, "sprint"],
+    ] as const) {
+      const draft = singleClick(initial, passability, { i: squares, j: 0 }, clock, 1);
+      expect(walkPace(draft)).toBe(pace);
+      expect(walkPace(doubleClick(draft, clock, 1.2))).toBe(pace);
+    }
   });
 
   it("a committed route lands whole at the next strike, not before", () => {

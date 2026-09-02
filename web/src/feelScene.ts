@@ -25,13 +25,13 @@ import {
   ShadowMaterial,
   SRGBColorSpace,
   Texture,
-  Vector2,
   Vector3,
   Vector4,
   WebGLRenderer,
 } from "three";
 import { createFeelCamera, resizeFeelCamera } from "./camera";
 import type { FeelManifest, VerifiedAssetPacket } from "./feelTypes";
+import { buildGroundGeometry } from "./groundGeometry";
 import type { Preset } from "./presets";
 import {
   fogFragmentShader,
@@ -153,25 +153,28 @@ function addGround(
   anisotropy: number,
 ): void {
   const rainy = presets.includes("rain");
-  const geometry = new PlaneGeometry(1, 1);
-  geometry.rotateX(-Math.PI / 2);
   const ambient = palette.ambient.clone().multiplyScalar(palette.ambientIntensity);
   const key = palette.key.clone().multiplyScalar(palette.keyIntensity * 0.44);
+  const cellsByMaterial = new Map<string, typeof manifest.layout.cells>();
   for (const cell of manifest.layout.cells) {
-    const swatch = requiredTexture(textures, `terrain/${cell.material}`).texture;
+    const cells = cellsByMaterial.get(cell.material) ?? [];
+    cells.push(cell);
+    cellsByMaterial.set(cell.material, cells);
+  }
+  for (const [materialName, cells] of cellsByMaterial) {
+    const swatch = requiredTexture(textures, `terrain/${materialName}`).texture;
     configureTexture(swatch, anisotropy);
     const material = new ShaderMaterial({
-      name: `ground-${cell.material}`,
+      name: `ground-${materialName}`,
       uniforms: {
         swatch: { value: swatch },
-        cellOrigin: { value: new Vector2(cell.i, cell.j) },
         swatchPeriod: { value: 3 },
         jointWidth: { value: 0.028 },
         wetness: { value: rainy ? 1 : 0 },
         timeTint: {
           value: presets.includes("dusk")
             ? new Color(0.94, 0.94, 0.94)
-            : cell.material === "grass"
+            : materialName === "grass"
               ? new Color(0.6, 0.72, 0.9)
               : new Color(0.74, 0.82, 0.96),
         },
@@ -182,9 +185,19 @@ function addGround(
       vertexShader: groundVertexShader,
       fragmentShader: groundFragmentShader,
     });
+    const data = buildGroundGeometry(cells);
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new BufferAttribute(new Float32Array(data.positions), 3));
+    geometry.setAttribute("uv", new BufferAttribute(new Float32Array(data.uvs), 2));
+    geometry.setAttribute(
+      "cellOrigin",
+      new BufferAttribute(new Float32Array(data.cellOrigins), 2),
+    );
+    geometry.setIndex(data.indices);
+    geometry.computeVertexNormals();
+    geometry.computeBoundingSphere();
     const mesh = new Mesh(geometry, material);
-    mesh.name = `Cell_${cell.i}_${cell.j}`;
-    mesh.position.set(cell.i, -0.006, cell.j);
+    mesh.name = `Ground_${materialName}`;
     mesh.receiveShadow = false;
     scene.add(mesh);
   }
@@ -342,16 +355,21 @@ function addLights(
   manifest: FeelManifest,
   presets: readonly Preset[],
   palette: ScenePalette,
-): { lantern: PointLight; lanternBase: number } {
+  focusCell: { i: number; j: number },
+): {
+  lantern: PointLight;
+  lanternBase: number;
+  keyLight: DirectionalLight;
+  keyTarget: Object3D;
+} {
   scene.add(new AmbientLight(palette.ambient, palette.ambientIntensity));
   const key = new DirectionalLight(palette.key, palette.keyIntensity);
   key.name = presets.includes("dusk") ? "WarmHorizonKey" : "CoolMoonlight";
-  key.position.set(
-    presets.includes("dusk") ? -6 : 8,
-    presets.includes("dusk") ? 6 : 12,
-    presets.includes("dusk") ? 10 : -7,
-  );
-  key.target.position.set(4.5, 0, 3.5);
+  const keyOffset = presets.includes("dusk")
+    ? new Vector3(-10.5, 6, 6.5)
+    : new Vector3(3.5, 12, -10.5);
+  key.target.position.set(focusCell.i, 0, focusCell.j);
+  key.position.copy(key.target.position).add(keyOffset);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
   key.shadow.camera.left = -10;
@@ -376,7 +394,15 @@ function addLights(
     candle.position.fromArray(position);
     scene.add(candle);
   });
-  return { lantern, lanternBase };
+  return { lantern, lanternBase, keyLight: key, keyTarget: key.target };
+}
+
+function initialCaretakerCell(manifest: FeelManifest): { i: number; j: number } {
+  const caretaker = manifest.layout.props.find((prop) => prop.kind === "caretaker");
+  if (caretaker === undefined) {
+    throw new Error("the feel layout carries no caretaker for the walk experiment");
+  }
+  return { i: Math.round(caretaker.cell_anchor[0]), j: Math.round(caretaker.cell_anchor[1]) };
 }
 
 function seededRandom(seed = 0x544d455f): () => number {
@@ -481,12 +507,19 @@ export async function startFeelScene(
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
   scene.background = palette.background;
-  const camera = createFeelCamera(window.innerWidth, window.innerHeight, manifest.layout.grid_extents);
+  const initialCell = initialCaretakerCell(manifest);
+  const camera = createFeelCamera(window.innerWidth, window.innerHeight, initialCell);
   const lanternPosition = new Vector3().fromArray(manifest.layout.light_sources.lantern_glass);
 
   addGround(scene, manifest, textures, presets, palette, anisotropy);
   addWalls(scene, manifest, textures, anisotropy);
-  const { lantern, lanternBase } = addLights(scene, manifest, presets, palette);
+  const { lantern, lanternBase, keyLight, keyTarget } = addLights(
+    scene,
+    manifest,
+    presets,
+    palette,
+    initialCell,
+  );
   const { billboards, swayMaterials, caretaker } = addProps(
     scene,
     manifest,
@@ -507,6 +540,9 @@ export async function startFeelScene(
     camera,
     layout: manifest.layout,
     caretaker,
+    initialCell,
+    keyLight,
+    keyTarget,
     startedAt: performance.now() / 1000,
   });
   let animationFrame = 0;
@@ -525,6 +561,7 @@ export async function startFeelScene(
     walkPresenter.update(performance.now() / 1000);
     renderer.setRenderTarget(null);
     renderer.clear();
+    const renderStartedAt = performance.now();
     renderer.render(scene, camera);
     if (fog !== null) {
       fog.material.uniforms.elapsed!.value = elapsed;
@@ -532,6 +569,8 @@ export async function startFeelScene(
       renderer.render(fog.scene, fog.camera);
       renderer.autoClear = true;
     }
+    stage.dataset.renderCalls = String(renderer.info.render.calls);
+    stage.dataset.renderMilliseconds = (performance.now() - renderStartedAt).toFixed(3);
     animationFrame = requestAnimationFrame(draw);
   };
 
@@ -549,6 +588,8 @@ export async function startFeelScene(
       cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
       walkPresenter.stop();
+      delete stage.dataset.renderCalls;
+      delete stage.dataset.renderMilliseconds;
       renderer.dispose();
     },
   };

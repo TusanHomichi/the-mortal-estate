@@ -20,6 +20,7 @@ export interface WalkIntentState {
 }
 
 export type WalkIntentKind = "idle" | "draft" | "committed";
+export type WalkPace = "walk" | "run" | "sprint";
 
 function copyCell(cell: Cell): Cell {
   return { i: cell.i, j: cell.j };
@@ -45,6 +46,16 @@ export function walkIntentKind(state: WalkIntentState): WalkIntentKind {
   if (state.committed !== null) return "committed";
   if (state.draft !== null) return "draft";
   return "idle";
+}
+
+export function walkPace(state: WalkIntentState): WalkPace | null {
+  const route = state.draft ?? state.committed?.route ?? null;
+  if (route === null) return null;
+  const squares = route.length - 1;
+  if (squares === 1) return "walk";
+  if (squares === 2) return "run";
+  if (squares === 3) return "sprint";
+  throw new Error(`a walk-experiment route has an invalid ${squares}-square pace`);
 }
 
 export function advanceWalk(state: WalkIntentState, now: number): WalkIntentState {

@@ -4,7 +4,7 @@ export const CAMERA_VERTICAL_SIZE_1280X800 = 5.050762722761054;
 export const CAMERA_TARGET_HEIGHT = 1.22;
 export const CAMERA_OFFSET = new Vector3(8, 6.531973, 8);
 
-export interface GridExtents {
+export interface FeelCameraFocus {
   i: number;
   j: number;
 }
@@ -12,7 +12,7 @@ export interface GridExtents {
 export function createFeelCamera(
   width: number,
   height: number,
-  extents: GridExtents,
+  initialFocus: FeelCameraFocus,
 ): OrthographicCamera {
   const aspect = width / height;
   const halfHeight = CAMERA_VERTICAL_SIZE_1280X800 / 2;
@@ -24,16 +24,16 @@ export function createFeelCamera(
     0.1,
     100,
   );
-  const target = new Vector3(
-    Math.min(extents.i * 0.38, 4.5),
-    CAMERA_TARGET_HEIGHT,
-    Math.min(extents.j * 0.38, 3.5),
-  );
+  camera.updateProjectionMatrix();
+  focusFeelCamera(camera, initialFocus);
+  return camera;
+}
+
+export function focusFeelCamera(camera: OrthographicCamera, cell: FeelCameraFocus): void {
+  const target = new Vector3(cell.i, CAMERA_TARGET_HEIGHT, cell.j);
   camera.position.copy(target).add(CAMERA_OFFSET);
   camera.lookAt(target);
-  camera.updateProjectionMatrix();
   camera.updateMatrixWorld(true);
-  return camera;
 }
 
 export function resizeFeelCamera(camera: OrthographicCamera, width: number, height: number): void {
