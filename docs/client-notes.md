@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 13
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor. Pending owner acceptance at the phase stop points.
+revision: 14
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool. Pending owner acceptance at the phase stop points.
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -372,7 +372,13 @@ until the next strike of one shared local beat, then the route lands whole;
 drafting remains free and a replacement commitment keeps that strike. Its
 packet-layout passability and three-second clock are disposable local stand-ins,
 with pure claims in `web/tests/` and the real-tab proof in
-`web/proof/walk-proof.mjs`. This is the opposite of `GridWorldView`'s
+`web/proof/walk-proof.mjs`. The proof reads its packet from `TME_FEEL_ASSETS`
+and refuses with exit 3 without it — a tracked path is never a default — and
+writes its captures to `TME_CAPTURE_OUTPUT` or a named temporary directory;
+`web/proof/capture-packet.mjs` photographs any packet under any query string
+for owner comparison, and both share `web/proof/serve.mjs`, which serves the
+scene on a free loopback port and stops the server's whole process group.
+This is the opposite of `GridWorldView`'s
 spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
 permission for presentation to remain fluid between beats is permission, not a
 requirement.

@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-08-27
-revision: 4
-status: Authored at genesis plan Phase 7, replacing the predecessor's workflow contract rather than editing it; amended after the 2026-08-20 CI disk exhaustion with the measured disk budget and the two-job CI composition. Pending owner acceptance at the phase stop point.
+last_updated: 2026-09-02
+revision: 5
+status: Authored at genesis plan Phase 7, replacing the predecessor's workflow contract rather than editing it; amended after the 2026-08-20 CI disk exhaustion with the measured disk budget and the two-job CI composition; revision 5 records working in a linked worktree and the write/run split for sandboxed helpers. Pending owner acceptance at the phase stop point.
 public_safe: true
 summary: How work is scoped, authored, proven, and closed out here — document families and precedence, the drift rule, implementer autonomy, the refactor threshold, the no-compatibility-adapters default, where authoring a gameplay spec starts, the three verification lessons, the CI contract, and the measured disk budget the two CI jobs fit inside.
 always: true
@@ -324,6 +324,30 @@ the kill is recorded with the exact test that performs it. An unexercised
 fail-closed path is an assumption, not a guarantee. This is principle P9 of
 [authoring-contracts.md](authoring-contracts.md); the qualification table lives in
 [boundary-checks.md](boundary-checks.md).
+
+### Working in a linked worktree
+
+An agent session usually runs in a linked worktree under `.claude/worktrees/`,
+not the main checkout. A fresh worktree lacks three things the lanes need, and
+each has one answer: the web dependencies (`npm ci`, which the `web` lane runs
+itself), the engine's class cache (rebuilt with the import command in the
+agent guide), and the private denylist, which the boundary check and the
+runner now resolve from the main checkout automatically. Build and deploy
+only from your own worktree, never from a checkout another agent is editing;
+a commit made there while its files are moving is a commit of someone else's
+half-finished work.
+
+### Helpers that cannot open a socket or a browser
+
+A sandboxed helper agent that writes code well may still be unable to listen
+on loopback or launch a browser. Split such work: the helper **writes** the
+harness, proof, or capture script and proves what it can (type checks, unit
+tests, pure-Python treatment), and the session that can open a browser
+**runs** it. Say which half is whose in the brief. Two process rules from the
+same day: a served proof spawns its server detached and stops the whole
+process group, because a dev server's children outlive a plain kill of the
+wrapper; and never signal processes by a pattern that also appears in your
+own command line — it matches your own shell.
 
 ### Running lanes on one host — observed, 2026-08-21
 
