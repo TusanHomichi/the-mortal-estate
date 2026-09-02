@@ -47,4 +47,16 @@ describe("direct route authoring", () => {
       authorRoute(passabilityFrom(field()), { i: 1, j: 1 }, { i: 5, j: 1 }),
     ).toBeNull();
   });
+
+  it("a route ending on a wall tile cannot be authored", () => {
+    const wall: WallRun = {
+      axis: "x",
+      start: [0.5, 2.5],
+      cells: 3,
+      door_interval: null,
+    };
+    expect(
+      authorRoute(passabilityFrom(field([wall])), { i: 2, j: 1 }, { i: 2, j: 2 }),
+    ).toBeNull();
+  });
 });

@@ -264,11 +264,13 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const updateHover = (): void => {
     if (hoverCell === null) {
       hoverOutline.visible = false;
+      stage.dataset.walkOutline = "hidden";
       setCursor("default");
       return;
     }
     const authorable = authorRoute(passability, state.caretakerCell, hoverCell) !== null;
     hoverOutline.visible = authorable;
+    stage.dataset.walkOutline = authorable ? "visible" : "hidden";
     if (authorable) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
     if (state.committed !== null) setCursor("waiting");
     else if (authorable || sameCell(state.caretakerCell, hoverCell)) setCursor("ready");
@@ -415,6 +417,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.walkState;
       delete stage.dataset.walkPace;
       delete stage.dataset.walkCursor;
+      delete stage.dataset.walkOutline;
       delete stage.dataset.walkClockStartedAt;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;

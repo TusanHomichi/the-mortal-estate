@@ -98,12 +98,12 @@ function runBounds(
         maxX: startX + along1,
         minY: y0,
         maxY: y1,
-        minZ: startZ - thickness / 2,
-        maxZ: startZ + thickness / 2,
+        minZ: startZ - thickness,
+        maxZ: startZ,
       }
     : {
-        minX: startX - thickness / 2,
-        maxX: startX + thickness / 2,
+        minX: startX - thickness,
+        maxX: startX,
         minY: y0,
         maxY: y1,
         minZ: startZ + along0,
@@ -171,7 +171,7 @@ function addBrace(parts: WallGeometryPart[], run: WallRun, panel: number): void 
   const centreAlong = panel + 0.5;
   const centreY = (WALL_PROFILE.sillTop + WALL_PROFILE.capBottom) / 2;
   const [startX, startZ] = run.start;
-  const front = WALL_PROFILE.thickness / 2 + 0.018;
+  const front = 0.018;
   const geometry = transformGeometry(local, (x, y, z) => {
     if (run.axis === "x") {
       const rotatedX = x * Math.cos(-angle) - y * Math.sin(-angle);
@@ -193,13 +193,13 @@ function panelIsDoor(run: WallRun, panel: number): boolean {
 
 function addCapTop(parts: WallGeometryPart[], run: WallRun): void {
   const [startX, startZ] = run.start;
-  const half = WALL_PROFILE.thickness / 2;
+  const thickness = WALL_PROFILE.thickness;
   const y = WALL_PROFILE.capTop + 0.001;
   const geometry = emptyGeometry();
   if (run.axis === "x") {
     pushFace(
       geometry,
-      [[startX, y, startZ + half], [startX + run.cells, y, startZ + half], [startX + run.cells, y, startZ - half], [startX, y, startZ - half]],
+      [[startX, y, startZ], [startX + run.cells, y, startZ], [startX + run.cells, y, startZ - thickness], [startX, y, startZ - thickness]],
       0,
       run.cells / 4,
       0,
@@ -208,7 +208,7 @@ function addCapTop(parts: WallGeometryPart[], run: WallRun): void {
   } else {
     pushFace(
       geometry,
-      [[startX - half, y, startZ], [startX + half, y, startZ], [startX + half, y, startZ + run.cells], [startX - half, y, startZ + run.cells]],
+      [[startX - thickness, y, startZ], [startX, y, startZ], [startX, y, startZ + run.cells], [startX - thickness, y, startZ + run.cells]],
       0,
       run.cells / 4,
       0,
@@ -222,7 +222,7 @@ function addDoor(parts: WallGeometryPart[], run: WallRun, interval: [number, num
   const [u0, u1] = interval;
   const centre = (u0 + u1) / 2;
   const [startX, startZ] = run.start;
-  const front = WALL_PROFILE.thickness / 2 + 0.002;
+  const front = 0.002;
   const geometry = emptyGeometry();
   if (run.axis === "x") {
     pushFace(
@@ -308,12 +308,12 @@ export function buildWallProfile(runs: readonly WallRun[]): WallGeometryPart[] {
       material: "post",
       geometry: cuboid(
         {
-          minX: x - width / 2,
-          maxX: x + width / 2,
+          minX: x - width,
+          maxX: x,
           minY: WALL_PROFILE.sillTop,
           maxY: WALL_PROFILE.capBottom,
-          minZ: z - width / 2,
-          maxZ: z + width / 2,
+          minZ: z - width,
+          maxZ: z,
         },
         0,
         1,

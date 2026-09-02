@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 7
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 7 records cursor readiness and the absent pulse meter in the browser feel scene's bounded local walk experiment. Pending owner acceptance at the phase stop points.
+revision: 8
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 8 records wall-tile passability in the browser feel scene's bounded local walk experiment. Pending owner acceptance at the phase stop points.
 public_safe: true
 summary: The successor's credential model, how the client speaks the one-world wire, why the shared wire fixture corpus is read rather than copied, the world-view seam and its implementations and experiments, how a capture and its identity sidecar are emitted, how the authoritative pulse is presented without becoming a second clock, cursor readiness in the browser feel surface, and the proof surfaces.
 routes:
@@ -381,6 +381,8 @@ of one, two, or three squares are labelled walk, run, or sprint.
 Its cursor is a plain pale arrow when ready, gains an hourglass while a route is
 committed, and gains a diagonal refusal bar over an unauthorable square; the
 scene has no beat meter.
+Packet-derived passability now reserves every wall tile from occupancy while
+leaving its door tile crossable.
 
 ### The preparation band and feedback inside its beat
 

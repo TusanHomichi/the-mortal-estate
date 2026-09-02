@@ -18,29 +18,44 @@ function layout(wallRuns: WallRun[] = [], props: FeelLayout["props"] = []): Feel
 
 const WALL: WallRun = {
   axis: "x",
-  start: [-0.5, 0.5],
+  start: [-0.5, 1.5],
   cells: 3,
   door_interval: null,
 };
 
 describe("packet-layout passability", () => {
-  it("a wall blocks its crossing", () => {
-    const passability = passabilityFrom(layout([WALL]));
-    expect(canStep(passability, { i: 0, j: 0 }, { i: 0, j: 1 })).toBe(false);
+  it("every tile under each wall run is blocked", () => {
+    const passability = passabilityFrom(
+      layout([WALL, { axis: "z", start: [1.5, -0.5], cells: 3, door_interval: null }]),
+    );
+    expect(passability.wallTiles).toEqual(
+      new Set(["0,1", "1,1", "2,1", "1,0", "1,2"]),
+    );
+    for (const key of passability.wallTiles) expect(passability.blocked.has(key)).toBe(true);
   });
 
-  it("the door interval opens exactly one crossing", () => {
+  it("the door tile is passable from both sides", () => {
     const passability = passabilityFrom(
       layout([{ ...WALL, door_interval: [1.4, 1.6] }]),
     );
+    expect(passability.doorTiles).toEqual(new Set(["1,1"]));
+    expect(passability.blocked.has("1,1")).toBe(false);
+    expect(canStep(passability, { i: 1, j: 2 }, { i: 1, j: 1 })).toBe(true);
     expect(canStep(passability, { i: 1, j: 0 }, { i: 1, j: 1 })).toBe(true);
-    expect(canStep(passability, { i: 0, j: 0 }, { i: 0, j: 1 })).toBe(false);
-    expect(canStep(passability, { i: 2, j: 0 }, { i: 2, j: 1 })).toBe(false);
+
+    const acrossZRun = passabilityFrom(
+      layout([
+        { axis: "z", start: [1.5, -0.5], cells: 3, door_interval: [1.4, 1.6] },
+      ]),
+    );
+    expect(acrossZRun.doorTiles).toEqual(new Set(["1,1"]));
+    expect(canStep(acrossZRun, { i: 2, j: 1 }, { i: 1, j: 1 })).toBe(true);
+    expect(canStep(acrossZRun, { i: 0, j: 1 }, { i: 1, j: 1 })).toBe(true);
   });
 
   it("a diagonal past a wall corner is refused", () => {
     const passability = passabilityFrom(layout([WALL]));
-    expect(canStep(passability, { i: 0, j: 0 }, { i: 1, j: 1 })).toBe(false);
+    expect(canStep(passability, { i: 0, j: 2 }, { i: 1, j: 1 })).toBe(false);
   });
 
   it("a diagonal cannot cut the far end corner of a wall", () => {
@@ -48,6 +63,23 @@ describe("packet-layout passability", () => {
       layout([{ axis: "x", start: [1.5, 1.5], cells: 1, door_interval: null }]),
     );
     expect(canStep(passability, { i: 1, j: 1 }, { i: 2, j: 2 })).toBe(false);
+  });
+
+  it("the meeting corner tile belongs to the wall", () => {
+    const passability = passabilityFrom(
+      layout([
+        { axis: "x", start: [0.5, 0.5], cells: 2, door_interval: null },
+        { axis: "z", start: [0.5, 0.5], cells: 2, door_interval: null },
+      ]),
+    );
+    expect(passability.wallTiles.has("0,0")).toBe(true);
+    expect(passability.blocked.has("0,0")).toBe(true);
+  });
+
+  it("the tile behind a wall tile remains walkable", () => {
+    const passability = passabilityFrom(layout([WALL]));
+    expect(passability.blocked.has("0,0")).toBe(false);
+    expect(canStep(passability, { i: 0, j: 0 }, { i: 1, j: 0 })).toBe(true);
   });
 
   it("prop cells are blocked", () => {

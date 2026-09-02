@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-02
-revision: 17
-status: Owner-accepted visual target. Revision 17 records cursor readiness and the absence of a visible pulse outside combat in the browser feel scene; no renderer, asset set, or production pipeline is accepted.
+revision: 18
+status: Owner-accepted visual target. Revision 18 records that wall runs own their tiles and sit on their camera-facing edges; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up geometry, calm-field texture discipline, cursor readiness and pulse visibility, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -139,7 +139,10 @@ terrain-cell contract. The joint's material colour may vary with the admitted
 material family, but its accepted native treatment may not drift asset by asset
 once calibration closes.
 
-Building floors and wall runs use that same cell ruler. Active play presents the
+Building floors and wall runs use that same cell ruler. A wall run owns the tiles
+it stands on: the strip is drawn on each tile's camera-facing edge, the tile is
+never occupied, and a door tile is the crossing (owner ruling, 2026-09-02).
+Active play presents the
 roof-off cutaway by default so occupants, interior cells, and wall-relative
 height remain readable; separately controllable roof art may complete an
 exterior silhouette when the presentation calls for it. The roof does not own
