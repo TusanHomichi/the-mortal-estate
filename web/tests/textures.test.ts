@@ -46,7 +46,7 @@ describe("decoding a sheet", () => {
       }),
     );
     const packet = {
-      manifest: { schema_version: 2, assets: {}, start: { space: "s", cell: [0, 0] }, spaces: {} },
+      manifest: { schema_version: 3, assets: {}, start: { space: "s", cell: [0, 0] }, spaces: {} },
       assets: new Map([
         ["props/caretaker", { bytes: new ArrayBuffer(0), file: "prop-caretaker.png" }],
         ["props/caretaker/normal", { bytes: new ArrayBuffer(0), file: "prop-caretaker-normal.png" }],

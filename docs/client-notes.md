@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 18
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs
+revision: 19
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -408,9 +408,20 @@ frame beside a candidate; it is a comparison aid for the owner's viewport
 ruling, the ruled frame remains the default, and the label names any step in
 force.
 Every packet prop placement carries a finite `elevation` from zero through six
-world units. The card centre is that floor-relative anchor plus half its nominal
-height for view-facing and wall-plane cards alike; a placement without the key
-is refused rather than treated as floor-standing.
+world units and a `card_height`: the world height the card's **image** spans,
+feet at the elevation, top at elevation plus card height — not the subject's
+own height. A low, long thing rendered at the ruled angle is mostly its depth,
+and sizing it by its own height drew beds and tables doll-sized beside the
+caretaker; the render harness knows the projected height and the placement
+now carries it (owner ruling, 2026-09-03; the `nominal_height` key and schema
+2 are retired and refused, schema 3 carries the change). The card centre is
+the anchor plus half the card height for view-facing and wall-plane cards; a
+`floor` facing lays the card flat on its cell just above the ground, its up
+toward north, for things that are genuinely flat — a rug — never for anything
+with a side; the client cannot judge flatness from a picture, so the prop's
+asset row declares it (`flat: true`) and a floor placement of a card not so
+declared is refused. A placement without the elevation key is refused rather than
+treated as floor-standing.
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
 sheet** beside its colour sheet — `normal: {file, sha256}`, verified like any
@@ -440,7 +451,7 @@ surround is itself filed as #29, because the durable contract is a normal
 sheet with nothing to damage.
 Packet-derived passability now reserves every wall tile from occupancy while
 leaving its door tile crossable.
-Schema-2 fixtures build wall-attached structure from batched material geometry,
+Fixtures build wall-attached structure from batched material geometry,
 block their tile, and own their practical light; only the fire inside the hearth
 remains a view-facing card.
 Outdoor tree and grass cards share one world-position-phased wind field; decoded
@@ -450,7 +461,7 @@ draw that dedicated interiors omit.
 Walls that would cover the caretaker's tile fade without moving the camera or
 changing their accepted height; the selection rule lives in
 `web/src/walk/wallOcclusion.ts`.
-The schema-2 packet makes the scene a set of disposable spaces joined by door
+The packet makes the scene a set of disposable spaces joined by door
 portals: landing on the last door square swaps to the target space and tile on
 the same strike, while rebuilding presentation-only passability, hover,
 occlusion, and camera focus. Closed exterior footprints keep pitched roofs as
