@@ -112,8 +112,8 @@ already lives in, and the owner has shipped with it before. Tauri renders
 through each platform's system webview rather than a bundled browser, so the
 desktop slice's proof obligation is stated now: the feel client must be
 proven on the webview of every desktop target — WebKitGTK on Linux and the
-Steam Deck, WebView2 on Windows — at the ruled play surface, before that
-target is claimed. The retained Godot shell stays cold pending a reason the
+Steam Deck, WebView2 on Windows, WKWebView on macOS — at the ruled play
+surface, before that target is claimed. The retained Godot shell stays cold pending a reason the
 browser cannot supply, and no other engine enters the stack: Unity was
 considered on 2026-09-03 and has no role.
 

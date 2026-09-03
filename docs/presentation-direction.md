@@ -461,8 +461,9 @@ one ground cell projects as a 179-pixel-wide diamond at 1280 × 800; ground
 cells are flat quads carrying material swatches in continuous world-plane
 coordinates; walls are real geometry built from a member profile in world
 units (plinth, sill, plaster, posts at every cell boundary, braces, lintel and
-door, cap front and cap top) so courses never seam; standing subjects are
-world-up billboards anchored at their cell centres at their nominal heights;
+door, cap front and cap top) so courses never seam; standing subjects other
+than characters are world-up billboards anchored at their cell centres at
+their nominal heights (characters are live rigs since 2026-09-03, below);
 and the scene's only warmth comes from actual light sources — the lantern and
 candles — as the owner ruled in the lab.
 
