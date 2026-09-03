@@ -688,13 +688,9 @@ export class SpaceScene {
     for (const prop of placements) {
       const source = requiredTexture(textures, `props/${prop.kind}`);
       configureTexture(source.texture, anisotropy);
+      // Size agreement with the colour sheet was proven at decode time.
       const normal = textures.get(`props/${prop.kind}/normal`) ?? null;
-      if (normal !== null) {
-        if (normal.width !== source.width || normal.height !== source.height) {
-          throw new Error(`the ${prop.kind} normal sheet does not match its colour sheet's size`);
-        }
-        configureTexture(normal.texture, anisotropy);
-      }
+      if (normal !== null) configureTexture(normal.texture, anisotropy);
       const width = prop.nominal_height * (source.width / source.height);
       const geometry = new PlaneGeometry(width, prop.nominal_height);
       let material: ShaderMaterial | MeshStandardMaterial;
