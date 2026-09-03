@@ -81,17 +81,31 @@ describe("figure materials the palette can patch", () => {
 describe("a clip must bind to the rig it plays on", () => {
   const clipOn = (node: string) => new AnimationClip("Idle", 1, [new VectorKeyframeTrack(`${node}.position`, [0, 1], [0, 0, 0, 0, 0, 0])]);
 
-  it("accepts a clip whose every track finds its node", () => {
+  const skinnedRig = (boneName: string): Group => {
+    const bone = new Bone();
+    bone.name = boneName;
+    const skinned = new SkinnedMesh(new BoxGeometry(), new MeshStandardMaterial());
+    skinned.add(bone);
+    skinned.bind(new Skeleton([bone]));
     const rig = new Group();
-    const hips = new Object3D();
-    hips.name = "Hips";
-    rig.add(hips);
-    expect(() => assertClipBinds(clipOn("Hips"), rig, "figure test rig")).not.toThrow();
+    rig.add(skinned);
+    return rig;
+  };
+
+  it("accepts a clip whose every track finds a skeleton bone", () => {
+    expect(() => assertClipBinds(clipOn("Hips"), skinnedRig("Hips"), "figure test rig")).not.toThrow();
   });
 
-  it("refuses a clip that targets a bone the rig does not have, naming it", () => {
-    const rig = new Group();
-    expect(() => assertClipBinds(clipOn("Tail"), rig, "figure test part")).toThrow(/cannot play Idle: no node named Tail/);
+  it("refuses a clip that targets a bone the skeleton does not have, naming it", () => {
+    expect(() => assertClipBinds(clipOn("Tail"), skinnedRig("Hips"), "figure test part")).toThrow(/cannot play Idle: no skeleton bone named Tail/);
+  });
+
+  it("refuses a plain hierarchy that merely carries the bone names", () => {
+    const decoy = new Group();
+    const hips = new Object3D();
+    hips.name = "Hips";
+    decoy.add(hips);
+    expect(() => assertClipBinds(clipOn("Hips"), decoy, "figure test part")).toThrow(/has no skinned mesh/);
   });
 });
 

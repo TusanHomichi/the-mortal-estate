@@ -23,7 +23,7 @@ import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
 import { SpaceScene } from "./space/SpaceScene";
 import { decodeTextures } from "./space/textures";
-import { decodeFigures, disposeDecodedFigures } from "./space/figureRig";
+import { decodeFigures, disposeDecodedFigures, type DecodedFigure } from "./space/figureRig";
 import type { Cell } from "./walk/layoutPassability";
 import { createWalkPresenter, type WalkPresenter } from "./walk/walkPresenter";
 
@@ -108,7 +108,16 @@ export async function startFeelScene(
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const textures = await decodeTextures(packet);
-  const figures = await decodeFigures(packet);
+  let figures: Map<string, DecodedFigure>;
+  try {
+    figures = await decodeFigures(packet);
+  } catch (error) {
+    // A refused figure refuses the scene; nothing created so far may outlive it.
+    for (const decoded of textures.values()) decoded.texture.dispose();
+    renderer.dispose();
+    canvas.remove();
+    throw error;
+  }
   const windWeightTextures = new Map<string, DataTexture>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();

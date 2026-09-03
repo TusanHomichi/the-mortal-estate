@@ -140,10 +140,17 @@ export function assertPaintableMaterials(root: Object3D, what: string): void {
  * is refused, naming the first bone it cannot find.
  */
 export function assertClipBinds(clip: AnimationClip, root: Object3D, what: string): void {
+  // The names that count are the bones of the skinned meshes' skeletons —
+  // a plain hierarchy carrying the right names would bind and move nothing.
+  const bones = new Set<string>();
+  root.traverse((object: Object3D) => {
+    if (object instanceof SkinnedMesh) for (const bone of object.skeleton.bones) bones.add(bone.name);
+  });
+  if (bones.size === 0) throw new Error(`${what} has no skinned mesh; ${clip.name} has nothing to move`);
   for (const track of clip.tracks) {
     const { nodeName } = PropertyBinding.parseTrackName(track.name);
-    if (nodeName === undefined || nodeName === "" || root.getObjectByName(nodeName) === undefined) {
-      throw new Error(`${what} cannot play ${clip.name}: no node named ${String(nodeName)}`);
+    if (nodeName === undefined || nodeName === "" || !bones.has(nodeName)) {
+      throw new Error(`${what} cannot play ${clip.name}: no skeleton bone named ${String(nodeName)}`);
     }
   }
 }
