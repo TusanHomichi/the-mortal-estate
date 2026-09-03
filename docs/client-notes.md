@@ -473,9 +473,10 @@ casts and receives the scene's shadows, and drops the contact-shadow blob the
 card had. Facing turns the rig a half-turn about world up along the axis the
 card mirrored across; the walk presenter places and faces one object and the
 scene ticks its mixers. The stage exposes `data-caretaker-figure` and
-`data-caretaker-clip` and the walk proof asserts both in both engines. Which
-clips beyond idle, eight-way facing, and the caretaker's own look are open
-(the plan is `docs/plans/2026-09-03-live-figure-rig.md`). Schemas 1–4 are
+`data-caretaker-clip` and the walk proof asserts both in both engines. The
+clips are idle and the three gaits (walk, run, sprint — owner decision,
+2026-09-03); which clips beyond those, eight-way facing, and the caretaker's
+own look are open (the plan is `docs/plans/2026-09-03-live-figure-rig.md`). Schemas 1–4 are
 refused by name.
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
