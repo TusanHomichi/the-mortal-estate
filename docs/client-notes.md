@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-02
-revision: 16
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.
+last_updated: 2026-09-03
+revision: 17
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -417,6 +417,16 @@ behind keeps a readable shadow side instead of going black. The patch refuses
 to build if a three upgrade moves that line. The kit cards' sheets come from a
 normal pass of the same render that produced their colour; the caretaker's is
 derived from its silhouette until the character pipeline renders it.
+Every sheet is decoded **straight, never premultiplied**
+(`createImageBitmap` with `premultiplyAlpha: "none"`, `web/src/space/textures.ts`).
+The browser's default round trip — premultiply on decode, un-premultiply on
+upload — zeroes the colour of every fully transparent pixel, which a colour
+sheet survives and a normal sheet does not: its flat surround turns black,
+filtering pulls that black into the silhouette ring as a backward normal, and
+the specular term lights it as a white outline around every card at every
+edge. Found on the served caretaker on 2026-09-03; the sheets' transparent
+surround is itself filed as #29, because the durable contract is a normal
+sheet with nothing to damage.
 Packet-derived passability now reserves every wall tile from occupancy while
 leaving its door tile crossable.
 Schema-2 fixtures build wall-attached structure from batched material geometry,
