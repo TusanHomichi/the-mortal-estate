@@ -496,9 +496,10 @@ interior is the space that carries no weather.
 
 Anything that belongs to a building — a hearth, a doorway, a window, a shelf —
 is built from material swatches over math like the walls, because it is seen at
-an angle and must have a side; free-standing things — a person, a tree, a table,
-a stone — are painted cards at the camera angle, placed clear of walls, and a
-flat wall-plane card is for genuinely flat things only. Characters were ruled on
+an angle and must have a side; free-standing things — a tree, a table, a
+stone — are painted cards at the camera angle, placed clear of walls, and a
+flat wall-plane card is for genuinely flat things only. A person was a card
+under this ruling and is not since 2026-09-03 (below). Characters were ruled on
 2026-09-02 as modelled and rigged in 3D but shipped as cards rendered at the
 ruled camera angle; that ruling is superseded below.
 
