@@ -2,18 +2,44 @@ import assert from "node:assert/strict";
 import { mkdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
-import { chromium } from "playwright";
-import { requirePacket, startVite } from "./serve.mjs";
+import { fileURLToPath } from "node:url";
+import { launchProofBrowser, proofBrowsers, requirePacket, startVite } from "./serve.mjs";
 
 // The packet under proof comes from the environment, never a tracked path; the
 // captures go where the owner asks (the capture-output capability) or to a
 // temporary directory that the summary line names.
 const packet = requirePacket();
-const captureRoot = path.resolve(
+const engines = proofBrowsers();
+const captureBase = path.resolve(
   process.env.TME_CAPTURE_OUTPUT?.trim() || path.join(os.tmpdir(), "tme-walk-proof"),
 );
+
+// Two engines, two processes: the proof below is written once, for one
+// browser, and the parent runs it per engine so each gets a fresh server, a
+// fresh tab, and its own capture directory.
+if (engines.length > 1) {
+  const script = fileURLToPath(import.meta.url);
+  let failed = 0;
+  for (const { name } of engines) {
+    const exit = await new Promise((resolve) => {
+      const child = spawn(process.execPath, [script], {
+        stdio: "inherit",
+        env: { ...process.env, TME_PROOF_BROWSER: name, TME_CAPTURE_OUTPUT: path.join(captureBase, name) },
+      });
+      child.on("exit", (code) => resolve(code ?? 1));
+    });
+    if (exit !== 0) failed += 1;
+  }
+  console.log(failed === 0
+    ? `PASS walk proof in ${engines.map((e) => e.name).join(" and ")}: ${captureBase}`
+    : `FAIL walk proof: ${failed} of ${engines.length} engines failed`);
+  process.exit(failed === 0 ? 0 : 1);
+}
+const [proofEngine] = engines;
+const engineName = proofEngine.name;
+const captureRoot = captureBase;
 const sequenceFrames = path.join(captureRoot, ".wind-sequence-frames");
 const execFileAsync = promisify(execFile);
 
@@ -57,7 +83,7 @@ async function waitForFreshStandInBeat(page, clockStartedAt) {
       return phase >= 0 && phase < WALK_STAND_IN_BEAT_SECONDS * 0.08;
     },
     clockStartedAt,
-    { timeout: 4_000 },
+    { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
   );
 }
 
@@ -158,6 +184,13 @@ async function draftAndCommit(page, clockStartedAt, from, target) {
       detail: 2,
     }));
   }, point);
+  // Wait for the commitment rather than sampling it: a slow rasteriser can
+  // take a frame or two to reflect it, and a fixed sample was the #31 flake.
+  await page.waitForFunction(
+    () => document.querySelector("#feel-stage")?.dataset.walkState === "committed",
+    null,
+    { timeout: 3_000 },
+  );
   assert.equal(await stageAttribute(page, "data-walk-state"), "committed");
 }
 
@@ -171,7 +204,7 @@ async function walkWithinSpace(page, clockStartedAt, space, from, target, camera
         stage.dataset.walkState === "idle";
     },
     { expectedSpace: space, expectedCell: `${target.i},${target.j}` },
-    { timeout: 4_000 },
+    { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
   );
   if (cameraFollows) await assertCaretakerCentred(page);
 }
@@ -193,7 +226,7 @@ async function walkThroughPortal(
         stage.dataset.walkState === "idle";
     },
     { expectedSpace: targetSpace, expectedCell: `${targetCell.i},${targetCell.j}` },
-    { timeout: 4_000 },
+    { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
   );
   assert.equal(await stageAttribute(page, "data-walk-space"), targetSpace);
   assert.deepEqual(parseCell(await stageAttribute(page, "data-caretaker-cell")), targetCell);
@@ -211,10 +244,11 @@ async function assertCameraBelongsToSpace(page, focus) {
 const vite = await startVite(packet);
 const baseUrl = vite.baseUrl;
 
-let browser;
+let launched;
 try {
   await mkdir(captureRoot, { recursive: true });
-  browser = await chromium.launch({ executablePath: chromium.executablePath(), headless: true });
+  launched = await launchProofBrowser(proofEngine);
+  const browser = launched.browser;
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const consoleErrors = [];
   page.on("console", (message) => {
@@ -279,13 +313,13 @@ try {
 
   assert.deepEqual(consoleErrors, []);
   console.log(
-    `PASS walk proof: ${captureRoot}; ${grassInstances} grass clumps; ` +
+    `PASS walk proof (${engineName}): ${captureRoot}; ${grassInstances} grass clumps; ` +
       `exterior draw calls ${measurement.calls}; ` +
       `30-frame rAF average ${measurement.averageRafMilliseconds.toFixed(3)} ms; ` +
       `render average ${measurement.averageRenderMilliseconds.toFixed(3)} ms`,
   );
 } finally {
-  await browser?.close();
+  await launched?.stop();
   await vite.stop();
   await rm(sequenceFrames, { recursive: true, force: true });
 }

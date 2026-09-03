@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 17
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary
+revision: 18
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -378,6 +378,17 @@ writes its captures to `TME_CAPTURE_OUTPUT` or a named temporary directory;
 `web/proof/capture-packet.mjs` photographs any packet under any query string
 for owner comparison, and both share `web/proof/serve.mjs`, which serves the
 scene on a free loopback port and stops the server's whole process group.
+Both run in **two engines**: `serve.mjs` resolves Chromium and Firefox from
+Playwright, the walk proof runs itself once per engine in a child process
+with its own server, tab, and capture directory (`<root>/chromium/`,
+`<root>/firefox/`), and the capture tool shoots every query in every engine
+as `<query>-<engine>.png`. Chromium renders headless; **headless Firefox has
+no WebGL at all** (probed 2026-09-03 — no preference enables it), so Firefox
+runs headed with software GL on a display: `DISPLAY` when the environment
+has one, otherwise an Xvfb the launcher starts and stops itself. An engine
+Playwright has not installed, or a Firefox with no display and no Xvfb,
+refuses the run with exit 3; `TME_PROOF_BROWSER=chromium|firefox` narrows a
+run to one engine for a quick look and is never how a proof is claimed.
 This is the opposite of `GridWorldView`'s
 spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
 permission for presentation to remain fluid between beats is permission, not a

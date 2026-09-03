@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 26
-status: Authored at genesis plan Phase 7; a live index that grows as slices close. Revision 18 records the viewport frame and prop scale rulings; revision 19 the interior camera; revision 20 the chrome; revision 21 the actions; revision 22 the accepted chrome layout; revision 23 proportional scaling; revision 24 the visible cell count and the ultrawide treatment; revision 25 the projection reaffirmed after the in-engine reference comparison; revision 26 live characters and the desktop client.
+revision: 27
+status: Authored at genesis plan Phase 7; a live index that grows as slices close. Revision 18 records the viewport frame and prop scale rulings; revision 19 the interior camera; revision 20 the chrome; revision 21 the actions; revision 22 the accepted chrome layout; revision 23 proportional scaling; revision 24 the visible cell count and the ultrawide treatment; revision 25 the projection reaffirmed after the in-engine reference comparison; revision 26 live characters and the desktop client; revision 27 the two-engine browser proofs.
 public_safe: true
 summary: The anti-rework index — closed conclusions about this project's code, method, visual projection, cursor readiness, and relational scale; their owners; and what reopening one costs.
 always: true
@@ -30,6 +30,7 @@ the wrong place for something that is deliberately open — see
 | Topic | Conclusion | Owner |
 | --- | --- | --- |
 | Implementation stack | A Rust workspace for rules, wire DTOs, simulation, authoring, and one authoritative server; one thin browser client (TypeScript, Vite, Three.js on WebGL2); the retained Godot shell; Python for repository checks, tools, and proof harnesses. Widening the stack is a decision, not a convenience — the browser toolchain entered by owner ruling on 2026-09-02. | [AGENTS.md](../AGENTS.md) |
+| Two-engine browser proofs | Every real-tab proof and capture runs in Chromium and Firefox; a run that cannot find one engine is incomplete, never a pass on the other. Narrowing to one engine is a look, not a proof. | [client architecture](client-architecture.md#the-web-client) — owner ruling 2026-09-03 |
 | Desktop client | The browser client is the client. The desktop build is that client in a Tauri shell, proven on each target's system webview before that target is claimed; the retained Godot shell stays cold pending a reason the browser cannot supply; Unity has no role. | [client architecture](client-architecture.md#the-web-client) — owner ruling 2026-09-03 |
 | Gameplay authority | One reusable rules boundary owns gameplay truth. The server calls into it; the client consumes its projections. | [boundary map](boundary-map.md) |
 | Client shape | Protocol-first and thin: no rules types, no legality inference, no gameplay ledger, no second clock. | [client architecture](client-architecture.md) |

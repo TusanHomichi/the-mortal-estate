@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 4
-status: Owner-authorized standing contract. Revision 3 records the browser-first ruling — the web client's baseline, its feel-surface role, and the retained Godot shell's standing — under the contract's full-re-proof rule; revision 4 records the desktop client as the web client in a native shell.
+revision: 5
+status: Owner-authorized standing contract. Revision 3 records the browser-first ruling — the web client's baseline, its feel-surface role, and the retained Godot shell's standing — under the contract's full-re-proof rule; revision 4 records the desktop client as the web client in a native shell; revision 5 the two-engine rule for real-tab proofs.
 public_safe: true
 summary: The client's standing architecture contract — engine baseline, the three state domains, control and wire consumption, command reconciliation and the epoch cursor, the renderer seam, the accessibility floor, the desktop targets, and the five layers of client proof.
 routes:
@@ -96,6 +96,17 @@ Its baseline:
 - Verification is a lane of its own: the `web` scope in
   `tools/run_verification.py`, gated on the `node` capability, running
   install, typecheck, unit tests, and build; `UNAVAILABLE` without Node.
+
+**Every real-tab proof runs in two engines (owner ruling, 2026-09-03).** The
+owner reviews the preview in Firefox; the proofs and captures ran in headless
+Chromium. A picture judged in one browser is judged in both: the walk proof
+and the capture tool run in Chromium and in Firefox through Playwright, each
+engine with its own server, tab, and captures — Firefox headed on a display
+with software GL, because headless Firefox has no WebGL — and a run that
+cannot find one of them, or Firefox's display, is incomplete, never a pass on
+the other. The desktop webviews join
+that list as targets are claimed. Narrowing a run to one engine is a look,
+not a proof.
 
 **The Godot shell is retained and cold.** It remains the reference
 implementation of the codec, reconciliation, and HUD contracts, and its proof

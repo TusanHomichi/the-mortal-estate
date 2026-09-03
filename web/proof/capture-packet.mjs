@@ -4,10 +4,11 @@
 // errors required. Usage:
 //   TME_FEEL_ASSETS=<packet> node web/proof/capture-packet.mjs --out <dir> \
 //       [--query preset=night] [--query "preset=night&zoom=-1"] [--width 1280] [--height 800]
+// Every query is shot in every proof engine (Chromium and Firefox), each frame
+// named `<query>-<engine>.png`; TME_PROOF_BROWSER=<engine> narrows to one.
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
-import { chromium } from "playwright";
-import { requirePacket, startVite } from "./serve.mjs";
+import { launchProofBrowser, proofBrowsers, requirePacket, startVite } from "./serve.mjs";
 
 function parseArguments(argv) {
   const options = { out: "", queries: [], width: 1280, height: 800 };
@@ -33,39 +34,46 @@ const packet = requirePacket();
 await mkdir(options.out, { recursive: true });
 const vite = await startVite(packet);
 let failures = 0;
-let browser;
+const engines = proofBrowsers();
 try {
-  browser = await chromium.launch({ executablePath: chromium.executablePath(), headless: true });
-  for (const query of options.queries) {
-    const name = query.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "default";
-    const page = await browser.newPage({
-      viewport: { width: options.width, height: options.height },
-      deviceScaleFactor: 1,
-    });
-    const errors = [];
-    page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
-    page.on("console", (message) => {
-      if (message.type() === "error") errors.push(`console: ${message.text()}`);
-    });
+  for (const proofEngine of engines) {
+    const engineName = proofEngine.name;
+    const launched = await launchProofBrowser(proofEngine);
+    const browser = launched.browser;
     try {
-      await page.goto(`${vite.baseUrl}?${query}`, { waitUntil: "networkidle", timeout: 30_000 });
-      await page.waitForFunction(() => document.body.dataset.sceneReady === "true", null, { timeout: 30_000 });
-      const state = await page.locator("#feel-stage").getAttribute("data-scene-state");
-      if (state !== "ready") errors.push(`scene: ${await page.locator("#scene-banner").innerText()}`);
-      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-      const target = path.join(options.out, `${name}.png`);
-      await page.screenshot({ path: target });
-      console.log(`${errors.length === 0 && state === "ready" ? "CAPTURED" : "FAILED"} ${target} ?${query}${errors.length ? "\n  " + errors.join("\n  ") : ""}`);
-      if (errors.length > 0 || state !== "ready") failures += 1;
-    } catch (error) {
-      failures += 1;
-      console.log(`FAILED ?${query}: ${error instanceof Error ? error.message : String(error)}`);
+      for (const query of options.queries) {
+        const name = query.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") || "default";
+        const page = await browser.newPage({
+          viewport: { width: options.width, height: options.height },
+          deviceScaleFactor: 1,
+        });
+        const errors = [];
+        page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
+        page.on("console", (message) => {
+          if (message.type() === "error") errors.push(`console: ${message.text()}`);
+        });
+        try {
+          await page.goto(`${vite.baseUrl}?${query}`, { waitUntil: "networkidle", timeout: 30_000 });
+          await page.waitForFunction(() => document.body.dataset.sceneReady === "true", null, { timeout: 30_000 });
+          const state = await page.locator("#feel-stage").getAttribute("data-scene-state");
+          if (state !== "ready") errors.push(`scene: ${await page.locator("#scene-banner").innerText()}`);
+          await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+          const target = path.join(options.out, `${name}-${engineName}.png`);
+          await page.screenshot({ path: target });
+          console.log(`${errors.length === 0 && state === "ready" ? "CAPTURED" : "FAILED"} [${engineName}] ${target} ?${query}${errors.length ? "\n  " + errors.join("\n  ") : ""}`);
+          if (errors.length > 0 || state !== "ready") failures += 1;
+        } catch (error) {
+          failures += 1;
+          console.log(`FAILED [${engineName}] ?${query}: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+          await page.close();
+        }
+      }
     } finally {
-      await page.close();
+      await launched.stop();
     }
   }
 } finally {
-  await browser?.close();
   await vite.stop();
 }
 process.exitCode = failures === 0 ? 0 : 1;

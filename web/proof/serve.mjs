@@ -3,9 +3,12 @@
 // whole process group stopped afterwards. Nothing here asserts anything
 // about the scene; it only gets a real tab in front of it.
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { chromium, firefox } from "playwright";
 
 export const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -22,6 +25,73 @@ export function requirePacket() {
     refuseUnavailable("TME_FEEL_ASSETS is not set; it must name the candidate packet directory");
   }
   return path.resolve(packet);
+}
+
+/**
+ * The engines every real-tab proof runs in (owner ruling, 2026-09-03): a
+ * picture judged in one browser is judged in both. `TME_PROOF_BROWSER` narrows
+ * a run to `chromium` or `firefox` for a single-engine look; the default is
+ * both, and an engine whose binary Playwright has not installed refuses the
+ * whole run with exit 3 rather than passing on the other one.
+ */
+export const PROOF_ENGINES = { chromium, firefox };
+
+export function proofBrowsers() {
+  const requested = process.env.TME_PROOF_BROWSER?.trim() || "all";
+  const names = requested === "all" ? Object.keys(PROOF_ENGINES) : [requested];
+  const selected = [];
+  for (const name of names) {
+    const engine = PROOF_ENGINES[name];
+    if (engine === undefined) {
+      console.error(`TME_PROOF_BROWSER names an unknown engine: ${name}`);
+      process.exit(2);
+    }
+    const executablePath = engine.executablePath();
+    if (!existsSync(executablePath)) {
+      refuseUnavailable(`Playwright has no ${name} at ${executablePath}; run: npx playwright install ${name}`);
+    }
+    selected.push({ name, engine, executablePath });
+  }
+  return selected;
+}
+
+/**
+ * Launch one proof engine the way it can actually render the scene. Chromium
+ * renders WebGL2 headless. Firefox has no GL context headless at all — probed
+ * 2026-09-03: no preference enables it — so it runs headed with software GL
+ * on a display: `DISPLAY` if the environment has one, otherwise an Xvfb this
+ * helper starts and stops. No display and no Xvfb is a refusal, not a pass.
+ */
+export async function launchProofBrowser({ name, engine, executablePath }) {
+  if (name === "chromium") {
+    const browser = await engine.launch({ executablePath, headless: true });
+    return { browser, stop: async () => { await browser.close(); } };
+  }
+  let display = process.env.DISPLAY?.trim() || "";
+  let xvfb = null;
+  if (display === "") {
+    let xvfbPath = "";
+    try { xvfbPath = execFileSync("which", ["Xvfb"], { encoding: "utf8" }).trim(); } catch { /* absent */ }
+    if (xvfbPath === "") refuseUnavailable("Firefox needs a display for WebGL2: set DISPLAY or install Xvfb");
+    const number = 90 + Math.floor(Math.random() * 900);
+    display = `:${number}`;
+    xvfb = spawn(xvfbPath, [display, "-screen", "0", "1600x1000x24", "-nolisten", "tcp"], { stdio: "ignore" });
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    if (xvfb.exitCode !== null) refuseUnavailable(`Xvfb ${display} exited with ${xvfb.exitCode}`);
+  }
+  const browser = await engine.launch({
+    executablePath,
+    headless: false,
+    firefoxUserPrefs: { "webgl.force-enabled": true, "webgl.forbid-software": false },
+    env: { ...process.env, DISPLAY: display, LIBGL_ALWAYS_SOFTWARE: "1" },
+  });
+  return {
+    browser,
+    stop: async () => {
+      await browser.close();
+      if (xvfb !== null && xvfb.exitCode === null) xvfb.kill("SIGTERM");
+    },
+  };
 }
 
 export async function freePort() {
