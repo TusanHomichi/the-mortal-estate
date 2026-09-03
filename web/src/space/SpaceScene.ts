@@ -113,7 +113,7 @@ export interface SpaceSceneOptions {
 }
 
 const WARM_LIGHT = new Color("#ffb457");
-const CARETAKER_NOMINAL_HEIGHT = 1.38;
+const CARETAKER_CARD_HEIGHT = 1.38;
 const RAIN_COUNT = 1080;
 const WALL_FADE_DURATION_SECONDS = 0.35;
 const WALL_FADED_PLASTER_OPACITY = 0.34;
@@ -679,7 +679,7 @@ export class SpaceScene {
         kind: "caretaker",
         cell_anchor: [caretakerCell.i, caretakerCell.j],
         elevation: 0,
-        nominal_height: CARETAKER_NOMINAL_HEIGHT,
+        card_height: CARETAKER_CARD_HEIGHT,
         sway: false,
         mirror: false,
         facing: "view",
@@ -691,8 +691,8 @@ export class SpaceScene {
       // Size agreement with the colour sheet was proven at decode time.
       const normal = textures.get(`props/${prop.kind}/normal`) ?? null;
       if (normal !== null) configureTexture(normal.texture, anisotropy);
-      const width = prop.nominal_height * (source.width / source.height);
-      const geometry = new PlaneGeometry(width, prop.nominal_height);
+      const width = prop.card_height * (source.width / source.height);
+      const geometry = new PlaneGeometry(width, prop.card_height);
       let material: ShaderMaterial | MeshStandardMaterial;
       if (prop.sway) {
         material = this.createWindMaterial(
@@ -720,13 +720,13 @@ export class SpaceScene {
       const transform = propCardTransform(prop);
       mesh.scale.x = transform.scaleX;
       mesh.position.set(transform.position.x, transform.position.y, transform.position.z);
-      mesh.rotation.set(0, transform.rotationY, 0);
+      mesh.rotation.set(transform.rotationX, transform.rotationY, 0, "YXZ");
       mesh.castShadow = true;
       const contactShadow = addContactShadow(
         this.group,
         transform.position.x,
         transform.position.z,
-        prop.nominal_height,
+        prop.card_height,
       );
       const shadowRotation = transform.contactShadowRotation;
       contactShadow.rotation.set(

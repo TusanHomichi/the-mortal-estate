@@ -48,7 +48,7 @@ function isIntegerVector(value: unknown, length: number): value is number[] {
 }
 
 function isPropFacing(value: unknown): value is PropPlacement["facing"] {
-  return value === "view" || value === "+z" || value === "+x";
+  return value === "view" || value === "+z" || value === "+x" || value === "floor";
 }
 
 function isSafePngPath(value: unknown): value is string {
@@ -342,7 +342,7 @@ function parseSpace(
         "kind",
         "cell_anchor",
         "elevation",
-        "nominal_height",
+        "card_height",
         "sway",
         "mirror",
         "facing",
@@ -352,8 +352,8 @@ function parseSpace(
       !isFiniteNumber(candidate.elevation) ||
       candidate.elevation < 0 ||
       candidate.elevation > 6 ||
-      !isFiniteNumber(candidate.nominal_height) ||
-      candidate.nominal_height <= 0 ||
+      !isFiniteNumber(candidate.card_height) ||
+      candidate.card_height <= 0 ||
       typeof candidate.sway !== "boolean" ||
       typeof candidate.mirror !== "boolean"
     ) {
@@ -377,7 +377,7 @@ function parseSpace(
       kind: candidate.kind,
       cell_anchor: [candidate.cell_anchor[0]!, candidate.cell_anchor[1]!] as [number, number],
       elevation: candidate.elevation,
-      nominal_height: candidate.nominal_height,
+      card_height: candidate.card_height,
       sway: candidate.sway,
       mirror: candidate.mirror,
       facing: candidate.facing,
@@ -463,13 +463,13 @@ function validateSpaces(spaces: Record<string, FeelSpace>, start: PortalTarget):
 }
 
 export function parseFeelManifest(value: unknown): FeelManifest {
-  if (isRecord(value) && value.schema_version === 1) {
-    throw new Error("candidate feel manifest schema 1 is retired and refused");
+  if (isRecord(value) && (value.schema_version === 1 || value.schema_version === 2)) {
+    throw new Error(`candidate feel manifest schema ${value.schema_version} is retired and refused`);
   }
   if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "start", "spaces"])) {
     throw new Error("the candidate feel manifest has unknown or missing top-level fields");
   }
-  if (value.schema_version !== 2 || !isRecord(value.assets)) {
+  if (value.schema_version !== 3 || !isRecord(value.assets)) {
     throw new Error("the candidate feel manifest schema version or assets are invalid");
   }
   if (!hasExactKeys(value.assets, ASSET_GROUPS)) {
@@ -497,7 +497,7 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     }),
   );
   validateSpaces(spaces, start);
-  return { schema_version: 2, assets, start, spaces };
+  return { schema_version: 3, assets, start, spaces };
 }
 
 function bytesToHex(bytes: Uint8Array): string {

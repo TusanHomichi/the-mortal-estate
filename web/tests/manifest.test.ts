@@ -16,7 +16,7 @@ function requiredRows(names: readonly string[]): Record<string, typeof row> {
 
 function validManifest(): Record<string, unknown> {
   return {
-    schema_version: 2,
+    schema_version: 3,
     assets: {
       terrain: requiredRows(REQUIRED_TERRAIN),
       walls: requiredRows(REQUIRED_WALLS),
@@ -49,7 +49,7 @@ function validManifest(): Record<string, unknown> {
 describe("candidate feel manifest", () => {
   it("parses the exact schema-2 spaces packet", () => {
     const parsed = parseFeelManifest(validManifest());
-    expect(parsed.schema_version).toBe(2);
+    expect(parsed.schema_version).toBe(3);
     expect(parsed.start).toEqual({ space: "room", cell: [1, 1] });
     expect(parsed.spaces.room?.light_sources.lantern_glass).toBeNull();
   });
@@ -64,7 +64,7 @@ describe("candidate feel manifest", () => {
       kind: "tree_rare",
       cell_anchor: [0, 0],
       elevation: 0,
-      nominal_height: 1.8,
+      card_height: 1.8,
       sway: true,
       mirror: true,
       facing: "view",
@@ -125,6 +125,38 @@ describe("candidate feel manifest", () => {
     const retired = validManifest();
     retired.schema_version = 1;
     expect(() => parseFeelManifest(retired)).toThrow(/schema 1 is retired and refused/);
+  });
+
+  it("refuses the retired schema 2 by name", () => {
+    const retired = validManifest();
+    retired.schema_version = 2;
+    expect(() => parseFeelManifest(retired)).toThrow(/schema 2 is retired and refused/);
+  });
+
+  const treePlacement = (): Record<string, unknown> => ({
+    kind: "tree",
+    cell_anchor: [2, 2],
+    elevation: 0,
+    card_height: 3.2,
+    sway: true,
+    mirror: false,
+    facing: "view",
+  });
+
+  it("refuses a placement that still carries the retired nominal_height key", () => {
+    const stale = validManifest() as { spaces: { room: { props: Record<string, unknown>[] } } };
+    const placement = treePlacement();
+    placement.nominal_height = placement.card_height;
+    delete placement.card_height;
+    stale.spaces.room.props.push(placement);
+    expect(() => parseFeelManifest(stale)).toThrow(/prop placement is invalid/);
+  });
+
+  it("accepts a floor-facing card and carries its facing through", () => {
+    const flat = validManifest() as { spaces: { room: { props: Record<string, unknown>[] } } };
+    flat.spaces.room.props.push({ ...treePlacement(), facing: "floor" });
+    const parsed = parseFeelManifest(flat);
+    expect(parsed.spaces.room!.props.at(-1)!.facing).toBe("floor");
   });
 
   it("refuses a portal whose source is not a door tile", () => {
@@ -214,7 +246,7 @@ describe("candidate feel manifest", () => {
       kind: "toString",
       cell_anchor: [0, 0],
       elevation: 0,
-      nominal_height: 1,
+      card_height: 1,
       sway: false,
       mirror: false,
       facing: "view",
@@ -230,7 +262,7 @@ describe("candidate feel manifest", () => {
       kind: "caretaker",
       cell_anchor: [1, 1],
       elevation: 0,
-      nominal_height: 1.38,
+      card_height: 1.38,
       sway: false,
       mirror: false,
       facing: "view",
@@ -252,7 +284,7 @@ describe("candidate feel manifest", () => {
       kind: "tree",
       cell_anchor: [1, 1],
       elevation: 0,
-      nominal_height: 1.6,
+      card_height: 1.6,
       sway: false,
       mirror: false,
     });
@@ -266,7 +298,7 @@ describe("candidate feel manifest", () => {
     planted.spaces.room.props.push({
       kind: "tree",
       cell_anchor: [1, 1],
-      nominal_height: 1.6,
+      card_height: 1.6,
       sway: false,
       mirror: false,
       facing: "view",
@@ -283,7 +315,7 @@ describe("candidate feel manifest", () => {
         kind: "tree",
         cell_anchor: [1, 1],
         elevation,
-        nominal_height: 1.6,
+        card_height: 1.6,
         sway: false,
         mirror: false,
         facing: "view",
@@ -300,7 +332,7 @@ describe("candidate feel manifest", () => {
       kind: "tree",
       cell_anchor: [1, 1],
       elevation: 0,
-      nominal_height: 1.6,
+      card_height: 1.6,
       sway: false,
       mirror: false,
       facing: "camera-ish",
@@ -318,7 +350,7 @@ describe("candidate feel manifest", () => {
       kind: "hearth",
       cell_anchor: [1, 1],
       elevation: 0,
-      nominal_height: 1.6,
+      card_height: 1.6,
       sway: false,
       mirror: false,
       facing: "+z",

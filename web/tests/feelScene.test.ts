@@ -8,7 +8,7 @@ function placement(mirror: boolean, facing: PropPlacement["facing"] = "view"): P
     kind: "tree_broad",
     cell_anchor: [0, 0],
     elevation: 0,
-    nominal_height: 2,
+    card_height: 2,
     sway: true,
     mirror,
     facing,

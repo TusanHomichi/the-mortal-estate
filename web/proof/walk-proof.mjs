@@ -52,6 +52,10 @@ const engineName = proofEngine.name;
 const captureRoot = captureBase;
 const sequenceFrames = path.join(captureRoot, ".wind-sequence-frames");
 const execFileAsync = promisify(execFile);
+// Two beats and slack for a landing, plus the synchronous build of the next
+// space when the landing is a portal: measured at up to ~9 s on headless
+// Chromium's software GL, under 2 s on Firefox's.
+const SPACE_BUILD_DEADLINE_MS = 20_000;
 
 function parseCell(value) {
   assert.match(value, /^-?\d+,-?\d+$/);
@@ -84,6 +88,9 @@ async function groundCellPoint(page, _focus, target) {
   );
 }
 
+// The fresh-beat window is the first 8 % of a beat — 240 ms. Polled on
+// animation frames it can be missed on every beat by a rasteriser whose
+// frames are 300 ms apart (headless Chromium here), so it polls on a timer.
 async function waitForFreshStandInBeat(page, clockStartedAt) {
   await page.waitForFunction(
     async (readyAt) => {
@@ -93,7 +100,7 @@ async function waitForFreshStandInBeat(page, clockStartedAt) {
       return phase >= 0 && phase < WALK_STAND_IN_BEAT_SECONDS * 0.08;
     },
     clockStartedAt,
-    { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
+    { polling: 16, timeout: 8_000 }, // two beats and slack
   );
 }
 
@@ -176,11 +183,16 @@ async function captureWindSequence(page) {
 
 async function draftAndCommit(page, clockStartedAt, from, target) {
   const point = await groundCellPoint(page, from, target);
+  const spaceBefore = await stageAttribute(page, "data-walk-space");
   await page.mouse.move(point.x, point.y);
   assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
   await page.mouse.click(point.x, point.y);
   assert.equal(await stageAttribute(page, "data-walk-state"), "draft");
+  const trace = [];
+  const snap = async (label) => trace.push(`${label}: ${await page.locator("#feel-stage").evaluate((stage) => `${stage.dataset.walkState}@${stage.dataset.caretakerCell} cursor=${stage.dataset.walkCursor} t=${(performance.now() / 1000).toFixed(3)}`)}`);
+  await snap("after click");
   await waitForFreshStandInBeat(page, clockStartedAt);
+  await snap("after fresh beat");
   await page.locator("#feel-stage").evaluate((stage, position) => {
     const canvas = stage.querySelector("canvas");
     if (!(canvas instanceof HTMLCanvasElement)) throw new Error("the proof found no canvas");
@@ -194,19 +206,31 @@ async function draftAndCommit(page, clockStartedAt, from, target) {
       detail: 2,
     }));
   }, point);
-  // The commitment is observed, not sampled: under a slow rasteriser the beat
-  // can strike between the double-click and the next read, in which case the
-  // route has already landed on the target and the state is idle there. Both
-  // are the commitment succeeding; a strict re-read of "committed" was #31.
-  await page.waitForFunction(
-    ({ expectedCell }) => {
-      const stage = document.querySelector("#feel-stage");
-      return stage?.dataset.walkState === "committed" ||
-        (stage?.dataset.walkState === "idle" && stage.dataset.caretakerCell === expectedCell);
-    },
-    { expectedCell: `${target.i},${target.j}` },
-    { timeout: 4_000 },
-  );
+  // The commitment is observed, not sampled, and on a timer: under a slow
+  // rasteriser the beat can strike between the double-click and the next
+  // animation frame, by which time the route has landed — on the target
+  // cell, or through a portal into another space. Each of those is the
+  // commitment succeeding; a strict re-read of "committed" was #31.
+  try {
+    await page.waitForFunction(
+      ({ expectedCell, previousSpace }) => {
+        const stage = document.querySelector("#feel-stage");
+        if (stage === null) return false;
+        const { walkState, walkSpace, caretakerCell } = stage.dataset;
+        return walkState === "committed" ||
+          (walkState === "idle" && caretakerCell === expectedCell) ||
+          (walkSpace !== previousSpace);
+      },
+      { expectedCell: `${target.i},${target.j}`, previousSpace: spaceBefore },
+      // A landing through a portal builds the next space synchronously, and
+      // under software GL that blocks the page for seconds — the poll cannot
+      // run until it finishes, so the deadline must outlast a space build.
+      { polling: 16, timeout: SPACE_BUILD_DEADLINE_MS },
+    );
+  } catch (error) {
+    await snap("after double-click wait");
+    throw new Error(`no commitment observed after the double-click; ${trace.join(" | ")}`, { cause: error });
+  }
 }
 
 async function walkWithinSpace(page, clockStartedAt, space, from, target, cameraFollows = true) {
@@ -241,7 +265,7 @@ async function walkThroughPortal(
         stage.dataset.walkState === "idle";
     },
     { expectedSpace: targetSpace, expectedCell: `${targetCell.i},${targetCell.j}` },
-    { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
+    { polling: 16, timeout: SPACE_BUILD_DEADLINE_MS }, // the landing builds a space; state and cell are still asserted
   );
   assert.equal(await stageAttribute(page, "data-walk-space"), targetSpace);
   assert.deepEqual(parseCell(await stageAttribute(page, "data-caretaker-cell")), targetCell);

@@ -58,14 +58,22 @@ export interface WallRun {
   door_interval: [number, number] | null;
 }
 
+/**
+ * A card placement. `card_height` is the world height the card's image spans —
+ * feet at `elevation`, top at `elevation + card_height` — not the subject's own
+ * height: a low, long thing rendered at the ruled angle is mostly its depth,
+ * and sizing it by its own height made beds and tables read doll-sized (owner
+ * ruling, 2026-09-03). `floor` lays the card flat on the ground, its up toward
+ * north, for things that are genuinely flat — a rug — and nothing with a side.
+ */
 export interface PropPlacement {
   kind: string;
   cell_anchor: [number, number];
   elevation: number;
-  nominal_height: number;
+  card_height: number;
   sway: boolean;
   mirror: boolean;
-  facing: "view" | "+z" | "+x";
+  facing: "view" | "+z" | "+x" | "floor";
 }
 
 export interface HearthFixturePlacement {
@@ -110,7 +118,7 @@ export interface FeelSpace {
 }
 
 export interface FeelManifest {
-  schema_version: 2;
+  schema_version: 3;
   assets: Record<AssetGroup, AssetRows>;
   start: PortalTarget;
   spaces: Record<string, FeelSpace>;

@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 18
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs
+revision: 19
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -408,9 +408,18 @@ frame beside a candidate; it is a comparison aid for the owner's viewport
 ruling, the ruled frame remains the default, and the label names any step in
 force.
 Every packet prop placement carries a finite `elevation` from zero through six
-world units. The card centre is that floor-relative anchor plus half its nominal
-height for view-facing and wall-plane cards alike; a placement without the key
-is refused rather than treated as floor-standing.
+world units and a `card_height`: the world height the card's **image** spans,
+feet at the elevation, top at elevation plus card height — not the subject's
+own height. A low, long thing rendered at the ruled angle is mostly its depth,
+and sizing it by its own height drew beds and tables doll-sized beside the
+caretaker; the render harness knows the projected height and the placement
+now carries it (owner ruling, 2026-09-03; the `nominal_height` key and schema
+2 are retired and refused, schema 3 carries the change). The card centre is
+the anchor plus half the card height for view-facing and wall-plane cards; a
+`floor` facing lays the card flat on its cell just above the ground, its up
+toward north, for things that are genuinely flat — a rug — never for anything
+with a side. A placement without the elevation key is refused rather than
+treated as floor-standing.
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
 sheet** beside its colour sheet — `normal: {file, sha256}`, verified like any
