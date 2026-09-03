@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Texture } from "three";
-import { applyFigurePalette, assertPaintableMaterials, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
+import { AnimationClip, Bone, BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Object3D, Skeleton, SkinnedMesh, Texture, VectorKeyframeTrack } from "three";
+import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, createFigureInstance, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
 import type { DecodedFigure } from "../src/space/figureRig";
 
 describe("figure files resolve only against verified bytes", () => {
@@ -75,5 +75,46 @@ describe("figure materials the palette can patch", () => {
     mesh.name = "Hood";
     root.add(mesh);
     expect(() => assertPaintableMaterials(root, "figure test part")).toThrow(/carries a MeshBasicMaterial on Hood; the figure palette patches only standard materials/);
+  });
+});
+
+describe("a clip must bind to the rig it plays on", () => {
+  const clipOn = (node: string) => new AnimationClip("Idle", 1, [new VectorKeyframeTrack(`${node}.position`, [0, 1], [0, 0, 0, 0, 0, 0])]);
+
+  it("accepts a clip whose every track finds its node", () => {
+    const rig = new Group();
+    const hips = new Object3D();
+    hips.name = "Hips";
+    rig.add(hips);
+    expect(() => assertClipBinds(clipOn("Hips"), rig, "figure test rig")).not.toThrow();
+  });
+
+  it("refuses a clip that targets a bone the rig does not have, naming it", () => {
+    const rig = new Group();
+    expect(() => assertClipBinds(clipOn("Tail"), rig, "figure test part")).toThrow(/cannot play Idle: no node named Tail/);
+  });
+});
+
+describe("an instance releases its cloned skeletons", () => {
+  it("disposes every skinned mesh's skeleton on dispose", () => {
+    const bone = new Bone();
+    bone.name = "Hips";
+    const skinned = new SkinnedMesh(new BoxGeometry(), new MeshStandardMaterial());
+    skinned.add(bone);
+    skinned.bind(new Skeleton([bone]));
+    const rig = new Group();
+    rig.add(skinned);
+    const disposed: Skeleton[] = [];
+    const original = Skeleton.prototype.dispose;
+    Skeleton.prototype.dispose = function (this: Skeleton) { disposed.push(this); };
+    try {
+      const clip = new AnimationClip("Idle", 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 0, 0])]);
+      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle" }, { i: 0, j: 0 }, 1);
+      instance.dispose();
+      expect(disposed).toHaveLength(1);
+      expect(disposed[0]).not.toBe(skinned.skeleton); // the clone's, not the source's
+    } finally {
+      Skeleton.prototype.dispose = original;
+    }
   });
 });

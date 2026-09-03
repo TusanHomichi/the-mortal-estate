@@ -7,6 +7,8 @@ import {
   Mesh,
   MeshStandardMaterial,
   Object3D,
+  PropertyBinding,
+  SkinnedMesh,
   Texture,
   Vector3,
 } from "three";
@@ -130,6 +132,29 @@ export function assertPaintableMaterials(root: Object3D, what: string): void {
   });
 }
 
+/**
+ * A clip binds by node name. Three's mixer treats a track it cannot bind as
+ * a warning and plays the rest, so a plain mesh, a part on another skeleton,
+ * or a library from a different rig would decode and simply not move. Every
+ * track must find its node on the rig and on every part; otherwise the figure
+ * is refused, naming the first bone it cannot find.
+ */
+export function assertClipBinds(clip: AnimationClip, root: Object3D, what: string): void {
+  for (const track of clip.tracks) {
+    const { nodeName } = PropertyBinding.parseTrackName(track.name);
+    if (nodeName === undefined || nodeName === "" || root.getObjectByName(nodeName) === undefined) {
+      throw new Error(`${what} cannot play ${clip.name}: no node named ${String(nodeName)}`);
+    }
+  }
+}
+
+/** Skinned meshes own a skeleton whose bone texture lives on the GPU; release each one. */
+function disposeSkeletons(root: Object3D): void {
+  root.traverse((object: Object3D) => {
+    if (object instanceof SkinnedMesh) object.skeleton.dispose();
+  });
+}
+
 function figureFiles(figure: FigureRow): string[] {
   return [figure.rig, ...figure.sidecars, figure.clips, ...figure.parts, ...figure.parts.flatMap((part) => part.sidecars)]
     .map((file) => file.file);
@@ -159,9 +184,10 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
         parts.push(scene);
       }
       const clips = (await parseGltf(loader, bytesOf(figure.clips.file), `figure ${name} clips`)).animations;
-      if (!clips.some((clip) => clip.name === figure.idle)) {
-        throw new Error(`figure ${name} has no clip named ${figure.idle}`);
-      }
+      const idle = clips.find((clip) => clip.name === figure.idle);
+      if (idle === undefined) throw new Error(`figure ${name} has no clip named ${figure.idle}`);
+      assertClipBinds(idle, rig.scene, `figure ${name} rig`);
+      parts.forEach((part, index) => assertClipBinds(idle, part, `figure ${name} part ${figure.parts[index]!.file}`));
       decoded.set(name, { name, rig: rig.scene, parts, clips, palette: figure.palette, rim: figure.rim, idle: figure.idle });
     } finally {
       for (const url of table.values()) URL.revokeObjectURL(url);
@@ -180,6 +206,7 @@ export function disposeDecodedFigures(figures: ReadonlyMap<string, DecodedFigure
   const materials = new Set<Material>();
   for (const figure of figures.values()) {
     for (const source of [figure.rig, ...figure.parts]) {
+      disposeSkeletons(source);
       source.traverse((object: Object3D) => {
         if (!(object instanceof Mesh)) return;
         object.geometry.dispose();
@@ -249,6 +276,7 @@ export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 
     },
     dispose() {
       root.removeFromParent();
+      disposeSkeletons(root);
       for (const material of ownedMaterials) material.dispose();
     },
   };
