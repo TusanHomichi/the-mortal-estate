@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 26
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; no renderer, asset set, or production pipeline is accepted.
+revision: 27
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -525,6 +525,24 @@ rules already recorded, now with their surface. Effects active on the player
 are shown as small spell icons floating in the play view's top-left, icons
 and not frames, and nothing else floats over the world.
 
+**Chrome layout accepted (owner, 2026-09-03).** The layout is ruled from a
+painted plate in the lab, in the blackened-iron hand the owner chose: the
+play view takes about three quarters of the width and seven tenths of the
+height at 1920 × 1080; the column on the right is one fifth of the width and
+holds, top to bottom, the bag, the six tabs, the two hands, the three vials,
+and the three readied-spell slots, compactly; the strip along the bottom is
+two panels — the left one every social channel as tabs (area, group, guild,
+and the rest), the right one combat and server messages only, each with its
+own input trough. The bag's slots are an invisible, compact grid that items
+snap to, sized so that a full bag holds many things, never a loose scatter.
+A group readout exists only while the player is in a group and appears then
+as its own forged plate at the right end of the strip; solo, it is absent.
+The window this leaves is wider than the ruled 1280 and some fifty pixels
+shorter than its 800, which the owner accepts. What remains open is not the
+layout but its assets: the slices, a nine-patch for every panel that
+stretches, this project's own engraved glyph set, and the accessibility
+floor's collapse.
+
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory
 named by the environment variable `TME_FEEL_ASSETS`, through a manifest that
@@ -550,8 +568,9 @@ Deliberately unresolved, and not to be resolved by implementation:
 - the exact palette discipline and animation budget within the ruled pixel and
   surface grammar;
 - the dead world's visual identity beyond the direction above;
-- the UI's typography and contrast palette, and the painted look of the
-  ruled chrome structure (two painted candidates exist in the lab)
+- the UI's typography and contrast palette, and the chrome's assets and
+  glyph set (the layout is ruled; the painted plate it came from is a lab
+  candidate, not a master)
   ([client architecture](client-architecture.md#input-and-the-accessibility-floor)
   owns the accessibility floor those must clear);
 - which production tools and presenter earn a place, which is decided by the
