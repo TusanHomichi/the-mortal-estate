@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 25
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; no renderer, asset set, or production pipeline is accepted.
+revision: 26
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -514,6 +514,17 @@ larger screen shows more world beside the column, not a larger world. The
 look of the chrome — its painting, not its structure — is not yet accepted;
 the lab's layout compositions are evidence for the structure only.
 
+**Action rulings (owner, 2026-09-03).** There is no row of action buttons.
+Attacking is a double-click on the creature with whatever is in hand. The
+spell book is one of the column's tabs; the player drags up to **three**
+spells from it into three readied slots at the foot of the column, and those
+three are the only shortcuts the chrome carries. Double-clicking a readied
+spell warms it and turns the pointer into a crosshair; clicking the creature
+casts the warmed spell at it — the warmed-spell and readiness-is-the-cursor
+rules already recorded, now with their surface. Effects active on the player
+are shown as small spell icons floating in the play view's top-left, icons
+and not frames, and nothing else floats over the world.
+
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory
 named by the environment variable `TME_FEEL_ASSETS`, through a manifest that
@@ -540,7 +551,7 @@ Deliberately unresolved, and not to be resolved by implementation:
   surface grammar;
 - the dead world's visual identity beyond the direction above;
 - the UI's typography and contrast palette, and the painted look of the
-  ruled chrome structure
+  ruled chrome structure (two painted candidates exist in the lab)
   ([client architecture](client-architecture.md#input-and-the-accessibility-floor)
   owns the accessibility floor those must clear);
 - which production tools and presenter earn a place, which is decided by the
