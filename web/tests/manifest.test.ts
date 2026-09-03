@@ -23,12 +23,13 @@ function figureRow(): Record<string, unknown> {
     palette: [[13, 7, 7], [200, 180, 160]],
     rim: 0.25,
     idle: "Idle_Loop",
+    gait: { walk: "Walk_Loop", run: "Jog_Fwd_Loop", sprint: "Sprint_Loop" },
   };
 }
 
 function validManifest(): Record<string, unknown> {
   return {
-    schema_version: 4,
+    schema_version: 5,
     assets: {
       terrain: requiredRows(REQUIRED_TERRAIN),
       walls: requiredRows(REQUIRED_WALLS),
@@ -61,9 +62,9 @@ function validManifest(): Record<string, unknown> {
 }
 
 describe("candidate feel manifest", () => {
-  it("parses the exact schema-4 spaces packet", () => {
+  it("parses the exact schema-5 spaces packet", () => {
     const parsed = parseFeelManifest(validManifest());
-    expect(parsed.schema_version).toBe(4);
+    expect(parsed.schema_version).toBe(5);
     expect(parsed.start).toEqual({ space: "room", cell: [1, 1] });
     expect(parsed.spaces.room?.light_sources.lantern_glass).toBeNull();
   });
@@ -143,8 +144,8 @@ describe("candidate feel manifest", () => {
     expect(() => parseFeelManifest(retired)).toThrow(/schema 1 is retired and refused/);
   });
 
-  it("refuses the retired schemas 2 and 3 by name", () => {
-    for (const version of [2, 3]) {
+  it("refuses the retired schemas 2, 3, and 4 by name", () => {
+    for (const version of [2, 3, 4]) {
       const retired = validManifest();
       retired.schema_version = version;
       expect(() => parseFeelManifest(retired)).toThrow(new RegExp(`schema ${version} is retired and refused`));
@@ -157,7 +158,17 @@ describe("candidate feel manifest", () => {
     expect(parsed.figures.caretaker!.palette).toEqual([[13, 7, 7], [200, 180, 160]]);
     expect(parsed.figures.caretaker!.rim).toBe(0.25);
     expect(parsed.figures.caretaker!.idle).toBe("Idle_Loop");
+    expect(parsed.figures.caretaker!.gait).toEqual({ walk: "Walk_Loop", run: "Jog_Fwd_Loop", sprint: "Sprint_Loop" });
     expect(parsed.figures.caretaker!.parts[0]!.sidecars[0]!.file).toBe("part-body.bin");
+  });
+
+  it("refuses a figure that does not name all three gait clips", () => {
+    const lame = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    lame.figures.caretaker.gait = { walk: "Walk_Loop", run: "" , sprint: "Sprint_Loop" };
+    expect(() => parseFeelManifest(lame)).toThrow(/walk, run, and sprint clips/);
+    const partial = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    partial.figures.caretaker.gait = { walk: "Walk_Loop" };
+    expect(() => parseFeelManifest(partial)).toThrow(/walk, run, and sprint clips/);
   });
 
   it("refuses a caretaker that names an unlisted figure", () => {

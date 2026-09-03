@@ -67,6 +67,8 @@ export interface FigureRow {
   palette: [number, number, number][];
   rim: number;
   idle: string;
+  /** The clips for the walk between pulses, by the route's pace. */
+  gait: { walk: string; run: string; sprint: string };
 }
 
 export type FigureRows = Record<string, FigureRow>;
@@ -146,7 +148,7 @@ export interface FeelSpace {
 }
 
 export interface FeelManifest {
-  schema_version: 4;
+  schema_version: 5;
   assets: Record<AssetGroup, AssetRows>;
   figures: FigureRows;
   /** Which figure the start places; the client carries no caretaker of its own. */

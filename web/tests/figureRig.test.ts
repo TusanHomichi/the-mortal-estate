@@ -55,7 +55,7 @@ describe("disposing decoded figures", () => {
     geometry.dispose = () => { disposed.geometry += 1; };
     material.dispose = () => { disposed.material += 1; };
     texture.dispose = () => { disposed.texture += 1; };
-    const figure: DecodedFigure = { name: "f", rig, parts: [part], clips: [], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "x" };
+    const figure: DecodedFigure = { name: "f", rig, parts: [part], clips: [], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "x", gait: { walk: "x", run: "x", sprint: "x" } };
     disposeDecodedFigures(new Map([["f", figure]]));
     expect(disposed).toEqual({ geometry: 2, material: 1, texture: 1 });
   });
@@ -123,7 +123,7 @@ describe("an instance releases its cloned skeletons", () => {
     Skeleton.prototype.dispose = function (this: Skeleton) { disposed.push(this); };
     try {
       const clip = new AnimationClip("Idle", 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 0, 0])]);
-      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle" }, { i: 0, j: 0 }, 1);
+      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Idle", run: "Idle", sprint: "Idle" } }, { i: 0, j: 0 }, 1);
       instance.dispose();
       expect(disposed).toHaveLength(1);
       expect(disposed[0]).not.toBe(skinned.skeleton); // the clone's, not the source's
@@ -173,5 +173,33 @@ describe("releasing parsed sources on a refusal", () => {
     rig.add(skinned);
     disposeFigureSources([rig, new Group()]);
     expect(disposed).toEqual({ skeleton: 1, geometry: 1, material: 1, texture: 1 });
+  });
+});
+
+describe("a figure changes gait by clip", () => {
+  it("plays the idle clip first and crossfades to the gait's clip, reporting the active clip", () => {
+    const bone = new Bone();
+    bone.name = "Hips";
+    const skinned = new SkinnedMesh(new BoxGeometry(), new MeshStandardMaterial());
+    skinned.add(bone);
+    skinned.bind(new Skeleton([bone]));
+    const rig = new Group();
+    rig.add(skinned);
+    const clip = (name: string) => new AnimationClip(name, 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 0, 0])]);
+    const instance = createFigureInstance(
+      { name: "f", rig, parts: [], clips: [clip("Idle"), clip("Walk"), clip("Jog"), clip("Sprint")], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Walk", run: "Jog", sprint: "Sprint" } },
+      { i: 0, j: 0 },
+      1,
+    );
+    expect(instance.gait).toBe("idle");
+    expect(instance.clip).toBe("Idle");
+    instance.setGait("run");
+    expect(instance.gait).toBe("run");
+    expect(instance.clip).toBe("Jog");
+    instance.setGait("run");
+    instance.setGait("idle");
+    expect(instance.clip).toBe("Idle");
+    instance.update(0.2);
+    instance.dispose();
   });
 });

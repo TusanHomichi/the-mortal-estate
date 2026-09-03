@@ -97,7 +97,7 @@ function parseFigureFiles(value: unknown, what: string): AssetFile[] {
 }
 
 function parseFigureRow(value: unknown, name: string): FigureRow {
-  if (!isRecord(value) || !hasExactKeys(value, ["rig", "sidecars", "clips", "parts", "palette", "rim", "idle"])) {
+  if (!isRecord(value) || !hasExactKeys(value, ["rig", "sidecars", "clips", "parts", "palette", "rim", "idle", "gait"])) {
     throw new Error(`the candidate feel figure ${name} has unknown or missing fields`);
   }
   const rig = parseFigureFile(value.rig, "figure rig", ".gltf");
@@ -133,6 +133,14 @@ function parseFigureRow(value: unknown, name: string): FigureRow {
   if (typeof value.idle !== "string" || value.idle.length === 0) {
     throw new Error(`the candidate feel figure ${name} names no idle clip`);
   }
+  const gait = value.gait;
+  if (
+    !isRecord(gait) ||
+    !hasExactKeys(gait, ["walk", "run", "sprint"]) ||
+    ![gait.walk, gait.run, gait.sprint].every((clip) => typeof clip === "string" && clip.length > 0)
+  ) {
+    throw new Error(`the candidate feel figure ${name} does not name its walk, run, and sprint clips`);
+  }
   return {
     rig,
     sidecars,
@@ -141,6 +149,7 @@ function parseFigureRow(value: unknown, name: string): FigureRow {
     palette: (value.palette as number[][]).map((colour) => [colour[0]!, colour[1]!, colour[2]!] as [number, number, number]),
     rim: value.rim,
     idle: value.idle,
+    gait: { walk: gait.walk as string, run: gait.run as string, sprint: gait.sprint as string },
   };
 }
 
@@ -567,13 +576,13 @@ function validateSpaces(spaces: Record<string, FeelSpace>, start: PortalTarget):
 }
 
 export function parseFeelManifest(value: unknown): FeelManifest {
-  if (isRecord(value) && (value.schema_version === 1 || value.schema_version === 2 || value.schema_version === 3)) {
+  if (isRecord(value) && [1, 2, 3, 4].includes(value.schema_version as number)) {
     throw new Error(`candidate feel manifest schema ${value.schema_version} is retired and refused`);
   }
   if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "figures", "caretaker", "start", "spaces"])) {
     throw new Error("the candidate feel manifest has unknown or missing top-level fields");
   }
-  if (value.schema_version !== 4 || !isRecord(value.assets)) {
+  if (value.schema_version !== 5 || !isRecord(value.assets)) {
     throw new Error("the candidate feel manifest schema version or assets are invalid");
   }
   if (!hasExactKeys(value.assets, ASSET_GROUPS)) {
@@ -618,7 +627,7 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     }),
   );
   validateSpaces(spaces, start);
-  return { schema_version: 4, assets, figures, caretaker, start, spaces };
+  return { schema_version: 5, assets, figures, caretaker, start, spaces };
 }
 
 function bytesToHex(bytes: Uint8Array): string {
