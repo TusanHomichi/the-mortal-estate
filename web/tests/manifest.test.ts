@@ -47,7 +47,7 @@ function validManifest(): Record<string, unknown> {
 }
 
 describe("candidate feel manifest", () => {
-  it("parses the exact schema-2 spaces packet", () => {
+  it("parses the exact schema-3 spaces packet", () => {
     const parsed = parseFeelManifest(validManifest());
     expect(parsed.schema_version).toBe(3);
     expect(parsed.start).toEqual({ space: "room", cell: [1, 1] });
