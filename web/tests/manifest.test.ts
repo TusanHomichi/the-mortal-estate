@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseFeelManifest, verifySha256 } from "../src/manifest";
+import { FIGURE_PALETTE_MAX, parseFeelManifest, verifySha256 } from "../src/manifest";
 import {
   REQUIRED_PROPS,
   REQUIRED_ROOFS,
@@ -182,6 +182,12 @@ describe("candidate feel manifest", () => {
     const pale = validManifest() as { figures: { caretaker: Record<string, unknown> } };
     pale.figures.caretaker.palette = [[0, 0, 300], [1, 1, 1]];
     expect(() => parseFeelManifest(pale)).toThrow(/palette is invalid/);
+    const wide = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    wide.figures.caretaker.palette = Array.from({ length: FIGURE_PALETTE_MAX + 1 }, (_, index) => [index % 256, 0, 0]);
+    expect(() => parseFeelManifest(wide)).toThrow(/palette is invalid/);
+    const widest = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    widest.figures.caretaker.palette = Array.from({ length: FIGURE_PALETTE_MAX }, (_, index) => [index % 256, 0, 0]);
+    expect(() => parseFeelManifest(widest)).not.toThrow();
     const bright = validManifest() as { figures: { caretaker: Record<string, unknown> } };
     bright.figures.caretaker.rim = 2;
     expect(() => parseFeelManifest(bright)).toThrow(/rim is invalid/);

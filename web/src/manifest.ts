@@ -60,6 +60,7 @@ function isSafePngPath(value: unknown): value is string {
 }
 
 const FIGURE_EXTENSIONS = [".gltf", ".glb", ".bin", ".png"];
+export const FIGURE_PALETTE_MAX = 64;
 
 function isSafeFigurePath(value: unknown): value is string {
   if (typeof value !== "string" || value.length === 0 || value.includes("\\")) return false;
@@ -109,10 +110,14 @@ function parseFigureRow(value: unknown, name: string): FigureRow {
   if (new Set(names).size !== names.length) {
     throw new Error(`the candidate feel figure ${name} names one file twice; a glTF resolves files by name`);
   }
+  // The palette becomes one vec3 fragment uniform per entry beside everything
+  // a physical material and the lights already need; WebGL2 guarantees only
+  // 224 fragment uniform vectors, so the cap stays well inside that. The
+  // treatment produces 28.
   if (
     !Array.isArray(value.palette) ||
     value.palette.length < 2 ||
-    value.palette.length > 256 ||
+    value.palette.length > FIGURE_PALETTE_MAX ||
     !value.palette.every((colour) => isIntegerVector(colour, 3) && colour.every((channel) => channel >= 0 && channel <= 255))
   ) {
     throw new Error(`the candidate feel figure ${name} palette is invalid`);
