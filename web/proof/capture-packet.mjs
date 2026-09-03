@@ -8,7 +8,7 @@
 // named `<query>-<engine>.png`; TME_PROOF_BROWSER=<engine> narrows to one.
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
-import { launchProofBrowser, proofBrowsers, requirePacket, startVite } from "./serve.mjs";
+import { ProofUnavailable, launchProofBrowser, proofBrowsers, reportUnavailable, requirePacket, startVite } from "./serve.mjs";
 
 function parseArguments(argv) {
   const options = { out: "", queries: [], width: 1280, height: 800 };
@@ -31,10 +31,11 @@ function parseArguments(argv) {
 
 const options = parseArguments(process.argv.slice(2));
 const packet = requirePacket();
+const engines = proofBrowsers();
 await mkdir(options.out, { recursive: true });
 const vite = await startVite(packet);
 let failures = 0;
-const engines = proofBrowsers();
+let unavailable = null;
 try {
   for (const proofEngine of engines) {
     const engineName = proofEngine.name;
@@ -73,7 +74,11 @@ try {
       await launched.stop();
     }
   }
+} catch (error) {
+  if (!(error instanceof ProofUnavailable)) throw error;
+  unavailable = error;
 } finally {
   await vite.stop();
 }
-process.exitCode = failures === 0 ? 0 : 1;
+if (unavailable !== null) reportUnavailable(unavailable);
+else process.exitCode = failures === 0 ? 0 : 1;
