@@ -331,6 +331,14 @@ source-tree path honestly.
 | 4 | a real server through the real contracts, from an empty database | `tools/run_client_live_proof.py` driving the shipped `ClientRoot.tscn` |
 | 5 | controlled render, capture, and export evidence | `client/tests/capture_fixture_frame.gd`, `client/tests/live_capture.gd`, `client/tests/pulse_capture.gd`, `client/tests/validate_export_presets.gd` |
 
+The table is the retained Godot shell's proof; the web client's standing
+proof is the `web` lane plus the real-tab walk proof and captures described
+in [client notes](client-notes.md). The packaged Tauri client adds a layer of
+its own when the desktop slice lands: the packaged app launched on each
+target and the same walk proof driven through its webview. Until that layer
+is green for a target, the target is not claimed, whatever the other layers
+say.
+
 Layer 4 is the one that matters most and the one most easily faked. It exists
 because **constructing a component in a test is not the same as exercising it
 through the wiring the product uses** — the lesson recorded in
