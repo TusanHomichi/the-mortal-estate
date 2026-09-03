@@ -113,6 +113,23 @@ function parseGltf(loader: GLTFLoader, bytes: ArrayBuffer, what: string): Promis
   });
 }
 
+/**
+ * The palette patch only exists for three's physical material. A glTF may
+ * carry other kinds — KHR_materials_unlit decodes to a basic material — and
+ * such a figure would render unpainted; it is refused at decode instead.
+ */
+export function assertPaintableMaterials(root: Object3D, what: string): void {
+  root.traverse((object: Object3D) => {
+    if (!(object instanceof Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if (!(material instanceof MeshStandardMaterial)) {
+        throw new Error(`${what} carries a ${material.type} on ${object.name || "a mesh"}; the figure palette patches only standard materials`);
+      }
+    }
+  });
+}
+
 function figureFiles(figure: FigureRow): string[] {
   return [figure.rig, ...figure.sidecars, figure.clips, ...figure.parts, ...figure.parts.flatMap((part) => part.sidecars)]
     .map((file) => file.file);
@@ -134,8 +151,13 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
       manager.setURLModifier((url) => resolveFigureUrl(url, table));
       const loader = new GLTFLoader(manager);
       const rig = await parseGltf(loader, bytesOf(figure.rig.file), `figure ${name} rig`);
+      assertPaintableMaterials(rig.scene, `figure ${name} rig`);
       const parts: Group[] = [];
-      for (const part of figure.parts) parts.push((await parseGltf(loader, bytesOf(part.file), `figure ${name} part ${part.file}`)).scene);
+      for (const part of figure.parts) {
+        const scene = (await parseGltf(loader, bytesOf(part.file), `figure ${name} part ${part.file}`)).scene;
+        assertPaintableMaterials(scene, `figure ${name} part ${part.file}`);
+        parts.push(scene);
+      }
       const clips = (await parseGltf(loader, bytesOf(figure.clips.file), `figure ${name} clips`)).animations;
       if (!clips.some((clip) => clip.name === figure.idle)) {
         throw new Error(`figure ${name} has no clip named ${figure.idle}`);
@@ -194,7 +216,9 @@ export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 
       object.receiveShadow = true;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       const patched = materials.map((material) => {
-        if (!(material instanceof MeshStandardMaterial)) return material;
+        if (!(material instanceof MeshStandardMaterial)) {
+          throw new Error(`figure ${figure.name} carries a ${material.type}; the palette patches only standard materials`);
+        }
         const own = material.clone();
         applyFigurePalette(own, figure.palette, figure.rim);
         ownedMaterials.push(own);

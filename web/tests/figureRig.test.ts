@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Texture } from "three";
-import { applyFigurePalette, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
+import { BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Texture } from "three";
+import { applyFigurePalette, assertPaintableMaterials, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
 import type { DecodedFigure } from "../src/space/figureRig";
 
 describe("figure files resolve only against verified bytes", () => {
@@ -58,5 +58,22 @@ describe("disposing decoded figures", () => {
     const figure: DecodedFigure = { name: "f", rig, parts: [part], clips: [], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "x" };
     disposeDecodedFigures(new Map([["f", figure]]));
     expect(disposed).toEqual({ geometry: 2, material: 1, texture: 1 });
+  });
+});
+
+describe("figure materials the palette can patch", () => {
+  it("accepts standard and physical materials", () => {
+    const root = new Group();
+    root.add(new Mesh(new BoxGeometry(), new MeshStandardMaterial()));
+    root.add(new Mesh(new BoxGeometry(), new MeshPhysicalMaterial()));
+    expect(() => assertPaintableMaterials(root, "figure test rig")).not.toThrow();
+  });
+
+  it("refuses an unlit or otherwise unpatchable material rather than rendering it unpainted", () => {
+    const root = new Group();
+    const mesh = new Mesh(new BoxGeometry(), new MeshBasicMaterial());
+    mesh.name = "Hood";
+    root.add(mesh);
+    expect(() => assertPaintableMaterials(root, "figure test part")).toThrow(/carries a MeshBasicMaterial on Hood; the figure palette patches only standard materials/);
   });
 });
