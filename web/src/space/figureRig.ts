@@ -198,6 +198,23 @@ function figureFiles(figure: FigureRow): string[] {
 /** Decodes every figure the packet carries, from verified bytes and nothing else. */
 export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<string, DecodedFigure>> {
   const decoded = new Map<string, DecodedFigure>();
+  // A refusal anywhere refuses the packet; whatever was parsed before it —
+  // earlier figures, or this figure's rig and parts — is released first.
+  const parsed: Object3D[] = [];
+  try {
+    await decodeFiguresInto(packet, decoded, parsed);
+  } catch (error) {
+    disposeFigureSources(parsed);
+    throw error;
+  }
+  return decoded;
+}
+
+async function decodeFiguresInto(
+  packet: VerifiedAssetPacket,
+  decoded: Map<string, DecodedFigure>,
+  parsed: Object3D[],
+): Promise<void> {
   for (const [name, figure] of Object.entries(packet.manifest.figures)) {
     const table = new Map<string, string>();
     const bytesOf = (file: string): ArrayBuffer => {
@@ -211,10 +228,12 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
       manager.setURLModifier((url) => resolveFigureUrl(url, table));
       const loader = new GLTFLoader(manager);
       const rig = await parseGltf(loader, bytesOf(figure.rig.file), `figure ${name} rig`);
+      parsed.push(rig.scene);
       assertPaintableMaterials(rig.scene, `figure ${name} rig`);
       const parts: Group[] = [];
       for (const part of figure.parts) {
         const scene = (await parseGltf(loader, bytesOf(part.file), `figure ${name} part ${part.file}`)).scene;
+        parsed.push(scene);
         assertPaintableMaterials(scene, `figure ${name} part ${part.file}`);
         parts.push(scene);
       }
@@ -232,7 +251,6 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
       for (const url of table.values()) URL.revokeObjectURL(url);
     }
   }
-  return decoded;
 }
 
 /**
@@ -242,17 +260,20 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
  * scene that decoded the figures stops.
  */
 export function disposeDecodedFigures(figures: ReadonlyMap<string, DecodedFigure>): void {
+  disposeFigureSources([...figures.values()].flatMap((figure) => [figure.rig, ...figure.parts]));
+}
+
+/** Releases parsed glTF scenes: skeletons, geometry, materials, and their textures. */
+export function disposeFigureSources(sources: readonly Object3D[]): void {
   const materials = new Set<Material>();
-  for (const figure of figures.values()) {
-    for (const source of [figure.rig, ...figure.parts]) {
-      disposeSkeletons(source);
-      source.traverse((object: Object3D) => {
-        if (!(object instanceof Mesh)) return;
-        object.geometry.dispose();
-        const owned = Array.isArray(object.material) ? object.material : [object.material];
-        for (const material of owned) materials.add(material);
-      });
-    }
+  for (const source of sources) {
+    disposeSkeletons(source);
+    source.traverse((object: Object3D) => {
+      if (!(object instanceof Mesh)) return;
+      object.geometry.dispose();
+      const owned = Array.isArray(object.material) ? object.material : [object.material];
+      for (const material of owned) materials.add(material);
+    });
   }
   for (const material of materials) {
     for (const value of Object.values(material)) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AnimationClip, Bone, BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Object3D, Skeleton, SkinnedMesh, Texture, VectorKeyframeTrack } from "three";
-import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, assertSameSkeleton, createFigureInstance, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
+import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, assertSameSkeleton, createFigureInstance, disposeDecodedFigures, disposeFigureSources, resolveFigureUrl } from "../src/space/figureRig";
 import type { DecodedFigure } from "../src/space/figureRig";
 
 describe("figure files resolve only against verified bytes", () => {
@@ -151,5 +151,27 @@ describe("a part must be on the rig's skeleton", () => {
   it("refuses a part missing bones or carrying extra ones, naming them", () => {
     expect(() => assertSameSkeleton(skinnedWith("Hips", "Spine"), skinnedWith("Hips", "Tail"), "figure test part"))
       .toThrow(/not on the rig's skeleton: 1 bone\(s\) missing \(Spine\), 1 extra \(Tail\)/);
+  });
+});
+
+describe("releasing parsed sources on a refusal", () => {
+  it("disposes skeletons, geometry, materials, and textures of every parsed scene", () => {
+    const bone = new Bone();
+    bone.name = "Hips";
+    const texture = new Texture();
+    const material = new MeshStandardMaterial({ map: texture });
+    const geometry = new BoxGeometry();
+    const skinned = new SkinnedMesh(geometry, material);
+    skinned.add(bone);
+    skinned.bind(new Skeleton([bone]));
+    const disposed = { skeleton: 0, geometry: 0, material: 0, texture: 0 };
+    skinned.skeleton.dispose = () => { disposed.skeleton += 1; };
+    geometry.dispose = () => { disposed.geometry += 1; };
+    material.dispose = () => { disposed.material += 1; };
+    texture.dispose = () => { disposed.texture += 1; };
+    const rig = new Group();
+    rig.add(skinned);
+    disposeFigureSources([rig, new Group()]);
+    expect(disposed).toEqual({ skeleton: 1, geometry: 1, material: 1, texture: 1 });
   });
 });

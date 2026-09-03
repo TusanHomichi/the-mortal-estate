@@ -195,7 +195,7 @@ did not foresee and the implementation records:
   are downscaled to 1 K in the lab's packet step, since the palette collapses
   their colour anyway).
 
-Proof, at the reviewed tree: 139 unit tests (the review added refusals for
+Proof, at the reviewed tree: 140 unit tests (the review added refusals for
 an unlisted file, an unpatchable material, a clip that does not bind to
 skeleton bones, a part on another skeleton, a palette over 32 colours, more
 than 16 candles, and disposal of decoded sources and cloned skeletons); fast
