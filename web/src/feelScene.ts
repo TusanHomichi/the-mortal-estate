@@ -23,7 +23,7 @@ import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
 import { SpaceScene } from "./space/SpaceScene";
 import { decodeTextures } from "./space/textures";
-import { decodeFigures } from "./space/figureRig";
+import { decodeFigures, disposeDecodedFigures } from "./space/figureRig";
 import type { Cell } from "./walk/layoutPassability";
 import { createWalkPresenter, type WalkPresenter } from "./walk/walkPresenter";
 
@@ -235,6 +235,9 @@ export async function startFeelScene(
       activeFog?.dispose();
       for (const decoded of textures.values()) decoded.texture.dispose();
       for (const texture of windWeightTextures.values()) texture.dispose();
+      disposeDecodedFigures(figures);
+      delete stage.dataset.caretakerFigure;
+      delete stage.dataset.caretakerClip;
       if (devHook !== null && window.__tmeFeel === devHook) delete window.__tmeFeel;
       delete stage.dataset.renderCalls;
       delete stage.dataset.renderMilliseconds;

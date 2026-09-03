@@ -7,6 +7,7 @@ import {
   Mesh,
   MeshStandardMaterial,
   Object3D,
+  Texture,
   Vector3,
 } from "three";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -145,6 +146,32 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
     }
   }
   return decoded;
+}
+
+/**
+ * Releases what decoding created — the source rigs' and parts' geometry, the
+ * materials the instances cloned from, and their textures. Instances share the
+ * geometry and dispose only their own materials, so this runs once, when the
+ * scene that decoded the figures stops.
+ */
+export function disposeDecodedFigures(figures: ReadonlyMap<string, DecodedFigure>): void {
+  const materials = new Set<Material>();
+  for (const figure of figures.values()) {
+    for (const source of [figure.rig, ...figure.parts]) {
+      source.traverse((object: Object3D) => {
+        if (!(object instanceof Mesh)) return;
+        object.geometry.dispose();
+        const owned = Array.isArray(object.material) ? object.material : [object.material];
+        for (const material of owned) materials.add(material);
+      });
+    }
+  }
+  for (const material of materials) {
+    for (const value of Object.values(material)) {
+      if (value instanceof Texture) value.dispose();
+    }
+    material.dispose();
+  }
 }
 
 // Facing: the rig's front is +z; a two-way facing turns it along ±x, the axis

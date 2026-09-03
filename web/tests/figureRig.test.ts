@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { MeshStandardMaterial } from "three";
-import { applyFigurePalette, resolveFigureUrl } from "../src/space/figureRig";
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Texture } from "three";
+import { applyFigurePalette, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
+import type { DecodedFigure } from "../src/space/figureRig";
 
 describe("figure files resolve only against verified bytes", () => {
   const table = new Map([["figure.bin", "blob:figure-bin"], ["T_Base.png", "blob:base"]]);
@@ -38,5 +39,24 @@ describe("the figure palette patch", () => {
     applyFigurePalette(material, palette, 0.25);
     const shader = { uniforms: {}, fragmentShader: "void main() {}", vertexShader: "" };
     expect(() => material.onBeforeCompile!(shader as never, {} as never)).toThrow(/anchor the figure palette patches/);
+  });
+});
+
+describe("disposing decoded figures", () => {
+  it("releases the sources' geometry, materials, and textures once", () => {
+    const texture = new Texture();
+    const material = new MeshStandardMaterial({ map: texture });
+    const geometry = new BoxGeometry();
+    const rig = new Group();
+    rig.add(new Mesh(geometry, material));
+    const part = new Group();
+    part.add(new Mesh(geometry, material)); // shared, as cloned instances share them
+    const disposed = { geometry: 0, material: 0, texture: 0 };
+    geometry.dispose = () => { disposed.geometry += 1; };
+    material.dispose = () => { disposed.material += 1; };
+    texture.dispose = () => { disposed.texture += 1; };
+    const figure: DecodedFigure = { name: "f", rig, parts: [part], clips: [], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "x" };
+    disposeDecodedFigures(new Map([["f", figure]]));
+    expect(disposed).toEqual({ geometry: 2, material: 1, texture: 1 });
   });
 });
