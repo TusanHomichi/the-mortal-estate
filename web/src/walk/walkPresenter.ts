@@ -40,6 +40,7 @@ import {
   createWalkIntent,
   doubleClick,
   presentedWalkPosition,
+  type PresentedWalk,
   singleClick,
   walkPace,
   walkIntentKind,
@@ -301,7 +302,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   // The last frames of the presented walk, for the proof: a real tab under a
   // slow rasteriser cannot be polled from outside fast enough to see a pulse.
   const presentedTrace: string[] = [];
-  const presentWalk = (now: number): void => {
+  const presentWalk = (now: number): PresentedWalk => {
     const presented = presentedWalkPosition(state, now);
     caretaker.place(presented.i, presented.j);
     if (presented.facing !== 0) caretaker.setFacing(presented.facing);
@@ -312,6 +313,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     presentedTrace.push(`${walkIntentKind(state)}/${presented.gait}@${presented.i.toFixed(3)},${presented.j.toFixed(3)}`);
     if (presentedTrace.length > PRESENTED_TRACE_FRAMES) presentedTrace.shift();
     stage.dataset.caretakerTrace = presentedTrace.join(" ");
+    return presented;
   };
 
   const reflectState = (): void => {
@@ -414,8 +416,13 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
         }
         transition(advanced, now);
       }
-      stage.dataset.walkFadedRuns = String(updateWallFade(state.caretakerCell, now));
-      presentWalk(now);
+      // The wall fade follows the figure as presented, not the square it is
+      // still authoritatively on: walking into a wall's cover mid-pulse must
+      // fade that wall then, not on the strike.
+      const presented = presentWalk(now);
+      stage.dataset.walkFadedRuns = String(
+        updateWallFade({ i: Math.round(presented.i), j: Math.round(presented.j) }, now),
+      );
 
       if (landedFootprints !== null) {
         const fade = Math.max(

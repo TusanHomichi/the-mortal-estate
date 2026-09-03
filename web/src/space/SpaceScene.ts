@@ -113,6 +113,8 @@ export interface SpaceSceneOptions {
 
 const WARM_LIGHT = new Color("#ffb457");
 const RAIN_COUNT = 1080;
+/** A frame gap beyond this is a pause, not a slow frame. */
+const PAUSE_GAP_SECONDS = 2;
 const WALL_FADE_DURATION_SECONDS = 0.35;
 const WALL_FADED_PLASTER_OPACITY = 0.34;
 const WALL_FADED_TIMBER_OPACITY = 0.48;
@@ -859,10 +861,10 @@ export class SpaceScene {
   update(elapsed: number): void {
     const delta = elapsed - this.lastElapsed;
     this.lastElapsed = elapsed;
-    // A slow frame still advances the clips, by at most half a second: the
-    // root moves by wall-clock time, and dropping the delta would slide the
-    // figure over the ground with its legs frozen.
-    if (delta > 0) this.caretaker.update(Math.min(delta, 0.5));
+    // The clips keep wall-clock time with the root, however slow the frame,
+    // or the feet slide; only a gap long enough to be a pause — a hidden tab,
+    // not a slow rasteriser — is treated as one and advanced a little.
+    if (delta > 0) this.caretaker.update(delta <= PAUSE_GAP_SECONDS ? delta : 0.5);
     this.windUniforms.elapsed.value = elapsed;
     this.windUniforms.windDirection.value.set(...this.windSettings.direction).normalize();
     this.windUniforms.windStrength.value = this.windSettings.strength;

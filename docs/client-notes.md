@@ -403,9 +403,10 @@ and bind to the rig and every part). A replacement commitment mid-pulse
 walks back along the route it was on — every step of it already authored and
 checked — to the authoritative square, then out along the new route, on the
 same strike; the figure is never presented on a segment that was not
-authored. On a slow frame the clips advance by at most half a second rather
-than not at all, so the figure does not slide with frozen legs. This is
-presentation only: the
+authored. The clips keep wall-clock time with the root however slow the frame
+(a gap over two seconds is a pause and advances a little), so the feet do not
+slide; the wall fade keys on the presented square, so a wall walked into
+mid-pulse fades then, not on the strike. This is presentation only: the
 authoritative square (`data-caretaker-cell`) does not move until the strike,
 the camera follows that square, and a walk the strike does not confirm is
 corrected by the snap. The stage exposes `data-caretaker-presented`,
