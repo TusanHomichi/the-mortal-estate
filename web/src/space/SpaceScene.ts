@@ -859,7 +859,10 @@ export class SpaceScene {
   update(elapsed: number): void {
     const delta = elapsed - this.lastElapsed;
     this.lastElapsed = elapsed;
-    if (delta > 0 && delta < 0.5) this.caretaker.update(delta);
+    // A slow frame still advances the clips, by at most half a second: the
+    // root moves by wall-clock time, and dropping the delta would slide the
+    // figure over the ground with its legs frozen.
+    if (delta > 0) this.caretaker.update(Math.min(delta, 0.5));
     this.windUniforms.elapsed.value = elapsed;
     this.windUniforms.windDirection.value.set(...this.windSettings.direction).normalize();
     this.windUniforms.windStrength.value = this.windSettings.strength;

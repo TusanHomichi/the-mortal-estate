@@ -399,8 +399,13 @@ figure is presented along the committed route from where it stood when it
 committed, arriving on the target as the strike lands, in the route's gait —
 walk, run, or sprint by squares, each a clip the figure row names (schema 5:
 `gait: {walk, run, sprint}`, every one of which must exist in the library
-and bind to the rig and every part). A replacement commitment continues from
-the presented point on the same strike. This is presentation only: the
+and bind to the rig and every part). A replacement commitment mid-pulse
+walks back along the route it was on — every step of it already authored and
+checked — to the authoritative square, then out along the new route, on the
+same strike; the figure is never presented on a segment that was not
+authored. On a slow frame the clips advance by at most half a second rather
+than not at all, so the figure does not slide with frozen legs. This is
+presentation only: the
 authoritative square (`data-caretaker-cell`) does not move until the strike,
 the camera follows that square, and a walk the strike does not confirm is
 corrected by the snap. The stage exposes `data-caretaker-presented`,

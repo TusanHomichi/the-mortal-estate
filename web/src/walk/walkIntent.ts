@@ -11,9 +11,17 @@ import { authorRoute } from "./route";
 export interface CommittedRoute {
   route: Cell[];
   landsAt: number;
-  /** When the commitment was made, and where the figure was presented then. */
+  /** When the commitment was made. */
   committedAt: number;
-  from: PresentedPoint;
+  /**
+   * The presented path back to the authoritative square: where the figure was
+   * presented when it committed, then the squares of the route it was walking,
+   * in reverse, ending on the square. Every step of it was authored and checked
+   * — presentation never implies a walkability it did not receive — so a
+   * replacement mid-pulse walks back to the square and out along the new route.
+   * A fresh commitment's lead is the square alone.
+   */
+  lead: PresentedPoint[];
 }
 
 /** A presented (not authoritative) position: fractional between squares while walking. */
@@ -90,7 +98,6 @@ function commitDraft(
   now: number,
 ): WalkIntentState {
   if (state.draft === null) return state;
-  const presented = presentedWalkPosition(state, now);
   return {
     ...state,
     draft: null,
@@ -98,9 +105,52 @@ function commitDraft(
       route: copyRoute(state.draft),
       landsAt: state.committed?.landsAt ?? clock.nextStrikeAfter(now),
       committedAt: now,
-      from: { i: presented.i, j: presented.j },
+      lead: leadBackToSquare(state, now),
     },
   };
+}
+
+/** The authored way back from the presented point to the authoritative square. */
+function leadBackToSquare(state: WalkIntentState, now: number): PresentedPoint[] {
+  const committed = state.committed;
+  if (committed === null || now >= committed.landsAt) return [copyCell(state.caretakerCell)];
+  const presented = presentedWalkPosition(state, now);
+  const path = presentedPath(committed);
+  // Find the segment the presented point lies on, then retreat along the
+  // squares before it; the squares are the old route's, already checked.
+  const fraction = presentedFraction(committed, now);
+  const lengths = segmentLengths(path);
+  const total = lengths.reduce((sum, length) => sum + length, 0);
+  let remaining = fraction * total;
+  let segment = 0;
+  while (segment < lengths.length - 1 && remaining > lengths[segment]!) {
+    remaining -= lengths[segment]!;
+    segment += 1;
+  }
+  const lead: PresentedPoint[] = [{ i: presented.i, j: presented.j }];
+  for (let index = segment; index >= 0; index -= 1) {
+    const point = path[index]!;
+    const last = lead[lead.length - 1]!;
+    if (Math.abs(point.i - last.i) > 1e-9 || Math.abs(point.j - last.j) > 1e-9) lead.push({ i: point.i, j: point.j });
+  }
+  // The old lead ends on the square; so does the new one.
+  const square = state.caretakerCell;
+  const end = lead[lead.length - 1]!;
+  if (Math.abs(end.i - square.i) > 1e-9 || Math.abs(end.j - square.j) > 1e-9) lead.push(copyCell(square));
+  return lead;
+}
+
+function presentedPath(committed: CommittedRoute): PresentedPoint[] {
+  return [...committed.lead, ...committed.route.slice(1)];
+}
+
+function segmentLengths(path: readonly PresentedPoint[]): number[] {
+  return path.slice(1).map((point, index) => Math.hypot(point.i - path[index]!.i, point.j - path[index]!.j));
+}
+
+function presentedFraction(committed: CommittedRoute, now: number): number {
+  const span = committed.landsAt - committed.committedAt;
+  return span <= 0 ? 1 : Math.min(1, Math.max(0, (now - committed.committedAt) / span));
 }
 
 export function cancelWalk(state: WalkIntentState, now: number): WalkIntentState {
@@ -160,10 +210,9 @@ export function presentedWalkPosition(state: WalkIntentState, now: number): Pres
   // At or past the strike the figure stands on the target even before the
   // state has been advanced to land it; the two agree the moment it is.
   if (now >= committed.landsAt) return { ...copyCell(routeEnd(committed.route)), facing: 0, gait: "idle" };
-  const span = committed.landsAt - committed.committedAt;
-  const fraction = span <= 0 ? 1 : Math.min(1, Math.max(0, (now - committed.committedAt) / span));
-  const path: PresentedPoint[] = [committed.from, ...committed.route.slice(1)];
-  const lengths = path.slice(1).map((point, index) => Math.hypot(point.i - path[index]!.i, point.j - path[index]!.j));
+  const fraction = presentedFraction(committed, now);
+  const path = presentedPath(committed);
+  const lengths = segmentLengths(path);
   const total = lengths.reduce((sum, length) => sum + length, 0);
   let remaining = fraction * total;
   for (let index = 0; index < lengths.length; index += 1) {

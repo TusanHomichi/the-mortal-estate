@@ -160,14 +160,34 @@ describe("the walk between pulses (presentation only)", () => {
     expect(advanceWalk(state, 3).caretakerCell).toEqual({ i: 2, j: 0 });
   });
 
-  it("a replacement continues from where the figure was presented, on the same strike", () => {
+  it("a replacement walks back along the authored route to the square, then out, on the same strike", () => {
     const first = committedRun();
     const redrafted = singleClick(first, passability, { i: 0, j: 1 }, clock, 1.75);
     const replaced = doubleClick(redrafted, clock, 1.75);
     expect(replaced.committed?.landsAt).toBe(3);
-    expect(replaced.committed?.from.i).toBeCloseTo(1, 5);
+    // presented at (1,0) mid-pulse; the lead is (1,0) → (0,0), the square
+    expect(replaced.committed?.lead.map((point) => [point.i, point.j])).toEqual([[1, 0], [0, 0]]);
     expect(presentedWalkPosition(replaced, 1.75)).toMatchObject({ i: 1, j: 0 });
+    // halfway through the remaining time it is back on its square, facing -i
+    const back = presentedWalkPosition(replaced, 1.75 + 1.25 / 2);
+    expect(back.i).toBeCloseTo(0, 5);
+    expect(back.j).toBeCloseTo(0, 5);
+    expect(presentedWalkPosition(replaced, 2)).toMatchObject({ facing: -1 });
     expect(presentedWalkPosition(replaced, 3)).toEqual({ i: 0, j: 1, facing: 0, gait: "idle" });
+  });
+
+  it("a replacement never presents a segment that was not authored", () => {
+    // walk east two squares, then mid-pulse replace with a route north: the
+    // presented path is east-back-west along the old route, then north — the
+    // diagonal from the fractional point to the new route is never taken.
+    const first = committedRun();
+    const replaced = doubleClick(singleClick(first, passability, { i: 0, j: 2 }, clock, 1.75), clock, 1.75);
+    const samples = [1.75, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9].map((t) => presentedWalkPosition(replaced, t));
+    for (const sample of samples) {
+      const onOldRoute = Math.abs(sample.j) < 1e-9 && sample.i >= 0 && sample.i <= 1;
+      const onNewRoute = Math.abs(sample.i) < 1e-9 && sample.j >= 0 && sample.j <= 2;
+      expect(onOldRoute || onNewRoute).toBe(true);
+    }
   });
 
   it("faces along i by the current segment and 0 along a j-only segment", () => {
