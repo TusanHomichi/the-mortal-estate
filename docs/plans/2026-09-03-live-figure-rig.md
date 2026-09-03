@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-03
-revision: 4
+revision: 5
 status: Implemented 2026-09-03 (PR web/live-figure) to the approved spec — packet schema 4 with the figures group, the caretaker as a live rig decoded from verified bytes, the palette material, idle clip, two-way facing, no contact blob; proven in both engines. Client notes revision 20 is the implemented truth; this document is the record of the plan and its open list (§6); §6a, the walk between pulses, is implemented (schema 5, gait clips, `presentedWalkPosition`) and awaits the owner's feel judgment on the deployed preview.
 public_safe: true
 summary: The caretaker becomes a live rigged mesh in the feel client — rig, outfit parts, and clip library carried by the packet under the same digest discipline as every sheet, the painted grammar reproduced in the character's material, the card retired — with every claim labelled decided, proposed, or open.
@@ -168,10 +168,18 @@ ever walks a route the client holds as committed. Proof: a capture sequence
 across one pulse in both engines, and the walk proof's landing assertions
 unchanged. The owner judges the feel; the test may fail it.
 
+**Gait clips — decided (owner, 2026-09-03).** The walk between pulses plays
+a clip per pace, not one clip: walk for one square, run for two, sprint for
+three — the pace the client already names and the footprints already show —
+each a clip the figure row names and every one required to exist and bind.
+Asked when the implementation reached for three clips where this section had
+authorised one; the owner chose three.
+
 ## 6. Open
 
-- Which clips beyond idle and walk, and what triggers them (landing, attack,
-  spell, death, sitting). The mechanism is decided; the extent is the owner's.
+- Which clips beyond idle and the three gaits, and what triggers them
+  (landing, attack, spell, death, sitting). The mechanism is decided; the
+  extent is the owner's.
 - Eight-way facing by route direction versus the two-way mirror carried over.
 - Whether the block grain is wanted on the live figure at play size.
 - The caretaker's own look: this slice ships the bare universal rig in the
