@@ -36,9 +36,14 @@ export interface AssetFile {
   sha256: string;
 }
 
-/** A prop card may carry a normal sheet beside its colour sheet; nothing else may. */
+/**
+ * A prop card may carry a normal sheet beside its colour sheet, and may declare
+ * itself `flat` — a thing with no side, a rug — which is the only card a
+ * placement may lay on the floor. Nothing else may carry either.
+ */
 export interface AssetRow extends AssetFile {
   normal: AssetFile | null;
+  flat: boolean;
 }
 
 export type AssetRows = Record<string, AssetRow>;

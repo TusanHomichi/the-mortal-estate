@@ -72,21 +72,32 @@ function parseAssetFile(value: unknown, what: string): AssetFile {
 }
 
 function parseAssetRow(value: unknown, group: AssetGroup): AssetRow {
-  if (!isRecord(value) || !Object.hasOwn(value, "normal")) {
-    return { ...parseAssetFile(value, "asset row"), normal: null };
+  let flat = false;
+  let row = value;
+  if (isRecord(value) && Object.hasOwn(value, "flat")) {
+    if (group !== "props") {
+      throw new Error(`a candidate feel ${group} asset row declares itself flat; only a prop card may`);
+    }
+    if (typeof value.flat !== "boolean") throw new Error("a candidate feel prop asset row has an invalid flat flag");
+    flat = value.flat;
+    const { flat: _flat, ...rest } = value;
+    row = rest;
+  }
+  if (!isRecord(row) || !Object.hasOwn(row, "normal")) {
+    return { ...parseAssetFile(row, "asset row"), normal: null, flat };
   }
   if (group !== "props") {
     throw new Error(`a candidate feel ${group} asset row carries a normal sheet; only a prop card may`);
   }
-  if (!hasExactKeys(value, ["file", "sha256", "normal"])) {
+  if (!hasExactKeys(row, ["file", "sha256", "normal"])) {
     throw new Error("a candidate feel prop asset row has unknown or missing fields");
   }
-  const colour = parseAssetFile({ file: value.file, sha256: value.sha256 }, "asset row");
-  const normal = parseAssetFile(value.normal, "prop normal sheet");
+  const colour = parseAssetFile({ file: row.file, sha256: row.sha256 }, "asset row");
+  const normal = parseAssetFile(row.normal, "prop normal sheet");
   if (normal.file === colour.file) {
     throw new Error("a candidate feel prop normal sheet names its own colour sheet");
   }
-  return { ...colour, normal };
+  return { ...colour, normal, flat };
 }
 
 function parseAssetGroup(value: unknown, name: AssetGroup): Record<string, AssetRow> {
@@ -372,6 +383,9 @@ function parseSpace(
     }
     if (!Object.hasOwn(assets.props, candidate.kind)) {
       throw new Error(`a candidate feel prop placement names an unlisted kind: ${candidate.kind}`);
+    }
+    if (candidate.facing === "floor" && !assets.props[candidate.kind]!.flat) {
+      throw new Error(`a candidate feel prop placement lays ${candidate.kind} on the floor, but its card is not declared flat`);
     }
     return {
       kind: candidate.kind,

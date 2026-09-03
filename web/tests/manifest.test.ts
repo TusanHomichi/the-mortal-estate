@@ -89,6 +89,7 @@ describe("candidate feel manifest", () => {
 
     const parsed = parseFeelManifest(planted);
     expect(parsed.assets.props.caretaker).toEqual({
+      flat: false,
       file: "prop-caretaker.png",
       sha256: digest,
       normal: { file: "prop-caretaker-normal.png", sha256: "1".repeat(64) },
@@ -152,11 +153,29 @@ describe("candidate feel manifest", () => {
     expect(() => parseFeelManifest(stale)).toThrow(/prop placement is invalid/);
   });
 
-  it("accepts a floor-facing card and carries its facing through", () => {
-    const flat = validManifest() as { spaces: { room: { props: Record<string, unknown>[] } } };
-    flat.spaces.room.props.push({ ...treePlacement(), facing: "floor" });
+  it("lays a card on the floor only when its row declares it flat", () => {
+    const upright = validManifest() as { spaces: { room: { props: Record<string, unknown>[] } } };
+    upright.spaces.room.props.push({ ...treePlacement(), facing: "floor" });
+    expect(() => parseFeelManifest(upright)).toThrow(/lays tree on the floor, but its card is not declared flat/);
+
+    const flat = validManifest() as {
+      assets: { props: Record<string, unknown> };
+      spaces: { room: { props: Record<string, unknown>[] } };
+    };
+    flat.assets.props.rug = { ...row, flat: true };
+    flat.spaces.room.props.push({ ...treePlacement(), kind: "rug", sway: false, facing: "floor" });
     const parsed = parseFeelManifest(flat);
+    expect(parsed.assets.props.rug!.flat).toBe(true);
     expect(parsed.spaces.room!.props.at(-1)!.facing).toBe("floor");
+  });
+
+  it("refuses a flat flag anywhere but a prop row, and a non-boolean one", () => {
+    const wall = validManifest() as { assets: { walls: Record<string, unknown> } };
+    wall.assets.walls.plaster = { ...row, flat: true };
+    expect(() => parseFeelManifest(wall)).toThrow(/declares itself flat; only a prop card may/);
+    const odd = validManifest() as { assets: { props: Record<string, unknown> } };
+    odd.assets.props.tree = { ...row, flat: "yes" };
+    expect(() => parseFeelManifest(odd)).toThrow(/invalid flat flag/);
   });
 
   it("refuses a portal whose source is not a door tile", () => {

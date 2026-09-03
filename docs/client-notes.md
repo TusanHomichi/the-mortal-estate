@@ -418,7 +418,9 @@ now carries it (owner ruling, 2026-09-03; the `nominal_height` key and schema
 the anchor plus half the card height for view-facing and wall-plane cards; a
 `floor` facing lays the card flat on its cell just above the ground, its up
 toward north, for things that are genuinely flat — a rug — never for anything
-with a side. A placement without the elevation key is refused rather than
+with a side; the client cannot judge flatness from a picture, so the prop's
+asset row declares it (`flat: true`) and a floor placement of a card not so
+declared is refused. A placement without the elevation key is refused rather than
 treated as floor-standing.
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
@@ -449,7 +451,7 @@ surround is itself filed as #29, because the durable contract is a normal
 sheet with nothing to damage.
 Packet-derived passability now reserves every wall tile from occupancy while
 leaving its door tile crossable.
-Schema-2 fixtures build wall-attached structure from batched material geometry,
+Fixtures build wall-attached structure from batched material geometry,
 block their tile, and own their practical light; only the fire inside the hearth
 remains a view-facing card.
 Outdoor tree and grass cards share one world-position-phased wind field; decoded
@@ -459,7 +461,7 @@ draw that dedicated interiors omit.
 Walls that would cover the caretaker's tile fade without moving the camera or
 changing their accepted height; the selection rule lives in
 `web/src/walk/wallOcclusion.ts`.
-The schema-2 packet makes the scene a set of disposable spaces joined by door
+The packet makes the scene a set of disposable spaces joined by door
 portals: landing on the last door square swaps to the target space and tile on
 the same strike, while rebuilding presentation-only passability, hover,
 occlusion, and camera focus. Closed exterior footprints keep pitched roofs as
