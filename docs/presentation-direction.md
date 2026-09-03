@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-02
-revision: 24
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; no renderer, asset set, or production pipeline is accepted.
+last_updated: 2026-09-03
+revision: 25
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -490,6 +490,30 @@ position rather than a shared loop, and hold the root while art-derived canopy
 weight lets leaves move apart from trunk; grass follows the same rooted rule
 (owner ruling, 2026-09-02).
 
+**Chrome rulings (owner, 2026-09-03).** The screen is one built object and
+nothing on it floats: no windows, no panels, no glossy overlay. Its structure
+follows the mid-1990s online tactical RPG the owner holds as the feel
+reference, read from the owner's own screens and written here in this
+project's words: the play view sits top-left; a column on the right holds,
+top to bottom, one large region switched by a strip of carved tabs — what is
+worn, the rings, the sack, a single thing examined, who is near, and what is
+prepared — then the two hands as recessed slots, then three glass gauges with
+a number under each, then a door mark to leave; a strip along the bottom
+holds a row of carved action tiles. **The three gauges are health, stamina,
+and mana, left to right; one the character has none of is shown empty, not
+hidden.** The chrome is built from the estate's own materials — the packet's
+plaster, timber, and fieldstone — with serif ink for type, and it is lit by
+the world's practical light so it belongs to the scene. The game is mouse
+driven: there is no mode button, and the route preview and its walk, run, or
+sprint word live on the world, not in the chrome. Events and speech are
+written over the play view's bottom-left as plain coloured lines with no
+box, never in a chat window. The sack shows its things as pictures at their
+own sizes, placed freely; those pictures are an asset class of their own, not
+scene cards. The play surface's ruled frame is unchanged by the chrome: a
+larger screen shows more world beside the column, not a larger world. The
+look of the chrome — its painting, not its structure — is not yet accepted;
+the lab's layout compositions are evidence for the structure only.
+
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory
 named by the environment variable `TME_FEEL_ASSETS`, through a manifest that
@@ -515,7 +539,8 @@ Deliberately unresolved, and not to be resolved by implementation:
 - the exact palette discipline and animation budget within the ruled pixel and
   surface grammar;
 - the dead world's visual identity beyond the direction above;
-- the UI's typography and contrast palette
+- the UI's typography and contrast palette, and the painted look of the
+  ruled chrome structure
   ([client architecture](client-architecture.md#input-and-the-accessibility-floor)
   owns the accessibility floor those must clear);
 - which production tools and presenter earn a place, which is decided by the
