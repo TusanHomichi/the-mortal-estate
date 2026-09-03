@@ -615,8 +615,9 @@ Deliberately unresolved, and not to be resolved by implementation:
 - the owner verdict on the representative micro-scene;
 - the exact native tile-edge length, joint width, and the actors' authored
   world-unit dimensions within the ruled 45-degree-yaw, 30-degree-elevation
-  framing (the camera's distance is not open: it derives from the ruled nine
-  cells);
+  framing (the orthographic frame's size is not open: it derives from the
+  ruled nine cells; the camera's distance along its view direction sets
+  nothing but clipping);
 - the ultrawide side panels' pieces — the treatment is ruled, the assets
   are not drawn;
 - the exact palette discipline and animation budget within the ruled pixel and
