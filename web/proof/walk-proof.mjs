@@ -181,7 +181,7 @@ async function captureWindSequence(page) {
   await rm(sequenceFrames, { recursive: true, force: true });
 }
 
-async function draftAndCommit(page, clockStartedAt, from, target) {
+async function draftAndCommit(page, clockStartedAt, from, target, afterCommit = null) {
   const point = await groundCellPoint(page, from, target);
   const spaceBefore = await stageAttribute(page, "data-walk-space");
   await page.mouse.move(point.x, point.y);
@@ -206,6 +206,9 @@ async function draftAndCommit(page, clockStartedAt, from, target) {
       detail: 2,
     }));
   }, point);
+  // A pulse observer starts the instant the commitment is dispatched: on a
+  // slow rasteriser, waiting first can mean the strike has already landed.
+  if (afterCommit !== null) await afterCommit();
   // The commitment is observed, not sampled, and on a timer: under a slow
   // rasteriser the beat can strike between the double-click and the next
   // animation frame, by which time the route has landed — on the target
@@ -233,8 +236,75 @@ async function draftAndCommit(page, clockStartedAt, from, target) {
   }
 }
 
-async function walkWithinSpace(page, clockStartedAt, space, from, target, cameraFollows = true) {
-  await draftAndCommit(page, clockStartedAt, from, target);
+function parsePresented(value) {
+  const [i, j] = value.split(",").map(Number);
+  return { i, j };
+}
+
+// The walk between pulses (plan §6a): after the commit and before the strike
+// the figure is presented along the route with the route's gait; the
+// authoritative square stays put until the strike, then both agree.
+async function capturePulse(page, from, target, expectedGait) {
+  // Screenshots across the pulse, best effort at whatever rate the engine
+  // manages; the assertions below read the presenter's own per-frame trace.
+  await rm(sequenceFrames, { recursive: true, force: true });
+  await mkdir(sequenceFrames, { recursive: true });
+  for (let index = 0; index < 8; index += 1) {
+    await page.screenshot({ path: path.join(sequenceFrames, `pulse-frame-${String(index).padStart(2, "0")}.png`) });
+    const state = await page.locator("#feel-stage").evaluate((stage) => ({ ...stage.dataset }));
+    if (state.walkState === "idle" && state.caretakerCell === `${target.i},${target.j}`) break;
+    await page.waitForTimeout(250);
+  }
+  await page.waitForFunction(
+    ({ expectedCell }) => {
+      const stage = document.querySelector("#feel-stage");
+      return stage?.dataset.walkState === "idle" && stage.dataset.caretakerCell === expectedCell;
+    },
+    { expectedCell: `${target.i},${target.j}` },
+    { polling: 16, timeout: SPACE_BUILD_DEADLINE_MS },
+  );
+  const trace = (await stageAttribute(page, "data-caretaker-trace")).split(" ").filter(Boolean).map((entry) => {
+    const [stateAndGait, point] = entry.split("@");
+    const [walkState, gait] = stateAndGait.split("/");
+    const [i, j] = point.split(",").map(Number);
+    return { walkState, gait, i, j };
+  });
+  const moving = trace.filter((frame) => frame.walkState === "committed");
+  const summary = trace.map((frame) => `${frame.walkState}/${frame.gait}@${frame.i.toFixed(2)},${frame.j.toFixed(2)}`).join(" ");
+  assert.ok(moving.length >= 1, `no frame was presented while the route was committed: ${summary}`);
+  for (const frame of moving) {
+    assert.equal(frame.gait, expectedGait, `gait during the pulse was ${frame.gait}, expected ${expectedGait}: ${summary}`);
+  }
+  const distance = (point) => Math.hypot(point.i - from.i, point.j - from.j);
+  const progress = moving.map(distance);
+  assert.ok(progress.every((value, index) => index === 0 || value >= progress[index - 1] - 1e-6), `the presented walk went backwards: ${summary}`);
+  const landed = trace[trace.length - 1];
+  assert.deepEqual({ i: landed.i, j: landed.j }, target, `the figure did not end on the target: ${summary}`);
+  assert.equal(landed.gait, "idle", `the figure kept its gait after landing: ${summary}`);
+  if (moving.length >= 2) {
+    assert.ok(progress[progress.length - 1] > progress[0], `the figure never left its square during the pulse: ${summary}`);
+  }
+  const output = path.join(captureRoot, "walk-pulse-sequence.webp");
+  await execFileAsync("ffmpeg", ["-loglevel", "error", "-y", "-framerate", "3", "-i", path.join(sequenceFrames, "pulse-frame-%02d.png"), "-an", "-c:v", "libwebp_anim", "-quality", "82", "-loop", "0", output]);
+  await rm(sequenceFrames, { recursive: true, force: true });
+  return moving.length;
+}
+
+function paceFor(from, target) {
+  const squares = Math.max(Math.abs(target.i - from.i), Math.abs(target.j - from.j));
+  return squares <= 1 ? "walk" : squares === 2 ? "run" : "sprint";
+}
+
+let pulseFramesObserved = 0;
+
+async function walkWithinSpace(page, clockStartedAt, space, from, target, cameraFollows = true, observePulse = false) {
+  await draftAndCommit(
+    page,
+    clockStartedAt,
+    from,
+    target,
+    observePulse ? async () => { pulseFramesObserved = await capturePulse(page, from, target, paceFor(from, target)); } : null,
+  );
   await page.waitForFunction(
     ({ expectedSpace, expectedCell }) => {
       const stage = document.querySelector("#feel-stage");
@@ -324,7 +394,9 @@ try {
 
   const courtyardStaging = { i: 12, j: 8 };
   const doorApproach = { i: 11, j: 7 };
-  await walkWithinSpace(page, clockStartedAt, "estate-grounds", start, courtyardStaging);
+  // The first route is photographed across its pulse: the gait is the route's pace.
+  await walkWithinSpace(page, clockStartedAt, "estate-grounds", start, courtyardStaging, true, true);
+
   await walkWithinSpace(page, clockStartedAt, "estate-grounds", courtyardStaging, doorApproach);
   await walkThroughPortal(
     page,
@@ -357,6 +429,7 @@ try {
   assert.deepEqual(consoleErrors, []);
   console.log(
     `PASS walk proof (${engineName}): ${captureRoot}; ${grassInstances} grass clumps; ` +
+      `pulse frames observed ${pulseFramesObserved}; ` +
       `exterior draw calls ${measurement.calls}; ` +
       `30-frame rAF average ${measurement.averageRafMilliseconds.toFixed(3)} ms; ` +
       `render average ${measurement.averageRenderMilliseconds.toFixed(3)} ms`,

@@ -1,4 +1,5 @@
 import {
+  AnimationAction,
   AnimationClip,
   AnimationMixer,
   Group,
@@ -32,16 +33,22 @@ export interface DecodedFigure {
   palette: [number, number, number][];
   rim: number;
   idle: string;
+  gait: { walk: string; run: string; sprint: string };
 }
 
-/** What the walk presenter holds: one object to place and face, ticked by the scene. */
+export type FigureGait = "idle" | "walk" | "run" | "sprint";
+
+/** What the walk presenter holds: one object to place, face, and set a gait on, ticked by the scene. */
 export interface FigureInstance {
   readonly name: string;
   readonly root: Group;
   readonly clip: string;
   facing: 1 | -1;
+  gait: FigureGait;
   place(i: number, j: number): void;
   setFacing(direction: 1 | -1): void;
+  /** Crossfades to the clip for a gait; the same gait again is a no-op. */
+  setGait(gait: FigureGait): void;
   update(deltaSeconds: number): void;
   dispose(): void;
 }
@@ -238,15 +245,19 @@ async function decodeFiguresInto(
         parts.push(scene);
       }
       const clips = (await parseGltf(loader, bytesOf(figure.clips.file), `figure ${name} clips`)).animations;
-      const idle = clips.find((clip) => clip.name === figure.idle);
-      if (idle === undefined) throw new Error(`figure ${name} has no clip named ${figure.idle}`);
-      assertClipBinds(idle, rig.scene, `figure ${name} rig`);
+      const named = { idle: figure.idle, ...figure.gait };
+      const required = Object.values(named).map((clipName) => {
+        const clip = clips.find((candidate) => candidate.name === clipName);
+        if (clip === undefined) throw new Error(`figure ${name} has no clip named ${clipName}`);
+        return clip;
+      });
+      for (const clip of required) assertClipBinds(clip, rig.scene, `figure ${name} rig`);
       parts.forEach((part, index) => {
         const what = `figure ${name} part ${figure.parts[index]!.file}`;
         assertSameSkeleton(rig.scene, part, what);
-        assertClipBinds(idle, part, what);
+        for (const clip of required) assertClipBinds(clip, part, what);
       });
-      decoded.set(name, { name, rig: rig.scene, parts, clips, palette: figure.palette, rim: figure.rim, idle: figure.idle });
+      decoded.set(name, { name, rig: rig.scene, parts, clips, palette: figure.palette, rim: figure.rim, idle: figure.idle, gait: figure.gait });
     } finally {
       for (const url of table.values()) URL.revokeObjectURL(url);
     }
@@ -286,6 +297,8 @@ export function disposeFigureSources(sources: readonly Object3D[]): void {
 // Facing: the rig's front is +z; a two-way facing turns it along ±x, the axis
 // the card used to mirror across (decided 2026-09-03; eight-way is open).
 const FACING_YAW: Record<1 | -1, number> = { 1: Math.PI / 2, [-1]: -Math.PI / 2 };
+/** A gait change crossfades over this long; a strike is three seconds, a walk clip about one. */
+const GAIT_FADE_SECONDS = 0.15;
 
 /** Instances a decoded figure at a cell: cloned skeletons, patched materials, the idle clip playing. */
 export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 1 | -1): FigureInstance {
@@ -293,8 +306,14 @@ export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 
   root.name = `Figure_${figure.name}`;
   const mixers: AnimationMixer[] = [];
   const ownedMaterials: Material[] = [];
-  const idle = figure.clips.find((clip) => clip.name === figure.idle);
-  if (idle === undefined) throw new Error(`figure ${figure.name} has no clip named ${figure.idle}`);
+  const clipFor = (gait: FigureGait): AnimationClip => {
+    const clipName = gait === "idle" ? figure.idle : figure.gait[gait];
+    const clip = figure.clips.find((candidate) => candidate.name === clipName);
+    if (clip === undefined) throw new Error(`figure ${figure.name} has no clip named ${clipName}`);
+    return clip;
+  };
+  const gaits: FigureGait[] = ["idle", "walk", "run", "sprint"];
+  const actions: Record<FigureGait, AnimationAction[]> = { idle: [], walk: [], run: [], sprint: [] };
   for (const source of [figure.rig, ...figure.parts]) {
     const part = cloneWithSkeleton(source) as Group;
     part.traverse((object: Object3D) => {
@@ -314,21 +333,33 @@ export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 
       object.material = Array.isArray(object.material) ? patched : patched[0]!;
     });
     const mixer = new AnimationMixer(part);
-    mixer.clipAction(idle).play();
+    for (const gait of gaits) actions[gait].push(mixer.clipAction(clipFor(gait)));
+    for (const action of actions.idle) action.play();
     mixers.push(mixer);
     root.add(part);
   }
+  let activeGait: FigureGait = "idle";
   const instance: FigureInstance = {
     name: figure.name,
     root,
-    clip: idle.name,
+    get clip() {
+      return clipFor(activeGait).name;
+    },
     facing,
+    gait: "idle",
     place(i, j) {
       root.position.set(i, 0, j);
     },
     setFacing(direction) {
       instance.facing = direction;
       root.rotation.y = FACING_YAW[direction];
+    },
+    setGait(gait) {
+      if (gait === activeGait) return;
+      for (const action of actions[activeGait]) action.fadeOut(GAIT_FADE_SECONDS);
+      for (const action of actions[gait]) action.reset().fadeIn(GAIT_FADE_SECONDS).play();
+      activeGait = gait;
+      instance.gait = gait;
     },
     update(deltaSeconds) {
       if (deltaSeconds <= 0) return;

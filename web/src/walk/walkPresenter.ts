@@ -39,7 +39,7 @@ import {
   cancelWalk,
   createWalkIntent,
   doubleClick,
-  presentedCaretakerPosition,
+  presentedWalkPosition,
   singleClick,
   walkPace,
   walkIntentKind,
@@ -69,6 +69,7 @@ export interface WalkPresenter {
   stop(): void;
 }
 
+const PRESENTED_TRACE_FRAMES = 48;
 type FootprintKind = "draft" | "committed" | "landed";
 
 interface DrawnFootprint {
@@ -294,9 +295,27 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     if (directionI > 0) caretaker.setFacing(1);
   };
 
+  // The walk between pulses (plan §6a): the figure is presented along the
+  // committed route between the commit and the strike; the authoritative
+  // square below is what the game believes and what the camera follows.
+  // The last frames of the presented walk, for the proof: a real tab under a
+  // slow rasteriser cannot be polled from outside fast enough to see a pulse.
+  const presentedTrace: string[] = [];
+  const presentWalk = (now: number): void => {
+    const presented = presentedWalkPosition(state, now);
+    caretaker.place(presented.i, presented.j);
+    if (presented.facing !== 0) caretaker.setFacing(presented.facing);
+    caretaker.setGait(presented.gait);
+    stage.dataset.caretakerPresented = `${presented.i.toFixed(3)},${presented.j.toFixed(3)}`;
+    stage.dataset.caretakerGait = presented.gait;
+    stage.dataset.caretakerClip = caretaker.clip;
+    presentedTrace.push(`${walkIntentKind(state)}/${presented.gait}@${presented.i.toFixed(3)},${presented.j.toFixed(3)}`);
+    if (presentedTrace.length > PRESENTED_TRACE_FRAMES) presentedTrace.shift();
+    stage.dataset.caretakerTrace = presentedTrace.join(" ");
+  };
+
   const reflectState = (): void => {
-    const position = presentedCaretakerPosition(state);
-    caretaker.place(position.i, position.j);
+    presentWalk(performance.now() / 1000);
     applyFacing();
     stage.dataset.walkState = walkIntentKind(state);
     stage.dataset.caretakerCell = `${state.caretakerCell.i},${state.caretakerCell.j}`;
@@ -396,6 +415,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
         transition(advanced, now);
       }
       stage.dataset.walkFadedRuns = String(updateWallFade(state.caretakerCell, now));
+      presentWalk(now);
 
       if (landedFootprints !== null) {
         const fade = Math.max(
@@ -437,6 +457,9 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.walkFadedRuns;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;
+      delete stage.dataset.caretakerPresented;
+      delete stage.dataset.caretakerGait;
+      delete stage.dataset.caretakerTrace;
     },
   };
 }

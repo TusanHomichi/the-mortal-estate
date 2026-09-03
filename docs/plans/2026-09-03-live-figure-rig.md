@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 3
-status: Implemented 2026-09-03 (PR web/live-figure) to the approved spec — packet schema 4 with the figures group, the caretaker as a live rig decoded from verified bytes, the palette material, idle clip, two-way facing, no contact blob; proven in both engines. Client notes revision 20 is the implemented truth; this document is the record of the plan and its open list (§6, §6a).
+revision: 4
+status: Implemented 2026-09-03 (PR web/live-figure) to the approved spec — packet schema 4 with the figures group, the caretaker as a live rig decoded from verified bytes, the palette material, idle clip, two-way facing, no contact blob; proven in both engines. Client notes revision 20 is the implemented truth; this document is the record of the plan and its open list (§6); §6a, the walk between pulses, is implemented (schema 5, gait clips, `presentedWalkPosition`) and awaits the owner's feel judgment on the deployed preview.
 public_safe: true
 summary: The caretaker becomes a live rigged mesh in the feel client — rig, outfit parts, and clip library carried by the packet under the same digest discipline as every sheet, the painted grammar reproduced in the character's material, the card retired — with every claim labelled decided, proposed, or open.
 ---
@@ -147,7 +147,7 @@ every proof green in both engines?
   compare beside the last card frames.
 - Fast lane over every changed path; the web lane in CI.
 
-## 6a. Proposed next slice — the walk between pulses
+## 6a. The walk between pulses — implemented 2026-09-03, under owner judgment
 
 **Owner direction, 2026-09-03:** nice animations are what we should do, and
 that means revisiting the walk. The authority does not move: the server

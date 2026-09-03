@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 20
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3; revision 20 the live caretaker figure and packet schema 4
+revision: 21
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3; revision 20 the live caretaker figure and packet schema 4; revision 21 the walk between pulses and packet schema 5
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -393,6 +393,30 @@ This is the opposite of `GridWorldView`'s
 spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
 permission for presentation to remain fluid between beats is permission, not a
 requirement.
+**The walk between pulses (owner direction, 2026-09-03; under the owner's
+judgment on the deployed preview).** Between the commit and the strike the
+figure is presented along the committed route from where it stood when it
+committed, arriving on the target as the strike lands, in the route's gait —
+walk, run, or sprint by squares, each a clip the figure row names (schema 5:
+`gait: {walk, run, sprint}`, every one of which must exist in the library
+and bind to the rig and every part). A replacement commitment continues from
+the presented point on the same strike. This is presentation only: the
+authoritative square (`data-caretaker-cell`) does not move until the strike,
+the camera follows that square, and a walk the strike does not confirm is
+corrected by the snap. The stage exposes `data-caretaker-presented`,
+`data-caretaker-gait`, the active `data-caretaker-clip`, and
+`data-caretaker-trace` — the presenter's own record of the last 48 frames'
+state, gait, and presented point, because a real tab under software GL
+cannot be polled from outside fast enough to see a three-second pulse (one
+round trip took seconds on headless Chromium with the skinned figure). The
+walk proof reads the trace after the landing in both engines and asserts at
+least one committed frame was presented, the presented point never went
+backwards, the gait was the route's, and the figure stands idle on the
+target; it also photographs the pulse at whatever rate the engine manages
+(`walk-pulse-sequence.webp`). The pure function is
+`presentedWalkPosition` in `web/src/walk/walkIntent.ts`; the settled row
+"movement lands on the beat" keeps its authority half and its presentation
+half awaits the owner's ruling.
 Outdoors the camera stays centred on the caretaker and re-centres on each
 landing; inside a building it belongs to the space — centred on the room's
 grid and unmoved by landings — and follows the caretaker again on the way out
@@ -445,7 +469,7 @@ card mirrored across; the walk presenter places and faces one object and the
 scene ticks its mixers. The stage exposes `data-caretaker-figure` and
 `data-caretaker-clip` and the walk proof asserts both in both engines. Which
 clips beyond idle, eight-way facing, and the caretaker's own look are open
-(the plan is `docs/plans/2026-09-03-live-figure-rig.md`). Schemas 1–3 are
+(the plan is `docs/plans/2026-09-03-live-figure-rig.md`). Schemas 1–4 are
 refused by name.
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal

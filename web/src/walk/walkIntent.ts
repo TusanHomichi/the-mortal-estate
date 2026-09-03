@@ -11,6 +11,23 @@ import { authorRoute } from "./route";
 export interface CommittedRoute {
   route: Cell[];
   landsAt: number;
+  /** When the commitment was made, and where the figure was presented then. */
+  committedAt: number;
+  from: PresentedPoint;
+}
+
+/** A presented (not authoritative) position: fractional between squares while walking. */
+export interface PresentedPoint {
+  i: number;
+  j: number;
+}
+
+export type Gait = "idle" | WalkPace;
+
+export interface PresentedWalk extends PresentedPoint {
+  /** The direction the figure faces along i, or 0 when the segment runs along j alone. */
+  facing: 1 | -1 | 0;
+  gait: Gait;
 }
 
 export interface WalkIntentState {
@@ -73,12 +90,15 @@ function commitDraft(
   now: number,
 ): WalkIntentState {
   if (state.draft === null) return state;
+  const presented = presentedWalkPosition(state, now);
   return {
     ...state,
     draft: null,
     committed: {
       route: copyRoute(state.draft),
       landsAt: state.committed?.landsAt ?? clock.nextStrikeAfter(now),
+      committedAt: now,
+      from: { i: presented.i, j: presented.j },
     },
   };
 }
@@ -113,6 +133,55 @@ export function doubleClick(
   return commitDraft(advanceWalk(state, now), clock, now);
 }
 
+/** The authoritative square: what the game believes, never between squares. */
 export function presentedCaretakerPosition(state: WalkIntentState): Cell {
   return copyCell(state.caretakerCell);
+}
+
+function paceOf(route: readonly Cell[]): WalkPace {
+  const squares = route.length - 1;
+  if (squares <= 1) return "walk";
+  if (squares === 2) return "run";
+  return "sprint";
+}
+
+/**
+ * The walk between pulses (owner direction, 2026-09-03; plan §6a). While a
+ * route is committed and the strike has not landed it, the figure is
+ * presented along the committed route from where it stood when it committed,
+ * arriving on the target as the strike lands; the gait is the route's pace.
+ * This is presentation only: the authoritative square is `caretakerCell` and
+ * lands whole on the strike as before — a walk the pulse does not confirm is
+ * corrected by the snap, never believed.
+ */
+export function presentedWalkPosition(state: WalkIntentState, now: number): PresentedWalk {
+  const committed = state.committed;
+  if (committed === null) return { ...copyCell(state.caretakerCell), facing: 0, gait: "idle" };
+  // At or past the strike the figure stands on the target even before the
+  // state has been advanced to land it; the two agree the moment it is.
+  if (now >= committed.landsAt) return { ...copyCell(routeEnd(committed.route)), facing: 0, gait: "idle" };
+  const span = committed.landsAt - committed.committedAt;
+  const fraction = span <= 0 ? 1 : Math.min(1, Math.max(0, (now - committed.committedAt) / span));
+  const path: PresentedPoint[] = [committed.from, ...committed.route.slice(1)];
+  const lengths = path.slice(1).map((point, index) => Math.hypot(point.i - path[index]!.i, point.j - path[index]!.j));
+  const total = lengths.reduce((sum, length) => sum + length, 0);
+  let remaining = fraction * total;
+  for (let index = 0; index < lengths.length; index += 1) {
+    const length = lengths[index]!;
+    const start = path[index]!;
+    const end = path[index + 1]!;
+    if (remaining <= length || index === lengths.length - 1) {
+      const t = length === 0 ? 1 : Math.min(1, remaining / length);
+      const di = Math.sign(end.i - start.i);
+      return {
+        i: start.i + (end.i - start.i) * t,
+        j: start.j + (end.j - start.j) * t,
+        facing: di === 0 ? 0 : (di as 1 | -1),
+        gait: paceOf(committed.route),
+      };
+    }
+    remaining -= length;
+  }
+  const end = path[path.length - 1]!;
+  return { i: end.i, j: end.j, facing: 0, gait: paceOf(committed.route) };
 }

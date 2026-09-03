@@ -8,6 +8,7 @@ import {
   createWalkIntent,
   doubleClick,
   presentedCaretakerPosition,
+  presentedWalkPosition,
   singleClick,
   walkPace,
   walkIntentKind,
@@ -123,5 +124,58 @@ describe("the local walk-intent state machine", () => {
     const refused = singleClick(withDraft, passability, { i: 4, j: 4 }, clock, 2.1);
     expect(refused.draft).toBeNull();
     expect(refused.committed).toEqual(committed.committed);
+  });
+});
+
+describe("the walk between pulses (presentation only)", () => {
+  const passability = passabilityFrom(layout);
+  const clock = new BeatClock(0);
+  const committedRun = () => {
+    // two squares, committed at t=0.5 to land on the strike at t=3
+    const drafted = singleClick(createWalkIntent({ i: 0, j: 0 }), passability, { i: 2, j: 0 }, clock, 0.5);
+    return doubleClick(drafted, clock, 0.5);
+  };
+
+  it("stands on its square with no commitment", () => {
+    const presented = presentedWalkPosition(createWalkIntent({ i: 1, j: 1 }), 7);
+    expect(presented).toEqual({ i: 1, j: 1, facing: 0, gait: "idle" });
+  });
+
+  it("starts where it stood, is between squares mid-pulse, and is on the target as the strike lands", () => {
+    const state = committedRun();
+    expect(state.committed?.landsAt).toBe(3);
+    expect(presentedWalkPosition(state, 0.5)).toMatchObject({ i: 0, j: 0, gait: "run", facing: 1 });
+    const mid = presentedWalkPosition(state, 1.75);
+    expect(mid.i).toBeCloseTo(1, 5);
+    expect(mid.gait).toBe("run");
+    expect(presentedWalkPosition(state, 2.9).i).toBeCloseTo(1.92, 2);
+    expect(presentedWalkPosition(state, 3)).toEqual({ i: 2, j: 0, facing: 0, gait: "idle" });
+  });
+
+  it("the authoritative square does not move until the strike", () => {
+    const state = committedRun();
+    expect(presentedCaretakerPosition(state)).toEqual({ i: 0, j: 0 });
+    expect(presentedWalkPosition(state, 2.9).i).toBeGreaterThan(1.5);
+    expect(advanceWalk(state, 2.9).caretakerCell).toEqual({ i: 0, j: 0 });
+    expect(advanceWalk(state, 3).caretakerCell).toEqual({ i: 2, j: 0 });
+  });
+
+  it("a replacement continues from where the figure was presented, on the same strike", () => {
+    const first = committedRun();
+    const redrafted = singleClick(first, passability, { i: 0, j: 1 }, clock, 1.75);
+    const replaced = doubleClick(redrafted, clock, 1.75);
+    expect(replaced.committed?.landsAt).toBe(3);
+    expect(replaced.committed?.from.i).toBeCloseTo(1, 5);
+    expect(presentedWalkPosition(replaced, 1.75)).toMatchObject({ i: 1, j: 0 });
+    expect(presentedWalkPosition(replaced, 3)).toEqual({ i: 0, j: 1, facing: 0, gait: "idle" });
+  });
+
+  it("faces along i by the current segment and 0 along a j-only segment", () => {
+    const drafted = singleClick(createWalkIntent({ i: 2, j: 2 }), passability, { i: 2, j: 4 }, clock, 0);
+    const state = doubleClick(drafted, clock, 0);
+    expect(presentedWalkPosition(state, 1).facing).toBe(0);
+    const back = doubleClick(singleClick(createWalkIntent({ i: 2, j: 2 }), passability, { i: 1, j: 2 }, clock, 0), clock, 0);
+    expect(presentedWalkPosition(back, 1).facing).toBe(-1);
+    expect(presentedWalkPosition(back, 1).gait).toBe("walk");
   });
 });
