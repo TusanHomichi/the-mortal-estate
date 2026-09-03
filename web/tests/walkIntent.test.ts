@@ -176,6 +176,23 @@ describe("the walk between pulses (presentation only)", () => {
     expect(presentedWalkPosition(replaced, 3)).toEqual({ i: 0, j: 1, facing: 0, gait: "idle" });
   });
 
+  it("a second replacement while still on the lead continues forward to the square, never cutting a corner", () => {
+    const first = committedRun(); // east 2, committed 0.5, lands 3
+    const north = doubleClick(singleClick(first, passability, { i: 0, j: 2 }, clock, 1.75), clock, 1.75); // lead (1,0)→(0,0)
+    // at t=2.0 the figure is on the lead, between (1,0) and (0,0); replace again toward (2,0)
+    const again = doubleClick(singleClick(north, passability, { i: 2, j: 0 }, clock, 2.0), clock, 2.0);
+    const lead = again.committed!.lead;
+    expect(lead[lead.length - 1]).toEqual({ i: 0, j: 0 });
+    expect(lead.every((point) => Math.abs(point.j) < 1e-9 && point.i >= 0 && point.i <= 1)).toBe(true);
+    for (const t of [2.0, 2.2, 2.4, 2.6, 2.8, 2.99]) {
+      const sample = presentedWalkPosition(again, t);
+      expect(Math.abs(sample.j)).toBeLessThan(1e-9); // never off the i axis
+      expect(sample.i).toBeGreaterThanOrEqual(-1e-9);
+      expect(sample.i).toBeLessThanOrEqual(2 + 1e-9);
+    }
+    expect(presentedWalkPosition(again, 3)).toEqual({ i: 2, j: 0, facing: 0, gait: "idle" });
+  });
+
   it("a replacement never presents a segment that was not authored", () => {
     // walk east two squares, then mid-pulse replace with a route north: the
     // presented path is east-back-west along the old route, then north — the

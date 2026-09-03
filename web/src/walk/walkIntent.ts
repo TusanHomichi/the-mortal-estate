@@ -110,33 +110,40 @@ function commitDraft(
   };
 }
 
-/** The authored way back from the presented point to the authoritative square. */
+/**
+ * The authored way back from the presented point to the authoritative square.
+ * The presented path is the lead (ending on the square) then the route (from
+ * the square). A figure still on the lead is already walking toward the
+ * square, so it continues forward along it; a figure out on the route
+ * retreats along the route's squares. Either way every point is one the path
+ * already held, and the lead ends on the square.
+ */
 function leadBackToSquare(state: WalkIntentState, now: number): PresentedPoint[] {
   const committed = state.committed;
   if (committed === null || now >= committed.landsAt) return [copyCell(state.caretakerCell)];
   const presented = presentedWalkPosition(state, now);
   const path = presentedPath(committed);
-  // Find the segment the presented point lies on, then retreat along the
-  // squares before it; the squares are the old route's, already checked.
-  const fraction = presentedFraction(committed, now);
+  const squareIndex = committed.lead.length - 1;
   const lengths = segmentLengths(path);
   const total = lengths.reduce((sum, length) => sum + length, 0);
-  let remaining = fraction * total;
+  let remaining = presentedFraction(committed, now) * total;
   let segment = 0;
   while (segment < lengths.length - 1 && remaining > lengths[segment]!) {
     remaining -= lengths[segment]!;
     segment += 1;
   }
   const lead: PresentedPoint[] = [{ i: presented.i, j: presented.j }];
-  for (let index = segment; index >= 0; index -= 1) {
-    const point = path[index]!;
+  const push = (point: PresentedPoint): void => {
     const last = lead[lead.length - 1]!;
     if (Math.abs(point.i - last.i) > 1e-9 || Math.abs(point.j - last.j) > 1e-9) lead.push({ i: point.i, j: point.j });
+  };
+  if (segment < squareIndex) {
+    // still on the lead: forward to the square
+    for (let index = segment + 1; index <= squareIndex; index += 1) push(path[index]!);
+  } else {
+    // out on the route: back along it to the square
+    for (let index = segment; index >= squareIndex; index -= 1) push(path[index]!);
   }
-  // The old lead ends on the square; so does the new one.
-  const square = state.caretakerCell;
-  const end = lead[lead.length - 1]!;
-  if (Math.abs(end.i - square.i) > 1e-9 || Math.abs(end.j - square.j) > 1e-9) lead.push(copyCell(square));
   return lead;
 }
 
