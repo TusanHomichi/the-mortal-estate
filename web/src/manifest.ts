@@ -1,4 +1,5 @@
 import {
+  type FigureRow,
   ASSET_GROUPS,
   REQUIRED_PROPS,
   REQUIRED_ROOFS,
@@ -56,6 +57,81 @@ function isSafePngPath(value: unknown): value is string {
   if (value.startsWith("/") || !value.toLowerCase().endsWith(".png")) return false;
   const parts = value.split("/");
   return parts.every((part) => part.length > 0 && part !== "." && part !== "..");
+}
+
+const FIGURE_EXTENSIONS = [".gltf", ".glb", ".bin", ".png"];
+
+function isSafeFigurePath(value: unknown): value is string {
+  if (typeof value !== "string" || value.length === 0 || value.includes("\\")) return false;
+  if (value.startsWith("/") || value.includes("/")) return false; // a figure's files are flat: glTF names them by basename
+  const lower = value.toLowerCase();
+  if (!FIGURE_EXTENSIONS.some((extension) => lower.endsWith(extension))) return false;
+  return value !== "." && value !== "..";
+}
+
+function parseFigureFile(value: unknown, what: string, extension: string | null = null): AssetFile {
+  if (!isRecord(value) || !hasExactKeys(value, ["file", "sha256"])) {
+    throw new Error(`a candidate feel ${what} has unknown or missing fields`);
+  }
+  if (!isSafeFigurePath(value.file) || typeof value.sha256 !== "string") {
+    throw new Error(`a candidate feel ${what} is invalid`);
+  }
+  if (extension !== null && !value.file.toLowerCase().endsWith(extension)) {
+    throw new Error(`a candidate feel ${what} must be a ${extension} file`);
+  }
+  if (!SHA256_PATTERN.test(value.sha256)) {
+    throw new Error(`a candidate feel ${what} digest is invalid`);
+  }
+  return { file: value.file, sha256: value.sha256 };
+}
+
+function parseFigureFiles(value: unknown, what: string): AssetFile[] {
+  if (!Array.isArray(value)) throw new Error(`a candidate feel ${what} list is invalid`);
+  return value.map((entry) => parseFigureFile(entry, what));
+}
+
+function parseFigureRow(value: unknown, name: string): FigureRow {
+  if (!isRecord(value) || !hasExactKeys(value, ["rig", "sidecars", "clips", "parts", "palette", "rim", "idle"])) {
+    throw new Error(`the candidate feel figure ${name} has unknown or missing fields`);
+  }
+  const rig = parseFigureFile(value.rig, "figure rig", ".gltf");
+  const sidecars = parseFigureFiles(value.sidecars, "figure sidecar");
+  const clips = parseFigureFile(value.clips, "figure clip library", ".glb");
+  if (!Array.isArray(value.parts)) throw new Error(`the candidate feel figure ${name} parts are invalid`);
+  const parts = value.parts.map((part) => {
+    if (!isRecord(part) || !hasExactKeys(part, ["file", "sha256", "sidecars"])) {
+      throw new Error(`a candidate feel figure part has unknown or missing fields`);
+    }
+    const file = parseFigureFile({ file: part.file, sha256: part.sha256 }, "figure part", ".gltf");
+    return { ...file, sidecars: parseFigureFiles(part.sidecars, "figure part sidecar") };
+  });
+  const names = [rig, ...sidecars, clips, ...parts, ...parts.flatMap((part) => part.sidecars)].map((file) => file.file);
+  if (new Set(names).size !== names.length) {
+    throw new Error(`the candidate feel figure ${name} names one file twice; a glTF resolves files by name`);
+  }
+  if (
+    !Array.isArray(value.palette) ||
+    value.palette.length < 2 ||
+    value.palette.length > 256 ||
+    !value.palette.every((colour) => isIntegerVector(colour, 3) && colour.every((channel) => channel >= 0 && channel <= 255))
+  ) {
+    throw new Error(`the candidate feel figure ${name} palette is invalid`);
+  }
+  if (!isFiniteNumber(value.rim) || value.rim < 0 || value.rim > 1) {
+    throw new Error(`the candidate feel figure ${name} rim is invalid`);
+  }
+  if (typeof value.idle !== "string" || value.idle.length === 0) {
+    throw new Error(`the candidate feel figure ${name} names no idle clip`);
+  }
+  return {
+    rig,
+    sidecars,
+    clips,
+    parts,
+    palette: (value.palette as number[][]).map((colour) => [colour[0]!, colour[1]!, colour[2]!] as [number, number, number]),
+    rim: value.rim,
+    idle: value.idle,
+  };
 }
 
 function parseAssetFile(value: unknown, what: string): AssetFile {
@@ -477,13 +553,13 @@ function validateSpaces(spaces: Record<string, FeelSpace>, start: PortalTarget):
 }
 
 export function parseFeelManifest(value: unknown): FeelManifest {
-  if (isRecord(value) && (value.schema_version === 1 || value.schema_version === 2)) {
+  if (isRecord(value) && (value.schema_version === 1 || value.schema_version === 2 || value.schema_version === 3)) {
     throw new Error(`candidate feel manifest schema ${value.schema_version} is retired and refused`);
   }
-  if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "start", "spaces"])) {
+  if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "figures", "caretaker", "start", "spaces"])) {
     throw new Error("the candidate feel manifest has unknown or missing top-level fields");
   }
-  if (value.schema_version !== 3 || !isRecord(value.assets)) {
+  if (value.schema_version !== 4 || !isRecord(value.assets)) {
     throw new Error("the candidate feel manifest schema version or assets are invalid");
   }
   if (!hasExactKeys(value.assets, ASSET_GROUPS)) {
@@ -500,6 +576,23 @@ export function parseFeelManifest(value: unknown): FeelManifest {
   requireAssets(assets, "props", REQUIRED_PROPS);
   requireAssets(assets, "roofs", REQUIRED_ROOFS);
 
+  if (!isRecord(value.figures) || Object.keys(value.figures).length === 0) {
+    throw new Error("the candidate feel manifest carries no figures");
+  }
+  const figures = Object.fromEntries(
+    Object.entries(value.figures).map(([name, row]) => {
+      if (name.length === 0) throw new Error("a candidate feel figure has no name");
+      return [name, parseFigureRow(row, name)];
+    }),
+  );
+  if (!isRecord(value.caretaker) || !hasExactKeys(value.caretaker, ["figure"]) || typeof value.caretaker.figure !== "string") {
+    throw new Error("the candidate feel manifest does not say which figure the start places");
+  }
+  if (!Object.hasOwn(figures, value.caretaker.figure)) {
+    throw new Error(`the candidate feel caretaker names an unlisted figure: ${value.caretaker.figure}`);
+  }
+  const caretaker = { figure: value.caretaker.figure };
+
   const start = parsePortalTarget(value.start, "start");
   if (!isRecord(value.spaces) || Object.keys(value.spaces).length === 0) {
     throw new Error("the candidate feel manifest carries no spaces");
@@ -511,7 +604,7 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     }),
   );
   validateSpaces(spaces, start);
-  return { schema_version: 3, assets, start, spaces };
+  return { schema_version: 4, assets, figures, caretaker, start, spaces };
 }
 
 function bytesToHex(bytes: Uint8Array): string {
@@ -561,6 +654,10 @@ export async function fetchVerifiedAssetPacket(
       await verified(`${group}/${name}`, row);
       if (row.normal !== null) await verified(`${group}/${name}/normal`, row.normal);
     }
+  }
+  for (const [name, figure] of Object.entries(manifest.figures)) {
+    const files = [figure.rig, ...figure.sidecars, figure.clips, ...figure.parts, ...figure.parts.flatMap((part) => part.sidecars)];
+    for (const file of files) await verified(`figures/${name}/${file.file}`, file);
   }
   return { manifest, assets };
 }

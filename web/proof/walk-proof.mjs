@@ -307,6 +307,10 @@ try {
   assert.ok(grassInstances > 0 && grassInstances <= 1_800);
   const start = parseCell(await stageAttribute(page, "data-caretaker-cell"));
   assert.deepEqual(start, { i: 13, j: 11 });
+  // The caretaker is a live figure: the packet's figure, decoded from verified
+  // bytes, with its idle clip playing (owner ruling, 2026-09-03).
+  assert.equal(await stageAttribute(page, "data-caretaker-figure"), "caretaker");
+  assert.ok((await stageAttribute(page, "data-caretaker-clip")).length > 0, "the caretaker plays no clip");
   await assertCaretakerCentred(page);
 
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));

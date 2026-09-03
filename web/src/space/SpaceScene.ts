@@ -30,6 +30,7 @@ import {
   type OrthographicCamera,
 } from "three";
 import { CAMERA_OFFSET, projectedHeightCoverTiles } from "../camera";
+import { createFigureInstance, type DecodedFigure, type FigureInstance } from "./figureRig";
 import type { FeelSpace, PropPlacement, WallRun } from "../feelTypes";
 import { GRASS_CLUMP_HEIGHT, scatterGrassClumps } from "../grassClumps";
 import { buildGroundGeometry } from "../groundGeometry";
@@ -95,10 +96,6 @@ interface HearthPresentation {
   lightBase: number;
 }
 
-export interface CaretakerObjects {
-  card: Mesh;
-  contactShadow: Mesh;
-}
 
 export interface SpaceSceneOptions {
   name: string;
@@ -110,10 +107,11 @@ export interface SpaceSceneOptions {
   camera: OrthographicCamera;
   caretakerCell: Cell;
   caretakerFacing: 1 | -1;
+  figures: Map<string, DecodedFigure>;
+  caretakerFigure: string;
 }
 
 const WARM_LIGHT = new Color("#ffb457");
-const CARETAKER_CARD_HEIGHT = 1.38;
 const RAIN_COUNT = 1080;
 const WALL_FADE_DURATION_SECONDS = 0.35;
 const WALL_FADED_PLASTER_OPACITY = 0.34;
@@ -304,7 +302,7 @@ function disposeMaterial(material: Material): void {
 
 export class SpaceScene {
   readonly group = new Group();
-  readonly caretaker: CaretakerObjects;
+  readonly caretaker: FigureInstance;
   readonly background: Color;
   readonly weatherEnabled: boolean;
   readonly grassInstanceCount: number;
@@ -348,8 +346,8 @@ export class SpaceScene {
     this.keyDirection = lights.direction;
     this.lantern = lights.lantern;
     this.lanternBase = lights.lanternBase;
-    this.caretaker = this.addProps();
-    this.caretaker.card.scale.x = options.caretakerFacing * Math.abs(this.caretaker.card.scale.x);
+    this.addProps();
+    this.caretaker = this.addCaretaker();
     this.grassInstanceCount = this.addGrass();
     this.rain = space.weather && presets.includes("rain")
       ? addRain(this.group, options.camera, space.grid_extents)
@@ -670,21 +668,18 @@ export class SpaceScene {
     };
   }
 
-  private addProps(): CaretakerObjects {
-    const { space, textures, anisotropy, caretakerCell } = this.options;
-    let caretaker: CaretakerObjects | null = null;
-    const placements: PropPlacement[] = [
-      ...space.props,
-      {
-        kind: "caretaker",
-        cell_anchor: [caretakerCell.i, caretakerCell.j],
-        elevation: 0,
-        card_height: CARETAKER_CARD_HEIGHT,
-        sway: false,
-        mirror: false,
-        facing: "view",
-      },
-    ];
+  private addCaretaker(): FigureInstance {
+    const { figures, caretakerFigure, caretakerCell, caretakerFacing } = this.options;
+    const figure = figures.get(caretakerFigure);
+    if (figure === undefined) throw new Error(`the packet's caretaker figure ${caretakerFigure} was not decoded`);
+    const instance = createFigureInstance(figure, caretakerCell, caretakerFacing);
+    this.group.add(instance.root);
+    return instance;
+  }
+
+  private addProps(): void {
+    const { space, textures, anisotropy } = this.options;
+    const placements = space.props;
     for (const prop of placements) {
       const source = requiredTexture(textures, `props/${prop.kind}`);
       configureTexture(source.texture, anisotropy);
@@ -736,10 +731,8 @@ export class SpaceScene {
         shadowRotation.order,
       );
       this.group.add(mesh);
-      if (prop.kind === "caretaker") caretaker = { card: mesh, contactShadow };
+      void contactShadow;
     }
-    if (caretaker === null) throw new Error("the space scene failed to place its caretaker");
-    return caretaker;
   }
 
   private createWindMaterial(
@@ -861,7 +854,12 @@ export class SpaceScene {
     return this.wallRuns[runIndex]?.materials.plaster.opacity ?? null;
   }
 
+  private lastElapsed = 0;
+
   update(elapsed: number): void {
+    const delta = elapsed - this.lastElapsed;
+    this.lastElapsed = elapsed;
+    if (delta > 0 && delta < 0.5) this.caretaker.update(delta);
     this.windUniforms.elapsed.value = elapsed;
     this.windUniforms.windDirection.value.set(...this.windSettings.direction).normalize();
     this.windUniforms.windStrength.value = this.windSettings.strength;
@@ -884,6 +882,7 @@ export class SpaceScene {
   }
 
   dispose(): void {
+    this.caretaker.dispose();
     const geometries = new Set<BufferGeometry>();
     const materials = new Set<Material>();
     this.group.traverse((object) => {

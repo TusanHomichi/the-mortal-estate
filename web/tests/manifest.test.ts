@@ -14,15 +14,29 @@ function requiredRows(names: readonly string[]): Record<string, typeof row> {
   return Object.fromEntries(names.map((name) => [name, row]));
 }
 
+function figureRow(): Record<string, unknown> {
+  return {
+    rig: { file: "figure.gltf", sha256: digest },
+    sidecars: [{ file: "figure.bin", sha256: digest }, { file: "figure-base.png", sha256: digest }],
+    clips: { file: "clips.glb", sha256: digest },
+    parts: [{ file: "part-body.gltf", sha256: digest, sidecars: [{ file: "part-body.bin", sha256: digest }] }],
+    palette: [[13, 7, 7], [200, 180, 160]],
+    rim: 0.25,
+    idle: "Idle_Loop",
+  };
+}
+
 function validManifest(): Record<string, unknown> {
   return {
-    schema_version: 3,
+    schema_version: 4,
     assets: {
       terrain: requiredRows(REQUIRED_TERRAIN),
       walls: requiredRows(REQUIRED_WALLS),
       props: requiredRows(REQUIRED_PROPS),
       roofs: requiredRows(REQUIRED_ROOFS),
     },
+    figures: { caretaker: figureRow() },
+    caretaker: { figure: "caretaker" },
     start: { space: "room", cell: [1, 1] },
     spaces: {
       room: {
@@ -47,9 +61,9 @@ function validManifest(): Record<string, unknown> {
 }
 
 describe("candidate feel manifest", () => {
-  it("parses the exact schema-3 spaces packet", () => {
+  it("parses the exact schema-4 spaces packet", () => {
     const parsed = parseFeelManifest(validManifest());
-    expect(parsed.schema_version).toBe(3);
+    expect(parsed.schema_version).toBe(4);
     expect(parsed.start).toEqual({ space: "room", cell: [1, 1] });
     expect(parsed.spaces.room?.light_sources.lantern_glass).toBeNull();
   });
@@ -129,10 +143,48 @@ describe("candidate feel manifest", () => {
     expect(() => parseFeelManifest(retired)).toThrow(/schema 1 is retired and refused/);
   });
 
-  it("refuses the retired schema 2 by name", () => {
-    const retired = validManifest();
-    retired.schema_version = 2;
-    expect(() => parseFeelManifest(retired)).toThrow(/schema 2 is retired and refused/);
+  it("refuses the retired schemas 2 and 3 by name", () => {
+    for (const version of [2, 3]) {
+      const retired = validManifest();
+      retired.schema_version = version;
+      expect(() => parseFeelManifest(retired)).toThrow(new RegExp(`schema ${version} is retired and refused`));
+    }
+  });
+
+  it("carries a figure through with its palette, rim, and idle clip", () => {
+    const parsed = parseFeelManifest(validManifest());
+    expect(parsed.caretaker).toEqual({ figure: "caretaker" });
+    expect(parsed.figures.caretaker!.palette).toEqual([[13, 7, 7], [200, 180, 160]]);
+    expect(parsed.figures.caretaker!.rim).toBe(0.25);
+    expect(parsed.figures.caretaker!.idle).toBe("Idle_Loop");
+    expect(parsed.figures.caretaker!.parts[0]!.sidecars[0]!.file).toBe("part-body.bin");
+  });
+
+  it("refuses a caretaker that names an unlisted figure", () => {
+    const stray = validManifest() as { caretaker: { figure: string } };
+    stray.caretaker.figure = "ghost";
+    expect(() => parseFeelManifest(stray)).toThrow(/unlisted figure: ghost/);
+  });
+
+  it("refuses a figure whose files are not flat, not glTF kinds, or named twice", () => {
+    const nested = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    nested.figures.caretaker.rig = { file: "deep/figure.gltf", sha256: digest };
+    expect(() => parseFeelManifest(nested)).toThrow(/figure rig is invalid/);
+    const wrongKind = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    wrongKind.figures.caretaker.clips = { file: "clips.gltf", sha256: digest };
+    expect(() => parseFeelManifest(wrongKind)).toThrow(/must be a \.glb file/);
+    const twice = validManifest() as { figures: { caretaker: { sidecars: Record<string, unknown>[] } } };
+    twice.figures.caretaker.sidecars.push({ file: "figure.bin", sha256: digest });
+    expect(() => parseFeelManifest(twice)).toThrow(/names one file twice/);
+  });
+
+  it("refuses a figure palette or rim out of range", () => {
+    const pale = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    pale.figures.caretaker.palette = [[0, 0, 300], [1, 1, 1]];
+    expect(() => parseFeelManifest(pale)).toThrow(/palette is invalid/);
+    const bright = validManifest() as { figures: { caretaker: Record<string, unknown> } };
+    bright.figures.caretaker.rim = 2;
+    expect(() => parseFeelManifest(bright)).toThrow(/rim is invalid/);
   });
 
   const treePlacement = (): Record<string, unknown> => ({

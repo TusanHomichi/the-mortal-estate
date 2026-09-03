@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 2
-status: Planning — the bounded spec and plan for the first live character in the browser client, under the 2026-09-03 live-characters ruling; the owner approved its four proposed calls (packet shape, two-way facing, no contact blob, idle-only motion) on 2026-09-03. Not implemented truth until closeout; a plan cannot widen its spec.
+revision: 3
+status: Implemented 2026-09-03 (PR web/live-figure) to the approved spec — packet schema 4 with the figures group, the caretaker as a live rig decoded from verified bytes, the palette material, idle clip, two-way facing, no contact blob; proven in both engines. Client notes revision 20 is the implemented truth; this document is the record of the plan and its open list (§6, §6a).
 public_safe: true
 summary: The caretaker becomes a live rigged mesh in the feel client — rig, outfit parts, and clip library carried by the packet under the same digest discipline as every sheet, the painted grammar reproduced in the character's material, the card retired — with every claim labelled decided, proposed, or open.
 ---
@@ -180,7 +180,27 @@ unchanged. The owner judges the feel; the test may fail it.
 - Whether any other class crosses to live 3D (none pending; the hearth is
   the precedent).
 
-## 7. Stop conditions
+## 7. Closeout (2026-09-03)
+
+Implemented as specified, with two facts learned on the way that the spec
+did not foresee and the implementation records:
+
+- The sheet decoder decoded every verified asset as an image; a figure's
+  glTF, buffers, and clip library now sit under `figures/` keys and the
+  decoder skips them (`isFigureKey`), with a test.
+- The facing yaw is ±π/2 about world up — the rig's +z front turned along
+  ±x, the axis the card mirrored across — rather than the 0/π the spec
+  wrote; two-way either way, and the presenter's contract is unchanged.
+- The packet grew by 17 MB (the clip library is 7 MB; the kit's 4K textures
+  are downscaled to 1 K in the lab's packet step, since the palette collapses
+  their colour anyway).
+
+Proof: 129 unit tests; fast lane COMPLETE; captures in both engines at
+night and dusk, courtyard and room; walk proof PASS in Chromium and Firefox
+with `data-caretaker-figure` and `data-caretaker-clip` asserted and both
+portal crossings walked. Draw calls 501 → 527 with the figure's six meshes.
+
+## 8. Stop conditions
 
 Stop and report rather than widen if: a verified glTF cannot be decoded
 without an unverified fetch; Firefox on software GL cannot skin the rig at a

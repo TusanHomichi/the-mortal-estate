@@ -14,7 +14,6 @@ export const REQUIRED_WALLS = [
 ] as const;
 
 export const REQUIRED_PROPS = [
-  "caretaker",
   "tree",
   "tree_slim",
   "tree_broad",
@@ -47,6 +46,30 @@ export interface AssetRow extends AssetFile {
 }
 
 export type AssetRows = Record<string, AssetRow>;
+
+/** One skinned outfit part on the figure's skeleton, with the files its glTF names. */
+export interface FigurePart extends AssetFile {
+  sidecars: AssetFile[];
+}
+
+/**
+ * A live figure (owner ruling, 2026-09-03): a rigged glTF, the files it names,
+ * a clip library, skinned parts on the same skeleton, and the material's inputs —
+ * the figure's own treated-card palette and a rim darkening. Every file is
+ * digest-bound; the client resolves the names a glTF asks for only against
+ * these, never the network.
+ */
+export interface FigureRow {
+  rig: AssetFile;
+  sidecars: AssetFile[];
+  clips: AssetFile;
+  parts: FigurePart[];
+  palette: [number, number, number][];
+  rim: number;
+  idle: string;
+}
+
+export type FigureRows = Record<string, FigureRow>;
 
 export interface CellPlan {
   i: number;
@@ -123,8 +146,11 @@ export interface FeelSpace {
 }
 
 export interface FeelManifest {
-  schema_version: 3;
+  schema_version: 4;
   assets: Record<AssetGroup, AssetRows>;
+  figures: FigureRows;
+  /** Which figure the start places; the client carries no caretaker of its own. */
+  caretaker: { figure: string };
   start: PortalTarget;
   spaces: Record<string, FeelSpace>;
 }

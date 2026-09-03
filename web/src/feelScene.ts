@@ -23,6 +23,7 @@ import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
 import { SpaceScene } from "./space/SpaceScene";
 import { decodeTextures } from "./space/textures";
+import { decodeFigures } from "./space/figureRig";
 import type { Cell } from "./walk/layoutPassability";
 import { createWalkPresenter, type WalkPresenter } from "./walk/walkPresenter";
 
@@ -107,6 +108,7 @@ export async function startFeelScene(
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const textures = await decodeTextures(packet);
+  const figures = await decodeFigures(packet);
   const windWeightTextures = new Map<string, DataTexture>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
@@ -149,8 +151,12 @@ export async function startFeelScene(
       camera,
       caretakerCell: targetCell,
       caretakerFacing: facing,
+      figures,
+      caretakerFigure: packet.manifest.caretaker.figure,
     });
     activeSpace = nextSpace;
+    stage.dataset.caretakerFigure = nextSpace.caretaker.name;
+    stage.dataset.caretakerClip = nextSpace.caretaker.clip;
     stage.dataset.grassInstances = String(nextSpace.grassInstanceCount);
     scene.background = nextSpace.background;
     scene.add(nextSpace.group);
