@@ -513,8 +513,10 @@ figure beside the treated furniture at play size without announcing a
 different medium (lab `camera-v36`, rounds three and four, 2026-09-03). The
 same ruling extends to **any subject class that cannot read as a card** — the
 owner's words: anything that has to be 3D to not look stupid — judged per
-class at play size through the production rule; everything else stays a card
-or structural geometry as ruled above. What this decides: the medium for
+class at play size through the production rule. The hearth is the precedent:
+as a flat card it read wrong, it became fixture geometry, and nothing since
+has failed the same test, so the live class list today is characters alone.
+Everything else stays a card or structural geometry as ruled above. What this decides: the medium for
 characters, that equipment is modular parts, and that figures animate by
 clip. What stays open: the exact in-shader treatment (the lab's palette
 lookup and rim are the candidate; the cards' block grain is optional), which

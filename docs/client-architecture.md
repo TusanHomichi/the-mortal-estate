@@ -106,10 +106,16 @@ it is its own decision.
 **The desktop client is the web client (owner ruling, 2026-09-03).** The
 browser client is the one client; the desktop build is that client in a
 native shell — a windowed wrapper giving a Steam build, the Steam Deck, a
-gamepad, and an installer to one codebase — and which shell is open, decided
-with its own proof when the desktop target is taken up. The retained Godot
-shell stays cold pending a reason the browser cannot supply, and no other
-engine enters the stack: Unity was considered on 2026-09-03 and has no role.
+gamepad, and an installer to one codebase. The shell is **Tauri** (owner
+ruling, 2026-09-03): it keeps the desktop in the Rust ecosystem the server
+already lives in, and the owner has shipped with it before. Tauri renders
+through each platform's system webview rather than a bundled browser, so the
+desktop slice's proof obligation is stated now: the feel client must be
+proven on the webview of every desktop target — WebKitGTK on Linux and the
+Steam Deck, WebView2 on Windows — at the ruled play surface, before that
+target is claimed. The retained Godot shell stays cold pending a reason the
+browser cannot supply, and no other engine enters the stack: Unity was
+considered on 2026-09-03 and has no role.
 
 ## Engine baseline (the retained Godot shell)
 
