@@ -559,13 +559,10 @@ fixed world extent, never as a scaled image; the chrome is authored at twice
 the design size and only ever scaled down; text, numbers, gauge levels, and
 health lines are drawn live by the client, never baked into art; and a
 display that is not 16:9 gives its spare space to the parts that want it —
-spare height to the bag and the chat, spare width to the chat — through
-nine-patch edges, while the window never moves. For a display wider than
-16:9 the owner's direction is that the interface should expand into the
-spare width rather than fill it with stone: the group readout and the
-active-effect icons take that space instead of floating over the play view.
-That treatment is not yet designed; 16:9 and 16:10 are the shapes the layout
-is judged on today.
+spare height to the bag and the chat through nine-patch edges, spare width
+to the side panels ruled below — while the window never moves. The owner's
+direction is that spare width expands the interface rather than filling it
+with stone; the ruling below says with what.
 
 **Visible cell count and ultrawide ruling (owner, 2026-09-03).** The play
 view shows **nine cells across each diagonal** of the ruled frame, the extent
@@ -576,11 +573,12 @@ seven by seven was considered and set aside: the accepted composites were
 judged at nine and stay true. On a display wider than 16:9 the play view
 keeps that extent and stays where the layout puts it; the spare width becomes
 **a forged side panel on each flank**, and the group readout and the
-active-effect icons move out of the play view into them. At 16:9 and 16:10
-nothing changes: the group readout stays a plate at the strip's right end
-while grouped, and the effect icons stay top-left of the play view. The bag
-and the chat take spare height only, as already ruled, and the play view
-never widens — sight range is not bought with a monitor. The side panels'
+active-effect icons move out of the play view into them. The chat does not
+widen; the panels take the width. At 16:9 and 16:10 nothing changes: the
+group readout stays a plate at the strip's right end while grouped, and the
+effect icons stay top-left of the play view. The bag and the chat take spare
+height only, and the play view never widens — sight range is not bought with
+a monitor. The side panels'
 pieces are not yet drawn; they are assets, and open with the rest.
 
 **The candidate-asset rule.** The scene's art is candidate material from the
