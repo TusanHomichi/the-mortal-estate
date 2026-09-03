@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 30
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; revision 29 records the visible cell count and the ultrawide treatment; revision 30 records the projection reaffirmed after the in-engine reference comparison; no renderer, asset set, or production pipeline is accepted.
+revision: 31
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; revision 29 records the visible cell count and the ultrawide treatment; revision 30 records the projection reaffirmed after the in-engine reference comparison; revision 31 records live characters — rigged meshes in the client, superseding cards for that class; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -498,11 +498,28 @@ Anything that belongs to a building — a hearth, a doorway, a window, a shelf �
 is built from material swatches over math like the walls, because it is seen at
 an angle and must have a side; free-standing things — a person, a tree, a table,
 a stone — are painted cards at the camera angle, placed clear of walls, and a
-flat wall-plane card is for genuinely flat things only. Characters are modelled
-and rigged in 3D, rendered at the ruled camera angle into sprite sheets with the
-pixel-cluster treatment, and shipped as cards; the raw mesh never enters the
-scene, while how many frames are rendered follows the still-open question of
-whether figures animate at all (owner ruling, 2026-09-02).
+flat wall-plane card is for genuinely flat things only. Characters were ruled on
+2026-09-02 as modelled and rigged in 3D but shipped as cards rendered at the
+ruled camera angle; that ruling is superseded below.
+
+**Live characters ruling (owner, 2026-09-03).** Characters are **live rigged
+meshes in the client**, not cards: the rig stands in the scene under the
+ruled camera and the scene's own lights and shadows, its equipment is skinned
+parts on the shared skeleton, and its motion is animation clips played on the
+rig. The painted grammar the cards carry is reproduced in the character's
+material: the lab showed the treated-card palette applied as a nearest-colour
+lookup in the fragment shader, with a rim darkening, puts a dressed live
+figure beside the treated furniture at play size without announcing a
+different medium (lab `camera-v36`, rounds three and four, 2026-09-03). The
+same ruling extends to **any subject class that cannot read as a card** — the
+owner's words: anything that has to be 3D to not look stupid — judged per
+class at play size through the production rule; everything else stays a card
+or structural geometry as ruled above. What this decides: the medium for
+characters, that equipment is modular parts, and that figures animate by
+clip. What stays open: the exact in-shader treatment (the lab's palette
+lookup and rim are the candidate; the cards' block grain is optional), which
+clips and how many, which further classes cross, and the character source
+pipeline itself.
 
 Vegetation cards take motion from one world-space wind field, phase from their
 position rather than a shared loop, and hold the root while art-derived canopy
