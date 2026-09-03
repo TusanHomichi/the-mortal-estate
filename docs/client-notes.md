@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 19
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3
+revision: 20
+status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3; revision 20 the live caretaker figure and packet schema 4
 public_safe: true
 summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
 routes:
@@ -413,8 +413,8 @@ feet at the elevation, top at elevation plus card height — not the subject's
 own height. A low, long thing rendered at the ruled angle is mostly its depth,
 and sizing it by its own height drew beds and tables doll-sized beside the
 caretaker; the render harness knows the projected height and the placement
-now carries it (owner ruling, 2026-09-03; the `nominal_height` key and schema
-2 are retired and refused, schema 3 carries the change). The card centre is
+now carries it (owner ruling, 2026-09-03; the `nominal_height` key is retired and
+refused; schema 3 carried the change, schema 4 carries it on). The card centre is
 the anchor plus half the card height for view-facing and wall-plane cards; a
 `floor` facing lays the card flat on its cell just above the ground, its up
 toward north, for things that are genuinely flat — a rug — never for anything
@@ -422,6 +422,31 @@ with a side; the client cannot judge flatness from a picture, so the prop's
 asset row declares it (`flat: true`) and a floor placement of a card not so
 declared is refused. A placement without the elevation key is refused rather than
 treated as floor-standing.
+**The caretaker is a live figure (owner ruling, 2026-09-03; schema 4).** The
+packet carries a `figures` group beside the sheets: each figure is a rigged
+glTF, the files its glTF names (buffers and textures, flat, by basename), a
+clip library, skinned outfit parts on the same skeleton with their own named
+files, the figure's treated-card palette inline, a rim darkening, and the
+name of its idle clip; the top level says which figure the start places
+(`caretaker: {figure}`), and the client carries no caretaker of its own —
+`caretaker` left the required prop sheets. Every file is digest-bound like a
+sheet. `web/src/space/figureRig.ts` decodes a figure once per packet
+**from verified bytes only**: the glTF loader's URL modifier resolves every
+name a glTF asks for against blob URLs of the verified payload and refuses an
+unlisted name, so no unverified fetch can occur; a figure whose clip library
+lacks its idle clip is refused at decode. Each space instances the figure
+with a cloned skeleton, clones and patches every standard material so its lit
+colour snaps, in gamma space, to the nearest palette colour after a rim from
+the view-space normal (the patch refuses to build if three's anchor moves, as
+the card wrap does), plays the idle clip on every part through its own mixer,
+casts and receives the scene's shadows, and drops the contact-shadow blob the
+card had. Facing turns the rig a half-turn about world up along the axis the
+card mirrored across; the walk presenter places and faces one object and the
+scene ticks its mixers. The stage exposes `data-caretaker-figure` and
+`data-caretaker-clip` and the walk proof asserts both in both engines. Which
+clips beyond idle, eight-way facing, and the caretaker's own look are open
+(the plan is `docs/plans/2026-09-03-live-figure-rig.md`). Schemas 1–3 are
+refused by name.
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
 sheet** beside its colour sheet — `normal: {file, sha256}`, verified like any

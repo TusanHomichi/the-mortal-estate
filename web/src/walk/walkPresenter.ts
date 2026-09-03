@@ -24,6 +24,7 @@ import { CAMERA_TARGET_HEIGHT, focusFeelCamera } from "../camera";
 import type { FeelSpace, PortalTarget } from "../feelTypes";
 import { portalLandingFor } from "../space/portals";
 import { BeatClock, WALK_STAND_IN_BEAT_SECONDS } from "./beat";
+import type { FigureInstance } from "../space/figureRig";
 import {
   WALK_CURSOR_HOTSPOT,
   walkCursorDataUris,
@@ -45,10 +46,6 @@ import {
   type WalkIntentState,
 } from "./walkIntent";
 
-interface CaretakerObjects {
-  card: Mesh;
-  contactShadow: Mesh;
-}
 
 export interface WalkPresenterOptions {
   stage: HTMLElement;
@@ -57,7 +54,7 @@ export interface WalkPresenterOptions {
   camera: OrthographicCamera;
   spaceName: string;
   space: FeelSpace;
-  caretaker: CaretakerObjects;
+  caretaker: FigureInstance;
   initialCell: Cell;
   updateWallFade: (playerCell: Cell, now: number) => number;
   onCellChanged: (previous: Cell, next: Cell) => void;
@@ -176,9 +173,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   } = options;
   const passability = passabilityFrom(space);
   const standInClock = new BeatClock(options.startedAt);
-  const homeScaleX = Math.abs(caretaker.card.scale.x || 1);
-  const cardHeight = caretaker.card.position.y;
-  const shadowHeight = caretaker.contactShadow.position.y;
   const soleTextures = {
     draft: makeSoleTexture("draft"),
     committed: makeSoleTexture("committed"),
@@ -296,14 +290,13 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     if (state.committed === null) return;
     const route = state.committed.route;
     const directionI = route[route.length - 1]!.i - route[0]!.i;
-    if (directionI < 0) caretaker.card.scale.x = -homeScaleX;
-    if (directionI > 0) caretaker.card.scale.x = homeScaleX;
+    if (directionI < 0) caretaker.setFacing(-1);
+    if (directionI > 0) caretaker.setFacing(1);
   };
 
   const reflectState = (): void => {
     const position = presentedCaretakerPosition(state);
-    caretaker.card.position.set(position.i, cardHeight, position.j);
-    caretaker.contactShadow.position.set(position.i, shadowHeight, position.j);
+    caretaker.place(position.i, position.j);
     applyFacing();
     stage.dataset.walkState = walkIntentKind(state);
     stage.dataset.caretakerCell = `${state.caretakerCell.i},${state.caretakerCell.j}`;
@@ -397,7 +390,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
           ? null
           : portalLandingFor(space, state.committed.route);
         if (landing !== null) {
-          options.onPortalLanding(landing, caretaker.card.scale.x < 0 ? -1 : 1);
+          options.onPortalLanding(landing, caretaker.facing);
           return;
         }
         transition(advanced, now);

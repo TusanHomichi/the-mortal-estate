@@ -23,6 +23,7 @@ import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
 import { SpaceScene } from "./space/SpaceScene";
 import { decodeTextures } from "./space/textures";
+import { decodeFigures, disposeDecodedFigures, type DecodedFigure } from "./space/figureRig";
 import type { Cell } from "./walk/layoutPassability";
 import { createWalkPresenter, type WalkPresenter } from "./walk/walkPresenter";
 
@@ -107,6 +108,16 @@ export async function startFeelScene(
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const textures = await decodeTextures(packet);
+  let figures: Map<string, DecodedFigure>;
+  try {
+    figures = await decodeFigures(packet);
+  } catch (error) {
+    // A refused figure refuses the scene; nothing created so far may outlive it.
+    for (const decoded of textures.values()) decoded.texture.dispose();
+    renderer.dispose();
+    canvas.remove();
+    throw error;
+  }
   const windWeightTextures = new Map<string, DataTexture>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
@@ -149,8 +160,12 @@ export async function startFeelScene(
       camera,
       caretakerCell: targetCell,
       caretakerFacing: facing,
+      figures,
+      caretakerFigure: packet.manifest.caretaker.figure,
     });
     activeSpace = nextSpace;
+    stage.dataset.caretakerFigure = nextSpace.caretaker.name;
+    stage.dataset.caretakerClip = nextSpace.caretaker.clip;
     stage.dataset.grassInstances = String(nextSpace.grassInstanceCount);
     scene.background = nextSpace.background;
     scene.add(nextSpace.group);
@@ -229,6 +244,9 @@ export async function startFeelScene(
       activeFog?.dispose();
       for (const decoded of textures.values()) decoded.texture.dispose();
       for (const texture of windWeightTextures.values()) texture.dispose();
+      disposeDecodedFigures(figures);
+      delete stage.dataset.caretakerFigure;
+      delete stage.dataset.caretakerClip;
       if (devHook !== null && window.__tmeFeel === devHook) delete window.__tmeFeel;
       delete stage.dataset.renderCalls;
       delete stage.dataset.renderMilliseconds;
