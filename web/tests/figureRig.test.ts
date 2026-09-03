@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AnimationClip, Bone, BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Object3D, Skeleton, SkinnedMesh, Texture, VectorKeyframeTrack } from "three";
-import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, createFigureInstance, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
+import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, assertSameSkeleton, createFigureInstance, disposeDecodedFigures, resolveFigureUrl } from "../src/space/figureRig";
 import type { DecodedFigure } from "../src/space/figureRig";
 
 describe("figure files resolve only against verified bytes", () => {
@@ -130,5 +130,26 @@ describe("an instance releases its cloned skeletons", () => {
     } finally {
       Skeleton.prototype.dispose = original;
     }
+  });
+});
+
+describe("a part must be on the rig's skeleton", () => {
+  const skinnedWith = (...names: string[]): Group => {
+    const bones = names.map((name) => { const bone = new Bone(); bone.name = name; return bone; });
+    const skinned = new SkinnedMesh(new BoxGeometry(), new MeshStandardMaterial());
+    for (const bone of bones) skinned.add(bone);
+    skinned.bind(new Skeleton(bones));
+    const root = new Group();
+    root.add(skinned);
+    return root;
+  };
+
+  it("accepts a part with exactly the rig's bones", () => {
+    expect(() => assertSameSkeleton(skinnedWith("Hips", "Spine"), skinnedWith("Spine", "Hips"), "figure test part")).not.toThrow();
+  });
+
+  it("refuses a part missing bones or carrying extra ones, naming them", () => {
+    expect(() => assertSameSkeleton(skinnedWith("Hips", "Spine"), skinnedWith("Hips", "Tail"), "figure test part"))
+      .toThrow(/not on the rig's skeleton: 1 bone\(s\) missing \(Spine\), 1 extra \(Tail\)/);
   });
 });

@@ -195,10 +195,16 @@ did not foresee and the implementation records:
   are downscaled to 1 K in the lab's packet step, since the palette collapses
   their colour anyway).
 
-Proof: 129 unit tests; fast lane COMPLETE; captures in both engines at
-night and dusk, courtyard and room; walk proof PASS in Chromium and Firefox
-with `data-caretaker-figure` and `data-caretaker-clip` asserted and both
-portal crossings walked. Draw calls 501 → 527 with the figure's six meshes.
+Proof, at the reviewed tree: 139 unit tests (the review added refusals for
+an unlisted file, an unpatchable material, a clip that does not bind to
+skeleton bones, a part on another skeleton, a palette over 32 colours, more
+than 16 candles, and disposal of decoded sources and cloned skeletons); fast
+lane COMPLETE; captures in both engines at night and dusk in the courtyard,
+the room photographed by the walk proof's interior capture; walk proof PASS
+in Chromium and Firefox with `data-caretaker-figure` and
+`data-caretaker-clip` asserted and both portal crossings walked. Draw calls
+501 → 527 with the figure's six meshes. On the served packet the idle
+clip's 65 targets are all skeleton joints on the rig and on every part.
 
 ## 8. Stop conditions
 

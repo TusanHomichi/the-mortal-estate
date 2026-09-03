@@ -155,6 +155,34 @@ export function assertClipBinds(clip: AnimationClip, root: Object3D, what: strin
   }
 }
 
+/** The bone names of every skinned mesh under a root, as one set. */
+function skeletonBoneNames(root: Object3D): Set<string> {
+  const bones = new Set<string>();
+  root.traverse((object: Object3D) => {
+    if (object instanceof SkinnedMesh) for (const bone of object.skeleton.bones) bones.add(bone.name);
+  });
+  return bones;
+}
+
+/**
+ * A part is mixed on its own skeleton, so it stays aligned with the rig only
+ * if it is the same skeleton: the same bones, no more and no fewer. A part
+ * built for another rig would bind the clip and deform apart from the body.
+ */
+export function assertSameSkeleton(rig: Object3D, part: Object3D, what: string): void {
+  const rigBones = skeletonBoneNames(rig);
+  const partBones = skeletonBoneNames(part);
+  const missing = [...rigBones].filter((bone) => !partBones.has(bone));
+  const extra = [...partBones].filter((bone) => !rigBones.has(bone));
+  if (missing.length > 0 || extra.length > 0) {
+    throw new Error(
+      `${what} is not on the rig's skeleton: ` +
+        `${missing.length} bone(s) missing${missing.length ? ` (${missing.slice(0, 3).join(", ")})` : ""}, ` +
+        `${extra.length} extra${extra.length ? ` (${extra.slice(0, 3).join(", ")})` : ""}`,
+    );
+  }
+}
+
 /** Skinned meshes own a skeleton whose bone texture lives on the GPU; release each one. */
 function disposeSkeletons(root: Object3D): void {
   root.traverse((object: Object3D) => {
@@ -194,7 +222,11 @@ export async function decodeFigures(packet: VerifiedAssetPacket): Promise<Map<st
       const idle = clips.find((clip) => clip.name === figure.idle);
       if (idle === undefined) throw new Error(`figure ${name} has no clip named ${figure.idle}`);
       assertClipBinds(idle, rig.scene, `figure ${name} rig`);
-      parts.forEach((part, index) => assertClipBinds(idle, part, `figure ${name} part ${figure.parts[index]!.file}`));
+      parts.forEach((part, index) => {
+        const what = `figure ${name} part ${figure.parts[index]!.file}`;
+        assertSameSkeleton(rig.scene, part, what);
+        assertClipBinds(idle, part, what);
+      });
       decoded.set(name, { name, rig: rig.scene, parts, clips, palette: figure.palette, rim: figure.rim, idle: figure.idle });
     } finally {
       for (const url of table.values()) URL.revokeObjectURL(url);

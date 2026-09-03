@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FIGURE_PALETTE_MAX, parseFeelManifest, verifySha256 } from "../src/manifest";
+import { CANDLES_MAX, FIGURE_PALETTE_MAX, parseFeelManifest, verifySha256 } from "../src/manifest";
 import {
   REQUIRED_PROPS,
   REQUIRED_ROOFS,
@@ -188,6 +188,15 @@ describe("candidate feel manifest", () => {
     const widest = validManifest() as { figures: { caretaker: Record<string, unknown> } };
     widest.figures.caretaker.palette = Array.from({ length: FIGURE_PALETTE_MAX }, (_, index) => [index % 256, 0, 0]);
     expect(() => parseFeelManifest(widest)).not.toThrow();
+  });
+
+  it("bounds the candles a space may carry, since each is a point light on the same uniform budget", () => {
+    const lit = validManifest() as { spaces: { room: { light_sources: { candles: number[][] } } } };
+    lit.spaces.room.light_sources.candles = Array.from({ length: CANDLES_MAX + 1 }, () => [0, 0.5, 0]);
+    expect(() => parseFeelManifest(lit)).toThrow(/light positions are invalid/);
+    const litEnough = validManifest() as { spaces: { room: { light_sources: { candles: number[][] } } } };
+    litEnough.spaces.room.light_sources.candles = Array.from({ length: CANDLES_MAX }, () => [0, 0.5, 0]);
+    expect(() => parseFeelManifest(litEnough)).not.toThrow();
     const bright = validManifest() as { figures: { caretaker: Record<string, unknown> } };
     bright.figures.caretaker.rim = 2;
     expect(() => parseFeelManifest(bright)).toThrow(/rim is invalid/);
