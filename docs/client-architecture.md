@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-02
-revision: 3
-status: Owner-authorized standing contract. Revision 3 records the browser-first ruling — the web client's baseline, its feel-surface role, and the retained Godot shell's standing — under the contract's full-re-proof rule.
+last_updated: 2026-09-03
+revision: 4
+status: Owner-authorized standing contract. Revision 3 records the browser-first ruling — the web client's baseline, its feel-surface role, and the retained Godot shell's standing — under the contract's full-re-proof rule; revision 4 records the desktop client as the web client in a native shell.
 public_safe: true
 summary: The client's standing architecture contract — engine baseline, the three state domains, control and wire consumption, command reconciliation and the epoch cursor, the renderer seam, the accessibility floor, the desktop targets, and the five layers of client proof.
 routes:
@@ -102,6 +102,20 @@ implementation of the codec, reconciliation, and HUD contracts, and its proof
 keeps running; it is no longer the feel surface, and no presentation
 investment goes into it unless a decision gives it a desktop role. Retiring
 it is its own decision.
+
+**The desktop client is the web client (owner ruling, 2026-09-03).** The
+browser client is the one client; the desktop build is that client in a
+native shell — a windowed wrapper giving a Steam build, the Steam Deck, a
+gamepad, and an installer to one codebase. The shell is **Tauri** (owner
+ruling, 2026-09-03): it keeps the desktop in the Rust ecosystem the server
+already lives in, and the owner has shipped with it before. Tauri renders
+through each platform's system webview rather than a bundled browser, so the
+desktop slice's proof obligation is stated now: the feel client must be
+proven on the webview of every desktop target — WebKitGTK on Linux and the
+Steam Deck, WebView2 on Windows, WKWebView on macOS — at the ruled play
+surface, before that target is claimed. The retained Godot shell stays cold pending a reason the
+browser cannot supply, and no other engine enters the stack: Unity was
+considered on 2026-09-03 and has no role.
 
 ## Engine baseline (the retained Godot shell)
 
@@ -316,6 +330,14 @@ source-tree path honestly.
 | 3 | scene, input, focus, accessibility, and minimum-resolution behaviour | `client/tests/test_input_bindings.gd`, `test_full_hud.gd`, `test_domain_panel.gd`, `test_interaction_director.gd` |
 | 4 | a real server through the real contracts, from an empty database | `tools/run_client_live_proof.py` driving the shipped `ClientRoot.tscn` |
 | 5 | controlled render, capture, and export evidence | `client/tests/capture_fixture_frame.gd`, `client/tests/live_capture.gd`, `client/tests/pulse_capture.gd`, `client/tests/validate_export_presets.gd` |
+
+The table is the retained Godot shell's proof; the web client's standing
+proof is the `web` lane plus the real-tab walk proof and captures described
+in [client notes](client-notes.md). The packaged Tauri client adds a layer of
+its own when the desktop slice lands: the packaged app launched on each
+target and the same walk proof driven through its webview. Until that layer
+is green for a target, the target is not claimed, whatever the other layers
+say.
 
 Layer 4 is the one that matters most and the one most easily faked. It exists
 because **constructing a component in a test is not the same as exercising it

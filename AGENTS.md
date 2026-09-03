@@ -76,7 +76,7 @@ crates/tme-server     sessions, admission, scheduling, durable authority
 crates/tme-sim        deterministic gameplay proving over the same rules
 crates/tme-authoring  authored documents -> proven runtime content
 web/                  the browser client — the feel surface, browser first
-client/               the retained Godot shell, cold pending its desktop role
+client/               the retained Godot shell, cold; the desktop is the web client in a shell
 content/lands/        the authored lands, and the compiled world a server serves
 content/              validated authored content and the test corpus
 tools/                the verification runner, boundary checks, the Workbench,
