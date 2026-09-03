@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { assertNormalSheetsMatch, isNormalSheetKey } from "../src/space/textures";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { VerifiedAssetPacket } from "../src/feelTypes";
+import { assertNormalSheetsMatch, decodeTextures, isNormalSheetKey } from "../src/space/textures";
 
 describe("normal sheets at decode time", () => {
   it("names a normal sheet by its key suffix", () => {
@@ -27,5 +28,38 @@ describe("normal sheets at decode time", () => {
   it("refuses a normal sheet with no colour sheet", () => {
     const textures = new Map([["props/ghost/normal", { width: 8, height: 8 }]]);
     expect(() => assertNormalSheetsMatch(textures)).toThrow(/has no colour sheet props\/ghost/);
+  });
+});
+
+describe("decoding a sheet", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("decodes every sheet straight, never through a premultiplied round trip", async () => {
+    const requests: ImageBitmapOptions[] = [];
+    vi.stubGlobal(
+      "createImageBitmap",
+      vi.fn(async (_blob: Blob, options?: ImageBitmapOptions) => {
+        requests.push(options ?? {});
+        return { width: 4, height: 4, close: () => undefined } as unknown as ImageBitmap;
+      }),
+    );
+    const packet = {
+      manifest: { schema_version: 2, assets: {}, start: { space: "s", cell: [0, 0] }, spaces: {} },
+      assets: new Map([
+        ["props/caretaker", { bytes: new ArrayBuffer(0), file: "prop-caretaker.png" }],
+        ["props/caretaker/normal", { bytes: new ArrayBuffer(0), file: "prop-caretaker-normal.png" }],
+      ]),
+    } as unknown as VerifiedAssetPacket;
+    const decoded = await decodeTextures(packet);
+    expect(decoded.size).toBe(2);
+    expect(requests).toHaveLength(2);
+    for (const options of requests) {
+      // The default round trip zeroes the colour under alpha 0; a normal
+      // sheet's surround would come back black and light the silhouette ring.
+      expect(options.premultiplyAlpha).toBe("none");
+      expect(options.imageOrientation).toBe("flipY");
+    }
   });
 });

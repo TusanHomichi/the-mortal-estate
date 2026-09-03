@@ -51,8 +51,14 @@ export async function decodeTextures(
         readableBitmap.close();
       }
       // ImageBitmap uploads ignore Texture.flipY in WebGL. Flip while decoding.
+      // Decode straight, never premultiplied: the browser's default round trip
+      // (premultiply on decode, un-premultiply on upload) zeroes the colour of
+      // every fully transparent pixel, so a normal sheet's flat surround becomes
+      // black, and filtering pulls that black into the silhouette ring as a
+      // backward normal — a bright outline around every card at every edge.
       const bitmap = await createImageBitmap(blob, {
         imageOrientation: "flipY",
+        premultiplyAlpha: "none",
       });
       const texture = new Texture(bitmap);
       texture.name = key;
