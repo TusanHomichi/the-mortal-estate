@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 28
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; no renderer, asset set, or production pipeline is accepted.
+revision: 29
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; revision 29 records the visible cell count and the ultrawide treatment; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -552,8 +552,8 @@ tiles are simply larger. This supersedes the fixed pixel density: the
 design size, not a ruled one, and a larger screen never shows more world.
 The reason is tactical fairness — sight range must not be bought with a
 monitor — and the reference game's fixed seven-by-seven view. The ruled
-6.31-unit frame height stands at the design size until the visible cell
-count is ruled (Open, below). Four rules keep it from looking like a
+6.31-unit frame height stands at the design size; the visible cell count
+is ruled below. Four rules keep it from looking like a
 stretched bitmap: the world is rendered at the display's real pixels with a
 fixed world extent, never as a scaled image; the chrome is authored at twice
 the design size and only ever scaled down; text, numbers, gauge levels, and
@@ -566,6 +566,22 @@ spare width rather than fill it with stone: the group readout and the
 active-effect icons take that space instead of floating over the play view.
 That treatment is not yet designed; 16:9 and 16:10 are the shapes the layout
 is judged on today.
+
+**Visible cell count and ultrawide ruling (owner, 2026-09-03).** The play
+view shows **nine cells across each diagonal** of the ruled frame, the extent
+the accepted layout already shows; that number is the fixed-cell camera's one
+input, and every other camera value — the diamond, the frame height, the
+actor scale — is derived from it at the design size. The reference game's
+seven by seven was considered and set aside: the accepted composites were
+judged at nine and stay true. On a display wider than 16:9 the play view
+keeps that extent and stays where the layout puts it; the spare width becomes
+**a forged side panel on each flank**, and the group readout and the
+active-effect icons move out of the play view into them. At 16:9 and 16:10
+nothing changes: the group readout stays a plate at the strip's right end
+while grouped, and the effect icons stay top-left of the play view. The bag
+and the chat take spare height only, as already ruled, and the play view
+never widens — sight range is not bought with a monitor. The side panels'
+pieces are not yet drawn; they are assets, and open with the rest.
 
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory
@@ -588,13 +604,10 @@ Deliberately unresolved, and not to be resolved by implementation:
 
 - the owner verdict on the representative micro-scene;
 - the exact native tile-edge length, joint width, camera distance, and actor
-  scale within the ruled 45-degree-yaw, 30-degree-elevation framing, and the
-  **visible cell count** of the play view now that its extent is the same for
-  everyone (the accepted layout shows about nine cells across each diagonal
-  at the ruled frame; the reference game showed seven by seven);
-- the ultrawide treatment: the interface expanding into the spare width so
-  the group readout and active-effect icons leave the play view, per the
-  owner's direction, not yet designed;
+  scale within the ruled 45-degree-yaw, 30-degree-elevation framing (the
+  visible cell count is ruled: nine across each diagonal);
+- the ultrawide side panels' pieces — the treatment is ruled, the assets
+  are not drawn;
 - the exact palette discipline and animation budget within the ruled pixel and
   surface grammar;
 - the dead world's visual identity beyond the direction above;
