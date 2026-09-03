@@ -72,6 +72,7 @@ describe("candidate feel manifest", () => {
 
     const parsed = parseFeelManifest(planted);
     expect(parsed.assets.props.tree_rare).toEqual({
+      flat: false,
       file: "prop-tree-rare.png",
       sha256: digest,
       normal: null,
