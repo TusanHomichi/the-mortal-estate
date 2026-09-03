@@ -450,11 +450,14 @@ world-up billboards anchored at their cell centres at their nominal heights;
 and the scene's only warmth comes from actual light sources — the lantern and
 candles — as the owner ruled in the lab.
 
-**Viewport ruling (owner, 2026-09-02).** The frame is 6.31 world units tall
-at the 1280 × 800 minimum play surface — one comparison step out from the
-lab's 5.05-unit frame, which is superseded — so the whole closed footprint of
-a building, roof included, sits in frame and the player stands about a fifth
-of the frame height. The ruling was made against painted full-frame references
+**Viewport ruling (owner, 2026-09-02).** The frame was ruled at 6.31 world
+units tall at the 1280 × 800 minimum play surface — one comparison step out
+from the lab's 5.05-unit frame, which is superseded — so the whole closed
+footprint of a building, roof included, sits in frame and the player stands
+about a fifth of the frame height. That height is itself superseded as a
+ruled value by the cell-count ruling of 2026-09-03, below, which derives the
+frame from the number of cells it shows; the intent this ruling records — the
+footprint in frame, the player about a fifth — stands. The ruling was made against painted full-frame references
 of the courtyard and the ground room (lab, review-candidate tier) in which the
 player stands about a sixth of the frame height; a further step out is
 expected once cards are re-baked at a higher density, and the client's `zoom`
@@ -551,9 +554,8 @@ tiles are simply larger. This supersedes the fixed pixel density: the
 179-pixel cell diamond of the viewport ruling becomes a value derived at the
 design size, not a ruled one, and a larger screen never shows more world.
 The reason is tactical fairness — sight range must not be bought with a
-monitor — and the reference game's fixed seven-by-seven view. The ruled
-6.31-unit frame height stands at the design size; the visible cell count
-is ruled below. Four rules keep it from looking like a
+monitor — and the reference game's fixed seven-by-seven view. The frame
+height is derived from the visible cell count, ruled below. Four rules keep it from looking like a
 stretched bitmap: the world is rendered at the display's real pixels with a
 fixed world extent, never as a scaled image; the chrome is authored at twice
 the design size and only ever scaled down; text, numbers, gauge levels, and
@@ -565,12 +567,22 @@ direction is that spare width expands the interface rather than filling it
 with stone; the ruling below says with what.
 
 **Visible cell count and ultrawide ruling (owner, 2026-09-03).** The play
-view shows **nine cells across each diagonal** of the ruled frame, the extent
-the accepted layout already shows; that number is the fixed-cell camera's one
-input, and every other camera value — the diamond, the frame height, the
-actor scale — is derived from it at the design size. The reference game's
-seven by seven was considered and set aside: the accepted composites were
-judged at nine and stay true. On a display wider than 16:9 the play view
+view is **nine cells tall**: nine ground-cell diamonds stacked along the play
+view's height at the design size, the extent the accepted layout already
+shows. That number is the fixed-cell camera's one input, and the camera's
+other values derive from it: under the ruled 30-degree elevation a cell's
+diamond is √2 · sin 30° ≈ 0.707 world units tall on screen, so the frame is
+nine of those, **≈ 6.36 world units** over the play view's full height; the
+diamond's pixel height is the play view's height over nine, its width twice
+that; and the count across the play view follows from the window's shape,
+about nine as well at the accepted layout. This supersedes the 6.31-unit
+frame of the viewport ruling, which was the lab's 5.05 one comparison step
+out and showed 8.93 cells; the difference is under one percent and the
+accepted composites, judged at that frame, stay true. The reference game's
+seven by seven was considered and set aside. What is authored is not
+derived: the actor's dimensions in world units stay authored under the
+one-metre-per-unit prop scale, and the actor's screen size follows from the
+camera; only the screen projection is derived here. On a display wider than 16:9 the play view
 keeps that extent and stays where the layout puts it; the spare width becomes
 **a forged side panel on each flank**, and the group readout and the
 active-effect icons move out of the play view into them. The chat does not
@@ -601,9 +613,10 @@ the owner's, at play size, through the production rule.
 Deliberately unresolved, and not to be resolved by implementation:
 
 - the owner verdict on the representative micro-scene;
-- the exact native tile-edge length, joint width, camera distance, and actor
-  scale within the ruled 45-degree-yaw, 30-degree-elevation framing (the
-  visible cell count is ruled: nine across each diagonal);
+- the exact native tile-edge length, joint width, and the actors' authored
+  world-unit dimensions within the ruled 45-degree-yaw, 30-degree-elevation
+  framing (the camera's distance is not open: it derives from the ruled nine
+  cells);
 - the ultrawide side panels' pieces — the treatment is ruled, the assets
   are not drawn;
 - the exact palette discipline and animation budget within the ruled pixel and
