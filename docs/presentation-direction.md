@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 29
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; revision 29 records the visible cell count and the ultrawide treatment; no renderer, asset set, or production pipeline is accepted.
+revision: 30
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; revision 29 records the visible cell count and the ultrawide treatment; revision 30 records the projection reaffirmed after the in-engine reference comparison; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -115,6 +115,22 @@ defects to correct, not characteristics to preserve.
 This ruling selects the packet's visual projection. It does **not** select a
 renderer, engine, platform, logical-to-screen implementation, or production
 tool. Those remain downstream evidence questions.
+
+**Reaffirmed (owner, 2026-09-03).** The owner asked to revisit the camera
+once more before locking it, this time in engine rather than by paintover:
+the lab rendered the served packet through a copy of this client under a
+straight-overhead, square-cell presentation with height drawn as a shared
+diagonal lean and figures seen from above — the classic tactical-map family
+this ruling had set aside — beside the ruled dimetric control, on the
+courtyard and the ground room at night and dusk. The interiors held up; the
+exteriors lost the volume this direction has been built to show — roofs
+became lids, wall faces became bands — and that loss is inherent to a
+top-down presentation, not a treatment gap. The owner ruled to keep the
+dimetric projection. What that family contributes is its play — cell count,
+cell ownership in the player's mind, a camera that snaps with the player,
+walls no one stands on — not its angle. The lab and its rig stay available
+should the question be reopened with the finished caretaker; its
+measurements stay in the lab.
 
 ### Tile assembly ruling
 
