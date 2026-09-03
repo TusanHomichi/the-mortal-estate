@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CANDLES_MAX, FIGURE_PALETTE_MAX, parseFeelManifest, verifySha256 } from "../src/manifest";
+import { FIGURE_PALETTE_MAX, POINT_LIGHTS_MAX, parseFeelManifest, verifySha256 } from "../src/manifest";
 import {
   REQUIRED_PROPS,
   REQUIRED_ROOFS,
@@ -190,16 +190,18 @@ describe("candidate feel manifest", () => {
     expect(() => parseFeelManifest(widest)).not.toThrow();
   });
 
-  it("bounds the candles a space may carry, since each is a point light on the same uniform budget", () => {
-    const lit = validManifest() as { spaces: { room: { light_sources: { candles: number[][] } } } };
-    lit.spaces.room.light_sources.candles = Array.from({ length: CANDLES_MAX + 1 }, () => [0, 0.5, 0]);
-    expect(() => parseFeelManifest(lit)).toThrow(/light positions are invalid/);
-    const litEnough = validManifest() as { spaces: { room: { light_sources: { candles: number[][] } } } };
-    litEnough.spaces.room.light_sources.candles = Array.from({ length: CANDLES_MAX }, () => [0, 0.5, 0]);
-    expect(() => parseFeelManifest(litEnough)).not.toThrow();
-    const bright = validManifest() as { figures: { caretaker: Record<string, unknown> } };
-    bright.figures.caretaker.rim = 2;
-    expect(() => parseFeelManifest(bright)).toThrow(/rim is invalid/);
+  it("bounds a space's point lights — candles, fixtures, and the lantern together", () => {
+    type Lit = { spaces: { room: { light_sources: { lantern_glass: number[] | null; candles: number[][] } } } };
+    const over = validManifest() as Lit;
+    over.spaces.room.light_sources.candles = Array.from({ length: POINT_LIGHTS_MAX + 1 }, () => [0, 0.5, 0]);
+    expect(() => parseFeelManifest(over)).toThrow(/carries 17 point lights .* at most 16/);
+    const exact = validManifest() as Lit;
+    exact.spaces.room.light_sources.candles = Array.from({ length: POINT_LIGHTS_MAX }, () => [0, 0.5, 0]);
+    expect(() => parseFeelManifest(exact)).not.toThrow();
+    const withLantern = validManifest() as Lit;
+    withLantern.spaces.room.light_sources.candles = Array.from({ length: POINT_LIGHTS_MAX }, () => [0, 0.5, 0]);
+    withLantern.spaces.room.light_sources.lantern_glass = [1, 1.5, 1];
+    expect(() => parseFeelManifest(withLantern)).toThrow(/carries 17 point lights/);
   });
 
   const treePlacement = (): Record<string, unknown> => ({

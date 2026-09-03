@@ -198,7 +198,7 @@ did not foresee and the implementation records:
 Proof, at the reviewed tree: 140 unit tests (the review added refusals for
 an unlisted file, an unpatchable material, a clip that does not bind to
 skeleton bones, a part on another skeleton, a palette over 32 colours, more
-than 16 candles, and disposal of decoded sources and cloned skeletons); fast
+than 16 point lights in a space, and disposal of decoded sources and cloned skeletons); fast
 lane COMPLETE; captures in both engines at night and dusk in the courtyard,
 the room photographed by the walk proof's interior capture; walk proof PASS
 in Chromium and Firefox with `data-caretaker-figure` and

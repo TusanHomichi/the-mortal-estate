@@ -61,8 +61,11 @@ function isSafePngPath(value: unknown): value is string {
 
 const FIGURE_EXTENSIONS = [".gltf", ".glb", ".bin", ".png"];
 export const FIGURE_PALETTE_MAX = 32;
-/** Each candle is a point light with its own fragment uniforms; the budget is shared with the figure palette. */
-export const CANDLES_MAX = 16;
+/**
+ * Every candle, every hearth fixture, and the lantern is a point light with its
+ * own fragment uniforms, on the same guaranteed budget as the figure palette.
+ */
+export const POINT_LIGHTS_MAX = 16;
 
 function isSafeFigurePath(value: unknown): value is string {
   if (typeof value !== "string" || value.length === 0 || value.includes("\\")) return false;
@@ -114,8 +117,8 @@ function parseFigureRow(value: unknown, name: string): FigureRow {
   }
   // The palette becomes one vec3 fragment uniform per entry beside everything
   // a physical material and the lights already need; WebGL2 guarantees only
-  // 224 fragment uniform vectors, the candles (CANDLES_MAX point lights) draw
-  // on the same budget, and the treatment produces 28, so the cap is 32.
+  // 224 fragment uniform vectors, a space's point lights (POINT_LIGHTS_MAX)
+  // draw on the same budget, and the treatment produces 28, so the cap is 32.
   if (
     !Array.isArray(value.palette) ||
     value.palette.length < 2 ||
@@ -498,10 +501,13 @@ function parseSpace(
     !hasExactKeys(lights, ["lantern_glass", "candles"]) ||
     (lights.lantern_glass !== null && !isVector(lights.lantern_glass, 3)) ||
     !Array.isArray(lights.candles) ||
-    lights.candles.length > CANDLES_MAX ||
     !lights.candles.every((candle) => isVector(candle, 3))
   ) {
     throw new Error("the candidate feel light positions are invalid");
+  }
+  const pointLights = lights.candles.length + fixtures.length + (lights.lantern_glass === null ? 0 : 1);
+  if (pointLights > POINT_LIGHTS_MAX) {
+    throw new Error(`a candidate feel space carries ${pointLights} point lights (candles, fixtures, lantern); at most ${POINT_LIGHTS_MAX}`);
   }
   if (typeof value.weather !== "boolean" || !Array.isArray(value.portals)) {
     throw new Error("the candidate feel space weather or portals are invalid");
