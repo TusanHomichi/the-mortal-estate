@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
-revision: 27
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; no renderer, asset set, or production pipeline is accepted.
+revision: 28
+status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; no renderer, asset set, or production pipeline is accepted.
 public_safe: true
 summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
 routes:
@@ -543,6 +543,30 @@ layout but its assets: the slices, a nine-patch for every panel that
 stretches, this project's own engraved glyph set, and the accessibility
 floor's collapse.
 
+**Proportional scaling ruling (owner, 2026-09-03).** Every player sees the
+same extent of world in the play view whatever their screen resolution, and
+the interface scales with it: the screen — chrome and window together — is
+designed once at 1920 × 1080 and scaled uniformly to the display; at 4K the
+tiles are simply larger. This supersedes the fixed pixel density: the
+179-pixel cell diamond of the viewport ruling becomes a value derived at the
+design size, not a ruled one, and a larger screen never shows more world.
+The reason is tactical fairness — sight range must not be bought with a
+monitor — and the reference game's fixed seven-by-seven view. The ruled
+6.31-unit frame height stands at the design size until the visible cell
+count is ruled (Open, below). Four rules keep it from looking like a
+stretched bitmap: the world is rendered at the display's real pixels with a
+fixed world extent, never as a scaled image; the chrome is authored at twice
+the design size and only ever scaled down; text, numbers, gauge levels, and
+health lines are drawn live by the client, never baked into art; and a
+display that is not 16:9 gives its spare space to the parts that want it —
+spare height to the bag and the chat, spare width to the chat — through
+nine-patch edges, while the window never moves. For a display wider than
+16:9 the owner's direction is that the interface should expand into the
+spare width rather than fill it with stone: the group readout and the
+active-effect icons take that space instead of floating over the play view.
+That treatment is not yet designed; 16:9 and 16:10 are the shapes the layout
+is judged on today.
+
 **The candidate-asset rule.** The scene's art is candidate material from the
 lab, and none of it is tracked. The scene loads assets only from the directory
 named by the environment variable `TME_FEEL_ASSETS`, through a manifest that
@@ -564,7 +588,13 @@ Deliberately unresolved, and not to be resolved by implementation:
 
 - the owner verdict on the representative micro-scene;
 - the exact native tile-edge length, joint width, camera distance, and actor
-  scale within the ruled 45-degree-yaw, 30-degree-elevation framing;
+  scale within the ruled 45-degree-yaw, 30-degree-elevation framing, and the
+  **visible cell count** of the play view now that its extent is the same for
+  everyone (the accepted layout shows about nine cells across each diagonal
+  at the ruled frame; the reference game showed seven by seven);
+- the ultrawide treatment: the interface expanding into the spare width so
+  the group readout and active-effect icons leave the play view, per the
+  owner's direction, not yet designed;
 - the exact palette discipline and animation budget within the ruled pixel and
   surface grammar;
 - the dead world's visual identity beyond the direction above;
