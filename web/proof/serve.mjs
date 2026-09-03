@@ -18,6 +18,20 @@ export function refuseUnavailable(reason) {
   process.exit(3);
 }
 
+/**
+ * The same refusal, thrown: for a capability found missing after a server is
+ * already up, so the caller's cleanup runs before the process reports 3.
+ */
+export class ProofUnavailable extends Error {
+  exitCode = 3;
+}
+
+/** Report a thrown refusal the way refuseUnavailable would, without exiting. */
+export function reportUnavailable(error) {
+  console.error(`UNAVAILABLE: ${error.message}`);
+  process.exitCode = 3;
+}
+
 /** The candidate packet directory, or a refusal: a tracked path is never a default. */
 export function requirePacket() {
   const packet = process.env.TME_FEEL_ASSETS?.trim() ?? "";
@@ -72,12 +86,12 @@ export async function launchProofBrowser({ name, engine, executablePath }) {
   if (display === "") {
     let xvfbPath = "";
     try { xvfbPath = execFileSync("which", ["Xvfb"], { encoding: "utf8" }).trim(); } catch { /* absent */ }
-    if (xvfbPath === "") refuseUnavailable("Firefox needs a display for WebGL2: set DISPLAY or install Xvfb");
+    if (xvfbPath === "") throw new ProofUnavailable("Firefox needs a display for WebGL2: set DISPLAY or install Xvfb");
     const number = 90 + Math.floor(Math.random() * 900);
     display = `:${number}`;
     xvfb = spawn(xvfbPath, [display, "-screen", "0", "1600x1000x24", "-nolisten", "tcp"], { stdio: "ignore" });
     await new Promise((resolve) => setTimeout(resolve, 600));
-    if (xvfb.exitCode !== null) refuseUnavailable(`Xvfb ${display} exited with ${xvfb.exitCode}`);
+    if (xvfb.exitCode !== null) throw new ProofUnavailable(`Xvfb ${display} exited with ${xvfb.exitCode}`);
   }
   const browser = await engine.launch({
     executablePath,

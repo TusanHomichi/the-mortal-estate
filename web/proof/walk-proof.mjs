@@ -5,7 +5,7 @@ import path from "node:path";
 import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
-import { launchProofBrowser, proofBrowsers, requirePacket, startVite } from "./serve.mjs";
+import { ProofUnavailable, launchProofBrowser, proofBrowsers, reportUnavailable, requirePacket, startVite } from "./serve.mjs";
 
 // The packet under proof comes from the environment, never a tracked path; the
 // captures go where the owner asks (the capture-output capability) or to a
@@ -22,6 +22,7 @@ const captureBase = path.resolve(
 if (engines.length > 1) {
   const script = fileURLToPath(import.meta.url);
   let failed = 0;
+  let unavailable = 0;
   for (const { name } of engines) {
     const exit = await new Promise((resolve) => {
       const child = spawn(process.execPath, [script], {
@@ -30,12 +31,21 @@ if (engines.length > 1) {
       });
       child.on("exit", (code) => resolve(code ?? 1));
     });
-    if (exit !== 0) failed += 1;
+    if (exit === 3) unavailable += 1;
+    else if (exit !== 0) failed += 1;
   }
-  console.log(failed === 0
-    ? `PASS walk proof in ${engines.map((e) => e.name).join(" and ")}: ${captureBase}`
-    : `FAIL walk proof: ${failed} of ${engines.length} engines failed`);
-  process.exit(failed === 0 ? 0 : 1);
+  // A failed engine is a failure; an engine that could not run is an
+  // incomplete proof, and stays exit 3 all the way up.
+  if (failed > 0) {
+    console.log(`FAIL walk proof: ${failed} of ${engines.length} engines failed`);
+    process.exit(1);
+  }
+  if (unavailable > 0) {
+    console.error(`UNAVAILABLE: walk proof ran in ${engines.length - unavailable} of ${engines.length} engines`);
+    process.exit(3);
+  }
+  console.log(`PASS walk proof in ${engines.map((e) => e.name).join(" and ")}: ${captureBase}`);
+  process.exit(0);
 }
 const [proofEngine] = engines;
 const engineName = proofEngine.name;
@@ -184,14 +194,19 @@ async function draftAndCommit(page, clockStartedAt, from, target) {
       detail: 2,
     }));
   }, point);
-  // Wait for the commitment rather than sampling it: a slow rasteriser can
-  // take a frame or two to reflect it, and a fixed sample was the #31 flake.
+  // The commitment is observed, not sampled: under a slow rasteriser the beat
+  // can strike between the double-click and the next read, in which case the
+  // route has already landed on the target and the state is idle there. Both
+  // are the commitment succeeding; a strict re-read of "committed" was #31.
   await page.waitForFunction(
-    () => document.querySelector("#feel-stage")?.dataset.walkState === "committed",
-    null,
-    { timeout: 3_000 },
+    ({ expectedCell }) => {
+      const stage = document.querySelector("#feel-stage");
+      return stage?.dataset.walkState === "committed" ||
+        (stage?.dataset.walkState === "idle" && stage.dataset.caretakerCell === expectedCell);
+    },
+    { expectedCell: `${target.i},${target.j}` },
+    { timeout: 4_000 },
   );
-  assert.equal(await stageAttribute(page, "data-walk-state"), "committed");
 }
 
 async function walkWithinSpace(page, clockStartedAt, space, from, target, cameraFollows = true) {
@@ -318,6 +333,9 @@ try {
       `30-frame rAF average ${measurement.averageRafMilliseconds.toFixed(3)} ms; ` +
       `render average ${measurement.averageRenderMilliseconds.toFixed(3)} ms`,
   );
+} catch (error) {
+  if (!(error instanceof ProofUnavailable)) throw error;
+  reportUnavailable(error);
 } finally {
   await launched?.stop();
   await vite.stop();
