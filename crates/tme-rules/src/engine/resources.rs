@@ -438,15 +438,6 @@ impl Engine {
         boundary_at: LogicalTime,
         events: &mut Vec<Event>,
     ) -> Result<(), StepError> {
-        if !boundary_at.is_multiple_of(
-            self.definition
-                .catalog
-                .rules
-                .resources
-                .recovery_interval_units,
-        ) {
-            return Ok(());
-        }
         let actor = self
             .world
             .actors
@@ -455,11 +446,28 @@ impl Engine {
         if !actor.is_alive() || actor.character.is_none() {
             return Ok(());
         }
-        let activity = if actor.resource_activity.last_active_at == Some(self.current_time()) {
+        let interval = self
+            .definition
+            .catalog
+            .rules
+            .resources
+            .recovery_interval_units;
+        let previous = actor.resource_activity.last_recovered_at;
+        if boundary_at.elapsed_rounds_since(previous) < u64::from(interval) {
+            return Ok(());
+        }
+        let activity = if actor
+            .resource_activity
+            .last_active_at
+            .is_some_and(|at| at >= previous)
+        {
             ResourceActivity::Active
         } else {
             ResourceActivity::Inactive
         };
+        self.world.actors[actor_index]
+            .resource_activity
+            .last_recovered_at = boundary_at;
         let hp_amount = match activity {
             ResourceActivity::Active => self.definition.catalog.rules.resources.active_hp_recovery,
             ResourceActivity::Inactive => {

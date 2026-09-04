@@ -126,7 +126,7 @@ func test_feedback_resolves_inside_the_beat_it_belongs_to() -> void:
 
 	# A command installed 120 ms before the beat ends: the 280 ms melee window
 	# would carry its payoff 160 ms into the next beat.
-	director.set_beat_deadline(1120)
+	director.set_cooldown_deadline(1120)
 	director.note_command_installed({"kind": "physical_attack", "mode": "fight", "target_actor_id": "actor-a"}, 1000)
 	director.set_test_clock(1000)
 	var entry: Dictionary = {"kind": "physical_combat", "text": "[HIT] Synthetic", "high_salience": true}
@@ -149,7 +149,7 @@ func test_a_payoff_that_already_fits_inside_the_beat_is_left_exactly_where_it_wa
 	var director: CombatFeelDirector = fixture["director"]
 	var deferred: Array[Dictionary] = []
 	director.deferred_feedback_ready.connect(func(entry: Dictionary) -> void: deferred.append(entry))
-	director.set_beat_deadline(4000)
+	director.set_cooldown_deadline(4000)
 	director.note_command_installed({"kind": "physical_attack", "mode": "fight", "target_actor_id": "actor-a"}, 1000)
 	director.set_test_clock(1000)
 	var entry: Dictionary = {"kind": "physical_combat", "text": "[HIT] Synthetic"}
@@ -171,7 +171,7 @@ func test_with_no_observed_beat_the_profile_windows_stand_alone() -> void:
 	var fixture: Dictionary = _director()
 	var director: CombatFeelDirector = fixture["director"]
 	var player: AudioCuePlayer = fixture["player"]
-	director.set_beat_deadline(-1)
+	director.set_cooldown_deadline(-1)
 	director.note_command_installed({"kind": "physical_attack", "mode": "shoot", "target_actor_id": "actor-b"}, 1000)
 	director.advance(1159)
 	_support.expect_equal(_history_roles(player), [], "an unmeasured beat imposes no deadline of its own")

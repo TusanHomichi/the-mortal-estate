@@ -6,17 +6,17 @@ loaded "Reach Attack" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:1,1 hp=12
 monster Reedling at realm_0/room_0:2,1 hp=5
 
-player ready: Delver at 1
-Delver intent at 1: poke reedling
+player ready: Delver at 3000ms
+Delver intent at 3000ms: poke reedling
 Delver missed Reedling: roll=2 attack_score=3 defense_score=13
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Reedling at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Reedling at 6000ms
 Reedling intent: move west
 Reedling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Reedling step west -> (1,1): terrain=Practice Ring cost=1 remaining=0
 Reedling moved from (2,1) to (1,1)
-readiness scheduled: Reedling cost=1 ready_at=3
+readiness scheduled: Reedling cost=1 ready_at=9000ms
 
 final state
 Delver at realm_0/room_0:1,1 hp=12 alive

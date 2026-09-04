@@ -6,8 +6,8 @@ loaded "Terrain Movement" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:1,1 hp=12
 monster Mireling at realm_0/room_0:5,4 hp=7
 
-player ready: Delver at 1
-Delver intent at 1: inspect
+player ready: Delver at 3000ms
+Delver intent at 3000ms: inspect
 Delver inspected at realm_0/room_0:1,1: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/room_0:1,0: blocked terrain terrain=Stone Wall
@@ -18,10 +18,9 @@ Delver inspected at realm_0/room_0:1,1: tile=Flagstone
   southwest -> realm_0/room_0:0,2: blocked terrain terrain=Stone Wall
   west -> realm_0/room_0:0,1: blocked terrain terrain=Stone Wall
   northwest -> realm_0/room_0:0,0: blocked terrain terrain=Stone Wall
-readiness scheduled: Delver cost=0 ready_at=1
 
-player ready: Delver at 1
-Delver intent at 1: sprint east,southeast,south
+player ready: Delver at 3000ms
+Delver intent at 3000ms: sprint east,southeast,south
 Delver sprint: requested=3 accepted=3 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
 Delver moved from (1,1) to (2,1)
@@ -29,42 +28,42 @@ Delver moved from (1,1) to (2,1)
 Delver moved from (2,1) to (3,2)
   Delver step south -> (3,3): terrain=Flagstone cost=1 remaining=0
 Delver moved from (3,2) to (3,3)
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Mireling at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Mireling at 6000ms
 Mireling intent: move northwest
 Mireling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Mireling step northwest -> (4,3): terrain=Flagstone cost=1 remaining=0
 Mireling moved from (5,4) to (4,3)
-readiness scheduled: Mireling cost=1 ready_at=3
+readiness scheduled: Mireling cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: sprint northwest,north,east
+player ready: Delver at 6000ms
+Delver intent at 6000ms: sprint northwest,north,east
 Delver sprint: requested=3 accepted=2 points=3 burden=None exertion=None stamina_cost=None stop=Blocked
   Delver step northwest -> (2,2): terrain=Flagstone cost=1 remaining=2
 Delver moved from (3,3) to (2,2)
   Delver step north -> (2,1): terrain=Flagstone cost=1 remaining=1
 Delver moved from (2,2) to (2,1)
 Delver blocked from (2,1) to (3,1): insufficient movement points
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Mireling at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Mireling at 9000ms
 Mireling intent: move northwest
 Mireling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Mireling step northwest -> (3,2): terrain=Flagstone cost=1 remaining=0
 Mireling moved from (4,3) to (3,2)
-readiness scheduled: Mireling cost=1 ready_at=4
+readiness scheduled: Mireling cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: wait
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Mireling at 4
+player ready: Delver at 9000ms
+Delver intent at 9000ms: wait
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Mireling at 12000ms
 Mireling intent: move northwest
 Mireling walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Mireling step northwest -> (2,1): terrain=Flagstone cost=1 remaining=0
 Mireling moved from (3,2) to (2,1)
-readiness scheduled: Mireling cost=1 ready_at=5
+readiness scheduled: Mireling cost=1 ready_at=15000ms
 
 final state
 Delver at realm_0/room_0:2,1 hp=12 alive

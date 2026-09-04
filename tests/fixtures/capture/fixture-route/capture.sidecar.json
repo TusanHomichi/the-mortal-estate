@@ -33,14 +33,14 @@
   },
   "image": {
     "path": "capture.png",
-    "sha256": "13f4a3cdedd6f163288a32fa7aeafb45ab43ee0763f43b33e0371842bc4b0a3e"
+    "sha256": "68ed43c1e72c4603cad811b24e9f8d5e026794021373326b6221393fd0169d0f"
   },
   "kind": "capture_identity_sidecar",
   "producer": "grid_world_view",
   "route": "fixture_frame",
   "scene": {
     "level": "surface",
-    "logical_time": "10",
+    "logical_time": "9645",
     "observation_center": {
       "x": 12,
       "y": 14

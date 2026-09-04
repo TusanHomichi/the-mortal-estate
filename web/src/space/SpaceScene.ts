@@ -1,3 +1,5 @@
+import { addStructures } from "./structures";
+import type { FigureFacing } from "../walk/facing";
 import {
   AdditiveBlending,
   AmbientLight,
@@ -106,9 +108,10 @@ export interface SpaceSceneOptions {
   anisotropy: number;
   camera: OrthographicCamera;
   caretakerCell: Cell;
-  caretakerFacing: 1 | -1;
+  caretakerFacing: FigureFacing;
   figures: Map<string, DecodedFigure>;
   caretakerFigure: string;
+  structures: ReadonlyMap<string, Group>;
 }
 
 const WARM_LIGHT = new Color("#ffb457");
@@ -341,6 +344,7 @@ export class SpaceScene {
     this.addGround();
     this.addWalls();
     this.addRoofs();
+    addStructures(this.group, name, space.structures, options.structures);
     this.addFixtures();
     const lights = this.addLights(caretakerCell);
     this.keyLight = lights.key;
@@ -891,7 +895,7 @@ export class SpaceScene {
     const geometries = new Set<BufferGeometry>();
     const materials = new Set<Material>();
     this.group.traverse((object) => {
-      if (!(object instanceof Mesh)) return;
+      if (!(object instanceof Mesh) || object.userData.sharedStructure) return;
       geometries.add(object.geometry);
       if (Array.isArray(object.material)) object.material.forEach((material) => materials.add(material));
       else materials.add(object.material);

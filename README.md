@@ -2,7 +2,7 @@
 
 > **Death is another place.**
 >
-> **A life ends. The pulse continues.**
+> **A life ends. The world continues.**
 
 The Mortal Estate is an original persistent online tactical role-playing game
 about life, death, inheritance, memory, and a land where mortality no longer
@@ -15,7 +15,7 @@ successor can inherit from them, or leave the land and accept ordinary aging
 and final death. Former characters remain people in the world rather than
 becoming deleted save records.
 
-The game combines deliberate pulse-based action, dangerous tile-and-terrain
+The game combines deliberate action with individual cooldowns, dangerous tile-and-terrain
 tactics, social interdependence, long character development, mutable
 environments, and a persistent world whose living settlements are built over
 lives and places that came before.
@@ -28,7 +28,7 @@ development record and frozen private predecessor remain private and are not
 part of this repository. Publishing this source did not release a game, client,
 service, public API, or content snapshot. Where the work stands, phase by phase,
 is the
-[genesis ledger](docs/plans/genesis-ledger.md#current-checkpoint-2026-09-04).
+[genesis ledger](docs/plans/genesis-ledger.md#current-checkpoint-2026-09-05).
 For what the clients implement now, read
 [client notes](docs/client-notes.md#current-implementation);
 [presentation direction](docs/presentation-direction.md) owns the accepted target.

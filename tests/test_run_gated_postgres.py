@@ -99,5 +99,15 @@ class TheCommandLine(unittest.TestCase):
         self.assertNotIn("--admin-url ", parser_arguments)
 
 
+class ExactGatedSelection(unittest.TestCase):
+    def test_an_empty_exact_filter_cannot_pass_as_database_proof(self) -> None:
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        with patch.object(gated.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout="0 tests, 0 benchmarks\n")) as run:
+            with self.assertRaisesRegex(gated.GatedError, "exact required test"):
+                gated.run_cargo_test(gated.GATED_TESTS[0], {})
+            self.assertEqual(run.call_count, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

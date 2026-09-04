@@ -1232,7 +1232,7 @@ async fn insert_synthetic_player_kill_mark(
         "INSERT INTO tme.player_kill_marks \
          (mark_id,facet_kill_sequence,killer_account_id,killer_character_id, \
           victim_account_id,victim_character_id,killer_session_id,victim_session_id, \
-          assessed_at,assessed_logical_time,linked_karma_added, \
+          assessed_at,assessed_logical_millis,linked_karma_added, \
           karma_forgiveness_eligible,expires_at) \
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8, \
                  statement_timestamp()-make_interval(secs=>$9),$2,false,false, \
@@ -2012,7 +2012,7 @@ async fn commit_kill(
     let revision: i64 = row.get("facet_revision");
     let sequence: i64 = row.get("last_server_sequence");
     let bytes: Vec<u8> = row.get("checkpoint_bytes");
-    let checkpoint = tme_rules::FacetCheckpointV4::from_bytes(bytes).unwrap();
+    let checkpoint = tme_rules::FacetCheckpointV5::from_bytes(bytes).unwrap();
     store
         .commit_system(tme_server::store::SystemCommit {
             facet_id: world_id,
@@ -2021,7 +2021,7 @@ async fn commit_kill(
             next_server_sequence: u64::try_from(sequence).unwrap() + 1,
             next_revision: u64::try_from(revision).unwrap() + 1,
             checkpoint: &checkpoint,
-            action: "facet_tick",
+            action: "facet_deadlines",
             durable_effects: std::slice::from_ref(
                 &tme_rules::DurableGameplayEffectV1::PlayerKillAssessed(assessment.clone()),
             ),
@@ -2118,7 +2118,7 @@ async fn insert_pending_consequence(
     sqlx::query(
         "INSERT INTO tme.pending_player_kill_consequences \
          (facet_kill_sequence,killer_account_id,killer_character_id,victim_character_id, \
-          victim_alignment,victim_nature,assessed_logical_time) \
+          victim_alignment,victim_nature,assessed_logical_millis) \
          VALUES ($1,$2,$3,$4,'lawful','human',1)",
     )
     .bind(sequence)
@@ -2317,7 +2317,7 @@ fn social_bootstrap(
         .expect("social scenario arrival");
     shared
         .clone()
-        .advance_realtime_boundary()
+        .advance_action_interval()
         .expect("two-player social facet advances one boundary");
 
     let _ = arrival_id;

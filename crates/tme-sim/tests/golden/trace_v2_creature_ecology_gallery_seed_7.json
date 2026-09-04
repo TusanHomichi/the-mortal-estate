@@ -3,15 +3,17 @@
     "contract_version": 2,
     "scenario_id": "creature_ecology_gallery",
     "seed": 7,
-    "event_contract_version": 40,
-    "snapshot_contract_version": 30,
-    "observed_snapshot_contract_version": 29,
-    "action_context_contract_version": 31,
+    "event_contract_version": 41,
+    "snapshot_contract_version": 31,
+    "observed_snapshot_contract_version": 30,
+    "action_context_contract_version": 32,
     "intent_contract_version": 26,
     "initial_debug_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "scope": "omniscient_local",
-      "logical_time": 1,
+      "logical_time": {
+        "milliseconds": 3000
+      },
       "controlled_actor_ids": [
         "player"
       ],
@@ -590,10 +592,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 1,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -703,10 +709,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 3,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -794,10 +804,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 2,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -907,10 +921,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 0,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": "gallery_club",
             "item_definition_id": "oak_club",
@@ -1102,8 +1120,10 @@
       "quest_states": []
     },
     "initial_observed_snapshot": {
-      "contract_version": 29,
-      "logical_time": 1,
+      "contract_version": 30,
+      "logical_time": {
+        "milliseconds": 3000
+      },
       "observer_actor_id": "player",
       "observation_center": {
         "realm": "realm_0",
@@ -1690,9 +1710,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -1802,9 +1826,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -1892,9 +1920,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -2004,9 +2036,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": "gallery_club",
             "item_definition_id": "oak_club",
@@ -2090,7 +2126,7 @@
       "tile_effects": []
     },
     "initial_action_context": {
-      "contract_version": 31,
+      "contract_version": 32,
       "actor_id": "player",
       "actor_name": "Trailwarden",
       "actor_kind": "player",
@@ -2103,8 +2139,12 @@
         }
       },
       "law_zone": "none",
-      "logical_time": 1,
-      "ready_at": 1,
+      "logical_time": {
+        "milliseconds": 3000
+      },
+      "ready_at": {
+        "milliseconds": 3000
+      },
       "can_act": true,
       "life_state": {
         "kind": "alive"
@@ -2112,7 +2152,9 @@
       "controlled_path_points": 3,
       "max_path_steps": 3,
       "last_resource_activity_at": null,
-      "attack_ready_at": 1,
+      "attack_ready_at": {
+        "milliseconds": 3000
+      },
       "active_effects": [],
       "magic_resistance": {
         "natural_save_twentieths": 5,
@@ -2767,14 +2809,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 1
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 1,
+            "logical_time": {
+              "milliseconds": 3000
+            },
             "intent": "fight ecology:gallery_pack:runner:0"
           }
         },
@@ -2864,7 +2910,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "loot_claim": {
               "owner": {
@@ -2957,13 +3005,9 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 2
-          }
-        },
-        {
-          "logical_time_advanced": {
-            "from": 1,
-            "to": 2
+            "ready_at": {
+              "milliseconds": 6000
+            }
           }
         },
         {
@@ -2971,7 +3015,9 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "kind": "monster",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
@@ -3027,7 +3073,7 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source_kind": "spell",
             "source_id": "venom_bite",
@@ -3044,7 +3090,9 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 6000
+            }
           }
         },
         {
@@ -3052,7 +3100,9 @@
             "actor_id": "ecology:gallery_pack:keeper:0",
             "actor": "Bramble Keeper",
             "kind": "monster",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
@@ -3094,14 +3144,235 @@
             "actor_id": "ecology:gallery_pack:keeper:0",
             "actor": "Bramble Keeper",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "logical_time_advanced": {
+            "from": {
+              "milliseconds": 3000
+            },
+            "to": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "effect_ticked": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 2
+          }
+        },
+        {
+          "effect_damaged": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "damage": 1,
+            "hp": 49
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 1,
+            "total_actual_damage": 1
+          }
+        },
+        {
+          "actor_ready": {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "actor": "Cinder Burrower",
+            "kind": "monster",
+            "logical_time": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "automatic_actor_decision": {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "actor": "Cinder Burrower",
+            "decision": {
+              "kind": "use_ability",
+              "ability_id": "ember_spit",
+              "spell_id": "venom_bite",
+              "spell_name": "Venom Bite",
+              "target_id": "player",
+              "target": "Trailwarden"
+            }
+          }
+        },
+        {
+          "spell_save_resolved": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "effect_id": "venom_bite",
+            "resistance_tag": "poison",
+            "natural_save_twentieths": 5,
+            "matching_bonus_twentieths": 0,
+            "selected_boost_source_kind": null,
+            "selected_boost_source_id": null,
+            "denominator": 20,
+            "save_twentieths": 5,
+            "roll": 9,
+            "success": false,
+            "mitigation_mode": null,
+            "requested_damage": null,
+            "resolved_damage": null
+          }
+        },
+        {
+          "effect_applied": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "source_kind": "spell",
+            "source_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 3
+          }
+        },
+        {
+          "actor_readiness_scheduled": {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "actor": "Cinder Burrower",
+            "cost_units": 1,
+            "ready_at": {
+              "milliseconds": 9000
+            }
+          }
+        },
+        {
+          "actor_ready": {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "actor": "Bramble Keeper",
+            "kind": "monster",
+            "logical_time": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "automatic_actor_decision": {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "actor": "Bramble Keeper",
+            "decision": {
+              "kind": "physical_attack",
+              "target_id": "player",
+              "target": "Trailwarden",
+              "mode": "fight"
+            }
+          }
+        },
+        {
+          "attacked": {
+            "attacker_id": "ecology:gallery_pack:keeper:0",
+            "attacker": "Bramble Keeper",
+            "defender_id": "player",
+            "defender": "Trailwarden",
+            "defender_location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "mode": "fight",
+            "damage_kind": "crushing",
+            "effective_combat_add_rating": 0,
+            "roll": 16,
+            "damage": 2,
+            "armor_reduction": 0,
+            "label": "light",
+            "wound_before": "wounded",
+            "wound_after": "wounded",
+            "defender_hp": 47
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 2,
+            "total_actual_damage": 3
+          }
+        },
+        {
+          "actor_readiness_scheduled": {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "actor": "Bramble Keeper",
+            "cost_units": 1,
+            "ready_at": {
+              "milliseconds": 9000
+            }
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 2,
+        "logical_time": {
+          "milliseconds": 6000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -3680,10 +3951,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -3793,10 +4068,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -3884,10 +4163,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -3961,9 +4244,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 47,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -3975,10 +4258,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 2,
-            "last_resource_activity_at": 1,
+            "ready_at": {
+              "milliseconds": 6000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 3000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 2,
+            "attack_ready_at": {
+              "milliseconds": 6000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -4049,7 +4338,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -4199,7 +4488,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -4217,8 +4508,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 2,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 6000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -4805,9 +5098,13 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -4917,9 +5214,13 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -5007,9 +5308,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -5083,9 +5388,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 47,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -5097,9 +5402,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 2,
-            "last_resource_activity_at": 1,
-            "attack_ready_at": 2,
+            "ready_at": {
+              "milliseconds": 6000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 3000
+            },
+            "attack_ready_at": {
+              "milliseconds": 6000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -5171,7 +5482,7 @@
             "character": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -5214,7 +5525,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -5230,7 +5543,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -5243,19 +5556,27 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 2,
-        "ready_at": 2,
+        "logical_time": {
+          "milliseconds": 6000
+        },
+        "ready_at": {
+          "milliseconds": 6000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 1,
-        "attack_ready_at": 2,
+        "last_resource_activity_at": {
+          "milliseconds": 3000
+        },
+        "attack_ready_at": {
+          "milliseconds": 6000
+        },
         "active_effects": [
           {
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source": {
               "kind": "spell",
@@ -5802,14 +6123,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 6000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 2,
+            "logical_time": {
+              "milliseconds": 6000
+            },
             "intent": "fight ecology:gallery_pack:keeper:0"
           }
         },
@@ -5830,8 +6155,8 @@
             "mode": "fight",
             "damage_kind": "crushing",
             "effective_combat_add_rating": 1,
-            "roll": 16,
-            "damage": 42,
+            "roll": 14,
+            "damage": 43,
             "armor_reduction": 0,
             "label": "fatal",
             "wound_before": "unhurt",
@@ -5888,7 +6213,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "loot_claim": {
               "owner": {
@@ -5932,7 +6259,9 @@
               "runner",
               "keeper"
             ],
-            "due_at": 4,
+            "due_at": {
+              "milliseconds": 12000
+            },
             "policy": "full_site"
           }
         },
@@ -5941,13 +6270,73 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 9000
+            }
           }
         },
         {
           "logical_time_advanced": {
-            "from": 2,
-            "to": 3
+            "from": {
+              "milliseconds": 6000
+            },
+            "to": {
+              "milliseconds": 9000
+            }
+          }
+        },
+        {
+          "effect_ticked": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 2
+          }
+        },
+        {
+          "effect_damaged": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "damage": 1,
+            "hp": 46
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 1,
+            "total_actual_damage": 4
           }
         },
         {
@@ -5955,7 +6344,9 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "kind": "monster",
-            "logical_time": 3
+            "logical_time": {
+              "milliseconds": 9000
+            }
           }
         },
         {
@@ -5992,7 +6383,7 @@
             "selected_boost_source_id": null,
             "denominator": 20,
             "save_twentieths": 5,
-            "roll": 19,
+            "roll": 17,
             "success": false,
             "mitigation_mode": null,
             "requested_damage": null,
@@ -6011,7 +6402,7 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source_kind": "spell",
             "source_id": "venom_bite",
@@ -6028,14 +6419,18 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "cost_units": 1,
-            "ready_at": 4
+            "ready_at": {
+              "milliseconds": 12000
+            }
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 3,
+        "logical_time": {
+          "milliseconds": 9000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -6614,10 +7009,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6727,10 +7126,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6818,10 +7221,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6895,9 +7302,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 46,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -6909,10 +7316,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
-            "last_resource_activity_at": 2,
+            "ready_at": {
+              "milliseconds": 9000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 6000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -6983,7 +7396,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -7084,7 +7497,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -7133,7 +7548,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -7158,7 +7575,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -7176,8 +7595,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 3,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 9000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -7764,9 +8185,13 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -7876,9 +8301,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -7966,9 +8395,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -8042,9 +8475,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 46,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -8056,9 +8489,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
-            "last_resource_activity_at": 2,
-            "attack_ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 6000
+            },
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -8130,7 +8569,7 @@
             "character": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -8173,7 +8612,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -8198,7 +8639,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -8214,7 +8657,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -8227,19 +8670,27 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 3,
-        "ready_at": 3,
+        "logical_time": {
+          "milliseconds": 9000
+        },
+        "ready_at": {
+          "milliseconds": 9000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 2,
-        "attack_ready_at": 3,
+        "last_resource_activity_at": {
+          "milliseconds": 6000
+        },
+        "attack_ready_at": {
+          "milliseconds": 9000
+        },
         "active_effects": [
           {
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source": {
               "kind": "spell",
@@ -8660,14 +9111,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 3
+            "logical_time": {
+              "milliseconds": 9000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 3,
+            "logical_time": {
+              "milliseconds": 9000
+            },
             "intent": "fight ecology:gallery_lair:burrower:0"
           }
         },
@@ -8688,8 +9143,8 @@
             "mode": "fight",
             "damage_kind": "crushing",
             "effective_combat_add_rating": 1,
-            "roll": 17,
-            "damage": 43,
+            "roll": 15,
+            "damage": 41,
             "armor_reduction": 0,
             "label": "fatal",
             "wound_before": "unhurt",
@@ -8746,7 +9201,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "loot_claim": {
               "owner": {
@@ -8817,7 +9274,9 @@
             "member_ids": [
               "burrower"
             ],
-            "due_at": 5,
+            "due_at": {
+              "milliseconds": 15000
+            },
             "policy": "full_site"
           }
         },
@@ -8826,20 +9285,82 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 4
+            "ready_at": {
+              "milliseconds": 12000
+            }
           }
         },
         {
           "logical_time_advanced": {
-            "from": 3,
-            "to": 4
+            "from": {
+              "milliseconds": 9000
+            },
+            "to": {
+              "milliseconds": 12000
+            }
+          }
+        },
+        {
+          "effect_ticked": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 2
+          }
+        },
+        {
+          "effect_damaged": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "damage": 1,
+            "hp": 45
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 1,
+            "total_actual_damage": 5
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 4,
+        "logical_time": {
+          "milliseconds": 12000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -9418,10 +9939,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -9509,10 +10034,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -9600,10 +10129,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -9677,9 +10210,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 45,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -9691,10 +10224,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
-            "last_resource_activity_at": 3,
+            "ready_at": {
+              "milliseconds": 12000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -9765,7 +10304,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -9776,7 +10315,7 @@
                   "poison"
                 ],
                 "potency": 1,
-                "remaining_rounds": 3,
+                "remaining_rounds": 2,
                 "until_condition": null,
                 "stacking": "refresh_duration",
                 "start_delay_rounds": 0,
@@ -9844,7 +10383,9 @@
             "site_id": "gallery_lair",
             "spawn_group_id": "gallery_lair_group",
             "generation": 0,
-            "full_clear_due_at": 5,
+            "full_clear_due_at": {
+              "milliseconds": 15000
+            },
             "member_slots": [
               {
                 "member_id": "burrower",
@@ -9866,7 +10407,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -9915,7 +10458,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -9940,7 +10485,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -9965,7 +10512,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -9983,8 +10532,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 4,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 12000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -10571,9 +11122,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -10661,9 +11216,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -10751,9 +11310,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -10827,9 +11390,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 45,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -10841,9 +11404,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
-            "last_resource_activity_at": 3,
-            "attack_ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -10915,7 +11484,7 @@
             "character": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -10926,7 +11495,7 @@
                   "poison"
                 ],
                 "potency": 1,
-                "remaining_rounds": 3,
+                "remaining_rounds": 2,
                 "until_condition": null,
                 "stacking": "refresh_duration",
                 "start_delay_rounds": 0,
@@ -10958,7 +11527,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -10983,7 +11554,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -11008,7 +11581,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -11024,7 +11599,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -11037,19 +11612,27 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 4,
-        "ready_at": 4,
+        "logical_time": {
+          "milliseconds": 12000
+        },
+        "ready_at": {
+          "milliseconds": 12000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 3,
-        "attack_ready_at": 4,
+        "last_resource_activity_at": {
+          "milliseconds": 9000
+        },
+        "attack_ready_at": {
+          "milliseconds": 12000
+        },
         "active_effects": [
           {
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source": {
               "kind": "spell",
@@ -11060,7 +11643,7 @@
               "poison"
             ],
             "potency": 1,
-            "remaining_rounds": 3,
+            "remaining_rounds": 2,
             "until_condition": null,
             "stacking": "refresh_duration",
             "start_delay_rounds": 0,
@@ -11337,14 +11920,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 4
+            "logical_time": {
+              "milliseconds": 12000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 4,
+            "logical_time": {
+              "milliseconds": 12000
+            },
             "intent": "wait"
           }
         },
@@ -11353,7 +11940,19 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 5
+            "ready_at": {
+              "milliseconds": 15000
+            }
+          }
+        },
+        {
+          "logical_time_advanced": {
+            "from": {
+              "milliseconds": 12000
+            },
+            "to": {
+              "milliseconds": 15000
+            }
           }
         },
         {
@@ -11368,14 +11967,14 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
               "poison"
             ],
             "potency": 1,
-            "remaining_rounds": 2
+            "remaining_rounds": 1
           }
         },
         {
@@ -11390,14 +11989,14 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
               "poison"
             ],
             "damage": 1,
-            "hp": 49
+            "hp": 44
           }
         },
         {
@@ -11407,20 +12006,16 @@
             "reward_unit_id": null,
             "reward_class": null,
             "applied_damage": 1,
-            "total_actual_damage": 1
-          }
-        },
-        {
-          "logical_time_advanced": {
-            "from": 4,
-            "to": 5
+            "total_actual_damage": 6
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 5,
+        "logical_time": {
+          "milliseconds": 15000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -11999,10 +12594,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -12090,10 +12689,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -12181,10 +12784,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -12258,7 +12865,7 @@
                 "y": 1
               }
             },
-            "hp": 49,
+            "hp": 44,
             "max_hp": 50,
             "wound_state": "wounded",
             "armor_protection": {
@@ -12272,10 +12879,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 5,
-            "last_resource_activity_at": 3,
+            "ready_at": {
+              "milliseconds": 15000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -12346,7 +12959,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -12357,7 +12970,7 @@
                   "poison"
                 ],
                 "potency": 1,
-                "remaining_rounds": 2,
+                "remaining_rounds": 1,
                 "until_condition": null,
                 "stacking": "refresh_duration",
                 "start_delay_rounds": 0,
@@ -12425,7 +13038,9 @@
             "site_id": "gallery_lair",
             "spawn_group_id": "gallery_lair_group",
             "generation": 0,
-            "full_clear_due_at": 5,
+            "full_clear_due_at": {
+              "milliseconds": 15000
+            },
             "member_slots": [
               {
                 "member_id": "burrower",
@@ -12447,7 +13062,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -12496,7 +13113,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -12521,7 +13140,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -12546,7 +13167,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -12564,8 +13187,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 5,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 15000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -13152,9 +13777,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -13242,9 +13871,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -13332,9 +13965,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -13408,7 +14045,7 @@
                 "y": 1
               }
             },
-            "hp": 49,
+            "hp": 44,
             "max_hp": 50,
             "wound_state": "wounded",
             "armor_protection": {
@@ -13422,9 +14059,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 5,
-            "last_resource_activity_at": 3,
-            "attack_ready_at": 4,
+            "ready_at": {
+              "milliseconds": 15000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -13496,7 +14139,7 @@
             "character": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -13507,7 +14150,7 @@
                   "poison"
                 ],
                 "potency": 1,
-                "remaining_rounds": 2,
+                "remaining_rounds": 1,
                 "until_condition": null,
                 "stacking": "refresh_duration",
                 "start_delay_rounds": 0,
@@ -13539,7 +14182,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -13564,7 +14209,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -13589,7 +14236,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -13605,7 +14254,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -13618,19 +14267,27 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 5,
-        "ready_at": 5,
+        "logical_time": {
+          "milliseconds": 15000
+        },
+        "ready_at": {
+          "milliseconds": 15000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 3,
-        "attack_ready_at": 4,
+        "last_resource_activity_at": {
+          "milliseconds": 9000
+        },
+        "attack_ready_at": {
+          "milliseconds": 12000
+        },
         "active_effects": [
           {
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source": {
               "kind": "spell",
@@ -13641,7 +14298,7 @@
               "poison"
             ],
             "potency": 1,
-            "remaining_rounds": 2,
+            "remaining_rounds": 1,
             "until_condition": null,
             "stacking": "refresh_duration",
             "start_delay_rounds": 0,
@@ -13918,14 +14575,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 5
+            "logical_time": {
+              "milliseconds": 15000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 5,
+            "logical_time": {
+              "milliseconds": 15000
+            },
             "intent": "wait"
           }
         },
@@ -13934,7 +14595,19 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 6
+            "ready_at": {
+              "milliseconds": 18000
+            }
+          }
+        },
+        {
+          "logical_time_advanced": {
+            "from": {
+              "milliseconds": 15000
+            },
+            "to": {
+              "milliseconds": 18000
+            }
           }
         },
         {
@@ -13949,14 +14622,14 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
               "poison"
             ],
             "potency": 1,
-            "remaining_rounds": 1
+            "remaining_rounds": 0
           }
         },
         {
@@ -13971,14 +14644,14 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
               "poison"
             ],
             "damage": 1,
-            "hp": 48
+            "hp": 43
           }
         },
         {
@@ -13988,20 +14661,33 @@
             "reward_unit_id": null,
             "reward_class": null,
             "applied_damage": 1,
-            "total_actual_damage": 2
+            "total_actual_damage": 7
           }
         },
         {
-          "logical_time_advanced": {
-            "from": 5,
-            "to": 6
+          "effect_expired": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison"
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 6,
+        "logical_time": {
+          "milliseconds": 18000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -14580,10 +15266,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -14671,10 +15361,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -14762,10 +15456,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -14839,7 +15537,7 @@
                 "y": 1
               }
             },
-            "hp": 48,
+            "hp": 43,
             "max_hp": 50,
             "wound_state": "wounded",
             "armor_protection": {
@@ -14853,10 +15551,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 6,
-            "last_resource_activity_at": 3,
+            "ready_at": {
+              "milliseconds": 18000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -14925,28 +15629,7 @@
               "tier": null
             },
             "npc": null,
-            "active_effects": [
-              {
-                "instance_id": "spell:venom_bite:2:player",
-                "effect_id": "venom_bite",
-                "source": {
-                  "kind": "spell",
-                  "id": "venom_bite"
-                },
-                "kind": "poison",
-                "tags": [
-                  "poison"
-                ],
-                "potency": 1,
-                "remaining_rounds": 1,
-                "until_condition": null,
-                "stacking": "refresh_duration",
-                "start_delay_rounds": 0,
-                "tick_interval_rounds": 1,
-                "suppresses_action": false,
-                "resistance_boosts": []
-              }
-            ],
+            "active_effects": [],
             "magic_resistance": {
               "natural_save_twentieths": 5,
               "evidence_state": "original_provisional",
@@ -15006,7 +15689,9 @@
             "site_id": "gallery_lair",
             "spawn_group_id": "gallery_lair_group",
             "generation": 0,
-            "full_clear_due_at": 5,
+            "full_clear_due_at": {
+              "milliseconds": 15000
+            },
             "member_slots": [
               {
                 "member_id": "burrower",
@@ -15028,7 +15713,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -15077,7 +15764,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -15102,7 +15791,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -15127,7 +15818,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -15145,8 +15838,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 6,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 18000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -15733,9 +16428,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -15823,9 +16522,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -15913,9 +16616,13 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -15989,7 +16696,7 @@
                 "y": 1
               }
             },
-            "hp": 48,
+            "hp": 43,
             "max_hp": 50,
             "wound_state": "wounded",
             "armor_protection": {
@@ -16003,9 +16710,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 6,
-            "last_resource_activity_at": 3,
-            "attack_ready_at": 4,
+            "ready_at": {
+              "milliseconds": 18000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -16075,28 +16788,7 @@
             },
             "npc": null,
             "character": null,
-            "active_effects": [
-              {
-                "instance_id": "spell:venom_bite:2:player",
-                "effect_id": "venom_bite",
-                "source": {
-                  "kind": "spell",
-                  "id": "venom_bite"
-                },
-                "kind": "poison",
-                "tags": [
-                  "poison"
-                ],
-                "potency": 1,
-                "remaining_rounds": 1,
-                "until_condition": null,
-                "stacking": "refresh_duration",
-                "start_delay_rounds": 0,
-                "tick_interval_rounds": 1,
-                "suppresses_action": false,
-                "resistance_boosts": []
-              }
-            ],
+            "active_effects": [],
             "magic_resistance": {
               "natural_save_twentieths": 5,
               "evidence_state": "original_provisional",
@@ -16120,7 +16812,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -16145,7 +16839,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -16170,7 +16866,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -16186,7 +16884,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -16199,38 +16897,25 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 6,
-        "ready_at": 6,
+        "logical_time": {
+          "milliseconds": 18000
+        },
+        "ready_at": {
+          "milliseconds": 18000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 3,
-        "attack_ready_at": 4,
-        "active_effects": [
-          {
-            "instance_id": "spell:venom_bite:2:player",
-            "effect_id": "venom_bite",
-            "source": {
-              "kind": "spell",
-              "id": "venom_bite"
-            },
-            "kind": "poison",
-            "tags": [
-              "poison"
-            ],
-            "potency": 1,
-            "remaining_rounds": 1,
-            "until_condition": null,
-            "stacking": "refresh_duration",
-            "start_delay_rounds": 0,
-            "tick_interval_rounds": 1,
-            "suppresses_action": false,
-            "resistance_boosts": []
-          }
-        ],
+        "last_resource_activity_at": {
+          "milliseconds": 9000
+        },
+        "attack_ready_at": {
+          "milliseconds": 12000
+        },
+        "active_effects": [],
         "magic_resistance": {
           "natural_save_twentieths": 5,
           "evidence_state": "original_provisional",
@@ -16488,9 +17173,11 @@
   "final": {
     "contract_version": 2,
     "final_debug_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "scope": "omniscient_local",
-      "logical_time": 6,
+      "logical_time": {
+        "milliseconds": 18000
+      },
       "controlled_actor_ids": [
         "player"
       ],
@@ -17069,10 +17756,14 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 4,
+          "ready_at": {
+            "milliseconds": 12000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 1,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -17160,10 +17851,14 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 3,
+          "ready_at": {
+            "milliseconds": 9000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 3,
-          "attack_ready_at": 3,
+          "attack_ready_at": {
+            "milliseconds": 9000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -17251,10 +17946,14 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 2,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -17328,7 +18027,7 @@
               "y": 1
             }
           },
-          "hp": 48,
+          "hp": 43,
           "max_hp": 50,
           "wound_state": "wounded",
           "armor_protection": {
@@ -17342,10 +18041,16 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 6,
-          "last_resource_activity_at": 3,
+          "ready_at": {
+            "milliseconds": 18000
+          },
+          "last_resource_activity_at": {
+            "milliseconds": 9000
+          },
           "tie_break_order": 0,
-          "attack_ready_at": 4,
+          "attack_ready_at": {
+            "milliseconds": 12000
+          },
           "physical_weapon": {
             "item_instance_id": "gallery_club",
             "item_definition_id": "oak_club",
@@ -17414,28 +18119,7 @@
             "tier": null
           },
           "npc": null,
-          "active_effects": [
-            {
-              "instance_id": "spell:venom_bite:2:player",
-              "effect_id": "venom_bite",
-              "source": {
-                "kind": "spell",
-                "id": "venom_bite"
-              },
-              "kind": "poison",
-              "tags": [
-                "poison"
-              ],
-              "potency": 1,
-              "remaining_rounds": 1,
-              "until_condition": null,
-              "stacking": "refresh_duration",
-              "start_delay_rounds": 0,
-              "tick_interval_rounds": 1,
-              "suppresses_action": false,
-              "resistance_boosts": []
-            }
-          ],
+          "active_effects": [],
           "magic_resistance": {
             "natural_save_twentieths": 5,
             "evidence_state": "original_provisional",
@@ -17495,7 +18179,9 @@
           "site_id": "gallery_lair",
           "spawn_group_id": "gallery_lair_group",
           "generation": 0,
-          "full_clear_due_at": 5,
+          "full_clear_due_at": {
+            "milliseconds": 15000
+          },
           "member_slots": [
             {
               "member_id": "burrower",
@@ -17517,7 +18203,9 @@
           "site_id": "gallery_pack",
           "spawn_group_id": "gallery_pack",
           "generation": 0,
-          "full_clear_due_at": 4,
+          "full_clear_due_at": {
+            "milliseconds": 12000
+          },
           "member_slots": [
             {
               "member_id": "keeper",
@@ -17566,7 +18254,9 @@
               "y": 1
             }
           },
-          "created_at": 3,
+          "created_at": {
+            "milliseconds": 9000
+          },
           "sequence": 3,
           "searched": false,
           "loot_claim": {
@@ -17591,7 +18281,9 @@
               "y": 1
             }
           },
-          "created_at": 2,
+          "created_at": {
+            "milliseconds": 6000
+          },
           "sequence": 2,
           "searched": false,
           "loot_claim": {
@@ -17616,7 +18308,9 @@
               "y": 1
             }
           },
-          "created_at": 1,
+          "created_at": {
+            "milliseconds": 3000
+          },
           "sequence": 1,
           "searched": false,
           "loot_claim": {
@@ -17634,8 +18328,10 @@
       "quest_states": []
     },
     "final_observed_snapshot": {
-      "contract_version": 29,
-      "logical_time": 6,
+      "contract_version": 30,
+      "logical_time": {
+        "milliseconds": 18000
+      },
       "observer_actor_id": "player",
       "observation_center": {
         "realm": "realm_0",
@@ -18222,9 +18918,13 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 4,
+          "ready_at": {
+            "milliseconds": 12000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -18312,9 +19012,13 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 3,
+          "ready_at": {
+            "milliseconds": 9000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 3,
+          "attack_ready_at": {
+            "milliseconds": 9000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -18402,9 +19106,13 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -18478,7 +19186,7 @@
               "y": 1
             }
           },
-          "hp": 48,
+          "hp": 43,
           "max_hp": 50,
           "wound_state": "wounded",
           "armor_protection": {
@@ -18492,9 +19200,15 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 6,
-          "last_resource_activity_at": 3,
-          "attack_ready_at": 4,
+          "ready_at": {
+            "milliseconds": 18000
+          },
+          "last_resource_activity_at": {
+            "milliseconds": 9000
+          },
+          "attack_ready_at": {
+            "milliseconds": 12000
+          },
           "physical_weapon": {
             "item_instance_id": "gallery_club",
             "item_definition_id": "oak_club",
@@ -18564,28 +19278,7 @@
           },
           "npc": null,
           "character": null,
-          "active_effects": [
-            {
-              "instance_id": "spell:venom_bite:2:player",
-              "effect_id": "venom_bite",
-              "source": {
-                "kind": "spell",
-                "id": "venom_bite"
-              },
-              "kind": "poison",
-              "tags": [
-                "poison"
-              ],
-              "potency": 1,
-              "remaining_rounds": 1,
-              "until_condition": null,
-              "stacking": "refresh_duration",
-              "start_delay_rounds": 0,
-              "tick_interval_rounds": 1,
-              "suppresses_action": false,
-              "resistance_boosts": []
-            }
-          ],
+          "active_effects": [],
           "magic_resistance": {
             "natural_save_twentieths": 5,
             "evidence_state": "original_provisional",
@@ -18609,7 +19302,9 @@
               "y": 1
             }
           },
-          "created_at": 3,
+          "created_at": {
+            "milliseconds": 9000
+          },
           "sequence": 3,
           "searched": false,
           "loot_claim": {
@@ -18634,7 +19329,9 @@
               "y": 1
             }
           },
-          "created_at": 2,
+          "created_at": {
+            "milliseconds": 6000
+          },
           "sequence": 2,
           "searched": false,
           "loot_claim": {
@@ -18659,7 +19356,9 @@
               "y": 1
             }
           },
-          "created_at": 1,
+          "created_at": {
+            "milliseconds": 3000
+          },
           "sequence": 1,
           "searched": false,
           "loot_claim": {
@@ -18675,7 +19374,7 @@
       "tile_effects": []
     },
     "final_action_context": {
-      "contract_version": 31,
+      "contract_version": 32,
       "actor_id": "player",
       "actor_name": "Trailwarden",
       "actor_kind": "player",
@@ -18688,38 +19387,25 @@
         }
       },
       "law_zone": "none",
-      "logical_time": 6,
-      "ready_at": 6,
+      "logical_time": {
+        "milliseconds": 18000
+      },
+      "ready_at": {
+        "milliseconds": 18000
+      },
       "can_act": true,
       "life_state": {
         "kind": "alive"
       },
       "controlled_path_points": 3,
       "max_path_steps": 3,
-      "last_resource_activity_at": 3,
-      "attack_ready_at": 4,
-      "active_effects": [
-        {
-          "instance_id": "spell:venom_bite:2:player",
-          "effect_id": "venom_bite",
-          "source": {
-            "kind": "spell",
-            "id": "venom_bite"
-          },
-          "kind": "poison",
-          "tags": [
-            "poison"
-          ],
-          "potency": 1,
-          "remaining_rounds": 1,
-          "until_condition": null,
-          "stacking": "refresh_duration",
-          "start_delay_rounds": 0,
-          "tick_interval_rounds": 1,
-          "suppresses_action": false,
-          "resistance_boosts": []
-        }
-      ],
+      "last_resource_activity_at": {
+        "milliseconds": 9000
+      },
+      "attack_ready_at": {
+        "milliseconds": 12000
+      },
+      "active_effects": [],
       "magic_resistance": {
         "natural_save_twentieths": 5,
         "evidence_state": "original_provisional",

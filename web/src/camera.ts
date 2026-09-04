@@ -1,13 +1,7 @@
 import { OrthographicCamera, Vector3 } from "three";
 
-/**
- * The ruled frame (owner ruling, 2026-09-02): 6.31 world units tall at the
- * 1280 x 800 minimum play surface, one comparison step out from the lab's
- * 5.05-unit frame, chosen against painted full-frame references in which the
- * player stands about a sixth of the frame height. One ground cell projects as
- * a 179.2-pixel-wide diamond.
- */
-export const CAMERA_VERTICAL_SIZE_1280X800 = 6.3134534034513175;
+/** Nine ground-cell diamonds tall at the ruled 30-degree camera elevation. */
+export const CAMERA_VERTICAL_SIZE_1280X800 = 9 * Math.SQRT2 * Math.sin(Math.PI / 6);
 export const CAMERA_TARGET_HEIGHT = 1.22;
 export const CAMERA_OFFSET = new Vector3(8, 6.531973, 8);
 const CAMERA_REFERENCE_VIEWPORT_HEIGHT = 800;

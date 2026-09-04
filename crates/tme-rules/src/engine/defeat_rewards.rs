@@ -396,9 +396,7 @@ impl Engine {
             .is_some_and(|presence| {
                 presence.connected
                     || presence.absent_since.is_some_and(|absent_since| {
-                        self.current_time()
-                            .value()
-                            .saturating_sub(absent_since.value())
+                        self.current_time().elapsed_rounds_since(absent_since)
                             < GROUP_DISCONNECT_GRACE_UNITS
                     })
             })

@@ -3,15 +3,17 @@
     "contract_version": 2,
     "scenario_id": "first_room",
     "seed": 7,
-    "event_contract_version": 40,
-    "snapshot_contract_version": 30,
-    "observed_snapshot_contract_version": 29,
-    "action_context_contract_version": 31,
+    "event_contract_version": 41,
+    "snapshot_contract_version": 31,
+    "observed_snapshot_contract_version": 30,
+    "action_context_contract_version": 32,
     "intent_contract_version": 26,
     "initial_debug_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "scope": "omniscient_local",
-      "logical_time": 1,
+      "logical_time": {
+        "milliseconds": 3000
+      },
       "controlled_actor_ids": [
         "player"
       ],
@@ -1310,10 +1312,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 6000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 1,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -1401,10 +1407,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 0,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": "training_knife",
             "item_definition_id": "training_knife",
@@ -1508,8 +1518,10 @@
       "quest_states": []
     },
     "initial_observed_snapshot": {
-      "contract_version": 29,
-      "logical_time": 1,
+      "contract_version": 30,
+      "logical_time": {
+        "milliseconds": 3000
+      },
       "observer_actor_id": "player",
       "observation_center": {
         "realm": "realm_0",
@@ -2819,9 +2831,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 6000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -2909,9 +2925,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": "training_knife",
             "item_definition_id": "training_knife",
@@ -2996,7 +3016,7 @@
       "tile_effects": []
     },
     "initial_action_context": {
-      "contract_version": 31,
+      "contract_version": 32,
       "actor_id": "player",
       "actor_name": "Delver",
       "actor_kind": "player",
@@ -3009,8 +3029,12 @@
         }
       },
       "law_zone": "none",
-      "logical_time": 1,
-      "ready_at": 1,
+      "logical_time": {
+        "milliseconds": 3000
+      },
+      "ready_at": {
+        "milliseconds": 3000
+      },
       "can_act": true,
       "life_state": {
         "kind": "alive"
@@ -3018,7 +3042,9 @@
       "controlled_path_points": 3,
       "max_path_steps": 3,
       "last_resource_activity_at": null,
-      "attack_ready_at": 1,
+      "attack_ready_at": {
+        "milliseconds": 3000
+      },
       "active_effects": [],
       "magic_resistance": {
         "natural_save_twentieths": 5,
@@ -3474,14 +3500,18 @@
             "actor_id": "player",
             "actor": "Delver",
             "kind": "player",
-            "logical_time": 1
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Delver",
-            "logical_time": 1,
+            "logical_time": {
+              "milliseconds": 3000
+            },
             "intent": "run east,east"
           }
         },
@@ -3596,13 +3626,19 @@
             "actor_id": "player",
             "actor": "Delver",
             "cost_units": 1,
-            "ready_at": 2
+            "ready_at": {
+              "milliseconds": 6000
+            }
           }
         },
         {
           "logical_time_advanced": {
-            "from": 1,
-            "to": 2
+            "from": {
+              "milliseconds": 3000
+            },
+            "to": {
+              "milliseconds": 6000
+            }
           }
         },
         {
@@ -3610,7 +3646,9 @@
             "actor_id": "mireling",
             "actor": "Mireling",
             "kind": "monster",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 6000
+            }
           }
         },
         {
@@ -3652,14 +3690,18 @@
             "actor_id": "mireling",
             "actor": "Mireling",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 9000
+            }
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 2,
+        "logical_time": {
+          "milliseconds": 6000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -4958,10 +5000,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -5049,10 +5095,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 2,
-            "last_resource_activity_at": 1,
+            "ready_at": {
+              "milliseconds": 6000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 3000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": "training_knife",
               "item_definition_id": "training_knife",
@@ -5156,8 +5208,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 2,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 6000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -6467,9 +6521,13 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6557,9 +6615,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 2,
-            "last_resource_activity_at": 1,
-            "attack_ready_at": 1,
+            "ready_at": {
+              "milliseconds": 6000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 3000
+            },
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": "training_knife",
               "item_definition_id": "training_knife",
@@ -6644,7 +6708,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Delver",
         "actor_kind": "player",
@@ -6657,16 +6721,24 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 2,
-        "ready_at": 2,
+        "logical_time": {
+          "milliseconds": 6000
+        },
+        "ready_at": {
+          "milliseconds": 6000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 1,
-        "attack_ready_at": 1,
+        "last_resource_activity_at": {
+          "milliseconds": 3000
+        },
+        "attack_ready_at": {
+          "milliseconds": 3000
+        },
         "active_effects": [],
         "magic_resistance": {
           "natural_save_twentieths": 5,
@@ -7039,14 +7111,18 @@
             "actor_id": "player",
             "actor": "Delver",
             "kind": "player",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 6000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Delver",
-            "logical_time": 2,
+            "logical_time": {
+              "milliseconds": 6000
+            },
             "intent": "fight mireling"
           }
         },
@@ -7077,13 +7153,19 @@
             "actor_id": "player",
             "actor": "Delver",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 9000
+            }
           }
         },
         {
           "logical_time_advanced": {
-            "from": 2,
-            "to": 3
+            "from": {
+              "milliseconds": 6000
+            },
+            "to": {
+              "milliseconds": 9000
+            }
           }
         },
         {
@@ -7091,7 +7173,9 @@
             "actor_id": "mireling",
             "actor": "Mireling",
             "kind": "monster",
-            "logical_time": 3
+            "logical_time": {
+              "milliseconds": 9000
+            }
           }
         },
         {
@@ -7133,14 +7217,18 @@
             "actor_id": "mireling",
             "actor": "Mireling",
             "cost_units": 1,
-            "ready_at": 4
+            "ready_at": {
+              "milliseconds": 12000
+            }
           }
         }
       ],
       "after_debug_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 3,
+        "logical_time": {
+          "milliseconds": 9000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -8439,10 +8527,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -8530,10 +8622,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
-            "last_resource_activity_at": 2,
+            "ready_at": {
+              "milliseconds": 9000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 6000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": "training_knife",
               "item_definition_id": "training_knife",
@@ -8637,8 +8735,10 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 29,
-        "logical_time": 3,
+        "contract_version": 30,
+        "logical_time": {
+          "milliseconds": 9000
+        },
         "observer_actor_id": "player",
         "observation_center": {
           "realm": "realm_0",
@@ -9948,9 +10048,13 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -10038,9 +10142,15 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
-            "last_resource_activity_at": 2,
-            "attack_ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 6000
+            },
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": "training_knife",
               "item_definition_id": "training_knife",
@@ -10125,7 +10235,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 31,
+        "contract_version": 32,
         "actor_id": "player",
         "actor_name": "Delver",
         "actor_kind": "player",
@@ -10138,16 +10248,24 @@
           }
         },
         "law_zone": "none",
-        "logical_time": 3,
-        "ready_at": 3,
+        "logical_time": {
+          "milliseconds": 9000
+        },
+        "ready_at": {
+          "milliseconds": 9000
+        },
         "can_act": true,
         "life_state": {
           "kind": "alive"
         },
         "controlled_path_points": 3,
         "max_path_steps": 3,
-        "last_resource_activity_at": 2,
-        "attack_ready_at": 3,
+        "last_resource_activity_at": {
+          "milliseconds": 6000
+        },
+        "attack_ready_at": {
+          "milliseconds": 9000
+        },
         "active_effects": [],
         "magic_resistance": {
           "natural_save_twentieths": 5,
@@ -10503,9 +10621,11 @@
   "final": {
     "contract_version": 2,
     "final_debug_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "scope": "omniscient_local",
-      "logical_time": 3,
+      "logical_time": {
+        "milliseconds": 9000
+      },
       "controlled_actor_ids": [
         "player"
       ],
@@ -11804,10 +11924,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 4,
+          "ready_at": {
+            "milliseconds": 12000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 1,
-          "attack_ready_at": 4,
+          "attack_ready_at": {
+            "milliseconds": 12000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -11895,10 +12019,16 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 3,
-          "last_resource_activity_at": 2,
+          "ready_at": {
+            "milliseconds": 9000
+          },
+          "last_resource_activity_at": {
+            "milliseconds": 6000
+          },
           "tie_break_order": 0,
-          "attack_ready_at": 3,
+          "attack_ready_at": {
+            "milliseconds": 9000
+          },
           "physical_weapon": {
             "item_instance_id": "training_knife",
             "item_definition_id": "training_knife",
@@ -12002,8 +12132,10 @@
       "quest_states": []
     },
     "final_observed_snapshot": {
-      "contract_version": 29,
-      "logical_time": 3,
+      "contract_version": 30,
+      "logical_time": {
+        "milliseconds": 9000
+      },
       "observer_actor_id": "player",
       "observation_center": {
         "realm": "realm_0",
@@ -13313,9 +13445,13 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 4,
+          "ready_at": {
+            "milliseconds": 12000
+          },
           "last_resource_activity_at": null,
-          "attack_ready_at": 4,
+          "attack_ready_at": {
+            "milliseconds": 12000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -13403,9 +13539,15 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 3,
-          "last_resource_activity_at": 2,
-          "attack_ready_at": 3,
+          "ready_at": {
+            "milliseconds": 9000
+          },
+          "last_resource_activity_at": {
+            "milliseconds": 6000
+          },
+          "attack_ready_at": {
+            "milliseconds": 9000
+          },
           "physical_weapon": {
             "item_instance_id": "training_knife",
             "item_definition_id": "training_knife",
@@ -13490,7 +13632,7 @@
       "tile_effects": []
     },
     "final_action_context": {
-      "contract_version": 31,
+      "contract_version": 32,
       "actor_id": "player",
       "actor_name": "Delver",
       "actor_kind": "player",
@@ -13503,16 +13645,24 @@
         }
       },
       "law_zone": "none",
-      "logical_time": 3,
-      "ready_at": 3,
+      "logical_time": {
+        "milliseconds": 9000
+      },
+      "ready_at": {
+        "milliseconds": 9000
+      },
       "can_act": true,
       "life_state": {
         "kind": "alive"
       },
       "controlled_path_points": 3,
       "max_path_steps": 3,
-      "last_resource_activity_at": 2,
-      "attack_ready_at": 3,
+      "last_resource_activity_at": {
+        "milliseconds": 6000
+      },
+      "attack_ready_at": {
+        "milliseconds": 9000
+      },
       "active_effects": [],
       "magic_resistance": {
         "natural_save_twentieths": 5,

@@ -20,10 +20,7 @@ const SUCCESS_SENTINEL: String = "TME_CLIENT_LIVE_PROOF_OK"
 const STEP_TIMEOUT_MSEC: int = 30000
 const UPDATE_WAIT_MSEC: int = 25000
 
-## Consecutive authoritative beats sampled for the pulse observation. Four
-## beats give three intervals, which is enough for the harness to see a cadence
-## rather than a single delay.
-const PULSE_OBSERVATIONS: int = 4
+## Actions are sampled at different offsets after their previous cooldown.
 
 const LiveSession: Script = preload("res://tests/live_session.gd")
 
@@ -88,23 +85,7 @@ func _run() -> void:
 		"the HUD reports the online lifecycle",
 	)
 
-	var welcome_revision: String = _client.authoritative_state.world_revision()
-	var beats: Array = await _observe_pulses()
-	_expect(
-		beats.size() == PULSE_OBSERVATIONS,
-		"the authoritative pulse delivered %d beats to an idle client" % PULSE_OBSERVATIONS,
-	)
-	for beat in beats:
-		_report("pulse_observation", "T%s at %d ms" % [beat["logical_time"], beat["at_msec"]])
-	if not beats.is_empty():
-		_report("state_update_world_revision", _client.authoritative_state.world_revision())
-		_expect(
-			_client.authoritative_state.world_revision() != welcome_revision
-			or _client.authoritative_state.server_sequence() != "0",
-			"an authoritative update advanced the world past the welcome",
-		)
-		if view != null:
-			_report("shell_after_update", view.status_text())
+	await _observe_cooldowns()
 
 	var feedback_before: int = _client.presentation_state.feedback_presenter.feedback_entries.size()
 	_client._on_intent_requested({"kind": "wait"})
@@ -132,23 +113,25 @@ func _run() -> void:
 ## client holds no cadence of its own and infers nothing from elapsed time: it
 ## reports what arrived and when, and `tools/run_client_live_proof.py` judges the
 ## interval against the ruled pulse.
-func _observe_pulses() -> Array:
-	var observations: Array = []
-	var last: String = _logical_time()
-	while observations.size() < PULSE_OBSERVATIONS:
-		var previous: String = last
-		var advanced: bool = await _session.wait_until(func() -> bool:
-			return _logical_time() != previous
-		, UPDATE_WAIT_MSEC)
-		if not advanced:
-			_fail(
-				"logical time stalled at T%s after %d of %d beats"
-				% [previous, observations.size(), PULSE_OBSERVATIONS]
-			)
-			return observations
-		last = _logical_time()
-		observations.append({"logical_time": last, "at_msec": Time.get_ticks_msec()})
-	return observations
+func _observe_cooldowns() -> void:
+	for offset: int in [137, 1173, 2511]:
+		await create_timer(float(offset) / 1000.0).timeout
+		var began: int = Time.get_ticks_msec()
+		_client._on_intent_requested({"kind": "wait"})
+		var accepted: bool = await _session.wait_until(func() -> bool:
+			return not _client.control_state.has_pending_command() and not bool(_client.authoritative_state.frame().get("can_act", true))
+		, STEP_TIMEOUT_MSEC)
+		_expect(accepted, "an offset action starts its own cooldown")
+		if not accepted:
+			return
+		var frame: Dictionary = _client.authoritative_state.frame()
+		var started: String = str(frame.get("logical_time", ""))
+		var ready: String = str(frame.get("ready_at", ""))
+		var finished: bool = await _session.wait_until(func() -> bool:
+			return bool(_client.authoritative_state.frame().get("can_act", false))
+		, STEP_TIMEOUT_MSEC)
+		_expect(finished, "the server unlocks the completed action")
+		_report("cooldown_observation", "start %s ready %s elapsed %d ms" % [started, ready, Time.get_ticks_msec() - began])
 
 
 func _logical_time() -> String:

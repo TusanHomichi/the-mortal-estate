@@ -13,7 +13,7 @@ use super::{
     WarmedSpellViewV1,
 };
 
-pub const OBSERVER_PROJECTION_CONTRACT_VERSION: u32 = 7;
+pub const OBSERVER_PROJECTION_CONTRACT_VERSION: u32 = 8;
 pub const STATIC_SCENE_CONTEXT_CONTRACT_VERSION: u32 = 1;
 pub const MAX_STATIC_SCENE_TILES: usize = 225;
 pub const MAX_STATIC_SCENE_PROPS: usize = 128;

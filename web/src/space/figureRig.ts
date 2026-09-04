@@ -15,6 +15,7 @@ import {
 } from "three";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { clone as cloneWithSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
+import { facingYaw, type FigureFacing } from "../walk/facing";
 import type { Cell } from "../walk/layoutPassability";
 import type { FigureRow, VerifiedAssetPacket } from "../feelTypes";
 
@@ -43,10 +44,10 @@ export interface FigureInstance {
   readonly name: string;
   readonly root: Group;
   readonly clip: string;
-  facing: 1 | -1;
+  facing: FigureFacing;
   gait: FigureGait;
   place(i: number, j: number): void;
-  setFacing(direction: 1 | -1): void;
+  setFacing(direction: FigureFacing): void;
   /** Crossfades to the clip for a gait; the same gait again is a no-op. */
   setGait(gait: FigureGait): void;
   update(deltaSeconds: number): void;
@@ -294,14 +295,11 @@ export function disposeFigureSources(sources: readonly Object3D[]): void {
   }
 }
 
-// Facing: the rig's front is +z; a two-way facing turns it along ±x, the axis
-// the card used to mirror across (decided 2026-09-03; eight-way is open).
-const FACING_YAW: Record<1 | -1, number> = { 1: Math.PI / 2, [-1]: -Math.PI / 2 };
 /** A gait change crossfades over this long; a strike is three seconds, a walk clip about one. */
 const GAIT_FADE_SECONDS = 0.15;
 
 /** Instances a decoded figure at a cell: cloned skeletons, patched materials, the idle clip playing. */
-export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 1 | -1): FigureInstance {
+export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: FigureFacing): FigureInstance {
   const root = new Group();
   root.name = `Figure_${figure.name}`;
   const mixers: AnimationMixer[] = [];
@@ -351,13 +349,17 @@ export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 
       root.position.set(i, 0, j);
     },
     setFacing(direction) {
-      instance.facing = direction;
-      root.rotation.y = FACING_YAW[direction];
+      root.rotation.y = facingYaw(direction);
+      instance.facing = { ...direction };
     },
     setGait(gait) {
       if (gait === activeGait) return;
-      for (const action of actions[activeGait]) action.fadeOut(GAIT_FADE_SECONDS);
-      for (const action of actions[gait]) action.reset().fadeIn(GAIT_FADE_SECONDS).play();
+      // Movement categories may share a clip. Preserve its phase instead of
+      // fading an action into itself and restarting the same stride.
+      if (clipFor(gait) !== clipFor(activeGait)) {
+        for (const action of actions[activeGait]) action.fadeOut(GAIT_FADE_SECONDS);
+        for (const action of actions[gait]) action.reset().fadeIn(GAIT_FADE_SECONDS).play();
+      }
       activeGait = gait;
       instance.gait = gait;
     },

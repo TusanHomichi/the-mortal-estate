@@ -14,14 +14,21 @@ fn bt_spell_engine_with_damage_interruption(
         vec!["#####", "#...#", "#####"],
         Coord { x: 2, y: 1 },
         |parts| {
-            let mut push_spell = |spell: serde_json::Value| {
+            let mut push_spell = |mut spell: serde_json::Value| {
                 let id = spell["id"].as_str().expect("spell id").to_string();
+                if ["web_field", "steady_light", "deep_darkness"].contains(&id.as_str()) {
+                    spell["effect"]["duration"]["rounds"] = serde_json::json!(3);
+                }
                 let canonical_key = match id.as_str() {
                     "web_field" => Some("spell/web_field/area_path_terrain_spells"),
                     "ember_cloud" => Some("spell/ember_cloud/area_path_terrain_spells"),
                     _ => None,
                 };
                 if let Some(key) = canonical_key {
+                    if id == "web_field" {
+                        parts.catalog["spells"][key]["effect"]["duration"]["rounds"] =
+                            serde_json::json!(3);
+                    }
                     parts.profile_value_mut()["spells"]
                         .as_array_mut()
                         .expect("spell selection")
@@ -645,9 +652,7 @@ fn hazard_overlay_ticks_damage_and_expires() {
     assert!(damaged < fizzled);
     assert!(engine.world().actors[target_index].warmed_spell.is_none());
 
-    let expire_events = engine
-        .apply_actor_intent(&tme_rules::ActorId::from("player"), PlayerIntent::Wait)
-        .expect("expire");
+    let expire_events = tick_events;
     assert!(expire_events.iter().any(
         |event| matches!(event, Event::TileEffectExpired { effect_id, .. } if effect_id == "ember_cloud")
     ));
@@ -665,7 +670,7 @@ fn lethal_hazard_overlay_emits_damage_then_one_defeat_before_expiry() {
     engine.world_mut().actors[target_index].hp = 2;
 
     engine
-        .apply_actor_intent(
+        .apply_realtime_actor_intent(
             &tme_rules::ActorId::from("player"),
             PlayerIntent::CastSpell {
                 spell_id: "ember_cloud".to_string(),
@@ -677,9 +682,7 @@ fn lethal_hazard_overlay_emits_damage_then_one_defeat_before_expiry() {
         )
         .expect("cast ember");
 
-    let tick_events = engine
-        .apply_actor_intent(&tme_rules::ActorId::from("player"), PlayerIntent::Wait)
-        .expect("lethal tick");
+    let tick_events = engine.advance_action_interval().expect("lethal tick");
     let ticked = tick_events
         .iter()
         .position(

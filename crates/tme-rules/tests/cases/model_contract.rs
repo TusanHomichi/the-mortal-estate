@@ -342,7 +342,7 @@ fn life_state_and_loot_claim_json_shapes_are_exact() {
         serde_json::json!({
             "kind": "ghost",
             "corpse_id": "corpse:3",
-            "defeated_at": 7
+            "defeated_at": {"milliseconds": 21000}
         })
     );
     assert_eq!(
@@ -354,7 +354,7 @@ fn life_state_and_loot_claim_json_shapes_are_exact() {
         serde_json::json!({
             "kind": "awaiting_resurrection",
             "cause": "fire",
-            "defeated_at": 8
+            "defeated_at": {"milliseconds": 24000}
         })
     );
 

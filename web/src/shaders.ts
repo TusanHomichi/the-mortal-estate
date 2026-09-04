@@ -40,6 +40,8 @@ export const groundFragmentShader = /* glsl */ `
     float lambert = max(dot(normalize(vWorldNormal), normalize(keyDirection)), 0.0);
     vec3 lighting = ambientColour + keyColour * lambert;
     gl_FragColor = vec4(base * lighting, 1.0);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 
@@ -158,6 +160,8 @@ export const windFragmentShader = /* glsl */ `
       keyColour * cardWrappedDiffuse(normal, keyDirection) +
       lanternColour * lantern;
     gl_FragColor = vec4(texel.rgb * lighting, texel.a);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 

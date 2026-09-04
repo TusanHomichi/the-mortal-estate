@@ -144,7 +144,7 @@ fn deterministic_fixture() -> DeterminismFixture {
     let exported = engine
         .export_checkpoint()
         .expect("two-actor fixture exports Checkpoint 3");
-    let canonical = tme_rules::FacetCheckpointV4::from_bytes(exported.as_bytes().to_vec())
+    let canonical = tme_rules::FacetCheckpointV5::from_bytes(exported.as_bytes().to_vec())
         .expect("fixture Checkpoint 3 bytes are canonical");
     let engine = Engine::hydrate_checkpoint(engine.definition().clone(), &canonical)
         .expect("fixture hydrates through Checkpoint 3 once");
@@ -199,7 +199,7 @@ fn direct_step(
     )
 }
 
-fn checkpoint_field(checkpoint: &tme_rules::FacetCheckpointV4, pointer: &str) -> serde_json::Value {
+fn checkpoint_field(checkpoint: &tme_rules::FacetCheckpointV5, pointer: &str) -> serde_json::Value {
     serde_json::from_slice::<serde_json::Value>(checkpoint.as_bytes())
         .unwrap()
         .pointer(pointer)
@@ -663,7 +663,7 @@ async fn run_determinism_oracle(fixture: DeterminismFixture) -> [u8; 32] {
         )];
         for _ in 0..ticks {
             let tick_outcome = typed_direct
-                .advance_realtime_boundary()
+                .advance_action_interval()
                 .expect("direct typed realtime boundary succeeds");
             typed_cursor.record(CertificationCommitKind::System, tick_outcome.state_changed);
             typed_direct_steps.push(direct_step(
@@ -755,7 +755,7 @@ async fn fixed_enqueue_sim_and_facet_paths_are_byte_exact_and_repeatable() {
         .collect::<String>();
     assert_eq!(first, second, "semantic trace SHA-256 must repeat exactly");
     assert_eq!(
-        semantic_sha256, "9cda8c8b76b554c1531a71ba2e04d937462ec964a7570858f501858a2a88c772",
+        semantic_sha256, "7f8eaf2b76d5bf20771d7b476a4055f694e1ab3b006d1529f15187cf5d25efcb",
         "semantic trace SHA-256 is an approval-visible determinism contract"
     );
 }
@@ -1137,10 +1137,10 @@ async fn full_mailbox_detach_finishes_presence_cleanup() {
     assert_eq!(inspection.pending_detaches, 0);
     assert!(!inspection.connected);
     assert_eq!(
-        checkpoint_field(&inspection.checkpoint, "/world/timing/now")
+        checkpoint_field(&inspection.checkpoint, "/world/timing/now/milliseconds")
             .as_u64()
             .unwrap(),
-        checkpoint_field(&before.checkpoint, "/world/timing/now")
+        checkpoint_field(&before.checkpoint, "/world/timing/now/milliseconds")
             .as_u64()
             .unwrap()
     );

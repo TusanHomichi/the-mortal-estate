@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 6
-status: Implemented server policy through S1 and the public-source cut; diagnostic fixture use clarified. Owner acceptance at G5 and the Phase 7 stop point remains pending in the carried record.
+last_updated: 2026-09-05
+revision: 7
+status: Individual deadline cutover implemented and verified under the September 5 owner direction; external-boundary activation and other recorded acceptance gates remain pending.
 public_safe: true
-summary: One world, bootstrap and content declarations, credentials, persistence, vocabulary debt, external-boundary policy, and PostgreSQL proof.
+summary: One authoritative world with individual deadlines, precise persistence, credentials, immutable migrations, and PostgreSQL proof.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -194,7 +194,7 @@ retired model is still alive. The term map:
 | `FacetId` / `facet_id` | `WorldInstanceId` / `world_instance_id` |
 | `facet_revision`, `observed_facet_revision` (server-internal only; the wire already uses the world names) | `world_revision`, `observed_world_revision` |
 | `FacetHandle`, `FacetRequest`, `FacetError`, `FacetCommand` | `WorldInstance*` |
-| `FacetCheckpointV4`, `FACET_CHECKPOINT_SCHEMA_VERSION` | `WorldCheckpointV4`, `WORLD_CHECKPOINT_SCHEMA_VERSION` |
+| `FacetCheckpointV5`, `FACET_CHECKPOINT_SCHEMA_VERSION` | `WorldCheckpointV4`, `WORLD_CHECKPOINT_SCHEMA_VERSION` |
 | `facet_kill_sequence` | `world_kill_sequence` |
 | `tme.facets`, `facet_key` | `tme.world_instances`, `world_key` |
 | audit actions `facet_tick`, `facet_presence` | `world_tick`, `world_presence` |
@@ -274,12 +274,27 @@ not quietly change is the shape above: if pending consequences ever gain an
 expiry, a partial-application mode, or a separate transaction, the ruling has
 been reversed and that needs an owner, not a refactor.
 
+## Individual deadline scheduling
+
+The [current timing ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
+replaces the shared pulse. A persisted facet rebases one monotonic clock on its
+recovered logical time. Before admitting an action it advances the rules to that
+clock's precise timestamp. Housekeeping checks for due work every 25 milliseconds;
+the check interval is operational and does not define or round gameplay deadlines.
+The rules process overdue work at its individual due times before reaching the
+requested timestamp. Durable application remains serialized through the facet.
+
+Checkpoint 5 stores explicit millisecond timestamps and each actor's recovery
+anchor. Earlier scalar-time checkpoint payloads are refused. Recovery pauses
+simulation during downtime and preserves remaining cooldowns. The separate
+private test-server deployment on the development host is [issue #40](https://github.com/TusanHomichi/the-mortal-estate/issues/40).
+
 ## Schema version tags
 
 `tme.facets.checkpoint_schema = 3` and `tme.command_receipts.outcome_schema = 3`
 are payload-format tags for the checkpoint and receipt encodings, not migration
 counters. They kept their values across the migration re-founding on purpose;
-`tme_rules::FACET_CHECKPOINT_SCHEMA_VERSION = 4` is a separate, unrelated
+`tme_rules::FACET_CHECKPOINT_SCHEMA_VERSION = 5` is a separate, unrelated
 version on the rules-side checkpoint envelope.
 
 ## The external boundary, when it activates
@@ -311,7 +326,7 @@ caller migrates in the same slice.
 | internal rules and content contracts | per-contract constants in `crates/tme-rules/src/view/contract_versions.rs` | replaced atomically |
 | the external wire | `PROTOCOL_MAJOR` / `PROTOCOL_MINOR`, `CONTROL_API_VERSION` in `crates/tme-protocol` | one supported version |
 | the checkpoint payload | `tme.facets.checkpoint_schema`, and the rules-side envelope version | format tags, not counters |
-| the SQL schema | the tracked migration set under `crates/tme-server/migrations/` | one founding migration |
+| the SQL schema | the tracked migration set under `crates/tme-server/migrations/` | immutable founding migration plus deadline audit and precise consequence-time migrations |
 
 Conflating any two of these is how a wire change becomes a database outage.
 
@@ -429,7 +444,7 @@ provisions per entry in `GATED_TESTS` and never reuses one.
 
 ### The EV certification's runner-owned identity
 
-`ev_certification.rs` and `postgres.rs::ev_database_fault_certification` assert
+`ev_certification.rs` and `postgres/database_recovery_tests.rs::ev_database_fault_certification` assert
 the environment they were given, and none of it can be satisfied by accident:
 
 | What the test asserts | What the runner provides |

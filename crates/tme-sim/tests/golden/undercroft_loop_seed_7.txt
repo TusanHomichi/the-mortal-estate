@@ -8,8 +8,8 @@ monster Kobold at realm_0/guard_post:2,1 hp=7
 monster Mireling at realm_0/lower_crypt:2,1 hp=7
 monster Cave Troll at realm_0/troll_den:2,2 hp=15
 
-player ready: Delver at 1
-Delver intent at 1: inspect
+player ready: Delver at 3000ms
+Delver intent at 3000ms: inspect
 Delver inspected at realm_0/entrance_hall:1,1: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/entrance_hall:1,0: blocked terrain terrain=Stone Wall
@@ -20,42 +20,41 @@ Delver inspected at realm_0/entrance_hall:1,1: tile=Flagstone
   southwest -> realm_0/entrance_hall:0,2: blocked terrain terrain=Stone Wall
   west -> realm_0/entrance_hall:0,1: blocked terrain terrain=Stone Wall
   northwest -> realm_0/entrance_hall:0,0: blocked terrain terrain=Stone Wall
-readiness scheduled: Delver cost=0 ready_at=1
 
-player ready: Delver at 1
-Delver intent at 1: walk south
+player ready: Delver at 3000ms
+Delver intent at 3000ms: walk south
 Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step south -> (1,2): terrain=Stone Stairs Down cost=2 remaining=1
 Delver moved from (1,1) to (1,2)
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Kobold at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Kobold at 6000ms
 Kobold intent: hold
-readiness scheduled: Kobold cost=1 ready_at=3
-monster ready: Mireling at 2
+readiness scheduled: Kobold cost=1 ready_at=9000ms
+monster ready: Mireling at 6000ms
 Mireling intent: watch
-readiness scheduled: Mireling cost=1 ready_at=3
-monster ready: Cave Troll at 2
+readiness scheduled: Mireling cost=1 ready_at=9000ms
+monster ready: Cave Troll at 6000ms
 Cave Troll intent: watch
-readiness scheduled: Cave Troll cost=1 ready_at=3
+readiness scheduled: Cave Troll cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: traverse stairs_down
+player ready: Delver at 6000ms
+Delver intent at 6000ms: traverse stairs_down
 --- Delver uses down stairs: realm_0/entrance_hall:1,2 -> realm_0/lower_crypt:1,1 ---
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Kobold at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Kobold at 9000ms
 Kobold intent: hold
-readiness scheduled: Kobold cost=1 ready_at=4
-monster ready: Mireling at 3
+readiness scheduled: Kobold cost=1 ready_at=12000ms
+monster ready: Mireling at 9000ms
 Mireling intent: wait
-readiness scheduled: Mireling cost=1 ready_at=4
-monster ready: Cave Troll at 3
+readiness scheduled: Mireling cost=1 ready_at=12000ms
+monster ready: Cave Troll at 9000ms
 Cave Troll intent: watch
-readiness scheduled: Cave Troll cost=1 ready_at=4
+readiness scheduled: Cave Troll cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: inspect
+player ready: Delver at 9000ms
+Delver intent at 9000ms: inspect
 Delver inspected at realm_0/lower_crypt:1,1: tile=Stone Stairs Up
   current tile: terrain=Stone Stairs Up cost=2
   north -> realm_0/lower_crypt:1,0: blocked terrain terrain=Crypt Wall
@@ -67,25 +66,24 @@ Delver inspected at realm_0/lower_crypt:1,1: tile=Stone Stairs Up
   west -> realm_0/lower_crypt:0,1: blocked terrain terrain=Crypt Wall
   northwest -> realm_0/lower_crypt:0,0: blocked terrain terrain=Crypt Wall
   nearby east: monster Mireling at (2,1) hp=7
-readiness scheduled: Delver cost=0 ready_at=3
 
-player ready: Delver at 3
-Delver intent at 3: traverse stairs_up
+player ready: Delver at 9000ms
+Delver intent at 9000ms: traverse stairs_up
 --- Delver uses up stairs: realm_0/lower_crypt:1,1 -> realm_0/entrance_hall:1,2 ---
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Kobold at 4
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Kobold at 12000ms
 Kobold intent: hold
-readiness scheduled: Kobold cost=1 ready_at=5
-monster ready: Mireling at 4
+readiness scheduled: Kobold cost=1 ready_at=15000ms
+monster ready: Mireling at 12000ms
 Mireling intent: watch
-readiness scheduled: Mireling cost=1 ready_at=5
-monster ready: Cave Troll at 4
+readiness scheduled: Mireling cost=1 ready_at=15000ms
+monster ready: Cave Troll at 12000ms
 Cave Troll intent: watch
-readiness scheduled: Cave Troll cost=1 ready_at=5
+readiness scheduled: Cave Troll cost=1 ready_at=15000ms
 
-player ready: Delver at 4
-Delver intent at 4: inspect
+player ready: Delver at 12000ms
+Delver intent at 12000ms: inspect
 Delver inspected at realm_0/entrance_hall:1,2: tile=Stone Stairs Down
   current tile: terrain=Stone Stairs Down cost=2
   north -> realm_0/entrance_hall:1,1: walkable terrain=Flagstone cost=1
@@ -96,7 +94,6 @@ Delver inspected at realm_0/entrance_hall:1,2: tile=Stone Stairs Down
   southwest -> realm_0/entrance_hall:0,3: blocked terrain terrain=Stone Wall
   west -> realm_0/entrance_hall:0,2: blocked terrain terrain=Stone Wall
   northwest -> realm_0/entrance_hall:0,1: blocked terrain terrain=Stone Wall
-readiness scheduled: Delver cost=0 ready_at=4
 
 final state
 Delver at realm_0/entrance_hall:1,2 hp=12 alive

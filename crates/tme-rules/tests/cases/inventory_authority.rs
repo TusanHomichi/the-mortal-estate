@@ -393,10 +393,10 @@ fn transient_actor_touch_does_not_bind_item() {
 
 #[test]
 fn current_contract_versions_cover_inventory_surfaces() {
-    assert_eq!(EVENT_CONTRACT_VERSION, 40);
-    assert_eq!(SNAPSHOT_CONTRACT_VERSION, 30);
-    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 29);
-    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 31);
+    assert_eq!(EVENT_CONTRACT_VERSION, 41);
+    assert_eq!(SNAPSHOT_CONTRACT_VERSION, 31);
+    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
+    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 32);
     assert_eq!(COMMAND_CONTRACT_VERSION, 26);
     assert_eq!(PATH_PREVIEW_CONTRACT_VERSION, 8);
     assert_eq!(TRACE_CONTRACT_VERSION, 1);

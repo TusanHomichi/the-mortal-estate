@@ -73,7 +73,10 @@ pub(super) fn actor_state_from_definition(
         stamina: instance.stamina,
         life_state: ActorLifeState::Alive,
         corpse_disposition: definition.corpse_disposition,
-        resource_activity: ActorResourceActivity::default(),
+        resource_activity: ActorResourceActivity {
+            last_active_at: None,
+            last_recovered_at: instance.timing.ready_at.min(instance.attack_ready_at),
+        },
         timing: instance.timing,
         attack_ready_at: instance.attack_ready_at,
         carried: instance.carried,
@@ -116,7 +119,7 @@ fn active_effect_from_def(def: &crate::content::ActiveEffectDef) -> ActiveEffect
         tick_interval_rounds: u32::try_from(def.tick_interval_rounds).unwrap_or(1),
         suppresses_action: def.suppresses_action,
         resistance_boosts: def.resistance_boosts.clone(),
-        last_ticked_at: LogicalTime::ZERO,
+        last_ticked_at: LogicalTime::FIRST,
     }
 }
 

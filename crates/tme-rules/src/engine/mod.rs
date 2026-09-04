@@ -24,9 +24,10 @@ mod combat;
 
 mod checkpoint;
 pub use checkpoint::{
-    CheckpointError, ContentIdentityV1, FACET_CHECKPOINT_SCHEMA_VERSION, FacetCheckpointV4,
+    CheckpointError, ContentIdentityV1, FACET_CHECKPOINT_SCHEMA_VERSION, FacetCheckpointV5,
 };
 mod damage;
+mod deadlines;
 mod death;
 mod defeat_rewards;
 mod ecology;

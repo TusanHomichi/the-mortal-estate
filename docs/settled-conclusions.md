@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-04
-revision: 29
-status: Live navigation index; detailed rulings remain in their sole owners. No decision reopened by the documentation audit.
+last_updated: 2026-09-05
+revision: 30
+status: Live navigation index including the September 5 timing ruling; detailed rulings remain in their sole owners.
 public_safe: true
 summary: Short lookup index for settled architecture, workflow, presentation decisions, and previously diagnosed traps.
 always: true
@@ -28,7 +28,7 @@ experimental gameplay tuning.
 | Client shape and baseline | Browser first; Godot retained and cold. | [client architecture](client-architecture.md#the-web-client) |
 | Browser and desktop proof | Two browser engines; Tauri targets need their own packaged-webview proof. | [client architecture](client-architecture.md#the-web-client) |
 | Live characters | Live rigs and modular equipment; material treatment remains candidate. | [presentation direction](presentation-direction.md#live-characters) |
-| Walk between pulses | Route presentation under owner test; authority still lands on the strike. | [client notes](client-notes.md#the-web-feel-scenes-walk-experiment) |
+| Individual movement cooldown | Every committed preview move gets a full interval and locks competing movement. | [client notes](client-notes.md#the-web-feel-scenes-walk-experiment) |
 | World projection and standing geometry | Accepted camera and world-up construction. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) |
 | Tile and building assembly | Shared cell ruler, dedicated interiors, exterior roofs. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
 | Spaces and portals | Current browser experiment and its limits. | [client notes](client-notes.md#the-web-feel-scenes-walk-experiment) |
@@ -41,8 +41,8 @@ experimental gameplay tuning.
 | Chrome layout | Accepted layout; assets remain candidates. | [presentation direction](presentation-direction.md#accepted-chrome-layout) |
 | Proportional scaling | Ruled cell count and ultrawide treatment; assets remain open. | [presentation direction](presentation-direction.md#proportional-scaling) |
 | One world | D4: no player-selectable divergent histories. | [server notes](server-notes.md#the-world-instance-and-what-it-is-for) |
-| Logical time and pulse | Rules time and server cadence have separate owners. | [boundary map](boundary-map.md#21-the-authoritative-pulse-d5) |
-| Presenting the pulse | Godot implementation measures frame arrivals. | [client notes](client-notes.md#the-pulse-made-visible) |
+| Individual authoritative deadlines | September 5 replaces the shared-pulse ruling. | [boundary map](boundary-map.md#21-authoritative-individual-deadlines-d5) |
+| Presenting cooldowns | Godot uses the observer’s precise deadline and frame-only readiness. | [client notes](client-notes.md#individual-cooldowns-made-visible) |
 | Content contracts | Authored facts have one owner. | [boundary map](boundary-map.md#11-the-authoredruntime-contract-seam) |
 | Content validation | Rust owns gameplay-semantic validation. | [boundary map](boundary-map.md#13-rust-is-the-sole-gameplay-semantic-validator-and-it-fails-closed) |
 | Authoring and member counts | Compiler owns land semantics; members are content. | [authoring compiler](authoring-compiler.md#what-it-compiles) |

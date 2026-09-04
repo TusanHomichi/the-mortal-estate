@@ -46,13 +46,13 @@ func present_frame(_frame: Dictionary, _frame_generation: int) -> void:
 	pass
 
 
-## Installs the beat the view is drawing inside of, as [PulseClock] accounts for
+## Installs the action interval the view is drawing inside of, as [ActionCooldown] accounts for
 ## it. It carries no authority a view may act on: readiness, logical time, and
 ## the wait are the frame's, already installed through [method present_frame].
-## What this adds is only how far into the current beat presentation has got, so
+## What this adds is only how far into the current action interval presentation has got, so
 ## a view can spread a step across it instead of snapping. A view that does not
 ## animate ignores it entirely.
-func present_pulse(_state: Dictionary) -> void:
+func present_cooldown(_state: Dictionary) -> void:
 	pass
 
 

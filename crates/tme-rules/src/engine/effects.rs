@@ -46,7 +46,10 @@ impl Engine {
             let mut remaining_effects = effects.into_iter();
             while let Some(mut effect) = remaining_effects.next() {
                 if effect.start_delay_rounds > 0 {
-                    effect.start_delay_rounds -= 1;
+                    if now.elapsed_rounds_since(effect.last_ticked_at) >= 1 {
+                        effect.start_delay_rounds -= 1;
+                        effect.last_ticked_at = now;
+                    }
                     kept.push(effect);
                     continue;
                 }
@@ -178,7 +181,7 @@ impl Engine {
         let now = self.current_time();
         let mut kept = Vec::new();
         for mut concealment in std::mem::take(&mut self.world.concealed_transitions) {
-            if concealment.last_ticked_at < now {
+            if now.elapsed_rounds_since(concealment.last_ticked_at) >= 1 {
                 concealment.last_ticked_at = now;
                 concealment.remaining_rounds = concealment.remaining_rounds.saturating_sub(1);
             }
@@ -201,7 +204,7 @@ impl Engine {
         let now = self.current_time();
         let mut kept = Vec::new();
         for mut portal in std::mem::take(&mut self.world.portal_transitions) {
-            if portal.last_ticked_at < now {
+            if now.elapsed_rounds_since(portal.last_ticked_at) >= 1 {
                 portal.last_ticked_at = now;
                 if let Some(remaining) = portal.remaining_rounds.as_mut() {
                     *remaining = remaining.saturating_sub(1);
@@ -223,7 +226,7 @@ impl Engine {
         let now = self.current_time();
         let mut kept = Vec::new();
         for mut enchantment in std::mem::take(&mut self.world.item_enchantments) {
-            if enchantment.last_ticked_at < now {
+            if now.elapsed_rounds_since(enchantment.last_ticked_at) >= 1 {
                 enchantment.last_ticked_at = now;
                 if let Some(remaining) = enchantment.remaining_rounds.as_mut() {
                     *remaining = remaining.saturating_sub(1);
@@ -325,7 +328,11 @@ impl Engine {
         let Some(mut effect) = self.world.actors[player_index].balm_effect else {
             return Ok(());
         };
-        if effect.last_tick_at >= self.current_time() {
+        if self
+            .current_time()
+            .elapsed_rounds_since(effect.last_tick_at)
+            < 1
+        {
             return Ok(());
         }
         if !self.world.actors[player_index].is_alive() {

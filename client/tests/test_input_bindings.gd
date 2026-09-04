@@ -223,11 +223,11 @@ func test_the_readiness_line_is_never_truncated() -> void:
 			var where: String = "%dx%d at %d percent" % [viewport.x, viewport.y, percent]
 			_support.expect_equal(
 				label.text,
-				screen.pulse_meter.meter_text(),
+				screen.cooldown_meter.meter_text(),
 				"the readiness line is the meter's own sentence at " + where,
 			)
 			_support.expect(
-				label.text.contains("preparing") and label.text.contains("world T"),
+				label.text.contains("preparing") and label.text.contains("Action cooldown"),
 				"the fixture is the longest state the line has at " + where,
 			)
 			_support.expect_equal(

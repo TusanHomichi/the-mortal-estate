@@ -4,9 +4,11 @@
     "scenario_id": "creature_ecology_gallery",
     "seed": 7,
     "initial_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "scope": "omniscient_local",
-      "logical_time": 1,
+      "logical_time": {
+        "milliseconds": 3000
+      },
       "controlled_actor_ids": [
         "player"
       ],
@@ -585,10 +587,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 1,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -698,10 +704,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 3,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -789,10 +799,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 2,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -902,10 +916,14 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 0,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": "gallery_club",
             "item_definition_id": "oak_club",
@@ -1109,14 +1127,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 1
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 1,
+            "logical_time": {
+              "milliseconds": 3000
+            },
             "intent": "fight ecology:gallery_pack:runner:0"
           }
         },
@@ -1206,7 +1228,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "loot_claim": {
               "owner": {
@@ -1299,13 +1323,9 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 2
-          }
-        },
-        {
-          "logical_time_advanced": {
-            "from": 1,
-            "to": 2
+            "ready_at": {
+              "milliseconds": 6000
+            }
           }
         },
         {
@@ -1313,7 +1333,9 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "kind": "monster",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
@@ -1369,7 +1391,7 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source_kind": "spell",
             "source_id": "venom_bite",
@@ -1386,7 +1408,9 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 6000
+            }
           }
         },
         {
@@ -1394,7 +1418,9 @@
             "actor_id": "ecology:gallery_pack:keeper:0",
             "actor": "Bramble Keeper",
             "kind": "monster",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 3000
+            }
           }
         },
         {
@@ -1436,14 +1462,235 @@
             "actor_id": "ecology:gallery_pack:keeper:0",
             "actor": "Bramble Keeper",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "logical_time_advanced": {
+            "from": {
+              "milliseconds": 3000
+            },
+            "to": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "effect_ticked": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 2
+          }
+        },
+        {
+          "effect_damaged": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "damage": 1,
+            "hp": 49
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 1,
+            "total_actual_damage": 1
+          }
+        },
+        {
+          "actor_ready": {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "actor": "Cinder Burrower",
+            "kind": "monster",
+            "logical_time": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "automatic_actor_decision": {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "actor": "Cinder Burrower",
+            "decision": {
+              "kind": "use_ability",
+              "ability_id": "ember_spit",
+              "spell_id": "venom_bite",
+              "spell_name": "Venom Bite",
+              "target_id": "player",
+              "target": "Trailwarden"
+            }
+          }
+        },
+        {
+          "spell_save_resolved": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "effect_id": "venom_bite",
+            "resistance_tag": "poison",
+            "natural_save_twentieths": 5,
+            "matching_bonus_twentieths": 0,
+            "selected_boost_source_kind": null,
+            "selected_boost_source_id": null,
+            "denominator": 20,
+            "save_twentieths": 5,
+            "roll": 9,
+            "success": false,
+            "mitigation_mode": null,
+            "requested_damage": null,
+            "resolved_damage": null
+          }
+        },
+        {
+          "effect_applied": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "source_kind": "spell",
+            "source_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 3
+          }
+        },
+        {
+          "actor_readiness_scheduled": {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "actor": "Cinder Burrower",
+            "cost_units": 1,
+            "ready_at": {
+              "milliseconds": 9000
+            }
+          }
+        },
+        {
+          "actor_ready": {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "actor": "Bramble Keeper",
+            "kind": "monster",
+            "logical_time": {
+              "milliseconds": 6000
+            }
+          }
+        },
+        {
+          "automatic_actor_decision": {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "actor": "Bramble Keeper",
+            "decision": {
+              "kind": "physical_attack",
+              "target_id": "player",
+              "target": "Trailwarden",
+              "mode": "fight"
+            }
+          }
+        },
+        {
+          "attacked": {
+            "attacker_id": "ecology:gallery_pack:keeper:0",
+            "attacker": "Bramble Keeper",
+            "defender_id": "player",
+            "defender": "Trailwarden",
+            "defender_location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "mode": "fight",
+            "damage_kind": "crushing",
+            "effective_combat_add_rating": 0,
+            "roll": 16,
+            "damage": 2,
+            "armor_reduction": 0,
+            "label": "light",
+            "wound_before": "wounded",
+            "wound_after": "wounded",
+            "defender_hp": 47
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 2,
+            "total_actual_damage": 3
+          }
+        },
+        {
+          "actor_readiness_scheduled": {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "actor": "Bramble Keeper",
+            "cost_units": 1,
+            "ready_at": {
+              "milliseconds": 9000
+            }
           }
         }
       ],
       "after_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 2,
+        "logical_time": {
+          "milliseconds": 6000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -2022,10 +2269,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -2135,10 +2386,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -2226,10 +2481,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -2303,9 +2562,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 47,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -2317,10 +2576,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 2,
-            "last_resource_activity_at": 1,
+            "ready_at": {
+              "milliseconds": 6000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 3000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 2,
+            "attack_ready_at": {
+              "milliseconds": 6000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -2391,7 +2656,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -2541,7 +2806,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -2570,14 +2837,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 2
+            "logical_time": {
+              "milliseconds": 6000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 2,
+            "logical_time": {
+              "milliseconds": 6000
+            },
             "intent": "fight ecology:gallery_pack:keeper:0"
           }
         },
@@ -2598,8 +2869,8 @@
             "mode": "fight",
             "damage_kind": "crushing",
             "effective_combat_add_rating": 1,
-            "roll": 16,
-            "damage": 42,
+            "roll": 14,
+            "damage": 43,
             "armor_reduction": 0,
             "label": "fatal",
             "wound_before": "unhurt",
@@ -2656,7 +2927,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "loot_claim": {
               "owner": {
@@ -2700,7 +2973,9 @@
               "runner",
               "keeper"
             ],
-            "due_at": 4,
+            "due_at": {
+              "milliseconds": 12000
+            },
             "policy": "full_site"
           }
         },
@@ -2709,13 +2984,73 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 3
+            "ready_at": {
+              "milliseconds": 9000
+            }
           }
         },
         {
           "logical_time_advanced": {
-            "from": 2,
-            "to": 3
+            "from": {
+              "milliseconds": 6000
+            },
+            "to": {
+              "milliseconds": 9000
+            }
+          }
+        },
+        {
+          "effect_ticked": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 2
+          }
+        },
+        {
+          "effect_damaged": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "damage": 1,
+            "hp": 46
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 1,
+            "total_actual_damage": 4
           }
         },
         {
@@ -2723,7 +3058,9 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "kind": "monster",
-            "logical_time": 3
+            "logical_time": {
+              "milliseconds": 9000
+            }
           }
         },
         {
@@ -2760,7 +3097,7 @@
             "selected_boost_source_id": null,
             "denominator": 20,
             "save_twentieths": 5,
-            "roll": 19,
+            "roll": 17,
             "success": false,
             "mitigation_mode": null,
             "requested_damage": null,
@@ -2779,7 +3116,7 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "source_kind": "spell",
             "source_id": "venom_bite",
@@ -2796,14 +3133,18 @@
             "actor_id": "ecology:gallery_lair:burrower:0",
             "actor": "Cinder Burrower",
             "cost_units": 1,
-            "ready_at": 4
+            "ready_at": {
+              "milliseconds": 12000
+            }
           }
         }
       ],
       "after_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 3,
+        "logical_time": {
+          "milliseconds": 9000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -3382,10 +3723,14 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -3495,10 +3840,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -3586,10 +3935,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -3663,9 +4016,9 @@
                 "y": 1
               }
             },
-            "hp": 50,
+            "hp": 46,
             "max_hp": 50,
-            "wound_state": "unhurt",
+            "wound_state": "wounded",
             "armor_protection": {
               "sources": [],
               "block_rating": 0,
@@ -3677,10 +4030,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 3,
-            "last_resource_activity_at": 2,
+            "ready_at": {
+              "milliseconds": 9000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 6000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -3751,7 +4110,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -3852,7 +4211,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -3901,7 +4262,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -3926,7 +4289,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -3955,14 +4320,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 3
+            "logical_time": {
+              "milliseconds": 9000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 3,
+            "logical_time": {
+              "milliseconds": 9000
+            },
             "intent": "fight ecology:gallery_lair:burrower:0"
           }
         },
@@ -3983,8 +4352,8 @@
             "mode": "fight",
             "damage_kind": "crushing",
             "effective_combat_add_rating": 1,
-            "roll": 17,
-            "damage": 43,
+            "roll": 15,
+            "damage": 41,
             "armor_reduction": 0,
             "label": "fatal",
             "wound_before": "unhurt",
@@ -4041,7 +4410,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "loot_claim": {
               "owner": {
@@ -4112,7 +4483,9 @@
             "member_ids": [
               "burrower"
             ],
-            "due_at": 5,
+            "due_at": {
+              "milliseconds": 15000
+            },
             "policy": "full_site"
           }
         },
@@ -4121,1191 +4494,19 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 4
+            "ready_at": {
+              "milliseconds": 12000
+            }
           }
         },
         {
           "logical_time_advanced": {
-            "from": 3,
-            "to": 4
-          }
-        }
-      ],
-      "after_snapshot": {
-        "contract_version": 30,
-        "scope": "omniscient_local",
-        "logical_time": 4,
-        "controlled_actor_ids": [
-          "player"
-        ],
-        "rules": {
-          "progression": {
-            "level_thresholds": [
-              {
-                "level": 1,
-                "cumulative_experience": 0
-              },
-              {
-                "level": 2,
-                "cumulative_experience": 100
-              },
-              {
-                "level": 3,
-                "cumulative_experience": 300
-              },
-              {
-                "level": 4,
-                "cumulative_experience": 600
-              },
-              {
-                "level": 5,
-                "cumulative_experience": 1000
-              },
-              {
-                "level": 6,
-                "cumulative_experience": 1500
-              },
-              {
-                "level": 7,
-                "cumulative_experience": 2100
-              },
-              {
-                "level": 8,
-                "cumulative_experience": 2800
-              },
-              {
-                "level": 9,
-                "cumulative_experience": 3600
-              },
-              {
-                "level": 10,
-                "cumulative_experience": 4500
-              }
-            ],
-            "growth_profiles": [
-              {
-                "class_id": "fighter",
-                "hit_points": {
-                  "kind": "attribute_bands",
-                  "attribute": "constitution",
-                  "bands": [
-                    {
-                      "minimum_attribute": 0,
-                      "outcomes": [
-                        {
-                          "amount": 8,
-                          "weight": 1
-                        },
-                        {
-                          "amount": 9,
-                          "weight": 1
-                        }
-                      ]
-                    },
-                    {
-                      "minimum_attribute": 10,
-                      "outcomes": [
-                        {
-                          "amount": 9,
-                          "weight": 1
-                        },
-                        {
-                          "amount": 10,
-                          "weight": 1
-                        }
-                      ]
-                    },
-                    {
-                      "minimum_attribute": 15,
-                      "outcomes": [
-                        {
-                          "amount": 10,
-                          "weight": 1
-                        },
-                        {
-                          "amount": 11,
-                          "weight": 1
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "magic_points": null,
-                "stamina_points": {
-                  "kind": "attribute_bands",
-                  "attribute": "strength",
-                  "bands": [
-                    {
-                      "minimum_attribute": 0,
-                      "outcomes": [
-                        {
-                          "amount": 3,
-                          "weight": 1
-                        },
-                        {
-                          "amount": 4,
-                          "weight": 1
-                        }
-                      ]
-                    },
-                    {
-                      "minimum_attribute": 10,
-                      "outcomes": [
-                        {
-                          "amount": 4,
-                          "weight": 1
-                        },
-                        {
-                          "amount": 5,
-                          "weight": 1
-                        }
-                      ]
-                    },
-                    {
-                      "minimum_attribute": 15,
-                      "outcomes": [
-                        {
-                          "amount": 5,
-                          "weight": 1
-                        },
-                        {
-                          "amount": 6,
-                          "weight": 1
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "physical_attribute_adds_by_level": [
-                  {
-                    "level": 3,
-                    "strength_adds": 2,
-                    "dexterity_adds": 2
-                  },
-                  {
-                    "level": 6,
-                    "strength_adds": 1,
-                    "dexterity_adds": 1
-                  },
-                  {
-                    "level": 9,
-                    "strength_adds": 1,
-                    "dexterity_adds": 1
-                  }
-                ]
-              }
-            ]
-          },
-          "skills": {
-            "base_learning_rate": 1,
-            "practice_thresholds": [
-              1,
-              3,
-              5,
-              7,
-              9,
-              11,
-              13,
-              15,
-              17,
-              19,
-              21,
-              23,
-              25,
-              27,
-              29,
-              31,
-              33,
-              35,
-              37,
-              39
-            ],
-            "training": {
-              "gold_per_learning_rate": 7,
-              "experience_per_learning_rate": 3,
-              "maximum_learning_rates": [
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12,
-                13,
-                14,
-                15,
-                16,
-                17,
-                18,
-                19,
-                20,
-                21
-              ]
+            "from": {
+              "milliseconds": 9000
+            },
+            "to": {
+              "milliseconds": 12000
             }
-          },
-          "movement": {
-            "controlled_path_points": 3,
-            "automatic_step_points": 1
-          },
-          "burden": {
-            "coin_burden_per_gold": 1,
-            "lightly_loaded_max_per_strength": 10000,
-            "moderately_loaded_max_per_strength": 20000,
-            "heavily_loaded_max_per_strength": 30000
-          },
-          "resources": {
-            "recovery_interval_units": 2,
-            "active_hp_recovery": 1,
-            "inactive_hp_recovery": 2,
-            "inactive_stamina_recovery": 1,
-            "mp_recovery": 1,
-            "normal_movement_stamina_cost": 1,
-            "rapid_movement_stamina_cost": 2
-          },
-          "magic": {
-            "warmup": {
-              "units": 1,
-              "evidence_state": "original_provisional"
-            },
-            "damage_interruption": {
-              "comparison": "strictly_greater",
-              "numerator": 1,
-              "denominator": 5,
-              "evidence_state": "original_provisional"
-            },
-            "resistance": {
-              "denominator": 20,
-              "denominator_evidence_state": "original_provisional",
-              "success_comparison": "roll_at_or_below",
-              "matching_boost_policy": "highest_matching",
-              "resolution_evidence_state": "original_provisional"
-            },
-            "casting_practice": {
-              "minimum_raw_points": 1,
-              "raw_points_per_mp": 1,
-              "primary_attribute_points_per_bonus": 10,
-              "evidence_state": "original_provisional"
-            },
-            "thaum_above_skill": {
-              "roll_denominator": 20,
-              "penalty_per_missing_level": 1,
-              "minimum_success_threshold": 1,
-              "evidence_state": "original_provisional"
-            },
-            "kill_experience": {
-              "directed": {
-                "numerator": 1,
-                "denominator": 1
-              },
-              "area_or_illusion": {
-                "numerator": 2,
-                "denominator": 5
-              },
-              "fraction_evidence_state": "original_provisional",
-              "rounding": "down",
-              "rounding_evidence_state": "original_provisional"
-            },
-            "mp_recovery": {
-              "active_item_policy": "highest_multiplier",
-              "rounding": "down",
-              "evidence_state": "original_provisional"
-            },
-            "effect_families": {
-              "raise_dead": {
-                "roll_denominator": 20,
-                "success_threshold_per_magic_level": 1,
-                "minimum_success_threshold": 1,
-                "evidence_state": "original_provisional"
-              }
-            }
-          },
-          "combat": {
-            "tuning_status": "original_provisional",
-            "attack_modes": {
-              "kick": {
-                "maximum_range": 0,
-                "cooldown_units": 1,
-                "damage_kind": "crushing"
-              },
-              "jumpkick": {
-                "maximum_range_cap": 3,
-                "skill_levels_per_extra_hex": 3,
-                "stamina_cost": 1,
-                "cooldown_units": 1,
-                "damage_kind": "crushing"
-              }
-            },
-            "hit": {
-              "base_defender_score": 10,
-              "attacker_attack_stat_divisor": 2,
-              "attacker_skill_level_divisor": 2,
-              "defender_defense_stat_divisor": 2,
-              "defender_dexterity_divisor": 3,
-              "non_character_defender_dexterity": 10
-            },
-            "block": {
-              "left_hand_selection_percent": 75,
-              "shield_percent_per_point": 10,
-              "shield_percent_cap": 90,
-              "armor_percent_per_point": 8,
-              "armor_percent_cap": 80,
-              "strength_penetration_percent_per_add": 2,
-              "armor_encumbrance_percent_per_point": 2,
-              "combat_add_penetration_percent_per_rating": 2
-            },
-            "fumble": {
-              "base_percent": 5,
-              "minimum_percent": 1,
-              "skill_levels_per_reduction": 4
-            },
-            "damage": {
-              "minimum_damage": 1,
-              "roll_variation_modulus": 3,
-              "moderate_label_min_percent": 20,
-              "heavy_label_min_percent": 40,
-              "severe_label_min_percent": 70
-            },
-            "wounds": {
-              "near_death_max_percent": 20,
-              "badly_wounded_max_percent": 50,
-              "wounded_max_percent": 99
-            },
-            "practice": {
-              "practice_raw_points": 1,
-              "life_and_death_raw_points": 2,
-              "overwhelming_raw_points": 1,
-              "fatal_blow_bonus_raw_points": 1,
-              "life_and_death_minimum_target_xp_per_attacker_level": 5,
-              "life_and_death_required_at_skill_level": 8
-            }
-          }
-        },
-        "spell_social": [
-          {
-            "spell_id": "venom_bite",
-            "social": {
-              "hostile_act": true,
-              "town_law": "permitted"
-            }
-          }
-        ],
-        "social_relations": {
-          "self_defense": [],
-          "npc_grudges": []
-        },
-        "realms": [
-          {
-            "id": "realm_0",
-            "name": "Cinder Hollow",
-            "levels": [
-              {
-                "id": "room_0",
-                "law_zone": "none",
-                "width": 5,
-                "height": 3,
-                "tiles": [
-                  {
-                    "position": {
-                      "x": 0,
-                      "y": 0
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 1,
-                      "y": 0
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 2,
-                      "y": 0
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 3,
-                      "y": 0
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 4,
-                      "y": 0
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 0,
-                      "y": 1
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 1,
-                      "y": 1
-                    },
-                    "terrain_id": "flagstone",
-                    "terrain_name": "Flagstone",
-                    "passable": true,
-                    "move_cost": 1,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 2,
-                      "y": 1
-                    },
-                    "terrain_id": "flagstone",
-                    "terrain_name": "Flagstone",
-                    "passable": true,
-                    "move_cost": 1,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 3,
-                      "y": 1
-                    },
-                    "terrain_id": "flagstone",
-                    "terrain_name": "Flagstone",
-                    "passable": true,
-                    "move_cost": 1,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 4,
-                      "y": 1
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 0,
-                      "y": 2
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 1,
-                      "y": 2
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 2,
-                      "y": 2
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 3,
-                      "y": 2
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  },
-                  {
-                    "position": {
-                      "x": 4,
-                      "y": 2
-                    },
-                    "terrain_id": "stone_wall",
-                    "terrain_name": "Stone Wall",
-                    "passable": false,
-                    "move_cost": null,
-                    "transition": null
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        "actors": [
-          {
-            "id": "ecology:gallery_lair:burrower:0",
-            "character_id": null,
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "alignment": "chaotic",
-              "nature": "other",
-              "behavior": "alignment_creature",
-              "owner_relation": "none"
-            },
-            "name": "Cinder Burrower",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 3,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": 4,
-            "last_resource_activity_at": null,
-            "tie_break_order": 1,
-            "attack_ready_at": 1,
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:keeper:0",
-            "character_id": null,
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "alignment": "chaotic",
-              "nature": "other",
-              "behavior": "alignment_creature",
-              "owner_relation": "none"
-            },
-            "name": "Bramble Keeper",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": 3,
-            "last_resource_activity_at": null,
-            "tie_break_order": 3,
-            "attack_ready_at": 3,
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:runner:0",
-            "character_id": null,
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "alignment": "chaotic",
-              "nature": "other",
-              "behavior": "alignment_creature",
-              "owner_relation": "none"
-            },
-            "name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": 1,
-            "last_resource_activity_at": null,
-            "tie_break_order": 2,
-            "attack_ready_at": 1,
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "player",
-            "character_id": null,
-            "kind": "player",
-            "creature_traits": [],
-            "social": {
-              "alignment": "lawful",
-              "nature": "human",
-              "behavior": "adventurer",
-              "owner_relation": "none"
-            },
-            "name": "Trailwarden",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 50,
-            "max_hp": 50,
-            "wound_state": "unhurt",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "alive"
-            },
-            "ready_at": 4,
-            "last_resource_activity_at": 3,
-            "tie_break_order": 0,
-            "attack_ready_at": 4,
-            "physical_weapon": {
-              "item_instance_id": "gallery_club",
-              "item_definition_id": "oak_club",
-              "skill_track_id": "mace",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 1,
-              "effective_combat_add_rating": 1,
-              "handedness": "one_handed",
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [
-                {
-                  "item_instance_id": "gallery_club",
-                  "item_definition_id": "oak_club",
-                  "name": "Oak Club",
-                  "quantity": 1,
-                  "identified": false,
-                  "appraised": false,
-                  "known_unit_value_gold": null,
-                  "known_stack_value_gold": null,
-                  "unit_burden": 1,
-                  "stack_burden": 1,
-                  "binding": {
-                    "state": "unrestricted"
-                  },
-                  "position": "right_hand",
-                  "valid_placements": [
-                    "hand",
-                    "belt_back",
-                    "sack"
-                  ]
-                }
-              ],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 1,
-              "coin_burden": 0,
-              "total_burden": 1,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "active_effects": [
-              {
-                "instance_id": "spell:venom_bite:2:player",
-                "effect_id": "venom_bite",
-                "source": {
-                  "kind": "spell",
-                  "id": "venom_bite"
-                },
-                "kind": "poison",
-                "tags": [
-                  "poison"
-                ],
-                "potency": 1,
-                "remaining_rounds": 3,
-                "until_condition": null,
-                "stacking": "refresh_duration",
-                "start_delay_rounds": 0,
-                "tick_interval_rounds": 1,
-                "suppresses_action": false,
-                "resistance_boosts": []
-              }
-            ],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          }
-        ],
-        "automatic_actors": [
-          {
-            "actor_id": "ecology:gallery_lair:burrower:0",
-            "behavior": "simple_chase",
-            "cadence_units": 1,
-            "aggro_radius": 6,
-            "leash_range": 8,
-            "physical_attack_modes": [
-              "fight"
-            ],
-            "awareness": {
-              "mode": "unrestricted"
-            },
-            "remembered": null,
-            "returning_home": false
-          },
-          {
-            "actor_id": "ecology:gallery_pack:runner:0",
-            "behavior": "simple_chase",
-            "cadence_units": 1,
-            "aggro_radius": 6,
-            "leash_range": 8,
-            "physical_attack_modes": [
-              "fight"
-            ],
-            "awareness": {
-              "mode": "unrestricted"
-            },
-            "remembered": null,
-            "returning_home": false
-          },
-          {
-            "actor_id": "ecology:gallery_pack:keeper:0",
-            "behavior": "simple_chase",
-            "cadence_units": 1,
-            "aggro_radius": 6,
-            "leash_range": 8,
-            "physical_attack_modes": [
-              "fight"
-            ],
-            "awareness": {
-              "mode": "unrestricted"
-            },
-            "remembered": null,
-            "returning_home": false
-          }
-        ],
-        "ecology_sites": [
-          {
-            "site_id": "gallery_lair",
-            "spawn_group_id": "gallery_lair_group",
-            "generation": 0,
-            "full_clear_due_at": 5,
-            "member_slots": [
-              {
-                "member_id": "burrower",
-                "location": {
-                  "realm": "realm_0",
-                  "level": "room_0",
-                  "position": {
-                    "x": 2,
-                    "y": 1
-                  }
-                },
-                "actor_id": null,
-                "vacant": true,
-                "due_at": null
-              }
-            ]
-          },
-          {
-            "site_id": "gallery_pack",
-            "spawn_group_id": "gallery_pack",
-            "generation": 0,
-            "full_clear_due_at": 4,
-            "member_slots": [
-              {
-                "member_id": "keeper",
-                "location": {
-                  "realm": "realm_0",
-                  "level": "room_0",
-                  "position": {
-                    "x": 2,
-                    "y": 1
-                  }
-                },
-                "actor_id": null,
-                "vacant": true,
-                "due_at": null
-              },
-              {
-                "member_id": "runner",
-                "location": {
-                  "realm": "realm_0",
-                  "level": "room_0",
-                  "position": {
-                    "x": 2,
-                    "y": 1
-                  }
-                },
-                "actor_id": null,
-                "vacant": true,
-                "due_at": null
-              }
-            ]
-          }
-        ],
-        "ground_items": [],
-        "corpses": [
-          {
-            "corpse_id": "corpse:3",
-            "origin_actor_id": "ecology:gallery_lair:burrower:0",
-            "origin_character_id": null,
-            "origin_kind": "monster",
-            "origin_name": "Cinder Burrower",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "created_at": 3,
-            "sequence": 3,
-            "searched": false,
-            "loot_claim": {
-              "owner": {
-                "kind": "transient_actor",
-                "id": "player"
-              },
-              "basis": "killing_blow"
-            }
-          },
-          {
-            "corpse_id": "corpse:2",
-            "origin_actor_id": "ecology:gallery_pack:keeper:0",
-            "origin_character_id": null,
-            "origin_kind": "monster",
-            "origin_name": "Bramble Keeper",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "created_at": 2,
-            "sequence": 2,
-            "searched": false,
-            "loot_claim": {
-              "owner": {
-                "kind": "transient_actor",
-                "id": "player"
-              },
-              "basis": "killing_blow"
-            }
-          },
-          {
-            "corpse_id": "corpse:1",
-            "origin_actor_id": "ecology:gallery_pack:runner:0",
-            "origin_character_id": null,
-            "origin_kind": "monster",
-            "origin_name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "created_at": 1,
-            "sequence": 1,
-            "searched": false,
-            "loot_claim": {
-              "owner": {
-                "kind": "transient_actor",
-                "id": "player"
-              },
-              "basis": "killing_blow"
-            }
-          }
-        ],
-        "ground_gold": [],
-        "tile_effects": [],
-        "concealed_transitions": [],
-        "quest_states": []
-      }
-    },
-    {
-      "contract_version": 1,
-      "step_index": 3,
-      "intent_label": "wait",
-      "preview": null,
-      "events": [
-        {
-          "actor_ready": {
-            "actor_id": "player",
-            "actor": "Trailwarden",
-            "kind": "player",
-            "logical_time": 4
-          }
-        },
-        {
-          "player_intent": {
-            "actor_id": "player",
-            "actor": "Trailwarden",
-            "logical_time": 4,
-            "intent": "wait"
-          }
-        },
-        {
-          "actor_readiness_scheduled": {
-            "actor_id": "player",
-            "actor": "Trailwarden",
-            "cost_units": 1,
-            "ready_at": 5
           }
         },
         {
@@ -5320,7 +4521,7 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
@@ -5342,14 +4543,14 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
               "poison"
             ],
             "damage": 1,
-            "hp": 49
+            "hp": 45
           }
         },
         {
@@ -5359,20 +4560,16 @@
             "reward_unit_id": null,
             "reward_class": null,
             "applied_damage": 1,
-            "total_actual_damage": 1
-          }
-        },
-        {
-          "logical_time_advanced": {
-            "from": 4,
-            "to": 5
+            "total_actual_damage": 5
           }
         }
       ],
       "after_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 5,
+        "logical_time": {
+          "milliseconds": 12000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -5951,10 +5148,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6042,10 +5243,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6133,10 +5338,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -6210,7 +5419,7 @@
                 "y": 1
               }
             },
-            "hp": 49,
+            "hp": 45,
             "max_hp": 50,
             "wound_state": "wounded",
             "armor_protection": {
@@ -6224,10 +5433,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 5,
-            "last_resource_activity_at": 3,
+            "ready_at": {
+              "milliseconds": 12000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -6298,7 +5513,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -6377,7 +5592,9 @@
             "site_id": "gallery_lair",
             "spawn_group_id": "gallery_lair_group",
             "generation": 0,
-            "full_clear_due_at": 5,
+            "full_clear_due_at": {
+              "milliseconds": 15000
+            },
             "member_slots": [
               {
                 "member_id": "burrower",
@@ -6399,7 +5616,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -6448,7 +5667,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -6473,7 +5694,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -6498,7 +5721,9 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -6518,7 +5743,7 @@
     },
     {
       "contract_version": 1,
-      "step_index": 4,
+      "step_index": 3,
       "intent_label": "wait",
       "preview": null,
       "events": [
@@ -6527,14 +5752,18 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "kind": "player",
-            "logical_time": 5
+            "logical_time": {
+              "milliseconds": 12000
+            }
           }
         },
         {
           "player_intent": {
             "actor_id": "player",
             "actor": "Trailwarden",
-            "logical_time": 5,
+            "logical_time": {
+              "milliseconds": 12000
+            },
             "intent": "wait"
           }
         },
@@ -6543,7 +5772,19 @@
             "actor_id": "player",
             "actor": "Trailwarden",
             "cost_units": 1,
-            "ready_at": 6
+            "ready_at": {
+              "milliseconds": 15000
+            }
+          }
+        },
+        {
+          "logical_time_advanced": {
+            "from": {
+              "milliseconds": 12000
+            },
+            "to": {
+              "milliseconds": 15000
+            }
           }
         },
         {
@@ -6558,7 +5799,7 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
@@ -6580,14 +5821,14 @@
                 "y": 1
               }
             },
-            "instance_id": "spell:venom_bite:2:player",
+            "instance_id": "spell:venom_bite:3000ms:player",
             "effect_id": "venom_bite",
             "kind": "poison",
             "tags": [
               "poison"
             ],
             "damage": 1,
-            "hp": 48
+            "hp": 44
           }
         },
         {
@@ -6597,20 +5838,16 @@
             "reward_unit_id": null,
             "reward_class": null,
             "applied_damage": 1,
-            "total_actual_damage": 2
-          }
-        },
-        {
-          "logical_time_advanced": {
-            "from": 5,
-            "to": 6
+            "total_actual_damage": 6
           }
         }
       ],
       "after_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "scope": "omniscient_local",
-        "logical_time": 6,
+        "logical_time": {
+          "milliseconds": 15000
+        },
         "controlled_actor_ids": [
           "player"
         ],
@@ -7189,10 +6426,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 4,
+            "ready_at": {
+              "milliseconds": 12000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 1,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -7280,10 +6521,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 3,
+            "ready_at": {
+              "milliseconds": 9000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 3,
-            "attack_ready_at": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -7371,10 +6616,14 @@
             "life_state": {
               "kind": "dead"
             },
-            "ready_at": 1,
+            "ready_at": {
+              "milliseconds": 3000
+            },
             "last_resource_activity_at": null,
             "tie_break_order": 2,
-            "attack_ready_at": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
             "physical_weapon": {
               "item_instance_id": null,
               "item_definition_id": null,
@@ -7448,7 +6697,7 @@
                 "y": 1
               }
             },
-            "hp": 48,
+            "hp": 44,
             "max_hp": 50,
             "wound_state": "wounded",
             "armor_protection": {
@@ -7462,10 +6711,16 @@
             "life_state": {
               "kind": "alive"
             },
-            "ready_at": 6,
-            "last_resource_activity_at": 3,
+            "ready_at": {
+              "milliseconds": 15000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
             "tie_break_order": 0,
-            "attack_ready_at": 4,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
             "physical_weapon": {
               "item_instance_id": "gallery_club",
               "item_definition_id": "oak_club",
@@ -7536,7 +6791,7 @@
             "npc": null,
             "active_effects": [
               {
-                "instance_id": "spell:venom_bite:2:player",
+                "instance_id": "spell:venom_bite:3000ms:player",
                 "effect_id": "venom_bite",
                 "source": {
                   "kind": "spell",
@@ -7615,7 +6870,9 @@
             "site_id": "gallery_lair",
             "spawn_group_id": "gallery_lair_group",
             "generation": 0,
-            "full_clear_due_at": 5,
+            "full_clear_due_at": {
+              "milliseconds": 15000
+            },
             "member_slots": [
               {
                 "member_id": "burrower",
@@ -7637,7 +6894,9 @@
             "site_id": "gallery_pack",
             "spawn_group_id": "gallery_pack",
             "generation": 0,
-            "full_clear_due_at": 4,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
             "member_slots": [
               {
                 "member_id": "keeper",
@@ -7686,7 +6945,9 @@
                 "y": 1
               }
             },
-            "created_at": 3,
+            "created_at": {
+              "milliseconds": 9000
+            },
             "sequence": 3,
             "searched": false,
             "loot_claim": {
@@ -7711,7 +6972,9 @@
                 "y": 1
               }
             },
-            "created_at": 2,
+            "created_at": {
+              "milliseconds": 6000
+            },
             "sequence": 2,
             "searched": false,
             "loot_claim": {
@@ -7736,7 +6999,1283 @@
                 "y": 1
               }
             },
-            "created_at": 1,
+            "created_at": {
+              "milliseconds": 3000
+            },
+            "sequence": 1,
+            "searched": false,
+            "loot_claim": {
+              "owner": {
+                "kind": "transient_actor",
+                "id": "player"
+              },
+              "basis": "killing_blow"
+            }
+          }
+        ],
+        "ground_gold": [],
+        "tile_effects": [],
+        "concealed_transitions": [],
+        "quest_states": []
+      }
+    },
+    {
+      "contract_version": 1,
+      "step_index": 4,
+      "intent_label": "wait",
+      "preview": null,
+      "events": [
+        {
+          "actor_ready": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "kind": "player",
+            "logical_time": {
+              "milliseconds": 15000
+            }
+          }
+        },
+        {
+          "player_intent": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "logical_time": {
+              "milliseconds": 15000
+            },
+            "intent": "wait"
+          }
+        },
+        {
+          "actor_readiness_scheduled": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "cost_units": 1,
+            "ready_at": {
+              "milliseconds": 18000
+            }
+          }
+        },
+        {
+          "logical_time_advanced": {
+            "from": {
+              "milliseconds": 15000
+            },
+            "to": {
+              "milliseconds": 18000
+            }
+          }
+        },
+        {
+          "effect_ticked": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "potency": 1,
+            "remaining_rounds": 0
+          }
+        },
+        {
+          "effect_damaged": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison",
+            "tags": [
+              "poison"
+            ],
+            "damage": 1,
+            "hp": 43
+          }
+        },
+        {
+          "defeat_contribution_recorded": {
+            "contributor_character_id": null,
+            "target_id": "player",
+            "reward_unit_id": null,
+            "reward_class": null,
+            "applied_damage": 1,
+            "total_actual_damage": 7
+          }
+        },
+        {
+          "effect_expired": {
+            "actor_id": "player",
+            "actor": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "instance_id": "spell:venom_bite:3000ms:player",
+            "effect_id": "venom_bite",
+            "kind": "poison"
+          }
+        }
+      ],
+      "after_snapshot": {
+        "contract_version": 31,
+        "scope": "omniscient_local",
+        "logical_time": {
+          "milliseconds": 18000
+        },
+        "controlled_actor_ids": [
+          "player"
+        ],
+        "rules": {
+          "progression": {
+            "level_thresholds": [
+              {
+                "level": 1,
+                "cumulative_experience": 0
+              },
+              {
+                "level": 2,
+                "cumulative_experience": 100
+              },
+              {
+                "level": 3,
+                "cumulative_experience": 300
+              },
+              {
+                "level": 4,
+                "cumulative_experience": 600
+              },
+              {
+                "level": 5,
+                "cumulative_experience": 1000
+              },
+              {
+                "level": 6,
+                "cumulative_experience": 1500
+              },
+              {
+                "level": 7,
+                "cumulative_experience": 2100
+              },
+              {
+                "level": 8,
+                "cumulative_experience": 2800
+              },
+              {
+                "level": 9,
+                "cumulative_experience": 3600
+              },
+              {
+                "level": 10,
+                "cumulative_experience": 4500
+              }
+            ],
+            "growth_profiles": [
+              {
+                "class_id": "fighter",
+                "hit_points": {
+                  "kind": "attribute_bands",
+                  "attribute": "constitution",
+                  "bands": [
+                    {
+                      "minimum_attribute": 0,
+                      "outcomes": [
+                        {
+                          "amount": 8,
+                          "weight": 1
+                        },
+                        {
+                          "amount": 9,
+                          "weight": 1
+                        }
+                      ]
+                    },
+                    {
+                      "minimum_attribute": 10,
+                      "outcomes": [
+                        {
+                          "amount": 9,
+                          "weight": 1
+                        },
+                        {
+                          "amount": 10,
+                          "weight": 1
+                        }
+                      ]
+                    },
+                    {
+                      "minimum_attribute": 15,
+                      "outcomes": [
+                        {
+                          "amount": 10,
+                          "weight": 1
+                        },
+                        {
+                          "amount": 11,
+                          "weight": 1
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "magic_points": null,
+                "stamina_points": {
+                  "kind": "attribute_bands",
+                  "attribute": "strength",
+                  "bands": [
+                    {
+                      "minimum_attribute": 0,
+                      "outcomes": [
+                        {
+                          "amount": 3,
+                          "weight": 1
+                        },
+                        {
+                          "amount": 4,
+                          "weight": 1
+                        }
+                      ]
+                    },
+                    {
+                      "minimum_attribute": 10,
+                      "outcomes": [
+                        {
+                          "amount": 4,
+                          "weight": 1
+                        },
+                        {
+                          "amount": 5,
+                          "weight": 1
+                        }
+                      ]
+                    },
+                    {
+                      "minimum_attribute": 15,
+                      "outcomes": [
+                        {
+                          "amount": 5,
+                          "weight": 1
+                        },
+                        {
+                          "amount": 6,
+                          "weight": 1
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "physical_attribute_adds_by_level": [
+                  {
+                    "level": 3,
+                    "strength_adds": 2,
+                    "dexterity_adds": 2
+                  },
+                  {
+                    "level": 6,
+                    "strength_adds": 1,
+                    "dexterity_adds": 1
+                  },
+                  {
+                    "level": 9,
+                    "strength_adds": 1,
+                    "dexterity_adds": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "skills": {
+            "base_learning_rate": 1,
+            "practice_thresholds": [
+              1,
+              3,
+              5,
+              7,
+              9,
+              11,
+              13,
+              15,
+              17,
+              19,
+              21,
+              23,
+              25,
+              27,
+              29,
+              31,
+              33,
+              35,
+              37,
+              39
+            ],
+            "training": {
+              "gold_per_learning_rate": 7,
+              "experience_per_learning_rate": 3,
+              "maximum_learning_rates": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21
+              ]
+            }
+          },
+          "movement": {
+            "controlled_path_points": 3,
+            "automatic_step_points": 1
+          },
+          "burden": {
+            "coin_burden_per_gold": 1,
+            "lightly_loaded_max_per_strength": 10000,
+            "moderately_loaded_max_per_strength": 20000,
+            "heavily_loaded_max_per_strength": 30000
+          },
+          "resources": {
+            "recovery_interval_units": 2,
+            "active_hp_recovery": 1,
+            "inactive_hp_recovery": 2,
+            "inactive_stamina_recovery": 1,
+            "mp_recovery": 1,
+            "normal_movement_stamina_cost": 1,
+            "rapid_movement_stamina_cost": 2
+          },
+          "magic": {
+            "warmup": {
+              "units": 1,
+              "evidence_state": "original_provisional"
+            },
+            "damage_interruption": {
+              "comparison": "strictly_greater",
+              "numerator": 1,
+              "denominator": 5,
+              "evidence_state": "original_provisional"
+            },
+            "resistance": {
+              "denominator": 20,
+              "denominator_evidence_state": "original_provisional",
+              "success_comparison": "roll_at_or_below",
+              "matching_boost_policy": "highest_matching",
+              "resolution_evidence_state": "original_provisional"
+            },
+            "casting_practice": {
+              "minimum_raw_points": 1,
+              "raw_points_per_mp": 1,
+              "primary_attribute_points_per_bonus": 10,
+              "evidence_state": "original_provisional"
+            },
+            "thaum_above_skill": {
+              "roll_denominator": 20,
+              "penalty_per_missing_level": 1,
+              "minimum_success_threshold": 1,
+              "evidence_state": "original_provisional"
+            },
+            "kill_experience": {
+              "directed": {
+                "numerator": 1,
+                "denominator": 1
+              },
+              "area_or_illusion": {
+                "numerator": 2,
+                "denominator": 5
+              },
+              "fraction_evidence_state": "original_provisional",
+              "rounding": "down",
+              "rounding_evidence_state": "original_provisional"
+            },
+            "mp_recovery": {
+              "active_item_policy": "highest_multiplier",
+              "rounding": "down",
+              "evidence_state": "original_provisional"
+            },
+            "effect_families": {
+              "raise_dead": {
+                "roll_denominator": 20,
+                "success_threshold_per_magic_level": 1,
+                "minimum_success_threshold": 1,
+                "evidence_state": "original_provisional"
+              }
+            }
+          },
+          "combat": {
+            "tuning_status": "original_provisional",
+            "attack_modes": {
+              "kick": {
+                "maximum_range": 0,
+                "cooldown_units": 1,
+                "damage_kind": "crushing"
+              },
+              "jumpkick": {
+                "maximum_range_cap": 3,
+                "skill_levels_per_extra_hex": 3,
+                "stamina_cost": 1,
+                "cooldown_units": 1,
+                "damage_kind": "crushing"
+              }
+            },
+            "hit": {
+              "base_defender_score": 10,
+              "attacker_attack_stat_divisor": 2,
+              "attacker_skill_level_divisor": 2,
+              "defender_defense_stat_divisor": 2,
+              "defender_dexterity_divisor": 3,
+              "non_character_defender_dexterity": 10
+            },
+            "block": {
+              "left_hand_selection_percent": 75,
+              "shield_percent_per_point": 10,
+              "shield_percent_cap": 90,
+              "armor_percent_per_point": 8,
+              "armor_percent_cap": 80,
+              "strength_penetration_percent_per_add": 2,
+              "armor_encumbrance_percent_per_point": 2,
+              "combat_add_penetration_percent_per_rating": 2
+            },
+            "fumble": {
+              "base_percent": 5,
+              "minimum_percent": 1,
+              "skill_levels_per_reduction": 4
+            },
+            "damage": {
+              "minimum_damage": 1,
+              "roll_variation_modulus": 3,
+              "moderate_label_min_percent": 20,
+              "heavy_label_min_percent": 40,
+              "severe_label_min_percent": 70
+            },
+            "wounds": {
+              "near_death_max_percent": 20,
+              "badly_wounded_max_percent": 50,
+              "wounded_max_percent": 99
+            },
+            "practice": {
+              "practice_raw_points": 1,
+              "life_and_death_raw_points": 2,
+              "overwhelming_raw_points": 1,
+              "fatal_blow_bonus_raw_points": 1,
+              "life_and_death_minimum_target_xp_per_attacker_level": 5,
+              "life_and_death_required_at_skill_level": 8
+            }
+          }
+        },
+        "spell_social": [
+          {
+            "spell_id": "venom_bite",
+            "social": {
+              "hostile_act": true,
+              "town_law": "permitted"
+            }
+          }
+        ],
+        "social_relations": {
+          "self_defense": [],
+          "npc_grudges": []
+        },
+        "realms": [
+          {
+            "id": "realm_0",
+            "name": "Cinder Hollow",
+            "levels": [
+              {
+                "id": "room_0",
+                "law_zone": "none",
+                "width": 5,
+                "height": 3,
+                "tiles": [
+                  {
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 1,
+                      "y": 0
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 2,
+                      "y": 0
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 3,
+                      "y": 0
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 4,
+                      "y": 0
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 0,
+                      "y": 1
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 1,
+                      "y": 1
+                    },
+                    "terrain_id": "flagstone",
+                    "terrain_name": "Flagstone",
+                    "passable": true,
+                    "move_cost": 1,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 2,
+                      "y": 1
+                    },
+                    "terrain_id": "flagstone",
+                    "terrain_name": "Flagstone",
+                    "passable": true,
+                    "move_cost": 1,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 3,
+                      "y": 1
+                    },
+                    "terrain_id": "flagstone",
+                    "terrain_name": "Flagstone",
+                    "passable": true,
+                    "move_cost": 1,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 4,
+                      "y": 1
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 1,
+                      "y": 2
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 2,
+                      "y": 2
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 3,
+                      "y": 2
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  },
+                  {
+                    "position": {
+                      "x": 4,
+                      "y": 2
+                    },
+                    "terrain_id": "stone_wall",
+                    "terrain_name": "Stone Wall",
+                    "passable": false,
+                    "move_cost": null,
+                    "transition": null
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "actors": [
+          {
+            "id": "ecology:gallery_lair:burrower:0",
+            "character_id": null,
+            "kind": "monster",
+            "creature_traits": [],
+            "social": {
+              "alignment": "chaotic",
+              "nature": "other",
+              "behavior": "alignment_creature",
+              "owner_relation": "none"
+            },
+            "name": "Cinder Burrower",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "hp": 0,
+            "max_hp": 3,
+            "wound_state": "dead",
+            "armor_protection": {
+              "sources": [],
+              "block_rating": 0,
+              "encumbrance": 0,
+              "cutting_reduction": 0,
+              "piercing_reduction": 0,
+              "crushing_reduction": 0
+            },
+            "life_state": {
+              "kind": "dead"
+            },
+            "ready_at": {
+              "milliseconds": 12000
+            },
+            "last_resource_activity_at": null,
+            "tie_break_order": 1,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
+            "physical_weapon": {
+              "item_instance_id": null,
+              "item_definition_id": null,
+              "skill_track_id": "hand",
+              "skill_level": 0,
+              "default_attack_mode": "fight",
+              "attack_modes": [
+                {
+                  "mode": "fight",
+                  "maximum_range": 0,
+                  "damage_kind": "crushing"
+                }
+              ],
+              "cooldown_units": 1,
+              "combat_add_rating": 0,
+              "effective_combat_add_rating": 0,
+              "handedness": null,
+              "block_value": 0,
+              "nocking_unloads_on_movement": null,
+              "offhand_occupied": false,
+              "full_two_handed_effect": true,
+              "bow_readiness": null,
+              "required_alignment": null,
+              "binding_usable": true,
+              "alignment_usable": true,
+              "restriction_usable": true,
+              "eligible_block_candidates": []
+            },
+            "carried": {
+              "items": [],
+              "gold": {
+                "left_hand": 0,
+                "right_hand": 0,
+                "sack": 0
+              }
+            },
+            "burden": {
+              "item_burden": 0,
+              "coin_burden": 0,
+              "total_burden": 0,
+              "lightly_loaded_limit": null,
+              "moderately_loaded_limit": null,
+              "heavily_loaded_limit": null,
+              "tier": null
+            },
+            "npc": null,
+            "active_effects": [],
+            "magic_resistance": {
+              "natural_save_twentieths": 5,
+              "evidence_state": "original_provisional",
+              "boosts": []
+            }
+          },
+          {
+            "id": "ecology:gallery_pack:keeper:0",
+            "character_id": null,
+            "kind": "monster",
+            "creature_traits": [],
+            "social": {
+              "alignment": "chaotic",
+              "nature": "other",
+              "behavior": "alignment_creature",
+              "owner_relation": "none"
+            },
+            "name": "Bramble Keeper",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "hp": 0,
+            "max_hp": 2,
+            "wound_state": "dead",
+            "armor_protection": {
+              "sources": [],
+              "block_rating": 0,
+              "encumbrance": 0,
+              "cutting_reduction": 0,
+              "piercing_reduction": 0,
+              "crushing_reduction": 0
+            },
+            "life_state": {
+              "kind": "dead"
+            },
+            "ready_at": {
+              "milliseconds": 9000
+            },
+            "last_resource_activity_at": null,
+            "tie_break_order": 3,
+            "attack_ready_at": {
+              "milliseconds": 9000
+            },
+            "physical_weapon": {
+              "item_instance_id": null,
+              "item_definition_id": null,
+              "skill_track_id": "hand",
+              "skill_level": 0,
+              "default_attack_mode": "fight",
+              "attack_modes": [
+                {
+                  "mode": "fight",
+                  "maximum_range": 0,
+                  "damage_kind": "crushing"
+                }
+              ],
+              "cooldown_units": 1,
+              "combat_add_rating": 0,
+              "effective_combat_add_rating": 0,
+              "handedness": null,
+              "block_value": 0,
+              "nocking_unloads_on_movement": null,
+              "offhand_occupied": false,
+              "full_two_handed_effect": true,
+              "bow_readiness": null,
+              "required_alignment": null,
+              "binding_usable": true,
+              "alignment_usable": true,
+              "restriction_usable": true,
+              "eligible_block_candidates": []
+            },
+            "carried": {
+              "items": [],
+              "gold": {
+                "left_hand": 0,
+                "right_hand": 0,
+                "sack": 0
+              }
+            },
+            "burden": {
+              "item_burden": 0,
+              "coin_burden": 0,
+              "total_burden": 0,
+              "lightly_loaded_limit": null,
+              "moderately_loaded_limit": null,
+              "heavily_loaded_limit": null,
+              "tier": null
+            },
+            "npc": null,
+            "active_effects": [],
+            "magic_resistance": {
+              "natural_save_twentieths": 5,
+              "evidence_state": "original_provisional",
+              "boosts": []
+            }
+          },
+          {
+            "id": "ecology:gallery_pack:runner:0",
+            "character_id": null,
+            "kind": "monster",
+            "creature_traits": [],
+            "social": {
+              "alignment": "chaotic",
+              "nature": "other",
+              "behavior": "alignment_creature",
+              "owner_relation": "none"
+            },
+            "name": "Bramble Runner",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "hp": 0,
+            "max_hp": 2,
+            "wound_state": "dead",
+            "armor_protection": {
+              "sources": [],
+              "block_rating": 0,
+              "encumbrance": 0,
+              "cutting_reduction": 0,
+              "piercing_reduction": 0,
+              "crushing_reduction": 0
+            },
+            "life_state": {
+              "kind": "dead"
+            },
+            "ready_at": {
+              "milliseconds": 3000
+            },
+            "last_resource_activity_at": null,
+            "tie_break_order": 2,
+            "attack_ready_at": {
+              "milliseconds": 3000
+            },
+            "physical_weapon": {
+              "item_instance_id": null,
+              "item_definition_id": null,
+              "skill_track_id": "hand",
+              "skill_level": 0,
+              "default_attack_mode": "fight",
+              "attack_modes": [
+                {
+                  "mode": "fight",
+                  "maximum_range": 0,
+                  "damage_kind": "crushing"
+                }
+              ],
+              "cooldown_units": 1,
+              "combat_add_rating": 0,
+              "effective_combat_add_rating": 0,
+              "handedness": null,
+              "block_value": 0,
+              "nocking_unloads_on_movement": null,
+              "offhand_occupied": false,
+              "full_two_handed_effect": true,
+              "bow_readiness": null,
+              "required_alignment": null,
+              "binding_usable": true,
+              "alignment_usable": true,
+              "restriction_usable": true,
+              "eligible_block_candidates": []
+            },
+            "carried": {
+              "items": [],
+              "gold": {
+                "left_hand": 0,
+                "right_hand": 0,
+                "sack": 0
+              }
+            },
+            "burden": {
+              "item_burden": 0,
+              "coin_burden": 0,
+              "total_burden": 0,
+              "lightly_loaded_limit": null,
+              "moderately_loaded_limit": null,
+              "heavily_loaded_limit": null,
+              "tier": null
+            },
+            "npc": null,
+            "active_effects": [],
+            "magic_resistance": {
+              "natural_save_twentieths": 5,
+              "evidence_state": "original_provisional",
+              "boosts": []
+            }
+          },
+          {
+            "id": "player",
+            "character_id": null,
+            "kind": "player",
+            "creature_traits": [],
+            "social": {
+              "alignment": "lawful",
+              "nature": "human",
+              "behavior": "adventurer",
+              "owner_relation": "none"
+            },
+            "name": "Trailwarden",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "hp": 43,
+            "max_hp": 50,
+            "wound_state": "wounded",
+            "armor_protection": {
+              "sources": [],
+              "block_rating": 0,
+              "encumbrance": 0,
+              "cutting_reduction": 0,
+              "piercing_reduction": 0,
+              "crushing_reduction": 0
+            },
+            "life_state": {
+              "kind": "alive"
+            },
+            "ready_at": {
+              "milliseconds": 18000
+            },
+            "last_resource_activity_at": {
+              "milliseconds": 9000
+            },
+            "tie_break_order": 0,
+            "attack_ready_at": {
+              "milliseconds": 12000
+            },
+            "physical_weapon": {
+              "item_instance_id": "gallery_club",
+              "item_definition_id": "oak_club",
+              "skill_track_id": "mace",
+              "skill_level": 0,
+              "default_attack_mode": "fight",
+              "attack_modes": [
+                {
+                  "mode": "fight",
+                  "maximum_range": 0,
+                  "damage_kind": "crushing"
+                }
+              ],
+              "cooldown_units": 1,
+              "combat_add_rating": 1,
+              "effective_combat_add_rating": 1,
+              "handedness": "one_handed",
+              "block_value": 0,
+              "nocking_unloads_on_movement": null,
+              "offhand_occupied": false,
+              "full_two_handed_effect": true,
+              "bow_readiness": null,
+              "required_alignment": null,
+              "binding_usable": true,
+              "alignment_usable": true,
+              "restriction_usable": true,
+              "eligible_block_candidates": []
+            },
+            "carried": {
+              "items": [
+                {
+                  "item_instance_id": "gallery_club",
+                  "item_definition_id": "oak_club",
+                  "name": "Oak Club",
+                  "quantity": 1,
+                  "identified": false,
+                  "appraised": false,
+                  "known_unit_value_gold": null,
+                  "known_stack_value_gold": null,
+                  "unit_burden": 1,
+                  "stack_burden": 1,
+                  "binding": {
+                    "state": "unrestricted"
+                  },
+                  "position": "right_hand",
+                  "valid_placements": [
+                    "hand",
+                    "belt_back",
+                    "sack"
+                  ]
+                }
+              ],
+              "gold": {
+                "left_hand": 0,
+                "right_hand": 0,
+                "sack": 0
+              }
+            },
+            "burden": {
+              "item_burden": 1,
+              "coin_burden": 0,
+              "total_burden": 1,
+              "lightly_loaded_limit": null,
+              "moderately_loaded_limit": null,
+              "heavily_loaded_limit": null,
+              "tier": null
+            },
+            "npc": null,
+            "active_effects": [],
+            "magic_resistance": {
+              "natural_save_twentieths": 5,
+              "evidence_state": "original_provisional",
+              "boosts": []
+            }
+          }
+        ],
+        "automatic_actors": [
+          {
+            "actor_id": "ecology:gallery_lair:burrower:0",
+            "behavior": "simple_chase",
+            "cadence_units": 1,
+            "aggro_radius": 6,
+            "leash_range": 8,
+            "physical_attack_modes": [
+              "fight"
+            ],
+            "awareness": {
+              "mode": "unrestricted"
+            },
+            "remembered": null,
+            "returning_home": false
+          },
+          {
+            "actor_id": "ecology:gallery_pack:runner:0",
+            "behavior": "simple_chase",
+            "cadence_units": 1,
+            "aggro_radius": 6,
+            "leash_range": 8,
+            "physical_attack_modes": [
+              "fight"
+            ],
+            "awareness": {
+              "mode": "unrestricted"
+            },
+            "remembered": null,
+            "returning_home": false
+          },
+          {
+            "actor_id": "ecology:gallery_pack:keeper:0",
+            "behavior": "simple_chase",
+            "cadence_units": 1,
+            "aggro_radius": 6,
+            "leash_range": 8,
+            "physical_attack_modes": [
+              "fight"
+            ],
+            "awareness": {
+              "mode": "unrestricted"
+            },
+            "remembered": null,
+            "returning_home": false
+          }
+        ],
+        "ecology_sites": [
+          {
+            "site_id": "gallery_lair",
+            "spawn_group_id": "gallery_lair_group",
+            "generation": 0,
+            "full_clear_due_at": {
+              "milliseconds": 15000
+            },
+            "member_slots": [
+              {
+                "member_id": "burrower",
+                "location": {
+                  "realm": "realm_0",
+                  "level": "room_0",
+                  "position": {
+                    "x": 2,
+                    "y": 1
+                  }
+                },
+                "actor_id": null,
+                "vacant": true,
+                "due_at": null
+              }
+            ]
+          },
+          {
+            "site_id": "gallery_pack",
+            "spawn_group_id": "gallery_pack",
+            "generation": 0,
+            "full_clear_due_at": {
+              "milliseconds": 12000
+            },
+            "member_slots": [
+              {
+                "member_id": "keeper",
+                "location": {
+                  "realm": "realm_0",
+                  "level": "room_0",
+                  "position": {
+                    "x": 2,
+                    "y": 1
+                  }
+                },
+                "actor_id": null,
+                "vacant": true,
+                "due_at": null
+              },
+              {
+                "member_id": "runner",
+                "location": {
+                  "realm": "realm_0",
+                  "level": "room_0",
+                  "position": {
+                    "x": 2,
+                    "y": 1
+                  }
+                },
+                "actor_id": null,
+                "vacant": true,
+                "due_at": null
+              }
+            ]
+          }
+        ],
+        "ground_items": [],
+        "corpses": [
+          {
+            "corpse_id": "corpse:3",
+            "origin_actor_id": "ecology:gallery_lair:burrower:0",
+            "origin_character_id": null,
+            "origin_kind": "monster",
+            "origin_name": "Cinder Burrower",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "created_at": {
+              "milliseconds": 9000
+            },
+            "sequence": 3,
+            "searched": false,
+            "loot_claim": {
+              "owner": {
+                "kind": "transient_actor",
+                "id": "player"
+              },
+              "basis": "killing_blow"
+            }
+          },
+          {
+            "corpse_id": "corpse:2",
+            "origin_actor_id": "ecology:gallery_pack:keeper:0",
+            "origin_character_id": null,
+            "origin_kind": "monster",
+            "origin_name": "Bramble Keeper",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "created_at": {
+              "milliseconds": 6000
+            },
+            "sequence": 2,
+            "searched": false,
+            "loot_claim": {
+              "owner": {
+                "kind": "transient_actor",
+                "id": "player"
+              },
+              "basis": "killing_blow"
+            }
+          },
+          {
+            "corpse_id": "corpse:1",
+            "origin_actor_id": "ecology:gallery_pack:runner:0",
+            "origin_character_id": null,
+            "origin_kind": "monster",
+            "origin_name": "Bramble Runner",
+            "location": {
+              "realm": "realm_0",
+              "level": "room_0",
+              "position": {
+                "x": 2,
+                "y": 1
+              }
+            },
+            "created_at": {
+              "milliseconds": 3000
+            },
             "sequence": 1,
             "searched": false,
             "loot_claim": {
@@ -7758,9 +8297,11 @@
   "final": {
     "contract_version": 1,
     "final_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "scope": "omniscient_local",
-      "logical_time": 6,
+      "logical_time": {
+        "milliseconds": 18000
+      },
       "controlled_actor_ids": [
         "player"
       ],
@@ -8339,10 +8880,14 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 4,
+          "ready_at": {
+            "milliseconds": 12000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 1,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -8430,10 +8975,14 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 3,
+          "ready_at": {
+            "milliseconds": 9000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 3,
-          "attack_ready_at": 3,
+          "attack_ready_at": {
+            "milliseconds": 9000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -8521,10 +9070,14 @@
           "life_state": {
             "kind": "dead"
           },
-          "ready_at": 1,
+          "ready_at": {
+            "milliseconds": 3000
+          },
           "last_resource_activity_at": null,
           "tie_break_order": 2,
-          "attack_ready_at": 1,
+          "attack_ready_at": {
+            "milliseconds": 3000
+          },
           "physical_weapon": {
             "item_instance_id": null,
             "item_definition_id": null,
@@ -8598,7 +9151,7 @@
               "y": 1
             }
           },
-          "hp": 48,
+          "hp": 43,
           "max_hp": 50,
           "wound_state": "wounded",
           "armor_protection": {
@@ -8612,10 +9165,16 @@
           "life_state": {
             "kind": "alive"
           },
-          "ready_at": 6,
-          "last_resource_activity_at": 3,
+          "ready_at": {
+            "milliseconds": 18000
+          },
+          "last_resource_activity_at": {
+            "milliseconds": 9000
+          },
           "tie_break_order": 0,
-          "attack_ready_at": 4,
+          "attack_ready_at": {
+            "milliseconds": 12000
+          },
           "physical_weapon": {
             "item_instance_id": "gallery_club",
             "item_definition_id": "oak_club",
@@ -8684,28 +9243,7 @@
             "tier": null
           },
           "npc": null,
-          "active_effects": [
-            {
-              "instance_id": "spell:venom_bite:2:player",
-              "effect_id": "venom_bite",
-              "source": {
-                "kind": "spell",
-                "id": "venom_bite"
-              },
-              "kind": "poison",
-              "tags": [
-                "poison"
-              ],
-              "potency": 1,
-              "remaining_rounds": 1,
-              "until_condition": null,
-              "stacking": "refresh_duration",
-              "start_delay_rounds": 0,
-              "tick_interval_rounds": 1,
-              "suppresses_action": false,
-              "resistance_boosts": []
-            }
-          ],
+          "active_effects": [],
           "magic_resistance": {
             "natural_save_twentieths": 5,
             "evidence_state": "original_provisional",
@@ -8765,7 +9303,9 @@
           "site_id": "gallery_lair",
           "spawn_group_id": "gallery_lair_group",
           "generation": 0,
-          "full_clear_due_at": 5,
+          "full_clear_due_at": {
+            "milliseconds": 15000
+          },
           "member_slots": [
             {
               "member_id": "burrower",
@@ -8787,7 +9327,9 @@
           "site_id": "gallery_pack",
           "spawn_group_id": "gallery_pack",
           "generation": 0,
-          "full_clear_due_at": 4,
+          "full_clear_due_at": {
+            "milliseconds": 12000
+          },
           "member_slots": [
             {
               "member_id": "keeper",
@@ -8836,7 +9378,9 @@
               "y": 1
             }
           },
-          "created_at": 3,
+          "created_at": {
+            "milliseconds": 9000
+          },
           "sequence": 3,
           "searched": false,
           "loot_claim": {
@@ -8861,7 +9405,9 @@
               "y": 1
             }
           },
-          "created_at": 2,
+          "created_at": {
+            "milliseconds": 6000
+          },
           "sequence": 2,
           "searched": false,
           "loot_claim": {
@@ -8886,7 +9432,9 @@
               "y": 1
             }
           },
-          "created_at": 1,
+          "created_at": {
+            "milliseconds": 3000
+          },
           "sequence": 1,
           "searched": false,
           "loot_claim": {

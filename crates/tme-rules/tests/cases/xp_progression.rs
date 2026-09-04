@@ -498,6 +498,9 @@ fn ordered_recovery_opens_gate_only_after_hp_and_stamina_are_full() {
     value.actors_mut()[0]["character"]["resources"]["hp"] = 18.into();
     value.actors_mut()[0]["character"]["resources"]["stamina"] = 9.into();
     let mut engine = engine_from_value(&value, 7);
+    engine.world_mut().actors[0]
+        .resource_activity
+        .last_recovered_at = tme_rules::LogicalTime::ZERO;
     let events = engine
         .apply_actor_intent(&tme_rules::ActorId::from("player"), PlayerIntent::Wait)
         .expect("wait and recovery should work");

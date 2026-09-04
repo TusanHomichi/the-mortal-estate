@@ -130,7 +130,7 @@ func test_readiness_replaces_from_frames_and_never_ticks_locally() -> void:
 	var exact_waiting_text: String = screen.readiness_status.text
 	_support.expect_equal(
 		exact_waiting_text,
-		"◇ Ready in 3 beats · beat unmeasured · world T12 · ready T15",
+		"◇ Action cooldown",
 		"waiting display uses exact frame facts, and claims no fill it has not measured",
 	)
 	screen._process(999.0)
@@ -145,7 +145,7 @@ func test_readiness_replaces_from_frames_and_never_ticks_locally() -> void:
 	screen.present_frame(ready, 2)
 	_support.expect_equal(
 		screen.readiness_status.text,
-		"◆ Ready · beat unmeasured · world T15 · ready T15",
+		"◆ Ready",
 		"new full frame atomically replaces readiness",
 	)
 	screen.free()
@@ -162,23 +162,23 @@ func test_readiness_replaces_from_frames_and_never_ticks_locally() -> void:
 func test_the_readiness_line_changes_on_the_beat_not_inside_it() -> void:
 	var screen: WorldShellScreen = ShellSupport.add_screen("res://scenes/WorldShellScreen.tscn") as WorldShellScreen
 	var waiting: Dictionary = ShellSupport.world_frame([])
-	waiting["logical_time"] = "20"
-	waiting["ready_at"] = "23"
+	waiting["logical_time"] = "20000"
+	waiting["ready_at"] = "23000"
 	waiting["can_act"] = false
-	screen.pulse_clock.set_test_clock(1000)
+	screen.action_cooldown.set_test_clock(1000)
 	screen.present_frame(waiting, 1)
 	var second: Dictionary = waiting.duplicate(true)
-	second["logical_time"] = "21"
-	screen.pulse_clock.set_test_clock(4000)
+	second["logical_time"] = "20000"
+	screen.action_cooldown.set_test_clock(1000)
 	screen.present_frame(second, 2)
-	_support.expect(screen.pulse_clock.has_measured_span(), "two rounds give the meter a span to fill across")
+	_support.expect(screen.action_cooldown.has_duration(), "two rounds give the meter a span to fill across")
 
 	var settled: String = screen.readiness_status.text
 	var fills: Array[float] = []
 	for step: int in 10:
-		screen.pulse_clock.set_test_clock(4000 + step * 250)
+		screen.action_cooldown.set_test_clock(1000 + step * 250)
 		screen._process(0.016)
-		fills.append(float(screen.pulse_meter.segments()[0]["fill"]))
+		fills.append(float(screen.cooldown_meter.segments()[0]["fill"]))
 		_support.expect_equal(
 			screen.readiness_status.text,
 			settled,
@@ -190,8 +190,9 @@ func test_the_readiness_line_changes_on_the_beat_not_inside_it() -> void:
 	)
 
 	var third: Dictionary = waiting.duplicate(true)
-	third["logical_time"] = "22"
-	screen.pulse_clock.set_test_clock(7000)
+	third["logical_time"] = "23000"
+	third["can_act"] = true
+	screen.action_cooldown.set_test_clock(7000)
 	screen.present_frame(third, 3)
 	screen._process(0.016)
 	_support.expect(

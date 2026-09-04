@@ -12,7 +12,7 @@ summary: The ruled design packet for the charter's first identity proof — its 
 # The identity proof — design packet
 
 For the current pause and the separately authorized browser feel work, start
-with the [genesis checkpoint](genesis-ledger.md#current-checkpoint-2026-09-04).
+with the [genesis checkpoint](genesis-ledger.md#current-checkpoint-2026-09-05).
 The implementation audit and file-line evidence below describe this packet's
 original baseline; they are not a current code index or permission to resume.
 
@@ -255,7 +255,7 @@ reopened.
 
 **Proposal.** `proposed` — four presentation expressions, all derived from the
 frame's `logical_time` / `ready_at`, none of them a second clock
-([§2.1 Never](../boundary-map.md#21-the-authoritative-pulse-d5)):
+([§2.1 Never](../boundary-map.md#21-authoritative-individual-deadlines-d5)):
 
 1. a **beat meter** filling between the frame's current time and `ready_at`,
    interpolated locally and re-anchored on every frame;

@@ -19201,7 +19201,7 @@
       "effect": {
         "duration": {
           "policy": "rounds",
-          "rounds": 1
+          "rounds": 2
         },
         "family": "portal",
         "portal": {

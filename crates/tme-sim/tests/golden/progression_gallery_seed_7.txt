@@ -6,20 +6,20 @@ loaded "Progression Gallery V1" realms=[realm_0] levels=[realm_0/room_0]
 player Delver (Fighter) at realm_0/room_0:1,1 hp=84
 monster Threshold Warden at realm_0/room_0:1,2 hp=5
 
-player ready: Delver at 1
-Delver intent at 1: walk south
+player ready: Delver at 3000ms
+Delver intent at 3000ms: walk south
 Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Delver step south -> (1,2): terrain=Floor cost=1 remaining=2
 Delver moved from (1,1) to (1,2)
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Threshold Warden at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Threshold Warden at 6000ms
 Threshold Warden intent: fight Delver
 Threshold Warden missed Delver: roll=11 attack_score=0 defense_score=15
-readiness scheduled: Threshold Warden cost=1 ready_at=3
+readiness scheduled: Threshold Warden cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: fight warden
+player ready: Delver at 6000ms
+Delver intent at 6000ms: fight warden
 Delver attacked Threshold Warden: roll=9 damage=18 label=fatal hp=0
 contribution to warden: character=Some(CharacterId("character:progression_gallery:primary")) class=Some(Physical) damage=5
 Threshold Warden was defeated: cause=physical claim=character:progression_gallery:primary/killing_blow
@@ -36,50 +36,50 @@ Delver reached level 8 as fighter! (xp: 2800)
   hp +10: 94/94 (peak 94)
   mp +0: 0/0
   stamina +5: 20/20
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
 
-player ready: Delver at 3
-Delver intent at 3: wait
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
+player ready: Delver at 9000ms
+Delver intent at 9000ms: wait
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
 
-player ready: Delver at 4
-Delver intent at 4: move_item steel_sword to belt_1
+player ready: Delver at 12000ms
+Delver intent at 12000ms: move_item steel_sword to belt_1
 Delver moved Steel Sword from right_hand to belt_1
-readiness scheduled: Delver cost=1 ready_at=5
-time 5
+readiness scheduled: Delver cost=1 ready_at=15000ms
+time 15000ms
 
-player ready: Delver at 5
-Delver intent at 5: promote knight
+player ready: Delver at 15000ms
+Delver intent at 15000ms: promote knight
 Delver promoted from Fighter to Knight, received Oath Ring in right_hand, and gained Blessed Edge, Valor, Cleanse, Beacon, Trail Sense!
-readiness scheduled: Delver cost=1 ready_at=6
-time 6
+readiness scheduled: Delver cost=1 ready_at=18000ms
+time 18000ms
 
-player ready: Delver at 6
-Delver intent at 6: move_item oath_ring:progression_gallery:primary to left_finger_1
+player ready: Delver at 18000ms
+Delver intent at 18000ms: move_item oath_ring:progression_gallery:primary to left_finger_1
 Delver moved Oath Ring from right_hand to left_finger_1
-readiness scheduled: Delver cost=1 ready_at=7
-time 7
+readiness scheduled: Delver cost=1 ready_at=21000ms
+time 21000ms
 
-player ready: Delver at 7
-Delver intent at 7: move_item steel_sword to right_hand
+player ready: Delver at 21000ms
+Delver intent at 21000ms: move_item steel_sword to right_hand
 Delver moved Steel Sword from belt_1 to right_hand
-readiness scheduled: Delver cost=1 ready_at=8
-time 8
+readiness scheduled: Delver cost=1 ready_at=24000ms
+time 24000ms
 
-player ready: Delver at 8
-Delver intent at 8: wait
-readiness scheduled: Delver cost=1 ready_at=9
-time 9
+player ready: Delver at 24000ms
+Delver intent at 24000ms: wait
+readiness scheduled: Delver cost=1 ready_at=27000ms
+time 27000ms
 
-player ready: Delver at 9
-Delver intent at 9: train gallery_trainer 20
+player ready: Delver at 27000ms
+Delver intent at 27000ms: train gallery_trainer 20
 Delver spent 14 gold
 Delver trained sword with gallery_trainer: learning rate 1 -> 3, offered 20 gold, spent 14, retained 6
 Delver gained 6 experience points (total: 2806)
-readiness scheduled: Delver cost=1 ready_at=10
-time 10
+readiness scheduled: Delver cost=1 ready_at=30000ms
+time 30000ms
 
 final state
 Delver (Knight) at realm_0/room_0:1,2 hp=94 alive

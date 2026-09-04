@@ -109,7 +109,7 @@ impl Engine {
                 actor_index += 1;
                 continue;
             };
-            if summoned.last_ticked_at < now {
+            if now.elapsed_rounds_since(summoned.last_ticked_at) >= 1 {
                 summoned.last_ticked_at = now;
                 if let Some(remaining) = summoned.remaining_rounds.as_mut() {
                     *remaining = remaining.saturating_sub(1);

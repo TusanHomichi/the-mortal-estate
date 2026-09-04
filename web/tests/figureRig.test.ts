@@ -123,7 +123,7 @@ describe("an instance releases its cloned skeletons", () => {
     Skeleton.prototype.dispose = function (this: Skeleton) { disposed.push(this); };
     try {
       const clip = new AnimationClip("Idle", 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 0, 0])]);
-      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Idle", run: "Idle", sprint: "Idle" } }, { i: 0, j: 0 }, 1);
+      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Idle", run: "Idle", sprint: "Idle" } }, { i: 0, j: 0 }, { i: 1, j: 0 });
       instance.dispose();
       expect(disposed).toHaveLength(1);
       expect(disposed[0]).not.toBe(skinned.skeleton); // the clone's, not the source's
@@ -177,6 +177,27 @@ describe("releasing parsed sources on a refusal", () => {
 });
 
 describe("a figure changes gait by clip", () => {
+  it("preserves the stride when two movement categories share a clip", () => {
+    const bone = new Bone();
+    bone.name = "Hips";
+    const rig = new Group();
+    rig.add(bone);
+    const idle = new AnimationClip("Idle", 1, []);
+    const jog = new AnimationClip("Jog", 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 1, 0])]);
+    const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [idle, jog],
+      palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle",
+      gait: { walk: "Jog", run: "Jog", sprint: "Jog" } }, { i: 0, j: 0 }, { i: 1, j: 0 });
+    instance.setGait("run");
+    instance.update(0.4);
+    expect(instance.root.getObjectByName("Hips")!.position.y).toBeCloseTo(0.4);
+    instance.setGait("sprint");
+    instance.update(0.1);
+    expect(instance.gait).toBe("sprint");
+    expect(instance.clip).toBe("Jog");
+    expect(instance.root.getObjectByName("Hips")!.position.y).toBeCloseTo(0.5);
+    instance.dispose();
+  });
+
   it("plays the idle clip first and crossfades to the gait's clip, reporting the active clip", () => {
     const bone = new Bone();
     bone.name = "Hips";
@@ -189,7 +210,7 @@ describe("a figure changes gait by clip", () => {
     const instance = createFigureInstance(
       { name: "f", rig, parts: [], clips: [clip("Idle"), clip("Walk"), clip("Jog"), clip("Sprint")], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Walk", run: "Jog", sprint: "Sprint" } },
       { i: 0, j: 0 },
-      1,
+      { i: 1, j: 0 },
     );
     expect(instance.gait).toBe("idle");
     expect(instance.clip).toBe("Idle");

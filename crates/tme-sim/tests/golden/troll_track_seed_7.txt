@@ -6,70 +6,70 @@ loaded "Troll Track" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:1,1 hp=12
 monster Troll at realm_0/room_0:5,1 hp=10
 
-player ready: Delver at 1
-Delver intent at 1: wait
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Troll at 2
+player ready: Delver at 3000ms
+Delver intent at 3000ms: wait
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Troll at 6000ms
 Troll intent: move west
 Troll walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Troll step west -> (4,1): terrain=Track Floor cost=1 remaining=0
 Troll moved from (5,1) to (4,1)
-readiness scheduled: Troll cost=1 ready_at=3
+readiness scheduled: Troll cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: wait
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Troll at 3
+player ready: Delver at 6000ms
+Delver intent at 6000ms: wait
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Troll at 9000ms
 Troll intent: move west
 Troll walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Troll step west -> (3,1): terrain=Track Floor cost=1 remaining=0
 Troll moved from (4,1) to (3,1)
-readiness scheduled: Troll cost=1 ready_at=4
+readiness scheduled: Troll cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: wait
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Troll at 4
+player ready: Delver at 9000ms
+Delver intent at 9000ms: wait
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Troll at 12000ms
 Troll intent: move west
 Troll walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Troll step west -> (2,1): terrain=Track Floor cost=1 remaining=0
 Troll moved from (3,1) to (2,1)
-readiness scheduled: Troll cost=1 ready_at=5
+readiness scheduled: Troll cost=1 ready_at=15000ms
 
-player ready: Delver at 4
-Delver intent at 4: wait
-readiness scheduled: Delver cost=1 ready_at=5
-time 5
-monster ready: Troll at 5
+player ready: Delver at 12000ms
+Delver intent at 12000ms: wait
+readiness scheduled: Delver cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Troll at 15000ms
 Troll intent: move west
 Troll walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Troll step west -> (1,1): terrain=Track Floor cost=1 remaining=0
 Troll moved from (2,1) to (1,1)
-readiness scheduled: Troll cost=1 ready_at=6
+readiness scheduled: Troll cost=1 ready_at=18000ms
 
-player ready: Delver at 5
-Delver intent at 5: fight troll
+player ready: Delver at 15000ms
+Delver intent at 15000ms: fight troll
 Delver missed Troll: roll=2 attack_score=3 defense_score=13
-readiness scheduled: Delver cost=1 ready_at=6
-time 6
-monster ready: Troll at 6
+readiness scheduled: Delver cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Troll at 18000ms
 Troll intent: fight Delver
 Troll missed Delver: roll=9 attack_score=2 defense_score=13
-readiness scheduled: Troll cost=1 ready_at=7
+readiness scheduled: Troll cost=1 ready_at=21000ms
 
-player ready: Delver at 6
-Delver intent at 6: fight troll
+player ready: Delver at 18000ms
+Delver intent at 18000ms: fight troll
 Delver attacked Troll: roll=11 damage=6 label=heavy hp=4
 contribution to troll: character=None class=None damage=6
-readiness scheduled: Delver cost=1 ready_at=7
-time 7
-monster ready: Troll at 7
+readiness scheduled: Delver cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Troll at 21000ms
 Troll intent: fight Delver
 Troll missed Delver: roll=2 attack_score=2 defense_score=13
-readiness scheduled: Troll cost=1 ready_at=8
+readiness scheduled: Troll cost=1 ready_at=24000ms
 
 final state
 Delver at realm_0/room_0:1,1 hp=12 alive

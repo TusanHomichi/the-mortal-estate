@@ -13,18 +13,10 @@ var _held_feedback: Array[Dictionary] = []
 var _seen_identities: Dictionary = {}
 var _clock_override_msec: int = -1
 
-## The local millisecond the beat now elapsing is expected to end at, as
-## [PulseClock] measured it, or -1 while no beat has been observed.
-##
-## The profile's payoff windows are the *minimum* time a cue may be held for, so
-## that a result never lands before the swing that caused it. They were also,
-## until this was here, the *only* thing bounding it — which left an unstated
-## assumption that a beat is comfortably longer than a payoff window. This makes
-## the bound explicit and derives it from the pulse instead: a cue belongs to the
-## beat its action resolved on, so it is shown inside that beat or at the end of
-## it, never spilled into the next one. Where no beat has been observed the
-## profile's windows stand alone, exactly as before.
-var _beat_deadline_msec: int = -1
+## Local presentation deadline supplied by ActionCooldown, or -1 if absent.
+## Payoff windows are bounded by this accepted action's interval. Only server
+## frames decide readiness; this bound controls cue presentation alone.
+var _cooldown_deadline_msec: int = -1
 
 
 func _init(
@@ -41,27 +33,25 @@ func begin_spell_prepare(spell_id: String, now_msec: int = -1) -> void:
 		"family": "spell",
 		"spell_id": spell_id,
 		"started_at": now,
-		"payoff_at": _inside_beat(now + profile.spell_minimum_payoff_msec, now),
+		"payoff_at": _inside_action_interval(now + profile.spell_minimum_payoff_msec, now),
 	}
 	_play("spell_chant", "prepare:" + spell_id)
-	_scheduled.append({"at": _inside_beat(now + profile.spell_chant_msec, now), "kind": "chant_complete"})
+	_scheduled.append({"at": _inside_action_interval(now + profile.spell_chant_msec, now), "kind": "chant_complete"})
 
 
 func set_test_clock(now_msec: int) -> void:
 	_clock_override_msec = now_msec
 
 
-func set_beat_deadline(deadline_msec: int) -> void:
-	_beat_deadline_msec = deadline_msec
+func set_cooldown_deadline(deadline_msec: int) -> void:
+	_cooldown_deadline_msec = deadline_msec
 
 
-## A moment brought inside the beat it belongs to. Never brought earlier than
-## `now`: a beat that has already ended does not make a cue retroactive, it
-## makes it due immediately.
-func _inside_beat(target_msec: int, now_msec: int) -> int:
-	if _beat_deadline_msec < 0:
+## Clamp a cue to its action interval without making it retroactive.
+func _inside_action_interval(target_msec: int, now_msec: int) -> int:
+	if _cooldown_deadline_msec < 0:
 		return target_msec
-	return maxi(now_msec, mini(target_msec, _beat_deadline_msec))
+	return maxi(now_msec, mini(target_msec, _cooldown_deadline_msec))
 
 
 func note_command_installed(intent: Dictionary, now_msec: int = -1) -> void:
@@ -75,10 +65,10 @@ func note_command_installed(intent: Dictionary, now_msec: int = -1) -> void:
 			"mode": mode,
 			"target_actor_id": str(intent.get("target_actor_id", "")),
 			"started_at": now,
-			"payoff_at": _inside_beat(now + (profile.ranged_minimum_payoff_msec if ranged else profile.melee_minimum_payoff_msec), now),
+			"payoff_at": _inside_action_interval(now + (profile.ranged_minimum_payoff_msec if ranged else profile.melee_minimum_payoff_msec), now),
 		}
 		_scheduled.append({
-			"at": _inside_beat(now + (profile.ranged_release_msec if ranged else profile.melee_wind_up_msec), now),
+			"at": _inside_action_interval(now + (profile.ranged_release_msec if ranged else profile.melee_wind_up_msec), now),
 			"kind": "release",
 			"role": "bow_release" if mode == "shoot" else "combat_swing",
 			"identity": "release:%s:%s" % [mode, intent.get("target_actor_id", "")],
@@ -88,10 +78,10 @@ func note_command_installed(intent: Dictionary, now_msec: int = -1) -> void:
 			"family": "spell",
 			"spell_id": str(intent.get("spell_id", _active.get("spell_id", ""))),
 			"started_at": now,
-			"payoff_at": _inside_beat(now + profile.spell_minimum_payoff_msec, now),
+			"payoff_at": _inside_action_interval(now + profile.spell_minimum_payoff_msec, now),
 		}
 		_scheduled.append({
-			"at": _inside_beat(now + profile.spell_release_msec, now),
+			"at": _inside_action_interval(now + profile.spell_release_msec, now),
 			"kind": "release",
 			"role": "spell_release",
 			"identity": "spell-release:" + str(_active.get("spell_id", "")),
@@ -144,7 +134,7 @@ func gate_feedback_entry(entry: Dictionary, cue: Dictionary, event_identity: Str
 	var role: String = _role_for_cue(cue)
 	var correlated: bool = _cue_correlates(cue)
 	var now: int = _now(-1)
-	var payoff_at: int = _inside_beat(int(_active.get("payoff_at", 0)), now)
+	var payoff_at: int = _inside_action_interval(int(_active.get("payoff_at", 0)), now)
 	if correlated and now < payoff_at:
 		_held_feedback.append({
 			"at": payoff_at,
@@ -178,12 +168,12 @@ func advance(now_msec: int = -1) -> void:
 		visual_flash_requested.emit(str(held.get("entry", {}).get("kind", "payoff")))
 		deferred_feedback_ready.emit((held["entry"] as Dictionary).duplicate(true))
 	_held_feedback = remaining_feedback
-	if not _active.is_empty() and now >= _inside_beat(int(_active.get("started_at", now)) + profile.visual_tail_cap_msec, now):
+	if not _active.is_empty() and now >= _inside_action_interval(int(_active.get("started_at", now)) + profile.visual_tail_cap_msec, now):
 		_active.clear()
 
 
 func discard() -> void:
-	_beat_deadline_msec = -1
+	_cooldown_deadline_msec = -1
 	_active.clear()
 	_scheduled.clear()
 	_held_feedback.clear()

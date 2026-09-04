@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { VerifiedAssetPacket } from "../src/feelTypes";
-import { assertNormalSheetsMatch, decodeTextures, isFigureKey, isNormalSheetKey } from "../src/space/textures";
+import { assertNormalSheetsMatch, decodeTextures, isModelKey, isNormalSheetKey } from "../src/space/textures";
 
 describe("normal sheets at decode time", () => {
   it("names a normal sheet by its key suffix", () => {
@@ -53,9 +53,10 @@ describe("decoding a sheet", () => {
       ]),
     } as unknown as VerifiedAssetPacket;
     packet.assets.set("figures/caretaker/figure.gltf", { bytes: new ArrayBuffer(0), file: "figure.gltf" });
+    packet.assets.set("structures/s/0", { bytes: new ArrayBuffer(0), file: "cottage.glb" });
     const decoded = await decodeTextures(packet);
     // The figure's files are not sheets and are never decoded as images.
-    expect(isFigureKey("figures/caretaker/figure.gltf")).toBe(true);
+    expect(isModelKey("figures/caretaker/figure.gltf")).toBe(true);
     expect(decoded.size).toBe(2);
     expect(requests).toHaveLength(2);
     for (const options of requests) {

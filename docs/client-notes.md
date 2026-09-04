@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 22
-status: Implemented browser and retained Godot notes, audited against the current tree. Owner acceptance remains pending at the original phase stop points; target acceptance is separate.
+last_updated: 2026-09-05
+revision: 24
+status: Browser scene pass 03 deployed to the existing private preview; individual cooldown implementation verified by the real client/server proof; local regression closeout complete.
 public_safe: true
-summary: Current browser and Godot implementations, browser operation, wire and credential behavior, rendering, and proof surfaces.
+summary: Current browser scene experiment and retained client implementation, including independent cooldown presentation and authoritative frame proof.
 routes:
   - web/**
   - client/**
@@ -27,20 +27,19 @@ live in [server notes](server-notes.md).
 
 | Surface | Implemented | Still outside it |
 | --- | --- | --- |
-| Browser (`web/`) | Three.js candidate-packet scene, local route drafting and beat, spaces and portals, live figure rigs and gait clips, lighting, wind, and camera comparison | Authentication, authoritative wire consumption, the accepted chrome/action interface, and its proportional layout |
+| Browser (`web/`) | Three.js candidate-packet scene, local route drafting and individual movement cooldown, spaces and portals, live figure rigs and gait clips, lighting, wind, and camera comparison | Authentication, authoritative wire consumption, the accepted chrome/action interface, and its proportional layout |
 | Retained Godot shell (`client/`) | Sign-in, server wire codec, command reconciliation, diagnostic world view, and live/capture harnesses | Accepted production art and the browser feel role |
 
-The browser is the active feel surface. Its local passability and beat are
+The browser is the active feel surface. Its local passability and action timing are
 experimental inputs, not gameplay authority. The September 3 chrome, actions,
 and scaling rulings are [targets](presentation-direction.md#chrome-and-actions),
 not completed features. `web/src/main.ts` still opens the feel scene directly,
 and `web/src/camera.ts::resizeFeelCamera` fixes vertical extent while deriving
-horizontal extent from aspect ratio; it does not yet enforce the ruled equal
-world extent across display shapes or derive it from the ruled nine cells.
-It still uses the earlier 6.313-unit frame constant. The layout slice must migrate that framing
-and its camera tests together and prove matched extents at the supported sizes.
+horizontal extent from aspect ratio. Its vertical frame now derives from the
+ruled nine cells (`9 × √2 × sin(30°)` world units); equal world extent across
+display shapes and the proportional interface remain for the layout slice.
 
-Unless a section explicitly says browser, the wire, credential, HUD, pulse, and
+Unless a section explicitly says browser, the wire, credential, HUD, cooldown, and
 capture implementation below describes the retained Godot shell. Its continued
 proof does not establish that the browser implements those contracts.
 
@@ -199,7 +198,7 @@ A view is never told about the HUD; it is given a rectangle. The contract:
 | `semantic_target_for_coordinate(square)` | the target at a square, or empty |
 | `semantic_target_for_display_position(position)` | the target under a pointer, or empty |
 | `pointer_surface()` | the control whose local space pointer positions use |
-| `present_pulse(state)` | the beat the view is drawing inside of; carries no authority, only how far the current beat has got |
+| `present_cooldown(state)` | progress within the reported action interval; carries no readiness authority |
 | `show_pending(start, path)` / `show_preview(preview)` / `clear_interaction()` | the movement-draft presentation |
 | `set_reach_grid_transient_active`, `toggle_grid`, `grid_control_state` | the reach-grid preference |
 | `present_feedback(kind)` | present one cue and return what was presented |
@@ -305,128 +304,32 @@ Two harnesses drive it, both under `client/tests/` and both excluded from export
 
 See [Workbench V0](workbench-v0.md) for what the Workbench does with all this.
 
-## The pulse made visible
+## Individual cooldowns made visible
 
-Ruling D5 gives this world one gameplay pulse and
-[boundary map §2.1](boundary-map.md#21-the-authoritative-pulse-d5) says where it
-lives: what a beat *means* is `tme-rules`' logical round, and *when* a beat is
-struck is `GAMEPLAY_PULSE` in `crates/tme-server/src/scheduler.rs` — one value in
-one place. The same section grants presentation exactly one liberty and forbids
-two things. Presentation **may remain fluid between authoritative beats**. It
-**may not** become a second gameplay clock, and it **may not infer readiness from
-elapsed seconds** — readiness arrives in the frame.
+The [September 5 timing ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
+replaces shared rounds with authoritative individual deadlines. Observer contract
+8 carries `logical_time`, `ready_at`, spell times, and other deadline values as
+canonical decimal **milliseconds**. The former contract 7 is refused.
 
-Until this slice the client honoured all three by saying nothing: the beat was a
-line of text, `◆ Ready · world T… · ready T…`, true and motionless. Charter item
-3 asks for the pulse to be *felt*. Four surfaces now express it, and every one of
-them derives from the frame.
-
-### `PulseClock`: the beat, observed rather than declared
-
-`client/presentation/pulse_clock.gd` is the one place the beat is derived, and
-the shell hands its account to everything that presents it, so the meter, the
-world view, and the feedback director can never describe different beats.
-
-Every authoritative answer is the frame's. `is_ready()` is the frame's `can_act`
-and nothing else. `beats_until_ready()` is the whole-round distance between the
-frame's own `logical_time` and its own `ready_at`. Neither consults a clock, and
-when frames stop arriving both keep saying what the last frame said.
-
-Only the *fill* — how far into the current beat presentation has got — is local,
-and it is **measured, not declared**. Nothing on the wire carries the cadence:
-there is no pulse field on the welcome or the frame, and adding one would put a
-second statement of a one-place value on the wire. So the client does not get to
-know 3.0 seconds and deliberately does not restate it. It times the beat instead:
-the interval between the arrival of round *T* and the arrival of round *T+1* is
-the span, and the fill is how far into that span the current beat has got. The
-server pushes a full frame to every observer on every tick
-(`advance_facet_tick`), so the re-anchor is real rather than opportunistic.
-
-That has a consequence worth stating plainly: the meter tracks the beat the
-server is **actually striking**, including when a loaded host strikes it late.
-
-Four refusals keep it honest, and each one fails closed:
-
-| Situation | What the meter does |
-| --- | --- |
-| the first beat of a session, before any interval exists | draws no fill at all, hatches the segment, and says "beat not yet measured" |
-| logical time earlier than the frame already held | refuses the frame outright; authority does not run backwards |
-| two rounds inside one interval | installs the frame but records no span — an update went unseen, and timing that interval would record a beat twice as long as the one being struck |
-| an interval outside 250 ms – 20 s | records no span; the bounds are wide on purpose, to exclude nonsense rather than to encode an expected cadence |
-
-And the fill is **clamped, never extrapolated**. A stalled connection freezes the
-meter at the end of the beat that did arrive instead of inventing beats that did
-not.
-
-`ready_at` **before** the frame's own `logical_time` is the ordinary ready
-state, not a contradiction: the rules make an actor ready when `ready_at <= now`
-(`engine/timing.rs`), so a character idle for four rounds carries a readiness
-time four rounds behind the world's. A meter that refused that would blank itself
-during ordinary play.
-
-### `PulseMeter`: one segment per beat of the wait
-
-`client/presentation/pulse_meter.gd` draws it: one segment per beat still to
-wait, the leading segment filling as the current beat elapses, and the fill
-snapping back to nothing when the authority strikes the next one. When the
-observer is ready and idle the meter does not go quiet — it shows the beat
-passing anyway, because the pulse is the world's, not the player's queue.
-
-The accessibility floor rules that a cue existing only as a hue is not a cue, so
-every state differs in **shape** as well: hatching for an unmeasured beat, a
-doubled border for ready. `meter_text()` states the same thing in words, and the
-HUD's readiness line **is** that string, so the picture and the sentence beside
-it cannot disagree.
-
-**The line is never trimmed, and that decided the rail's layout.** The first
-attempt put the meter beside the readiness line inside the top rail's status
-column, which left the line about 145 px for a sentence that needs 729 — every
-capture read `◆ Ready · beat …`, with the wait, both of the frame's times, and
-the preparation band ellipsized away. The band now spans the rail's full width
-above the three-column row: the whole sentence fits one line at both 1280x720 and
-the narrower 1024x768 window captures are taken in, enlarged text wraps rather
-than trimming, and the rail grows to show every line it wraps to instead of being
-pinned to a fixed height. `OVERRUN_TRIM_ELLIPSIS` is gone from this control at
-every text scale. `client/tests/test_input_bindings.gd` asserts it —
-`test_the_readiness_line_is_never_truncated`, against the longest state the line
-has, and it fails on both the layout and the trim setting that shipped the
-defect.
-
-That meter belongs to the retained Godot shell; by the 2026-09-02 ruling, the
-browser feel surface draws no pulse outside combat.
-
-### Movement across the beat
-
-`GridWorldView` spreads a step over the beat instead of snapping it. A marker's
-displacement is two facts added together — how far the observer moved, and how
-far that marker moved — which is why the controlled character comes out at zero
-and holds its place while everything else slides past it. That is the same step,
-seen from inside it.
-
-Four conditions all have to hold, and any one failing makes the frame a snap:
-the frame is the immediate successor of the one before it; the marker was in the
-previous frame; the displacement is a step rather than a transition (two squares);
-and the marker's whole rectangle stays inside the lattice for the whole travel.
-
-**The lattice itself never moves inside a beat, and this is deliberate.** The
-capture sidecar's camera says a square's rectangle is the origin plus the square
-times the pitch, with no other framing constant in force, and the Workbench
-addresses captures through it. Scrolling the terrain would either break that or
-put a row of squares under the banner when the lattice fits its area tightly. So
-the terrain still steps discretely on the beat while the markers standing on it
-travel — an honest limitation of a diagnostic lattice, and one a pixel-native
-renderer is free to remove behind the same seam.
+`client/presentation/action_cooldown.gd` derives the observer's remaining duration
+from the frame. Its first frame supplies enough information to animate a bar;
+there is no cadence measurement. Updates for the same deadline preserve progress,
+duplicate frames cannot extend it, and an idle character's bar stays ready.
+Only `can_act` grants readiness. A full local bar with no confirming frame still
+leaves actions locked. `CooldownMeter` labels the same state in text and shape.
+The world view and feedback director consume that presentation state; neither
+owns gameplay time. The retained diagnostic grid still steps terrain discretely
+while interpolating eligible markers.
 
 ### The web feel scene's walk experiment
 
 The browser feel scene's local experiment lets one click draft a direct route of
-one to three squares; an impassable step or farther target clears the draft
-instead of finding another way. A second click on that square or a double click
-commits it, another square re-drafts it, and Escape or right-click clears both a
-draft and an unlanded commitment. The caretaker's authoritative local square
-stays fixed until the next strike of one shared local beat, then the route lands whole;
-drafting remains free and a replacement commitment keeps that strike. Its
-packet-layout passability and three-second clock are disposable local stand-ins,
+one to three squares; an impassable step or farther target clears the draft.
+A second click or double click commits a fresh three-second interval. Further
+clicks, double clicks, Escape, and right-click cannot replace or cancel a committed
+move. Escape and right-click clear drafts. The local square changes when the
+complete interval ends; the next move receives another complete interval.
+Packet-layout passability and timing remain disposable local stand-ins,
 with pure claims in `web/tests/` and the real-tab proof in
 `web/proof/walk-proof.mjs`. The proof reads its packet from `TME_FEEL_ASSETS`
 and refuses with exit 3 without it — a tracked path is never a default — and
@@ -445,36 +348,13 @@ has one, otherwise an Xvfb the launcher starts and stops itself. An engine
 Playwright has not installed, or a Firefox with no display and no Xvfb,
 refuses the run with exit 3; `TME_PROOF_BROWSER=chromium|firefox` narrows a
 run to one engine for a quick look and is never how a proof is claimed.
-**The walk between pulses (owner direction, 2026-09-03; under the owner's
-judgment on the deployed preview).** Between the commit and the strike the
-figure is presented along the committed route from where it stood when it
-committed, arriving on the target as the strike lands, in the route's gait —
-walk, run, or sprint by squares, each a clip the figure row names (schema 5:
-`gait: {walk, run, sprint}`, every one of which must exist in the library
-and bind to the rig and every part). A replacement commitment mid-pulse
-walks back along the route it was on — every step of it already authored and
-checked — to the authoritative square, then out along the new route, on the
-same strike; the figure is never presented on a segment that was not
-authored. The clips keep wall-clock time with the root however slow the frame
-(a gap over two seconds is a pause and advances a little), so the feet do not
-slide; the wall fade keys on the presented square, so a wall walked into
-mid-pulse fades then, not on the strike. This is presentation only: the
-authoritative square (`data-caretaker-cell`) does not move until the strike,
-the camera follows that square, and a walk the strike does not confirm is
-corrected by the snap. The stage exposes `data-caretaker-presented`,
-`data-caretaker-gait`, the active `data-caretaker-clip`, and
-`data-caretaker-trace` — the presenter's own record of the last 48 frames'
-state, gait, and presented point, because a real tab under software GL
-cannot be polled from outside fast enough to see a three-second pulse (one
-round trip took seconds on headless Chromium with the skinned figure). The
-walk proof reads the trace after the landing in both engines and asserts at
-least one committed frame was presented, the presented point never went
-backwards, the gait was the route's, and the figure stands idle on the
-target; it also photographs the pulse at whatever rate the engine manages
-(`walk-pulse-sequence.webp`). The pure function is
-`presentedWalkPosition` in `web/src/walk/walkIntent.ts`;
-[presentation direction](presentation-direction.md#movement-and-readiness)
-keeps the standing authority rule and the pending presentation verdict separate.
+**Movement presentation (owner direction, 2026-09-05).** The figure follows the
+committed route over its full interval, with no return-to-start replacement path.
+Run and sprint still identify route lengths; both use the candidate's jog clip.
+The presenter exposes the committed and landing timestamps and records presented
+positions in its bounded trace. The real-tab proof checks the exact three-second
+interval, refusal of competing input, forward travel, final position, facing,
+and portal landing in Chromium and Firefox.
 Outdoors the camera stays centred on the caretaker and re-centres on each
 landing; inside a building it belongs to the space — centred on the room's
 grid and unmoved by landings — and follows the caretaker again on the way out
@@ -496,7 +376,7 @@ own height. A low, long thing rendered at the ruled angle is mostly its depth,
 and sizing it by its own height drew beds and tables doll-sized beside the
 caretaker; the render harness knows the projected height and the placement
 now carries it (owner ruling, 2026-09-03; the `nominal_height` key is retired and
-refused; introduced in schema 3 and retained in current schema 5). The card centre is
+refused; introduced in schema 3 and retained in current schema 6). The card centre is
 the anchor plus half the card height for view-facing and wall-plane cards; a
 `floor` facing lays the card flat on its cell just above the ground, its up
 toward north, for things that are genuinely flat — a rug — never for anything
@@ -522,14 +402,43 @@ colour snaps, in gamma space, to the nearest palette colour after a rim from
 the view-space normal (the patch refuses to build if three's anchor moves, as
 the card wrap does), plays the idle clip on every part through its own mixer,
 casts and receives the scene's shadows, and drops the contact-shadow blob the
-card had. Facing turns the rig a half-turn about world up along the axis the
-card mirrored across; the walk presenter places and faces one object and the
-scene ticks its mixers. The stage exposes `data-caretaker-figure` and
-`data-caretaker-clip` and the walk proof asserts both in both engines. The
-clips are idle and the three gaits (walk, run, sprint — owner decision,
-2026-09-03); which clips beyond those, eight-way facing, and the caretaker's
-own look are open (the plan is `docs/plans/2026-09-03-live-figure-rig.md`). Schemas 1–4 are
-refused by name.
+card had. Facing follows each presented route segment in eight ground directions,
+including the last segment when a slow frame skips the landing. While idle, the
+figure looks toward the pointer's ground cell; a committed route owns facing
+until its landing. The rig's forward axis is +Z, rotated about world up, and
+portal transitions carry the heading. The stage exposes `data-caretaker-figure`,
+`data-caretaker-clip`, `data-caretaker-facing`, and `data-caretaker-yaw`; the walk
+proof checks all eight pointer headings and the final heading after movement
+in both engines. These corrections follow the owner's September 4 request to
+fit the figure to the scene and face its movement/look direction.
+
+Movement categories select authored clip names; they need not select different
+clips. The September 4 candidate binds both run and sprint to the restrained jog
+following the owner's concern about the exaggerated three-square sprint.
+Changing between categories that share a clip preserves its stride phase.
+The candidate's figure and every outfit part are uniformly reduced to 80% in
+the external asset packet; the renderer imposes no fixed actor height. The
+caretaker's accepted look and further animation classes remain open.
+
+**Static structures (schema 6, September 4 scene-fit pass).** Every space now
+carries a `structures` list. Each placement names a digest-bound, self-contained
+static GLB, a ground anchor, a quarter-turn yaw, and a bounded inclusive cell
+footprint. The verified bytes must embed their buffers and images and carry no
+skins or animations. Structures decode once per packet; space instances share
+their geometry and materials, with disposal after the packet scene stops.
+The footprint blocks the local walk stand-in just as a roof footprint does;
+visible eaves do not define occupancy. Schemas 1–5 are refused by name, and a
+space without `structures` is refused. Geometry and all external candidate
+payloads remain outside the checkout. This supports the assembled cottage in
+the existing outbuilding site; it does not add an interior or a portal to it.
+
+The same pass corrects ground and wind-card shader output to the renderer's
+sRGB output space and balances outdoor ambient, key, and lantern intensities
+in `web/src/space/palette.ts`. Interior lighting retains its separate palette.
+The pure proofs cover embedded structure refusal, occupancy and corner blocking,
+eight headings, bent routes, skipped landings, and shared-clip stride continuity.
+These are candidate implementation changes; visual acceptance remains the owner's.
+
 Light touches a card's shape through two things that ship together
 (`web/src/space/cardLighting.ts`). A prop asset row may carry a **normal
 sheet** beside its colour sheet — `normal: {file, sha256}`, verified like any
@@ -572,35 +481,24 @@ changing their accepted height; the selection rule lives in
 `web/src/walk/wallOcclusion.ts`.
 The packet makes the scene a set of disposable spaces joined by door
 portals: landing on the last door square swaps to the target space and tile on
-the same strike, while rebuilding presentation-only passability, hover,
+the same completion, while rebuilding presentation-only passability, hover,
 occlusion, and camera focus. Closed exterior footprints keep pitched roofs as
 always-on dressing and block every covered tile except a portal; dedicated
 interiors carry no roofs or weather, render their camera-near walls only through
 the sill, and use their own props and practical lights.
 
-### The preparation band and feedback inside its beat
+### Spell preparation and feedback
 
-The band under the meter shows what is prepared but not yet resolved, and
-distinguishes the two kinds. A **warmed spell** is authority's own preparation,
-counted in rounds from the frame's `warmed_spell.ready_at`, and it lands on a
-beat. A **locally installed intent** is the client's claim that it sent
-something, drawn in the same band with a hatch over it so the two are never read
-as the same kind of fact. Authority outranks the local claim whenever both exist.
-
-`CombatFeelDirector`'s payoff windows were the *minimum* a cue may be held for,
-so a result never lands before the swing that caused it. They were also, until
-now, the only thing bounding it — an unstated assumption that a beat is
-comfortably longer than a payoff window. The bound is now explicit and derived
-from the pulse: a cue belongs to the round its action resolved on, so it is shown
-inside that beat or at the end of it, never spilled into the next. Where no beat
-has been observed the profile's windows stand alone, exactly as before, and the
-profile's nine values are unchanged.
+The preparation band distinguishes server-reported spell preparation from a local
+command awaiting a result. Spell readiness uses its own deadline in milliseconds.
+Feedback presentation uses the current action's local presentation deadline where
+one exists; the profile's presentation windows remain the fallback.
 
 ### `CanonicalDecimal`: one owner for the wire's wide numbers
 
-Logical rounds cross the wire as canonical decimal strings and never pass through
+Logical milliseconds cross the wire as canonical decimal strings and never pass through
 a float, because a `double` stops being able to tell integers apart at 2^53 and
-the shared fixture corpus carries exactly those boundary values. Counting beats
+the shared fixture corpus carries exactly those boundary values. Presenting remaining time
 means differencing two of them, and three copies of that comparison logic had
 grown up independently — one in the adapter, one in the HUD, one in the
 interaction director. `client/adapter/canonical_decimal.gd` is now the one owner
@@ -609,18 +507,12 @@ it.
 
 ### Proving it
 
-| Claim | Where |
-| --- | --- |
-| the meter derives from frame times only, and readiness never from elapsed time | `client/tests/test_pulse_clock.gd` |
-| the fill freezes rather than extrapolating when frames stop | `client/tests/test_pulse_clock.gd` |
-| backwards authority, skipped rounds, and impossible intervals are refused | `client/tests/test_pulse_clock.gd` |
-| a step completes inside one beat and lands on its authoritative square | `client/tests/test_grid_world_view.gd` |
-| the lattice and the controlled marker hold still inside a beat | `client/tests/test_grid_world_view.gd` |
-| a marker mid-step resolves a pointer where it is drawn | `client/tests/test_grid_world_view.gd` |
-| feedback resolves inside the beat it belongs to | `client/tests/test_combat_feel_director.gd` |
-| a real client, against a real server, shows the beat advancing | `tools/run_pulse_capture.py` |
-| that capture's verdict refuses a frozen meter, straddled beats, and a locally decided readiness | `tests/test_pulse_capture.py` |
-
+`client/tests/test_action_cooldown.gd` covers independent offsets, complete
+durations, duplicate frames, wide timestamps, and refusal to infer readiness.
+`tools/run_client_live_proof.py` exercises accepted actions at different offsets
+against the real server. The capture driver photographs one action's progress.
+The [cutover plan](plans/2026-09-05-individual-action-cooldowns.md) records which
+proof has actually completed during this slice.
 
 ## Proof surfaces
 
@@ -693,10 +585,13 @@ It also records that frame, which is how the ordinary capture route gets a real
 server frame to replay. Re-record both together; see
 `tests/fixtures/capture/provenance.md`.
 
-**The pulse capture.** `tools/run_pulse_capture.py` is the visible half of the
-live proof. The live proof runs headless and therefore has no picture; this one
-serves the `first_land_structure` corpus fixture under a virtual display and
-photographs the window at three known points inside **one** beat:
+**The cooldown capture.** `tools/run_pulse_capture.py` retains its historical
+command name and photographs three points within one accepted action's cooldown
+against the real server and the `first_land_structure` corpus fixture.
+Its samples must share one `ready_at`, progress by at least 0.30 in total,
+and agree with the frame's readiness. It checks the action's full three-second
+interval independently of the implementation constant. Separate offset actions
+are proved by `tools/run_client_live_proof.py`.
 
 ```bash
 tools/run_pulse_capture.py \
@@ -704,14 +599,6 @@ tools/run_pulse_capture.py \
   --godot <pinned godot binary> \
   --output <directory>
 ```
-
-It then judges what it took: the samples must belong to one round of logical
-time, the fill must strictly increase and span at least 0.30 of the beat, every
-sample's words must agree with that frame's own readiness, and the beat the
-client measured **for itself** must be the ruled cadence. That last check is
-worth more than it looks: the client is never told the pulse, so it is two
-independent statements of one fact agreeing, not a constant compared with
-itself.
 
 ## What these phases did not do
 

@@ -217,7 +217,6 @@ def normalized_projection(document: dict[str, Any]) -> dict[str, Any]:
     """Fields compared across runs; run identities and timing are excluded."""
     frame = document["frame"]
     return {
-        "logical_time": frame.get("logical_time"),
         "observer_actor_id": frame.get("observer_actor_id"),
         "observation_center": copy.deepcopy(frame.get("observation_center")),
         "observation_radius": frame.get("observation_radius"),
@@ -317,6 +316,9 @@ def proof(arguments: argparse.Namespace) -> int:
     source_commit = git_value("rev-parse", "HEAD")
     source_tree = git_value("rev-parse", "HEAD^{tree}")
     tracked_status_before = git_value("status", "--short", "--untracked-files=no").splitlines()
+    runtime_paths = git_value("ls-files", "--cached", "--others", "--exclude-standard", "--", "crates", "client", "tools", "Cargo.toml", "Cargo.lock").splitlines()
+    working_sources = {path: sha256(REPOSITORY_ROOT / path) for path in sorted(set(runtime_paths)) if (REPOSITORY_ROOT / path).is_file()}
+    working_source_sha256 = sha256_bytes(canonical_json(working_sources))
     world = dataclasses.replace(declared, simulation_seed=None, generated_seed=effective_seed)
     client_script = REPOSITORY_ROOT / "client/tests/record_presentation_adoption_frame.gd"
     started = time.monotonic()
@@ -355,7 +357,7 @@ def proof(arguments: argparse.Namespace) -> int:
         else (REPOSITORY_ROOT / TRACKED_FRAME_PATH)
     )
     expected_comparison: dict[str, Any] = {"performed": False, "equal": None}
-    if expected_path.is_file() and expected_path != frame_path:
+    if not arguments.record_frame and expected_path.is_file() and expected_path != frame_path:
         expected_document = json.loads(expected_path.read_text(encoding="utf-8"))
         expected_projection = validate_frame(expected_document, fixture)
         expected_digest = sha256_bytes(canonical_json(expected_projection))
@@ -382,6 +384,8 @@ def proof(arguments: argparse.Namespace) -> int:
             "commit": source_commit,
             "tree": source_tree,
             "tracked_status_before": tracked_status_before,
+            "working_source_sha256": working_source_sha256,
+            "working_source_file_count": len(working_sources),
             "world_document": source["world_document"],
             "world_document_sha256": sha256(REPOSITORY_ROOT / source["world_document"]),
             "world_template": declared.world_template,

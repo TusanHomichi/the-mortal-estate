@@ -10,8 +10,6 @@ use crate::model::{
 use super::setup::{ActorInstanceState, actor_state_from_definition};
 use super::{Engine, StepError};
 
-const MAX_SITE_MATERIALIZATIONS_PER_BOUNDARY: usize = 2;
-
 #[derive(Debug)]
 struct LootItemCandidate {
     identity_suffix: String,
@@ -465,11 +463,7 @@ impl Engine {
                 continue;
             }
 
-            let materialized_members = ordered_due_members
-                .iter()
-                .take(MAX_SITE_MATERIALIZATIONS_PER_BOUNDARY)
-                .cloned()
-                .collect::<Vec<_>>();
+            let materialized_members = ordered_due_members;
             let from_generation = previous.generation;
             let advance_generation =
                 full_clear_due || matches!(group.reset, SpawnResetDef::SlotReplenishment { .. });
@@ -504,16 +498,6 @@ impl Engine {
                         .get_mut(member_id)
                         .expect("validated ecology member")
                         .due_at = None;
-                }
-                for member_id in ordered_due_members
-                    .iter()
-                    .skip(MAX_SITE_MATERIALIZATIONS_PER_BOUNDARY)
-                {
-                    state
-                        .member_slots
-                        .get_mut(member_id)
-                        .expect("validated ecology member")
-                        .due_at = Some(boundary_at);
                 }
             }
 

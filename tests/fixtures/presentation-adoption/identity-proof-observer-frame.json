@@ -349,7 +349,7 @@
       {
         "actor_id": "player",
         "attack_safety": "invalid",
-        "character_id": "155b8862-18a6-47a9-b915-1d40d2f40b17",
+        "character_id": "4dd1eb0e-8b8a-4e10-829b-12b7ab8bbdf8",
         "hp": 20,
         "kind": "player",
         "life_state": "alive",
@@ -457,7 +457,7 @@
         }
       ]
     },
-    "contract_version": 7,
+    "contract_version": 8,
     "corpses": [],
     "corpses_truncated": false,
     "gold_piles": [],
@@ -465,7 +465,7 @@
     "ground_items": [],
     "ground_items_truncated": false,
     "incoming_item_offers": [],
-    "logical_time": "2",
+    "logical_time": "6184",
     "npcs_here": [
       {
         "actor_id": "threshold_keeper",
@@ -511,7 +511,7 @@
     "observer_actor_id": "player",
     "outgoing_item_offers": [],
     "quest_log": [],
-    "ready_at": "1",
+    "ready_at": "3000",
     "services_here": [
       {
         "capabilities": [
@@ -561,7 +561,7 @@
     ],
     "social": {
       "blocked_character_ids": [],
-      "character_id": "155b8862-18a6-47a9-b915-1d40d2f40b17",
+      "character_id": "4dd1eb0e-8b8a-4e10-829b-12b7ab8bbdf8",
       "following_character_id": null,
       "group": null,
       "incoming_invitations": [],
@@ -5536,7 +5536,7 @@
           }
         }
       ],
-      "minimum_logical_time": 2.0,
+      "minimum_logical_time": 6000.0,
       "npc_interaction": {
         "actor_id": "threshold_keeper",
         "interaction_id": "ask_about_the_rite"
@@ -5561,10 +5561,10 @@
         "service_id": "keeper_rite"
       }
     },
-    "server_sequence": "3",
-    "source_commit": "8bb7316d845a427f4925adcb46d60cbfc27acfbd",
-    "source_tree": "4419e8d76c1a8100c83beaca8603a281e6042bdd",
-    "world_revision": "3"
+    "server_sequence": "5",
+    "source_commit": "74abe7631ad1e3af23a4c216d5a13504cdf75775",
+    "source_tree": "52850865629dbb6df80043868a79a31a1a170d1e",
+    "world_revision": "5"
   },
   "schema_version": 1
 }

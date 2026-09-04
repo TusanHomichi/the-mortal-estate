@@ -6,26 +6,26 @@ loaded "Martial Hand Block Actions" realms=[realm_0] levels=[realm_0/room_0]
 player Hand Adept (Martial Artist) at realm_0/room_0:1,1 hp=20
 monster Sparring Beast at realm_0/room_0:1,2 hp=12
 
-player ready: Hand Adept at 1
-Hand Adept intent at 1: walk south
+player ready: Hand Adept at 3000ms
+Hand Adept intent at 3000ms: walk south
 Hand Adept walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Hand Adept step south -> (1,2): terrain=Flagstone cost=1 remaining=2
 Hand Adept moved from (1,1) to (1,2)
-readiness scheduled: Hand Adept cost=1 ready_at=2
-time 2
-monster ready: Sparring Beast at 2
+readiness scheduled: Hand Adept cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Sparring Beast at 6000ms
 Sparring Beast intent: fight Hand Adept
 Sparring Beast's attack against Hand Adept was blocked by right_martial_hand
-readiness scheduled: Sparring Beast cost=1 ready_at=3
+readiness scheduled: Sparring Beast cost=1 ready_at=9000ms
 
-player ready: Hand Adept at 2
-Hand Adept intent at 2: wait
-readiness scheduled: Hand Adept cost=1 ready_at=3
-time 3
-monster ready: Sparring Beast at 3
+player ready: Hand Adept at 6000ms
+Hand Adept intent at 6000ms: wait
+readiness scheduled: Hand Adept cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Sparring Beast at 9000ms
 Sparring Beast intent: fight Hand Adept
 Sparring Beast's attack against Hand Adept was blocked by right_martial_hand
-readiness scheduled: Sparring Beast cost=1 ready_at=4
+readiness scheduled: Sparring Beast cost=1 ready_at=12000ms
 
 final state
 Hand Adept (Martial Artist) at realm_0/room_0:1,2 hp=20 alive

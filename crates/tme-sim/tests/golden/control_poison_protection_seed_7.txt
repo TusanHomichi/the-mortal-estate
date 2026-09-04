@@ -6,123 +6,125 @@ loaded "Control Poison Protection" realms=[realm_0] levels=[realm_0/room_0]
 player Sel (Wizard) at realm_0/room_0:1,1 hp=8
 monster Dummy at realm_0/room_0:3,1 hp=10
 
-player ready: Sel at 1
-Sel intent at 1: cast ember_skin on target
+player ready: Sel at 3000ms
+Sel intent at 3000ms: cast ember_skin on target
 Dummy gains ember_skin (resistance) for 4 rounds.
 Sel's Ember Skin practice on wizard_magic: raw=2 reason=eligible_successful_cast
 Sel gained 2 wizard_magic practice points (pool: 2)
-readiness scheduled: Sel cost=1 ready_at=2
-Sel regenerated 1 Hp (9/10, Active, time 2)
-Sel regenerated 1 Mp (30/30, Active, time 2)
-time 2
-monster ready: Dummy at 2
+readiness scheduled: Sel cost=1 ready_at=6000ms
+time 6000ms
+ember_skin ticks on Dummy (3 rounds remain).
+monster ready: Dummy at 6000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=3
+readiness scheduled: Dummy cost=1 ready_at=9000ms
 
-player ready: Sel at 2
-Sel intent at 2: cast flame on target
+player ready: Sel at 6000ms
+Sel intent at 6000ms: cast flame on target
 Dummy resolves flame save [fire]: roll=11 threshold=8/20 natural=5 boost=3 result=failure mitigation=none damage=3->3.
 Sel's Flame hits Dummy for 3 damage (7 hp).
 contribution to target: character=Some(CharacterId("character:control_poison_protection:primary")) class=Some(DirectedSpell) damage=3
 Sel's Flame practice on wizard_magic: raw=3 reason=eligible_successful_cast
 Sel gained 3 wizard_magic practice points (pool: 5)
 Sel's wizard_magic skill advanced to level 1, critique 1
-readiness scheduled: Sel cost=1 ready_at=3
-ember_skin ticks on Dummy (3 rounds remain).
-time 3
-monster ready: Dummy at 3
+readiness scheduled: Sel cost=1 ready_at=9000ms
+time 9000ms
+ember_skin ticks on Dummy (2 rounds remain).
+Sel regenerated 1 Hp (9/10, Active, time 9000ms)
+Sel regenerated 1 Mp (28/30, Active, time 9000ms)
+monster ready: Dummy at 9000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=4
+readiness scheduled: Dummy cost=1 ready_at=12000ms
 
-player ready: Sel at 3
-Sel intent at 3: cast venom on target
+player ready: Sel at 9000ms
+Sel intent at 9000ms: cast venom on target
 Dummy resolves venom save [poison]: roll=2 threshold=5/20 natural=5 boost=0 result=success mitigation=negate damage=none->none.
 Sel's Venom practice on wizard_magic: raw=3 reason=eligible_successful_cast
 Sel gained 3 wizard_magic practice points (pool: 5)
 Sel's wizard_magic skill advanced to level 1, critique 2
-readiness scheduled: Sel cost=1 ready_at=4
-ember_skin ticks on Dummy (2 rounds remain).
-Sel regenerated 1 Hp (10/10, Active, time 4)
-Sel regenerated 1 Mp (27/30, Active, time 4)
-time 4
-monster ready: Dummy at 4
-Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=5
-
-player ready: Sel at 4
-Sel intent at 4: wait
-readiness scheduled: Sel cost=1 ready_at=5
+readiness scheduled: Sel cost=1 ready_at=12000ms
+time 12000ms
 ember_skin ticks on Dummy (1 rounds remain).
-time 5
-monster ready: Dummy at 5
+monster ready: Dummy at 12000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=6
+readiness scheduled: Dummy cost=1 ready_at=15000ms
 
-player ready: Sel at 5
-Sel intent at 5: cast neutralize on target
+player ready: Sel at 12000ms
+Sel intent at 12000ms: wait
+readiness scheduled: Sel cost=1 ready_at=15000ms
+time 15000ms
+ember_skin ticks on Dummy (0 rounds remain).
+ember_skin expires on Dummy.
+Sel regenerated 1 Hp (10/10, Active, time 15000ms)
+Sel regenerated 1 Mp (27/30, Active, time 15000ms)
+monster ready: Dummy at 15000ms
+Dummy intent: hold
+readiness scheduled: Dummy cost=1 ready_at=18000ms
+
+player ready: Sel at 15000ms
+Sel intent at 15000ms: cast neutralize on target
 Sel's Neutralize practice on wizard_magic: raw=2 reason=eligible_successful_cast
 Sel gained 2 wizard_magic practice points (pool: 4)
 Sel's wizard_magic skill advanced to level 1, critique 3
-readiness scheduled: Sel cost=1 ready_at=6
-ember_skin ticks on Dummy (0 rounds remain).
-ember_skin expires on Dummy.
-Sel regenerated 1 Mp (27/30, Active, time 6)
-time 6
-monster ready: Dummy at 6
+readiness scheduled: Sel cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Dummy at 18000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=7
+readiness scheduled: Dummy cost=1 ready_at=21000ms
 
-player ready: Sel at 6
-Sel intent at 6: cast toxin_ward on target
+player ready: Sel at 18000ms
+Sel intent at 18000ms: cast toxin_ward on target
 Dummy gains toxin_ward (protection) for 4 rounds.
 Sel's Toxin Ward practice on wizard_magic: raw=2 reason=eligible_successful_cast
 Sel gained 2 wizard_magic practice points (pool: 3)
 Sel's wizard_magic skill advanced to level 1, critique 4
-readiness scheduled: Sel cost=1 ready_at=7
-time 7
-monster ready: Dummy at 7
+readiness scheduled: Sel cost=1 ready_at=21000ms
+time 21000ms
+toxin_ward ticks on Dummy (3 rounds remain).
+Sel regenerated 1 Mp (26/30, Active, time 21000ms)
+monster ready: Dummy at 21000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=8
+readiness scheduled: Dummy cost=1 ready_at=24000ms
 
-player ready: Sel at 7
-Sel intent at 7: cast venom on target
+player ready: Sel at 21000ms
+Sel intent at 21000ms: cast venom on target
 Dummy resolves venom save [poison]: roll=9 threshold=9/20 natural=5 boost=4 result=success mitigation=negate damage=none->none.
 Sel's Venom practice on wizard_magic: raw=3 reason=eligible_successful_cast
 Sel gained 3 wizard_magic practice points (pool: 3)
 Sel's wizard_magic skill advanced to level 1, critique 5
-readiness scheduled: Sel cost=1 ready_at=8
-toxin_ward ticks on Dummy (3 rounds remain).
-Sel regenerated 1 Mp (25/30, Active, time 8)
-time 8
-monster ready: Dummy at 8
+readiness scheduled: Sel cost=1 ready_at=24000ms
+time 24000ms
+toxin_ward ticks on Dummy (2 rounds remain).
+monster ready: Dummy at 24000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=9
+readiness scheduled: Dummy cost=1 ready_at=27000ms
 
-player ready: Sel at 8
-Sel intent at 8: cast self_hold on self
+player ready: Sel at 24000ms
+Sel intent at 24000ms: cast self_hold on self
 Sel resolves self_hold save [stun]: roll=8 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
 Sel gains self_hold (control_status) for 2 rounds.
 Sel's Self Hold practice on wizard_magic: raw=2 reason=eligible_successful_cast
 Sel gained 2 wizard_magic practice points (pool: 2)
-readiness scheduled: Sel cost=1 ready_at=9
-toxin_ward ticks on Dummy (2 rounds remain).
-time 9
-monster ready: Dummy at 9
-Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=10
-
-player ready: Sel at 9
-Sel intent at 9: walk east
-Sel's walk east is suppressed by self_hold.
-readiness scheduled: Sel cost=1 ready_at=10
+readiness scheduled: Sel cost=1 ready_at=27000ms
+time 27000ms
 self_hold ticks on Sel (1 rounds remain).
 toxin_ward ticks on Dummy (1 rounds remain).
-Sel regenerated 1 Mp (25/30, Inactive, time 10)
-Sel regenerated 1 Stamina (18/20, Inactive, time 10)
-time 10
-monster ready: Dummy at 10
+Sel regenerated 1 Mp (24/30, Active, time 27000ms)
+monster ready: Dummy at 27000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=11
+readiness scheduled: Dummy cost=1 ready_at=30000ms
+
+player ready: Sel at 27000ms
+Sel intent at 27000ms: walk east
+Sel's walk east is suppressed by self_hold.
+readiness scheduled: Sel cost=1 ready_at=30000ms
+time 30000ms
+self_hold ticks on Sel (0 rounds remain).
+self_hold expires on Sel.
+toxin_ward ticks on Dummy (0 rounds remain).
+toxin_ward expires on Dummy.
+monster ready: Dummy at 30000ms
+Dummy intent: hold
+readiness scheduled: Dummy cost=1 ready_at=33000ms
 
 final state
 Sel (Wizard) at realm_0/room_0:1,1 hp=10 alive

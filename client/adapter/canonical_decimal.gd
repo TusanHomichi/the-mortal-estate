@@ -19,7 +19,7 @@ extends RefCounted
 ## digit `0`. Every function here relies on that and on nothing else, which is
 ## why length is a valid first comparison.
 
-## The largest difference [method rounds_between] will report. A gap wider than
+## The largest difference [method bounded_difference] will report. A gap wider than
 ## this is not a number a presentation surface has any use for — it is "further
 ## away than anything worth drawing" — and reporting it as a saturated count
 ## keeps the result an ordinary `int` no matter how wide the operands were.
@@ -56,7 +56,7 @@ static func at_least(left: String, right: String) -> bool:
 ## fields is the ordinary case rather than a fault: an actor ready at round 5
 ## while the world stands at round 9 is simply ready, and has been for four
 ## rounds.
-static func rounds_between(earlier: String, later: String) -> int:
+static func bounded_difference(earlier: String, later: String) -> int:
 	if not is_canonical(earlier) or not is_canonical(later):
 		return 0
 	if not less(earlier, later):

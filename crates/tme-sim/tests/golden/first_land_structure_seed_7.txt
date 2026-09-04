@@ -103,8 +103,8 @@ ecology site upper_halls_watch spawned watch_b as ecology:upper_halls_watch:watc
 ecology site upper_halls_west_bones spawned watch_a as ecology:upper_halls_west_bones:watch_a:0 generation 0 at testland/upper_halls:13,6
 ecology site upper_halls_west_bones spawned watch_b as ecology:upper_halls_west_bones:watch_b:0 generation 0 at testland/upper_halls:15,6
 
-player ready: Edda at 1
-Edda intent at 1: inspect
+player ready: Edda at 3000ms
+Edda intent at 3000ms: inspect
 Edda inspected at testland/surface:25,62: tile=Testland Bridge + South Dock
   current tile: terrain=Testland Bridge + South Dock cost=1
   north -> testland/surface:25,61: walkable terrain=Testland Bridge cost=1
@@ -115,7 +115,6 @@ Edda inspected at testland/surface:25,62: tile=Testland Bridge + South Dock
   southwest -> testland/surface:24,63: blocked terrain terrain=Deep Coastal Water
   west -> testland/surface:24,62: walkable terrain=Testland Bridge cost=1
   northwest -> testland/surface:24,61: walkable terrain=Testland Bridge cost=1
-readiness scheduled: Edda cost=0 ready_at=1
 
 final state
 Edda (Wizard) at testland/surface:25,62 hp=20 alive

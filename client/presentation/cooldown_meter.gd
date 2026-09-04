@@ -1,35 +1,7 @@
-class_name PulseMeter
+class_name CooldownMeter
 extends Control
 
-## The beat, drawn.
-##
-## Charter item 3 asks for the authoritative pulse to be [i]felt[/i], and until
-## now the client stated it: `◆ Ready · world T… · ready T…`, a true sentence
-## with no rhythm in it. This is the same fact as motion — one segment per beat
-## still to wait, the leading segment filling as the current beat elapses, and
-## the fill snapping back to nothing the moment the authority strikes the next
-## one. When the observer is ready and idle the meter does not go quiet: it
-## shows the beat passing anyway, because the pulse is the world's, not the
-## player's queue.
-##
-## Everything it draws comes from [PulseClock], which is to say from the frame.
-## It holds no timer, decides no readiness, and asserts no cadence.
-##
-## [b]The picture is never the only cue.[/b] The accessibility floor in
-## [url]../../docs/client-architecture.md[/url] rules that a cue existing only as
-## a hue is not a cue, so every state here differs in [i]shape[/i] as well —
-## hatching for a beat not yet measured, a doubled border for ready — and
-## [method meter_text] states the same thing in words, which is what the HUD's
-## readiness line and this control's accessibility description both read.
-
-## The size a meter takes when nothing else has sized it. A scene that places
-## one states its own, and this never overrides that: the meter sits under the
-## readiness line in the HUD's top rail, where the words come first and the
-## picture is the second half of the same statement.
-##
-## The height reserves both rows whether or not a preparation band is showing.
-## Sizing to the content instead would make the rail jump every time a command
-## was sent, and would make the band appear by shrinking the beat.
+## Displays the controlled character's own action cooldown and spell preparation.
 const DEFAULT_MINIMUM_SIZE: Vector2 = Vector2(60.0, 18.0)
 
 const SEGMENT_GAP: int = 3
@@ -72,7 +44,7 @@ func _notification(what: int) -> void:
 
 
 ## Installs one account of the beat. An empty state is absence of authority.
-func present_pulse(state: Dictionary) -> void:
+func present_cooldown(state: Dictionary) -> void:
 	_state = state.duplicate(true)
 	_refresh()
 
@@ -92,14 +64,14 @@ func clear() -> void:
 func segments() -> Array[Dictionary]:
 	if not bool(_state.get("has_authority", false)):
 		return []
-	var drawn: int = maxi(1, mini(MAXIMUM_SEGMENTS, int(_state.get("beats_until_ready", 0))))
-	var fill: float = float(_state.get("fill", 0.0)) if bool(_state.get("measured", false)) else 0.0
+	var drawn: int = 1
+	var fill: float = float(_state.get("fill", 0.0)) if bool(_state.get("known_duration", false)) else 0.0
 	var rows: Array[Dictionary] = []
 	for index: int in drawn:
 		rows.append({
-			"kind": "ready" if int(_state.get("beats_until_ready", 0)) == 0 else "beat",
+			"kind": "ready" if int(_state.get("remaining_msec", 0)) == 0 else "beat",
 			"fill": fill if index == 0 else 0.0,
-			"measured": bool(_state.get("measured", false)),
+			"known_duration": bool(_state.get("known_duration", false)),
 		})
 	return rows
 
@@ -108,32 +80,11 @@ func segments() -> Array[Dictionary]:
 ## the sentence beside it can never disagree about what is being shown.
 func meter_text() -> String:
 	if not bool(_state.get("has_authority", false)):
-		return "◇ Beat: no authoritative frame"
-	var logical_time: String = str(_state.get("logical_time", "?"))
-	var ready_at: String = str(_state.get("ready_at", "?"))
-	var beats: int = int(_state.get("beats_until_ready", 0))
-	var head: String = (
-		"◆ Ready" if bool(_state.get("can_act", false)) else "◇ Ready in %d beat%s" % [beats, "" if beats == 1 else "s"]
-	)
-	# Deliberately no live percentage. The fill is what the meter draws, and
-	# restating it in words made this string change on every drawn frame — which
-	# changed the label's minimum size on every drawn frame, which re-resolved
-	# the whole top rail's layout on every drawn frame. That stalled the client
-	# hard enough that a real run observed a 536 ms gap between two rounds. The
-	# words carry what changes on the beat; the picture carries what changes
-	# inside it.
-	var line: String = (
-		"%s · world T%s · ready T%s" % [head, logical_time, ready_at]
-		if bool(_state.get("measured", false))
-		else "%s · beat unmeasured · world T%s · ready T%s" % [head, logical_time, ready_at]
-	)
+		return "◇ No authoritative frame"
+	var line: String = "◆ Ready" if bool(_state.get("can_act", false)) else "◇ Action cooldown"
 	var prepared: Dictionary = _state.get("prepared", {})
 	if not prepared.is_empty():
-		line += " · preparing %s, %d beat%s" % [
-			str(prepared.get("label", "action")),
-			int(prepared.get("beats_remaining", 0)),
-			"" if int(prepared.get("beats_remaining", 0)) == 1 else "s",
-		]
+		line += " · preparing %s" % str(prepared.get("label", "action"))
 	return line
 
 
@@ -183,7 +134,7 @@ func _draw() -> void:
 func _draw_segment(rect: Rect2, row: Dictionary) -> void:
 	_draw_track(rect)
 	var ready: bool = str(row.get("kind", "beat")) == "ready"
-	if not bool(row.get("measured", false)):
+	if not bool(row.get("known_duration", false)):
 		# No span observed yet, so there is no fill this control is entitled to
 		# draw. Hatching says "unknown" in shape rather than leaving an empty
 		# rectangle that reads as "nothing is happening".
@@ -203,10 +154,10 @@ func _draw_band(rect: Rect2, band: Dictionary) -> void:
 	if rect.size.y <= 0.0:
 		return
 	_draw_track(rect)
-	var remaining: int = maxi(0, int(band.get("beats_remaining", 0)))
+	var remaining: int = maxi(0, int(band.get("remaining_msec", 0)))
 	# The band lands on a beat: it shows what is left of the wait, so a spell
 	# one beat from ready shows one segment's worth and empties onto the beat.
-	var portion: float = 0.0 if remaining == 0 else 1.0 / float(maxi(1, remaining))
+	var portion: float = 0.0 if remaining == 0 else 1.0
 	draw_rect(Rect2(rect.position, Vector2(rect.size.x * portion, rect.size.y)), PREPARED_FILL, true)
 	if not bool(band.get("authoritative", false)):
 		# A locally installed intent is the client's own claim, not the world's.

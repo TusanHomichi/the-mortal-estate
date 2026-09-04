@@ -49,7 +49,7 @@
     ]
   },
   "capture_barrier": {
-    "minimum_logical_time": 2,
+    "minimum_logical_time": 6000,
     "observer_actor_id": "player",
     "actor_count": 3,
     "actors": [

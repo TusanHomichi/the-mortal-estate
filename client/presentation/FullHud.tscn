@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://presentation/full_hud.gd" id="1_hud"]
 [ext_resource type="PackedScene" path="res://presentation/SpellPalette.tscn" id="2_spells"]
-[ext_resource type="Script" path="res://presentation/pulse_meter.gd" id="3_pulse"]
+[ext_resource type="Script" path="res://presentation/cooldown_meter.gd" id="3_pulse"]
 
 [node name="FullHud" type="Control"]
 layout_mode = 3
@@ -41,7 +41,7 @@ size_flags_horizontal = 3
 autowrap_mode = 3
 text = "◇ Beat: no authoritative frame"
 
-[node name="PulseMeter" type="Control" parent="TopRail/TopColumn/BeatBand"]
+[node name="CooldownMeter" type="Control" parent="TopRail/TopColumn/BeatBand"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 18)
 layout_mode = 2

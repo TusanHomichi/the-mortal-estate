@@ -6,72 +6,72 @@ loaded "Gold Bank and Locker Storage Gallery" realms=[realm_0] levels=[realm_0/r
 player Mara (Fighter) at realm_0/room_0:1,1 hp=12
 monster Storage Dummy at realm_0/room_0:1,2 hp=99
 
-player ready: Mara at 1
-Mara intent at 1: move_gold Carried { position: Sack } Carried { position: LeftHand } Exact { amount: 50 }
+player ready: Mara at 3000ms
+Mara intent at 3000ms: move_gold Carried { position: Sack } Carried { position: LeftHand } Exact { amount: 50 }
 Mara relocated 50 gold: carried:player:sack -> carried:player:left_hand reason=player_move
-readiness scheduled: Mara cost=1 ready_at=2
-time 2
-monster ready: Storage Dummy at 2
+readiness scheduled: Mara cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Storage Dummy at 6000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=3
+readiness scheduled: Storage Dummy cost=1 ready_at=9000ms
 
-player ready: Mara at 2
-Mara intent at 2: move_gold Carried { position: LeftHand } GroundHere Exact { amount: 30 }
+player ready: Mara at 6000ms
+Mara intent at 6000ms: move_gold Carried { position: LeftHand } GroundHere Exact { amount: 30 }
 Mara relocated 30 gold: carried:player:left_hand -> ground:gold:1@realm_0/room_0:1,1 reason=player_move
-readiness scheduled: Mara cost=1 ready_at=3
-time 3
-monster ready: Storage Dummy at 3
+readiness scheduled: Mara cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Storage Dummy at 9000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=4
+readiness scheduled: Storage Dummy cost=1 ready_at=12000ms
 
-player ready: Mara at 3
-Mara intent at 3: deposit_bank_gold west_counter bank_access gold:1
+player ready: Mara at 9000ms
+Mara intent at 9000ms: deposit_bank_gold west_counter bank_access gold:1
 Mara relocated 30 gold: ground:gold:1@realm_0/room_0:1,1 -> bank:trail_bank:character:gold_bank_locker_storage:primary reason=bank_deposit
 Mara deposited 30 gold at bank trail_bank: 0 -> 30
 Mara completes bank deposit of gold:1 at trail_bank.
-readiness scheduled: Mara cost=1 ready_at=4
-time 4
-monster ready: Storage Dummy at 4
+readiness scheduled: Mara cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Storage Dummy at 12000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=5
+readiness scheduled: Storage Dummy cost=1 ready_at=15000ms
 
-player ready: Mara at 4
-Mara intent at 4: withdraw_bank_gold east_counter bank_access 18
+player ready: Mara at 12000ms
+Mara intent at 12000ms: withdraw_bank_gold east_counter bank_access 18
 Mara withdrew 18 gold at bank trail_bank: 30 -> 12
 Mara relocated 18 gold: bank:trail_bank:character:gold_bank_locker_storage:primary -> ground:gold:2@realm_0/room_0:1,1 reason=bank_withdrawal
 Mara completes withdrawal of 18 gold from trail_bank.
-readiness scheduled: Mara cost=1 ready_at=5
-time 5
-monster ready: Storage Dummy at 5
+readiness scheduled: Mara cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Storage Dummy at 15000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=6
+readiness scheduled: Storage Dummy cost=1 ready_at=18000ms
 
-player ready: Mara at 5
-Mara intent at 5: move_gold Ground { gold_pile_id: GoldPileId("gold:2") } Carried { position: Sack } All
+player ready: Mara at 15000ms
+Mara intent at 15000ms: move_gold Ground { gold_pile_id: GoldPileId("gold:2") } Carried { position: Sack } All
 Mara relocated 18 gold: ground:gold:2@realm_0/room_0:1,1 -> carried:player:sack reason=player_move
-readiness scheduled: Mara cost=1 ready_at=6
-time 6
-monster ready: Storage Dummy at 6
+readiness scheduled: Mara cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Storage Dummy at 18000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=7
+readiness scheduled: Storage Dummy cost=1 ready_at=21000ms
 
-player ready: Mara at 6
-Mara intent at 6: deposit_locker_item west_counter locker_access field_case
+player ready: Mara at 18000ms
+Mara intent at 18000ms: deposit_locker_item west_counter locker_access field_case
 Mara stored Field Case in a locker
-readiness scheduled: Mara cost=1 ready_at=7
-time 7
-monster ready: Storage Dummy at 7
+readiness scheduled: Mara cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Storage Dummy at 21000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=8
+readiness scheduled: Storage Dummy cost=1 ready_at=24000ms
 
-player ready: Mara at 7
-Mara intent at 7: withdraw_locker_item east_counter locker_access field_case sack_item_1
+player ready: Mara at 21000ms
+Mara intent at 21000ms: withdraw_locker_item east_counter locker_access field_case sack_item_1
 Mara withdrew Field Case to sack_item_1
-readiness scheduled: Mara cost=1 ready_at=8
-time 8
-monster ready: Storage Dummy at 8
+readiness scheduled: Mara cost=1 ready_at=24000ms
+time 24000ms
+monster ready: Storage Dummy at 24000ms
 Storage Dummy intent: hold
-readiness scheduled: Storage Dummy cost=1 ready_at=9
+readiness scheduled: Storage Dummy cost=1 ready_at=27000ms
 
 final state
 Mara (Fighter) at realm_0/room_0:1,1 hp=12 alive

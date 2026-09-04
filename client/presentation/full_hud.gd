@@ -50,7 +50,7 @@ const MAX_STACKED_RAIL_VIEWPORT_FRACTION: float = 0.42
 
 @onready var connection_status: Label = %ConnectionStatus
 @onready var readiness_status: Label = %ReadinessStatus
-@onready var pulse_meter: PulseMeter = %PulseMeter
+@onready var cooldown_meter: CooldownMeter = %CooldownMeter
 @onready var action_indicator: Label = %ActionIndicator
 @onready var reconnect_button: Button = %ReconnectButton
 @onready var domains_button: Button = %DomainsButton
@@ -280,7 +280,7 @@ func configure_presenter(value: FeedbackPresenter) -> void:
 
 func reset_presentation_surface() -> void:
 	_frame.clear()
-	pulse_meter.clear()
+	cooldown_meter.clear()
 	_selected_actor_id = ""
 	_cue_remaining = 0.0
 	cue_banner.visible = false

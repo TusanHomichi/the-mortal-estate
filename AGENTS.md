@@ -2,7 +2,7 @@
 
 **The Mortal Estate** is an original persistent online tactical role-playing
 game about life, death, inheritance, and memory. The player is a lineage; death
-is another place to play; the world advances on one authoritative pulse.
+is another place to play; the server owns individual action deadlines without a shared gameplay pulse.
 
 This file is the Contract and the entry point. It owns routing and the essential
 operating rules; detailed workflow and verification usage have linked owners.
@@ -19,7 +19,7 @@ operating rules; detailed workflow and verification usage have linked owners.
   other documents point there.
 - **Owner rulings bind.** D2 reopens inherited mechanics, names, values,
   timings, penalties, and routes; surviving code is not design acceptance.
-  D5 owns the pulse. Read the [rulings](docs/boundary-map.md#what-an-authored-seam-does-and-does-not-settle)
+  D5 owns authoritative timing. Read the [rulings](docs/boundary-map.md#what-an-authored-seam-does-and-does-not-settle)
   before designing either.
 - **Atomic internal cutovers.** The external product boundary is not active.
   Follow the [no-compatibility policy](docs/agent-workflow.md#no-compatibility-adapters):
@@ -116,11 +116,10 @@ setup, incomplete verdicts, capture, and CI are in
 
 ## What needs an owner decision
 
-Reopened product decisions; pulse cadence; multiple live worlds; external
+Reopened product decisions; action timing; multiple live worlds; external
 product-boundary activation or outside players; publication; visual acceptance
 and accepted masters; adding an AI runtime; Git lifecycle work; spending; and
-effects outside this machine. A cadence change also needs the side-by-side
-play-feel test required by D5.
+effects outside this machine. Timing changes follow the current D5 ruling.
 
 If a request conflicts with an owner ruling, the charter, a boundary, or the
 public-boundary policy, state the conflict and risk and get explicit owner

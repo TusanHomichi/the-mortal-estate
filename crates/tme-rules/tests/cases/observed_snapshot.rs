@@ -107,7 +107,7 @@ fn v2_player_tile_is_visible() {
         .expect("observed snapshot should succeed");
 
     assert_eq!(v2.contract_version, OBSERVED_SNAPSHOT_CONTRACT_VERSION);
-    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 29);
+    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
 
     // Player at (1, 1) in room_0 — must be Visible
     assert_eq!(
@@ -131,7 +131,7 @@ fn observed_29_exposes_living_ecology_actors_without_scheduler_or_origin_state()
     let observed = engine
         .actor_observed_snapshot(&tme_rules::ActorId::from("player"))
         .expect("observed ecology snapshot");
-    assert_eq!(observed.contract_version, 29);
+    assert_eq!(observed.contract_version, 30);
     assert!(observed.actors.iter().any(|actor| {
         actor.id == "ecology:gallery_pack:runner:0" && actor.name == "Bramble Runner"
     }));

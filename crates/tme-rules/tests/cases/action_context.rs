@@ -586,7 +586,7 @@ fn summon_action_context_includes_summoned_target_metadata() {
     assert_eq!(summoned.instance_id, "summon:call_echo:1:echo_guardian");
     assert_eq!(summoned.source_spell_id, "call_echo");
     assert_eq!(summoned.template_id, "echo_guardian");
-    assert_eq!(summoned.remaining_rounds, Some(2));
+    assert_eq!(summoned.remaining_rounds, Some(1));
 }
 
 #[test]
@@ -623,7 +623,7 @@ fn summon_observed_action_context_includes_summoned_target_metadata() {
     assert_eq!(summoned.instance_id, "summon:call_echo:1:echo_guardian");
     assert_eq!(summoned.source_spell_id, "call_echo");
     assert_eq!(summoned.template_id, "echo_guardian");
-    assert_eq!(summoned.remaining_rounds, Some(2));
+    assert_eq!(summoned.remaining_rounds, Some(1));
 }
 
 #[test]

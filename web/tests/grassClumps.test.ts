@@ -15,6 +15,7 @@ function space(weather = true): FeelSpace {
     roofs: [],
     props: [],
     fixtures: [],
+    structures: [],
     light_sources: { lantern_glass: null, candles: [] },
     weather,
     portals: [],

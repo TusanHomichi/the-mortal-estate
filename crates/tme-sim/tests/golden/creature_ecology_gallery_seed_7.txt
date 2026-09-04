@@ -8,8 +8,8 @@ ecology site gallery_lair spawned burrower as ecology:gallery_lair:burrower:0 ge
 ecology site gallery_pack spawned runner as ecology:gallery_pack:runner:0 generation 0 at realm_0/room_0:2,1
 ecology site gallery_pack spawned keeper as ecology:gallery_pack:keeper:0 generation 0 at realm_0/room_0:2,1
 
-player ready: Trailwarden at 1
-Trailwarden intent at 1: fight ecology:gallery_pack:runner:0
+player ready: Trailwarden at 3000ms
+Trailwarden intent at 3000ms: fight ecology:gallery_pack:runner:0
 Bramble Runner's crushing affinity adjusted 43 by 3/2 to 64
 Trailwarden attacked Bramble Runner: roll=8 damage=64 label=fatal hp=0
 contribution to ecology:gallery_pack:runner:0: character=None class=None damage=2
@@ -19,38 +19,54 @@ Bramble Runner's River Flint was retained in corpse:1
 Bramble Runner relocated 2 gold: carried:ecology:gallery_pack:runner:0:sack -> corpse:1 reason=corpse_retention claim=actor:player/killing_blow
 Bramble Runner life state: alive -> dead
 shared defeat reward for Bramble Runner: available=0 awarded=0 reason=no_eligible_player_contribution
-readiness scheduled: Trailwarden cost=1 ready_at=2
-time 2
-monster ready: Cinder Burrower at 2
+readiness scheduled: Trailwarden cost=1 ready_at=6000ms
+monster ready: Cinder Burrower at 3000ms
 Cinder Burrower intent: use Venom Bite on Trailwarden
 Trailwarden resolves venom_bite save [poison]: roll=11 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
 Trailwarden gains venom_bite (poison) for 3 rounds.
-readiness scheduled: Cinder Burrower cost=1 ready_at=3
-monster ready: Bramble Keeper at 2
+readiness scheduled: Cinder Burrower cost=1 ready_at=6000ms
+monster ready: Bramble Keeper at 3000ms
 Bramble Keeper intent: fight Trailwarden
 Bramble Keeper missed Trailwarden: roll=2 attack_score=0 defense_score=13
-readiness scheduled: Bramble Keeper cost=1 ready_at=3
+readiness scheduled: Bramble Keeper cost=1 ready_at=6000ms
+time 6000ms
+venom_bite ticks on Trailwarden (2 rounds remain).
+venom_bite damages Trailwarden for 1 (49 hp).
+contribution to player: character=None class=None damage=1
+monster ready: Cinder Burrower at 6000ms
+Cinder Burrower intent: use Venom Bite on Trailwarden
+Trailwarden resolves venom_bite save [poison]: roll=9 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
+Trailwarden gains venom_bite (poison) for 3 rounds.
+readiness scheduled: Cinder Burrower cost=1 ready_at=9000ms
+monster ready: Bramble Keeper at 6000ms
+Bramble Keeper intent: fight Trailwarden
+Bramble Keeper attacked Trailwarden: roll=16 damage=2 label=light hp=47
+contribution to player: character=None class=None damage=2
+readiness scheduled: Bramble Keeper cost=1 ready_at=9000ms
 
-player ready: Trailwarden at 2
-Trailwarden intent at 2: fight ecology:gallery_pack:keeper:0
-Trailwarden attacked Bramble Keeper: roll=16 damage=42 label=fatal hp=0
+player ready: Trailwarden at 6000ms
+Trailwarden intent at 6000ms: fight ecology:gallery_pack:keeper:0
+Trailwarden attacked Bramble Keeper: roll=14 damage=43 label=fatal hp=0
 contribution to ecology:gallery_pack:keeper:0: character=None class=None damage=2
 Bramble Keeper was defeated: cause=physical claim=actor:player/killing_blow
 corpse corpse:2 created for Bramble Keeper at realm_0/room_0:2,1 claim=actor:player/killing_blow
 Bramble Keeper life state: alive -> dead
 shared defeat reward for Bramble Keeper: available=0 awarded=0 reason=no_eligible_player_contribution
 ecology site gallery_pack generation 0 full-site materialization for [runner,keeper] scheduled for 4
-readiness scheduled: Trailwarden cost=1 ready_at=3
-time 3
-monster ready: Cinder Burrower at 3
+readiness scheduled: Trailwarden cost=1 ready_at=9000ms
+time 9000ms
+venom_bite ticks on Trailwarden (2 rounds remain).
+venom_bite damages Trailwarden for 1 (46 hp).
+contribution to player: character=None class=None damage=1
+monster ready: Cinder Burrower at 9000ms
 Cinder Burrower intent: use Venom Bite on Trailwarden
-Trailwarden resolves venom_bite save [poison]: roll=19 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
+Trailwarden resolves venom_bite save [poison]: roll=17 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=none->none.
 Trailwarden gains venom_bite (poison) for 3 rounds.
-readiness scheduled: Cinder Burrower cost=1 ready_at=4
+readiness scheduled: Cinder Burrower cost=1 ready_at=12000ms
 
-player ready: Trailwarden at 3
-Trailwarden intent at 3: fight ecology:gallery_lair:burrower:0
-Trailwarden attacked Cinder Burrower: roll=17 damage=43 label=fatal hp=0
+player ready: Trailwarden at 9000ms
+Trailwarden intent at 9000ms: fight ecology:gallery_lair:burrower:0
+Trailwarden attacked Cinder Burrower: roll=15 damage=41 label=fatal hp=0
 contribution to ecology:gallery_lair:burrower:0: character=None class=None damage=3
 Cinder Burrower was defeated: cause=physical claim=actor:player/killing_blow
 corpse corpse:3 created for Cinder Burrower at realm_0/room_0:2,1 claim=actor:player/killing_blow
@@ -58,27 +74,31 @@ Cinder Burrower's Cloth Bundle was retained in corpse:3
 Cinder Burrower life state: alive -> dead
 shared defeat reward for Cinder Burrower: available=0 awarded=0 reason=no_eligible_player_contribution
 ecology site gallery_lair generation 0 full-site materialization for [burrower] scheduled for 5
-readiness scheduled: Trailwarden cost=1 ready_at=4
-time 4
-
-player ready: Trailwarden at 4
-Trailwarden intent at 4: wait
-readiness scheduled: Trailwarden cost=1 ready_at=5
+readiness scheduled: Trailwarden cost=1 ready_at=12000ms
+time 12000ms
 venom_bite ticks on Trailwarden (2 rounds remain).
-venom_bite damages Trailwarden for 1 (49 hp).
+venom_bite damages Trailwarden for 1 (45 hp).
 contribution to player: character=None class=None damage=1
-time 5
 
-player ready: Trailwarden at 5
-Trailwarden intent at 5: wait
-readiness scheduled: Trailwarden cost=1 ready_at=6
+player ready: Trailwarden at 12000ms
+Trailwarden intent at 12000ms: wait
+readiness scheduled: Trailwarden cost=1 ready_at=15000ms
+time 15000ms
 venom_bite ticks on Trailwarden (1 rounds remain).
-venom_bite damages Trailwarden for 1 (48 hp).
+venom_bite damages Trailwarden for 1 (44 hp).
 contribution to player: character=None class=None damage=1
-time 6
+
+player ready: Trailwarden at 15000ms
+Trailwarden intent at 15000ms: wait
+readiness scheduled: Trailwarden cost=1 ready_at=18000ms
+time 18000ms
+venom_bite ticks on Trailwarden (0 rounds remain).
+venom_bite damages Trailwarden for 1 (43 hp).
+contribution to player: character=None class=None damage=1
+venom_bite expires on Trailwarden.
 
 final state
-Trailwarden at realm_0/room_0:2,1 hp=48 alive
+Trailwarden at realm_0/room_0:2,1 hp=43 alive
 Cinder Burrower [ecology:gallery_lair:burrower:0] at realm_0/room_0:2,1 hp=0 dead
 Bramble Runner [ecology:gallery_pack:runner:0] at realm_0/room_0:2,1 hp=0 dead
 Bramble Keeper [ecology:gallery_pack:keeper:0] at realm_0/room_0:2,1 hp=0 dead

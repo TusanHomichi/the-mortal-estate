@@ -43,7 +43,7 @@ export function passabilityFrom(space: FeelSpace): LayoutPassability {
     space.portals.map((portal) => cellKey({ i: portal.cell[0], j: portal.cell[1] })),
   );
   const roofTiles = new Set<string>();
-  for (const roof of space.roofs) {
+  for (const roof of [...space.roofs, ...space.structures]) {
     for (let j = roof.footprint.j0; j <= roof.footprint.j1; j += 1) {
       for (let i = roof.footprint.i0; i <= roof.footprint.i1; i += 1) {
         const key = cellKey({ i, j });

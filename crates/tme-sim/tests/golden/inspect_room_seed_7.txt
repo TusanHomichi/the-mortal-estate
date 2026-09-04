@@ -6,8 +6,8 @@ loaded "Inspect Room" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:2,2 hp=12
 monster Mireling at realm_0/room_0:3,2 hp=7
 
-player ready: Delver at 1
-Delver intent at 1: inspect
+player ready: Delver at 3000ms
+Delver intent at 3000ms: inspect
 Delver inspected at realm_0/room_0:2,2: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/room_0:2,1: walkable terrain=Flagstone cost=1
@@ -19,7 +19,6 @@ Delver inspected at realm_0/room_0:2,2: tile=Flagstone
   west -> realm_0/room_0:1,2: walkable terrain=Flagstone cost=1
   northwest -> realm_0/room_0:1,1: walkable terrain=Flagstone cost=1
   nearby east: monster Mireling at (3,2) hp=7
-readiness scheduled: Delver cost=0 ready_at=1
 
 final state
 Delver at realm_0/room_0:2,2 hp=12 alive

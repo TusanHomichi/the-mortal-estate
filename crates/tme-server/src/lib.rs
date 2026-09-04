@@ -21,7 +21,6 @@ pub use http::AppState;
 pub use postgres::{
     PostgresBootstrap, PostgresCharacterBootstrap, PostgresState, PostgresWorldBootstrap,
 };
-pub use scheduler::GAMEPLAY_PULSE;
 
 #[cfg(test)]
 mod tests {

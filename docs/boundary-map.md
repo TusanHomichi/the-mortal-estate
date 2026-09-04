@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 3
+last_updated: 2026-09-05
+revision: 4
 status: Standing and authored ownership boundaries from Phase 7; path and protocol ownership corrections only. Phase 7 owner acceptance remains pending.
 public_safe: true
-summary: Fact ownership, implemented seams, authored life/death boundaries, the pulse ruling, and the AI boundary.
+summary: Fact ownership, implemented seams, authored life/death boundaries, the individual timing ruling, and the AI boundary.
 always: true
 ---
 
@@ -48,9 +48,9 @@ settled. Each authored seam below therefore ends with an explicit **Reopened**
 list, and that list is binding: an agent that finds a value in an authored seam
 has found a defect in this document, not a decision.
 
-The one ruled value in this map is the pulse: **3.0 seconds**, ruling D5,
-recorded at [The authoritative pulse](#21-the-authoritative-pulse-d5) and
-implemented as `GAMEPLAY_PULSE` in `crates/tme-server/src/scheduler.rs`.
+Authoritative timing follows the September 5 replacement of D5: individual
+action deadlines, with a standard movement duration of three seconds. The
+[ruling below](#21-authoritative-individual-deadlines-d5) owns the design.
 
 ## Where this sits
 
@@ -143,27 +143,15 @@ file fails every clean-content validation rather than passing quietly. See
 
 ## 1.4 Deterministic logical time
 
-**Owner.** `crates/tme-rules/src/model/timing.rs` defines `LogicalTime` —
-deliberately independent of wall-clock seconds — and `ActionCost` in whole
-rounds. `crates/tme-rules/src/engine/timing.rs` is the only place `World.timing.now`
-advances, in `advance_realtime_boundary_transaction`.
+**Owner.** `LogicalTime` in `crates/tme-rules/src/model/timing.rs` stores precise
+milliseconds; `ActionCost` stores authored duration units. The rules engine's
+`advance_to` transaction alone advances `World.timing.now`, visiting due times
+in chronological order with stable actor tie breaking.
 
-**Rule.** Each living actor holds an absolute next-ready time and a stable order.
-An actor-addressed committed intent schedules that actor, resolves ready
-automatic actors in stable order, and completes the logical boundary before
-returning the next controlled opportunity. Read-only intents are free and advance
-none of it.
-
-**Never.** No boundary outside the rules crate advances gameplay time. No
-subsystem derives a gameplay decision from wall-clock elapsed time. Presentation
-may interpolate between beats; it may not tick.
-
-**Proof.** `crates/tme-rules/tests/` timing coverage; the client asserts
-readiness comes from the frame's `logical_time` / `ready_at` / `can_act` and
-never from wall time (`client/tests/test_pointer_movement.gd`).
-
-The wall-clock cadence at which those boundaries are struck is a separate fact
-with a separate owner and a ruled value: [2.1](#21-the-authoritative-pulse-d5).
+Read-only intents do not reschedule actors or drain time. Rejected intents roll
+back atomically. A deterministic driver may advance an action interval explicitly;
+a live server supplies monotonic elapsed time. The
+[timing ruling](#21-authoritative-individual-deadlines-d5) owns that distinction.
 
 ## 1.5 Fail-closed terrain composition
 
@@ -256,8 +244,8 @@ table. No simulator-only actor implementation.
 **Rule.** Ecology alone observes vacancy, schedules a positive logical-time
 reset, defers materialisation while a site is observed, and recreates slots in
 stable order through the shared actor constructor and the single RNG.
-Materialisation is capped per site per logical boundary
-(`MAX_SITE_MATERIALIZATIONS_PER_BOUNDARY`).
+All eligible due slots materialise in stable order at their deadline. Observation
+may defer them; leaving observation releases due work without a shared-period quota.
 
 **Never.** Ecology is not an AI, clock, movement, combat, death, corpse, reward,
 inventory, or scheduler authority, and holds no second RNG. It retains prior
@@ -452,67 +440,41 @@ contemplated, and reopens the seam it deliberately locked.
 Each entry names an owner and the invariants that survive whatever the mechanics
 become. **No entry settles a mechanic.**
 
-## 2.1 The authoritative pulse (D5)
+## 2.1 Authoritative individual deadlines (D5)
 
-The charter makes one authoritative pulse a product invariant. A product
-invariant with a ruled value and no named owner is still a fact class waiting to
-drift, so this is where it is named.
+**Replacement ruling (owner, 2026-09-05).** The server remains the sole gameplay
+authority. Every character acts on its own deadlines, based on accepted actions
+and their costs. There is no shared gameplay pulse. This explicitly supersedes
+the August 19 global-pulse ruling and the charter language derived from it.
 
-**The ruling (D5, owner, 2026-08-19).**
-
-- **One authoritative gameplay pulse begins at 3.0 seconds.**
-- Player readiness, automatic actors, spell preparation, recovery, and
-  pulse-owned environmental processes **derive from that clock**.
-- Networking, animation, rendering, interpolation, telemetry, and server
-  housekeeping may run more frequently but **may not become a second gameplay
-  clock**.
-- **Presentation may remain fluid between authoritative beats.**
-- A later cadence change requires an **explicit owner ruling backed by a
-  side-by-side play-feel test**. It may not drift through implementation or
-  prose.
-- **The one-second statement is not product authority.**
-
-**Owner — the beat and the striking of it are two facts.**
+- A movement commitment receives a complete three-second interval from its own
+  start. Further movement is locked until that interval expires. The next
+  accepted move starts another complete interval; no route is squeezed into a
+  remainder of a shared beat.
+- Automatic actors, spell preparation, effects, recovery, and environmental
+  work use their own due times. Authored action-cost units remain durations;
+  their conversion to milliseconds does not define a global phase.
+- One monotonic server clock supplies elapsed time to the serialized world
+  owner. The rules advance chronologically through due work in deterministic
+  order. Housekeeping may check deadlines; its wake frequency cannot shorten,
+  reset, or align a gameplay duration.
+- Persistence retains precise current time and individual deadlines. Recovery
+  rebases the clock while preserving remaining durations. Reconnection and
+  replay cannot clear a cooldown.
+- Clients present progress but obtain legality from authoritative frames.
+  Local elapsed time cannot grant readiness.
 
 | Fact | Owner |
 | --- | --- |
-| what one beat *means* — one logical round, and everything scheduled in rounds | `crates/tme-rules/src/engine/timing.rs` (`advance_realtime_boundary`), over `LogicalTime` in `crates/tme-rules/src/model/timing.rs` |
-| *when* a beat is struck — the wall-clock cadence | `crates/tme-server/src/scheduler.rs`, the sole wall-clock source, which sends one boundary request into the single world-instance mailbox. The value is the constant `GAMEPLAY_PULSE` there, and nowhere else. |
-| applying a struck beat exactly once | `crates/tme-server/src/facet.rs` (`advance_facet_tick`) |
+| Duration conversion and precise logical timestamps | `crates/tme-rules/src/model/timing.rs` |
+| Individual legality, scheduling, and chronological due work | `crates/tme-rules/src/engine/timing.rs` and `engine/deadlines.rs` |
+| Monotonic elapsed time and housekeeping requests | `crates/tme-server/src/scheduler.rs` |
+| Serialized durable application and publication | `crates/tme-server/src/facet/` |
+| Client cooldown presentation | [client notes](client-notes.md#individual-cooldowns-made-visible) |
 
-**Rule.** The cadence is one value in one place. Everything timed derives from
-the beat by counting rounds, never by reading a clock of its own.
-
-**Never.** No second scheduler, timer, or background task may submit a gameplay
-boundary. No subsystem may reach for wall time to decide a gameplay outcome. No
-presentation layer may infer readiness from elapsed seconds — readiness arrives
-in the frame. The cadence may not be changed by editing a constant: it changes by
-owner ruling with a play-feel test, and this document changes with it.
-
-**Proof.** `crates/tme-server/src/scheduler.rs` unit tests hold the cadence
-contract: one asserts `GAMEPLAY_PULSE` is the ruled 3.0 seconds, the other that
-the scheduler strikes exactly one boundary per elapsed pulse and none for an
-elapsed second. End to end, `tools/run_client_live_proof.py` drives a real
-client against a real server and judges the beats it observes — one round of
-logical time per pulse of wall time — against the ruled value it names in its
-own right, so the proof cannot pass by agreeing with the constant it tests. That
-verdict is itself held by `tests/test_live_proof_pulse.py`, which feeds it
-recorded observations — including a one-second cadence — and checks what it
-refuses. The client's frame-only readiness is proven in
-`client/tests/test_pointer_movement.gd`.
-
-The client now also **presents** the beat, under the fluid-between-beats
-permission above and nothing wider. It is never told the cadence — nothing on
-the wire carries one — so it measures the interval between two authoritative
-rounds and interpolates inside it, while readiness stays the frame's `can_act`.
-`client/tests/test_pulse_clock.gd` holds the refusals that keep that from
-becoming a second clock: no fill before an interval has been observed, no
-extrapolation past one, no readiness from elapsed time, and no measurement of an
-interval that skipped a round. `tools/run_pulse_capture.py` photographs a real
-client's meter advancing inside one round and judges the beat that client
-measured for itself against this ruling's value — two independent statements of
-one fact agreeing, rather than a constant compared with itself. The presentation
-contract is [client notes](client-notes.md#the-pulse-made-visible).
+The [cutover closeout](plans/2026-09-05-individual-action-cooldowns.md) records
+implementation and verification status. The ruling is settled; incomplete
+implementation or proof must not be reported as completion.
 
 ## 2.2 Death as continued play
 
@@ -543,7 +505,7 @@ Life state stays one enum with one writer
   is dead reads the projected fact.
 - **Death changes where a character acts. It never changes who adjudicates.**
   A dead character's actions are ordinary typed intents through the ordinary
-  command path, resolved by the ordinary owners, on the same pulse.
+  command path, resolved by the ordinary owners, under the same server authority.
 - **No automatic recovery.** Return is an achieved, authored transition. Nothing
   outside this owner may invent a recovery policy, and no timer, disconnect,
   reconnect, or convenience path may perform one.
@@ -680,7 +642,7 @@ character to play. Because it is irreversible, it is also **explicit**:
 **Aging.** If age is a gameplay fact, it has one owner and one advance site, on
 the same discipline logical time already has
 ([1.4](#14-deterministic-logical-time)): one counter, advanced in one place,
-derived from the pulse. No second age counter anywhere, and no client-side aging.
+derived from authoritative elapsed time. No second age counter anywhere, and no client-side aging.
 
 **Never.** No irreversible transition without an authored route to it. No
 reversal by operator edit — an irreversible transition that operators quietly
@@ -758,7 +720,7 @@ deterministic system responsibilities.
   degraded, slow, or over budget.
 - Any wall-clock AI trigger enters through the same single boundary path as
   everything else. It may not become a second gameplay clock
-  ([2.1](#21-the-authoritative-pulse-d5)).
+  ([2.1](#21-authoritative-individual-deadlines-d5)).
 - Generated text is subject to the same expression boundary as any other external
   material: a model's knowledge of other games is not a clean content source. See
   [public boundary policy](public-boundary-policy.md).

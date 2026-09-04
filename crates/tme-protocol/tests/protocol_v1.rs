@@ -31,7 +31,7 @@ fn character_id() -> CharacterId {
 
 fn observer_frame(sack_gold: i64, pile_amounts: &[i64]) -> ObserverFrame {
     ObserverFrame {
-        contract_version: 7,
+        contract_version: 8,
         logical_time: DecimalU64::new(0),
         ready_at: DecimalU64::new(0),
         observer_actor_id: ActorId::new("player").unwrap(),

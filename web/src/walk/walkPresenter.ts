@@ -23,7 +23,8 @@ import {
 import { CAMERA_TARGET_HEIGHT, focusFeelCamera } from "../camera";
 import type { FeelSpace, PortalTarget } from "../feelTypes";
 import { portalLandingFor } from "../space/portals";
-import { BeatClock, WALK_STAND_IN_BEAT_SECONDS } from "./beat";
+import { WALK_MOVE_SECONDS } from "./beat";
+import { facingBetween, type FigureFacing } from "./facing";
 import type { FigureInstance } from "../space/figureRig";
 import {
   WALK_CURSOR_HOTSPOT,
@@ -61,8 +62,7 @@ export interface WalkPresenterOptions {
   onCellChanged: (previous: Cell, next: Cell) => void;
   /** Whether the camera re-centres on the caretaker at each landing (false inside a building). */
   cameraFollowsCaretaker: boolean;
-  onPortalLanding: (target: PortalTarget, facing: 1 | -1) => void;
-  startedAt: number;
+  onPortalLanding: (target: PortalTarget, facing: FigureFacing) => void;
 }
 
 export interface WalkPresenter {
@@ -174,7 +174,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     updateWallFade,
   } = options;
   const passability = passabilityFrom(space);
-  const standInClock = new BeatClock(options.startedAt);
   const soleTextures = {
     draft: makeSoleTexture("draft"),
     committed: makeSoleTexture("committed"),
@@ -194,10 +193,9 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   let footprintIdentity = "";
   let landedFootprints: LandedFootprints | null = null;
   let hoverCell: Cell | null = null;
-  stage.dataset.walkClockStartedAt = String(options.startedAt);
   stage.dataset.walkSpace = options.spaceName;
   stage.dataset.walkFadedRuns = String(
-    updateWallFade(state.caretakerCell, options.startedAt),
+    updateWallFade(state.caretakerCell, performance.now() / 1000),
   );
 
   const clearFootprints = (): void => {
@@ -279,21 +277,13 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       setCursor("default");
       return;
     }
-    const authorable = authorRoute(passability, state.caretakerCell, hoverCell) !== null;
+    const authorable = state.committed === null && authorRoute(passability, state.caretakerCell, hoverCell) !== null;
     hoverOutline.visible = authorable;
     stage.dataset.walkOutline = authorable ? "visible" : "hidden";
     if (authorable) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
     if (state.committed !== null) setCursor("waiting");
     else if (authorable || sameCell(state.caretakerCell, hoverCell)) setCursor("ready");
     else setCursor("refused");
-  };
-
-  const applyFacing = (): void => {
-    if (state.committed === null) return;
-    const route = state.committed.route;
-    const directionI = route[route.length - 1]!.i - route[0]!.i;
-    if (directionI < 0) caretaker.setFacing(-1);
-    if (directionI > 0) caretaker.setFacing(1);
   };
 
   // The walk between pulses (plan §6a): the figure is presented along the
@@ -305,8 +295,10 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const presentWalk = (now: number): PresentedWalk => {
     const presented = presentedWalkPosition(state, now);
     caretaker.place(presented.i, presented.j);
-    if (presented.facing !== 0) caretaker.setFacing(presented.facing);
+    if (presented.facing !== null) caretaker.setFacing(presented.facing);
     caretaker.setGait(presented.gait);
+    stage.dataset.caretakerFacing = `${caretaker.facing.i},${caretaker.facing.j}`;
+    stage.dataset.caretakerYaw = String(caretaker.root.rotation.y);
     stage.dataset.caretakerPresented = `${presented.i.toFixed(3)},${presented.j.toFixed(3)}`;
     stage.dataset.caretakerGait = presented.gait;
     stage.dataset.caretakerClip = caretaker.clip;
@@ -318,8 +310,14 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
 
   const reflectState = (): void => {
     presentWalk(performance.now() / 1000);
-    applyFacing();
     stage.dataset.walkState = walkIntentKind(state);
+    if (state.committed !== null) {
+      stage.dataset.walkCommittedAt = String(state.committed.committedAt);
+      stage.dataset.walkLandsAt = String(state.committed.landsAt);
+    } else {
+      delete stage.dataset.walkCommittedAt;
+      delete stage.dataset.walkLandsAt;
+    }
     stage.dataset.caretakerCell = `${state.caretakerCell.i},${state.caretakerCell.j}`;
     const pace = walkPace(state);
     label.textContent = `WALK EXPERIMENT — LOCAL, NOT AUTHORITY${pace === null ? "" : ` · ${pace.toUpperCase()}`}`;
@@ -365,34 +363,41 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
 
   const onPointerMove = (event: PointerEvent): void => {
     hoverCell = pointerCell(event);
+    if (state.committed === null && hoverCell !== null) {
+      const facing = facingBetween(state.caretakerCell, hoverCell);
+      if (facing !== null) caretaker.setFacing(facing);
+    }
     updateHover();
   };
   const onPointerLeave = (): void => {
     hoverCell = null;
     updateHover();
   };
+  // The frame update owns completion and portal crossings. Input must not
+  // consume a landing first, even if a slow frame has passed the deadline.
   const onClick = (event: MouseEvent): void => {
+    if (state.committed !== null) return;
     if (event.button !== 0 || event.detail !== 1) return;
     const target = pointerCell(event);
     if (target === null) return;
     const now = nowSeconds();
-    transition(singleClick(state, passability, target, standInClock, now), now);
+    transition(singleClick(state, passability, target, now), now);
   };
   const onDoubleClick = (event: MouseEvent): void => {
     if (event.button !== 0) return;
     event.preventDefault();
     const now = nowSeconds();
-    transition(doubleClick(state, standInClock, now), now);
+    if (state.committed === null) transition(doubleClick(state, now), now);
   };
   const onContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
     const now = nowSeconds();
-    transition(cancelWalk(state, now), now);
+    if (state.committed === null) transition(cancelWalk(state, now), now);
   };
   const onKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== "Escape") return;
     const now = nowSeconds();
-    transition(cancelWalk(state, now), now);
+    if (state.committed === null) transition(cancelWalk(state, now), now);
   };
 
   canvas.addEventListener("pointermove", onPointerMove);
@@ -407,6 +412,10 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     update: (now: number): void => {
       const advanced = advanceWalk(state, now);
       if (advanced !== state) {
+        // Preserve the terminal heading without emitting a committed/idle
+        // presentation frame before the state transition has landed.
+        const terminalFacing = presentedWalkPosition(state, now).facing;
+        if (terminalFacing !== null) caretaker.setFacing(terminalFacing);
         const landing = state.committed === null
           ? null
           : portalLandingFor(space, state.committed.route);
@@ -427,7 +436,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       if (landedFootprints !== null) {
         const fade = Math.max(
           0,
-          1 - (now - landedFootprints.landedAt) / WALK_STAND_IN_BEAT_SECONDS,
+          1 - (now - landedFootprints.landedAt) / WALK_MOVE_SECONDS,
         );
         for (const footprint of footprints) {
           if (footprint.kind === "landed") {
@@ -459,7 +468,8 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.walkPace;
       delete stage.dataset.walkCursor;
       delete stage.dataset.walkOutline;
-      delete stage.dataset.walkClockStartedAt;
+      delete stage.dataset.walkCommittedAt;
+      delete stage.dataset.walkLandsAt;
       delete stage.dataset.walkSpace;
       delete stage.dataset.walkFadedRuns;
       delete stage.dataset.caretakerCell;
@@ -467,6 +477,8 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.caretakerPresented;
       delete stage.dataset.caretakerGait;
       delete stage.dataset.caretakerTrace;
+      delete stage.dataset.caretakerFacing;
+      delete stage.dataset.caretakerYaw;
     },
   };
 }
