@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-27
-revision: 5
-status: Written across Phase 5 stage 2, executing owner ruling D4; extended at Phase 7 with the external-boundary policy and at slice S1 with which world the one process serves. Pending owner acceptance at G5 and at the Phase 7 stop point.
+last_updated: 2026-09-04
+revision: 6
+status: Implemented server policy through S1 and the public-source cut; diagnostic fixture use clarified. Owner acceptance at G5 and the Phase 7 stop point remains pending in the carried record.
 public_safe: true
-summary: What the server's internal world-instance abstraction exists for after the D4 surgery, which world the one process serves and the two documents that decide it, the line a future scaling change may not cross, the enrollment password policy, the vocabulary rename still owed, the open gaps the surgery surfaced, and the versioning, migration, and rollback policy that takes effect when the external boundary activates.
+summary: One world, bootstrap and content declarations, credentials, persistence, vocabulary debt, external-boundary policy, and PostgreSQL proof.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -113,9 +113,11 @@ observation centre the client presents must be the square the served seed seats
 the controlled actor on, so a proof that signed into some other land fails
 instead of reporting success.
 
-The corpus scenarios under `content/test-corpus/` remain what they are — the
-conformance corpus the rules and simulation crates are proven against. They are
-not a world anyone serves.
+The corpus remains non-canonical conformance data, not the served-world
+declaration for the identity proof. Diagnostic harnesses may serve fixtures:
+`tools/run_pulse_capture.py` explicitly loads the `first_land_structure` corpus
+world, and `tools/run_fixture_land_capture.py` loads the compiled authoring
+fixture. Neither grants those fixtures production content authority.
 
 ## The line a scaling change may not cross
 

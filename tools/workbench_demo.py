@@ -48,6 +48,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from workbench import capture as capture_reader  # noqa: E402
 from workbench import capture_harness  # noqa: E402
 from workbench import imageops  # noqa: E402
+from workbench_integrity import carried_tree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 STARTUP_TIMEOUT_SECONDS = 15
@@ -293,7 +294,7 @@ def apply_act(base: str) -> dict:
 
 def rejection_act(base: str, selection_id: str) -> None:
     rule("and one Apply that is REFUSED — which is the more important half")
-    tree = carried_tree()
+    tree = carried_tree(ROOT)
     record = stage(
         base,
         {
@@ -310,8 +311,11 @@ def rejection_act(base: str, selection_id: str) -> None:
     print(f"  operation     {rejection['operation']['record_id']}  {rejection['operation']['verb']}")
     print(f"  assertion     {rejection['assertion']}")
     print(f"  record        {answer['path']}")
-    print(f"  carried tree  "
-          f"{'UNCHANGED' if carried_tree() == tree else 'CHANGED — THIS IS A DEFECT'}")
+    after = carried_tree(ROOT)
+    changed = sorted(name for name in tree.keys() | after.keys() if tree.get(name) != after.get(name))
+    if changed:
+        raise RuntimeError(f"rejected Apply changed carried files: {', '.join(changed)}")
+    print("  carried tree  UNCHANGED")
     post(base, "/api/retract", {"record_id": record["record_id"], "reason": "wrong cell"})
     print(f"  retracted     {record['record_id']} — the log keeps what was tried")
 
@@ -335,31 +339,6 @@ def accept_act(base: str, applied: dict) -> None:
     print(f"  {record['record_id']}  candidate {record['candidate_sha256'][:16]}")
     print(f"  grants        {json.dumps(record['grants'])}")
     print(f"  ceremony      {record['ceremony']}")
-
-
-def carried_tree() -> dict:
-    """A digest of every carried file, so "unchanged" is measured, not claimed.
-
-    A filesystem walk over everything `.gitignore` does not exclude, rather than
-    a listing of what git tracks: a file that is carried but not yet committed
-    is exactly the state a slice under review is in, and it must be as protected
-    as a committed one. It also needs no repository, which matters because this
-    demonstration is a verification step and runs inside the clean-copy proof.
-    """
-    skip = {".git"}
-    for line in (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines():
-        entry = line.split("#", 1)[0].strip()
-        if entry.endswith("/") and not entry.startswith("!"):
-            skip.add(entry.rstrip("/").lstrip("/"))
-    digests = {}
-    for path in ROOT.rglob("*"):
-        if not path.is_file() or path.is_symlink():
-            continue
-        relative = path.relative_to(ROOT)
-        if relative.parts[0] in skip:
-            continue
-        digests[str(relative)] = hashlib.sha256(path.read_bytes()).hexdigest()
-    return digests
 
 
 def main() -> int:

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-20
-revision: 1
-status: Complete. The logical half landed at Phase 4W; the gameplay-capture half at Phase 6W. Pending owner acceptance at the phase stop point.
+last_updated: 2026-09-04
+revision: 2
+status: Implemented at Phases 4W and 6W; owner acceptance remains at the recorded stop points. Audit documents explicit land selection and the verification owner.
 public_safe: true
-summary: The Selection Bridge — how to run it, what a selection packet carries, how a capture is taken and read, the two plan-level rulings this slice owed, the measured cost of every loop, and the criterion-to-test table for the whole of V0. The editing half is Workbench V1.
+summary: Workbench pointing, projection selection, packets, capture addressing, staleness, retention, and proof.
 routes:
   - tools/workbench/**
   - tools/workbench_demo.py
@@ -68,6 +68,14 @@ limit of this slice.
 ```bash
 cargo run -p tme-authoring            # produce the logical projection (once, ahead of time)
 python3 tools/workbench/serve.py      # serve both views on 127.0.0.1:8730
+```
+
+The default projection is the synthetic authoring fixture. To inspect the
+identity-proof land, select its tracked projection explicitly:
+
+```bash
+python3 tools/workbench/serve.py \
+  --projection content/lands/identity-proof/generated/workbench_projection.json
 ```
 
 `--port 0` picks a free port; `--root` points at another checkout; `--session`
@@ -233,7 +241,7 @@ The capture routes are the verification runner's **`capture` lane**
 composition, and never selected automatically by a changed path. That is the
 charter's third loop — an exact gameplay preview on demand — and keeping it out
 of `full` is what stops a workspace build from becoming the price of looking at
-a frame. See [AGENTS.md](../AGENTS.md#the-four-lanes).
+a frame. See [verification](verification.md#the-four-lanes).
 
 ### What a capture is
 

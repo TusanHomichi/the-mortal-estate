@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-03
-revision: 21
-status: Written across Phase 6 stage 2, extended at Phase 6W, and routed to its architecture owner at Phase 7; revision 13 records the browser feel packet's required prop elevation anchor; revision 14 makes the browser proofs read their packet from the environment and adds the packet capture tool; revision 15 records the interior camera; revision 16 records card normal sheets and the wrapped diffuse. Pending owner acceptance at the phase stop points.; revision 17 records the straight decode — no premultiplied round trip — that the normal sheets made necessary; revision 18 records the two-engine browser proofs; revision 19 the card-height placement key, the floor facing, and packet schema 3; revision 20 the live caretaker figure and packet schema 4; revision 21 the walk between pulses and packet schema 5
+last_updated: 2026-09-04
+revision: 22
+status: Implemented browser and retained Godot notes, audited against the current tree. Owner acceptance remains pending at the original phase stop points; target acceptance is separate.
 public_safe: true
-summary: The successor's credential model, wire and renderer seams, pulse presentation, and the browser feel surface's spaces, portals, fixtures, required prop elevation anchors, card normal sheets and wrapped diffuse, cursor, outdoor wind, exterior wall fade, and proof surfaces.
+summary: Current browser and Godot implementations, browser operation, wire and credential behavior, rendering, and proof surfaces.
 routes:
   - web/**
   - client/**
@@ -22,6 +22,62 @@ The standing architecture these decisions sit inside is
 [client architecture](client-architecture.md), and the visual target is
 [presentation direction](presentation-direction.md). Server-side counterparts
 live in [server notes](server-notes.md).
+
+## Current implementation
+
+| Surface | Implemented | Still outside it |
+| --- | --- | --- |
+| Browser (`web/`) | Three.js candidate-packet scene, local route drafting and beat, spaces and portals, live figure rigs and gait clips, lighting, wind, and camera comparison | Authentication, authoritative wire consumption, the accepted chrome/action interface, and its proportional layout |
+| Retained Godot shell (`client/`) | Sign-in, server wire codec, command reconciliation, diagnostic world view, and live/capture harnesses | Accepted production art and the browser feel role |
+
+The browser is the active feel surface. Its local passability and beat are
+experimental inputs, not gameplay authority. The September 3 chrome, actions,
+and scaling rulings are [targets](presentation-direction.md#chrome-and-actions),
+not completed features. `web/src/main.ts` still opens the feel scene directly,
+and `web/src/camera.ts::resizeFeelCamera` fixes vertical extent while deriving
+horizontal extent from aspect ratio; it does not yet enforce the ruled equal
+world extent across display shapes or derive it from the ruled nine cells.
+It still uses the earlier 6.313-unit frame constant. The layout slice must migrate that framing
+and its camera tests together and prove matched extents at the supported sizes.
+
+Unless a section explicitly says browser, the wire, credential, HUD, pulse, and
+capture implementation below describes the retained Godot shell. Its continued
+proof does not establish that the browser implements those contracts.
+
+## Browser operation and proof
+
+From the repository root:
+
+```bash
+npm --prefix web ci
+TME_FEEL_ASSETS=/absolute/path/outside-checkout npm --prefix web run dev
+```
+
+Use the loopback URL printed by Vite. `web/vite.config.ts` serves candidate
+assets only for the dev server, from an absolute directory outside the checkout.
+A static `web/dist/` build does not package or serve that private packet. An
+absent or refused packet produces the scene's absence banner.
+
+The browser uses query parameters, for example `?preset=night,wind&zoom=-1`;
+`web/src/presets.ts` owns their vocabulary and bounds. `TME_FEEL_PRESET` belongs
+to the retained Godot experiment, not this browser entry point.
+
+The [standing web lane](verification.md#browser-evidence) uses synthetic
+fixtures. These optional real-tab commands additionally need a candidate packet
+and Playwright's installed Chromium and Firefox, plus `DISPLAY` or Xvfb for
+Firefox. [The walk experiment](#the-web-feel-scenes-walk-experiment) records
+the engine launcher and incomplete-run behavior:
+
+```bash
+TME_FEEL_ASSETS=/absolute/path/outside-checkout node web/proof/walk-proof.mjs
+TME_FEEL_ASSETS=/absolute/path/outside-checkout node web/proof/capture-packet.mjs \
+  --out /absolute/capture/output --query preset=night --width 1280 --height 800
+```
+
+The walk proof uses a 1280 × 800 viewport and writes to `TME_CAPTURE_OUTPUT`
+or a named temporary directory. The capture command requires `--out` and accepts
+repeated `--query` values and explicit dimensions. These captures are evidence
+for review; passing them cannot accept art or close an owner gate.
 
 ## The credential model (owner ruling D7)
 
@@ -367,8 +423,8 @@ The browser feel scene's local experiment lets one click draft a direct route of
 one to three squares; an impassable step or farther target clears the draft
 instead of finding another way. A second click on that square or a double click
 commits it, another square re-drafts it, and Escape or right-click clears both a
-draft and an unlanded commitment. The caretaker stands on its current square
-until the next strike of one shared local beat, then the route lands whole;
+draft and an unlanded commitment. The caretaker's authoritative local square
+stays fixed until the next strike of one shared local beat, then the route lands whole;
 drafting remains free and a replacement commitment keeps that strike. Its
 packet-layout passability and three-second clock are disposable local stand-ins,
 with pure claims in `web/tests/` and the real-tab proof in
@@ -389,10 +445,6 @@ has one, otherwise an Xvfb the launcher starts and stops itself. An engine
 Playwright has not installed, or a Firefox with no display and no Xvfb,
 refuses the run with exit 3; `TME_PROOF_BROWSER=chromium|firefox` narrows a
 run to one engine for a quick look and is never how a proof is claimed.
-This is the opposite of `GridWorldView`'s
-spread-over-the-beat step: the owner's ruling governs the feel surface, and D5's
-permission for presentation to remain fluid between beats is permission, not a
-requirement.
 **The walk between pulses (owner direction, 2026-09-03; under the owner's
 judgment on the deployed preview).** Between the commit and the strike the
 figure is presented along the committed route from where it stood when it
@@ -420,9 +472,9 @@ least one committed frame was presented, the presented point never went
 backwards, the gait was the route's, and the figure stands idle on the
 target; it also photographs the pulse at whatever rate the engine manages
 (`walk-pulse-sequence.webp`). The pure function is
-`presentedWalkPosition` in `web/src/walk/walkIntent.ts`; the settled row
-"movement lands on the beat" keeps its authority half and its presentation
-half awaits the owner's ruling.
+`presentedWalkPosition` in `web/src/walk/walkIntent.ts`;
+[presentation direction](presentation-direction.md#movement-and-readiness)
+keeps the standing authority rule and the pending presentation verdict separate.
 Outdoors the camera stays centred on the caretaker and re-centres on each
 landing; inside a building it belongs to the space — centred on the room's
 grid and unmoved by landings — and follows the caretaker again on the way out
@@ -444,7 +496,7 @@ own height. A low, long thing rendered at the ruled angle is mostly its depth,
 and sizing it by its own height drew beds and tables doll-sized beside the
 caretaker; the render harness knows the projected height and the placement
 now carries it (owner ruling, 2026-09-03; the `nominal_height` key is retired and
-refused; schema 3 carried the change, schema 4 carries it on). The card centre is
+refused; introduced in schema 3 and retained in current schema 5). The card centre is
 the anchor plus half the card height for view-facing and wall-plane cards; a
 `floor` facing lays the card flat on its cell just above the ground, its up
 toward north, for things that are genuinely flat — a rug — never for anything
@@ -493,8 +545,9 @@ practical alike, uses one **wrapped diffuse**, `(N·L + w) / (1 + w)` with
 written into the wind card shader directly, so a card lit from the side or
 behind keeps a readable shadow side instead of going black. The patch refuses
 to build if a three upgrade moves that line. The kit cards' sheets come from a
-normal pass of the same render that produced their colour; the caretaker's is
-derived from its silhouette until the character pipeline renders it.
+normal pass of the same render that produced their colour. The current
+caretaker uses the live rig's geometry normals; its earlier card used a
+silhouette-derived normal sheet.
 Every sheet is decoded **straight, never premultiplied**
 (`createImageBitmap` with `premultiplyAlpha: "none"`, `web/src/space/textures.ts`).
 The browser's default round trip — premultiply on decode, un-premultiply on
@@ -571,7 +624,7 @@ it.
 
 ## Proof surfaces
 
-**The standing suite.** The whole client suite runs headless:
+**The retained Godot suite.** The suite runs headless:
 
 ```bash
 cd client && <godot> --headless --path . -s res://tests/run_all.gd
@@ -581,7 +634,7 @@ cd client && <godot> --headless --path . -s res://tests/run_all.gd
 one: `input_bindings` (what a key is bound to and the accessibility floor),
 `pointer_movement` (drafting a move and what authority does to the draft), and
 `world_shell_actions` (ground, inspection, exact server-offered actions, unsafe
-confirmation, the domain surfaces). They share `tests/shell_test_support.gd`,
+confirmation, the domain surfaces). They share `client/tests/shell_test_support.gd`,
 which holds every frame builder and screen helper as a static function and
 asserts nothing — a helper that asserted would put a failure in a file whose name
 says nothing about what failed.
@@ -642,8 +695,8 @@ server frame to replay. Re-record both together; see
 
 **The pulse capture.** `tools/run_pulse_capture.py` is the visible half of the
 live proof. The live proof runs headless and therefore has no picture; this one
-serves the same corpus land under a virtual display and photographs the window at
-three known points inside **one** beat:
+serves the `first_land_structure` corpus fixture under a virtual display and
+photographs the window at three known points inside **one** beat:
 
 ```bash
 tools/run_pulse_capture.py \
@@ -661,6 +714,9 @@ independent statements of one fact agreeing, not a constant compared with
 itself.
 
 ## What these phases did not do
+
+These are limitations of the retained Godot world-view implementation, not a
+claim that the separate browser experiment contains no rendering or candidate art.
 
 - **No renderer, still.** The presentation scaffold retired with its assets.
   `GridWorldView` is a diagnostic lattice with real targeting; it is not the

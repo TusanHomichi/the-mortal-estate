@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-19
-revision: 1
-status: Ported at the G1 to G2 boundary; pending owner acceptance at G2.
+last_updated: 2026-09-04
+revision: 2
+status: Working authoring standard ported at G1–G2; original owner-acceptance qualification retained. Audit links implemented instances without claiming all obligations are complete.
 public_safe: true
-summary: The successor's contract-first authoring standard for geography, authoring artifacts, conformance, validation, and owner taste gates.
+summary: Contract-first geography and asset authoring, conformance, validator qualification, and owner taste gates.
 routes:
   - crates/tme-authoring/**
 ---
@@ -50,10 +50,12 @@ names something this project has not built yet, it states the obligation in the
 future tense and names who owes it. If a passage only makes sense with context
 outside this file, that is a defect in this document.
 
-Nothing here is instantiated yet. This project has no validators, no
-verification runner, no blueprints, and no evidence convention at the time of
-the port. Every "the validator blocks on..." below is a specification for work
-not yet done, not a description of a running check.
+At the time of the port none of this was instantiated. The project now has
+qualified [boundary checks](boundary-checks.md), an
+[authoring compiler](authoring-compiler.md), a [Workbench](workbench-v1.md), and
+a [verification baseline](verification.md). Those owners state what exists and
+what is proven. The method below still includes unimplemented obligations;
+reading a requirement here does not establish that its validator exists.
 
 ## 1. Problem
 

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-03
-revision: 5
-status: Owner-authorized standing contract. Revision 3 records the browser-first ruling — the web client's baseline, its feel-surface role, and the retained Godot shell's standing — under the contract's full-re-proof rule; revision 4 records the desktop client as the web client in a native shell; revision 5 the two-engine rule for real-tab proofs.
+last_updated: 2026-09-04
+revision: 6
+status: Owner-authorized browser-first contract; documentation audit separates the accepted layout target from current client implementations.
 public_safe: true
-summary: The client's standing architecture contract — engine baseline, the three state domains, control and wire consumption, command reconciliation and the epoch cursor, the renderer seam, the accessibility floor, the desktop targets, and the five layers of client proof.
+summary: Client authority, browser and Godot baselines, state domains, wire consumption, accessibility, and proof obligations.
 routes:
   - web/**
   - client/**
@@ -58,7 +58,8 @@ constraints:
    interpolates inside it. It never extrapolates past what it measured, and it
    draws no fill at all until an interval has been observed.
 
-One owner holds all three: `client/presentation/pulse_clock.gd`. Every surface
+In the retained Godot implementation, one owner holds all three:
+`client/presentation/pulse_clock.gd`. Every surface
 that presents the beat — the meter, the world view, the feedback director — is
 handed that one account, so they cannot describe different beats. The
 implementation and its refusals are
@@ -88,11 +89,13 @@ Its baseline:
   is consumed rather than re-implemented. Until that lands, the web client
   carries no wire consumption, and any interim TypeScript codec is a verified
   mirror proven against `tests/fixtures/wire/` exactly as the GDScript one is.
-- Presentation is judged at the `1280 × 800` minimum play surface in the tab.
-  Candidate art reaches the client only through a digest-bound packet named
+- The accepted layout and display-scaling target is owned by
+  [presentation direction](presentation-direction.md#proportional-scaling);
+  [client notes](client-notes.md#current-implementation) separates that target
+  from the current browser proof surface. Candidate art reaches the client
+  only through a digest-bound packet named
   out of band (`TME_FEEL_ASSETS` at the dev server), never a tracked path —
-  the same rule [presentation direction](presentation-direction.md#the-in-engine-feel-scene)
-  states for the Godot feel scene.
+  the [candidate-asset rule](presentation-direction.md#candidate-assets).
 - Verification is a lane of its own: the `web` scope in
   `tools/run_verification.py`, gated on the `node` capability, running
   install, typecheck, unit tests, and build; `UNAVAILABLE` without Node.

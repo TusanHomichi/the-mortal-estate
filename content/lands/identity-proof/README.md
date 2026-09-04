@@ -1,10 +1,10 @@
 # The identity proof's land — authored, compiled, and served
 
 This directory is the first authored land in this project that a **runtime
-loads**. Everything the server serves for the identity proof is derived from
-`settlement.tmj` by `cargo run -p tme-authoring`, and nothing else in this
-directory is hand-written except the promotion receipt and the served-world
-declaration.
+loads**. The compiled geography is derived from `settlement.tmj` by
+`cargo run -p tme-authoring`. The simulation seed, promotion receipt, and
+served-world declaration are authored inputs; the selected catalog lives
+outside this directory. Only `generated/` is compiler output.
 
 ## What is here
 

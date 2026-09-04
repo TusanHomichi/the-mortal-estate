@@ -24,15 +24,20 @@ deleted afterwards, and the tracked tree is compared before and after.
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
+import io
 import json
+import os
 import shutil
 import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from workbench_test_support import REPO_ROOT, TOOLS
+from boundary_test_support import BoundaryTestCase
 
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
@@ -40,6 +45,7 @@ if str(TOOLS) not in sys.path:
 from workbench import apply as apply_module  # noqa: E402
 from workbench import bridge  # noqa: E402
 from workbench import imageops  # noqa: E402
+from workbench_integrity import carried_tree  # noqa: E402
 from workbench import operations as operation_log  # noqa: E402
 from workbench import replay as replay_module  # noqa: E402
 from workbench.packet import now  # noqa: E402
@@ -58,7 +64,7 @@ FIXTURE_LAND = "authoring_fixture"
 
 MASTER = "content/authoring-fixture/fixture-surface.tmj"
 RECEIPT = "content/authoring-fixture/promotion.json"
-DIGEST_CONSTANT = "crates/tme-authoring/src/promotion.rs"
+DIGEST_CONSTANT = "crates/tme-authoring/src/contract/fixture.rs"
 ASSET = "content/authoring-fixture/fixture-swatch.png"
 PROVENANCE = "content/authoring-fixture/asset-provenance.json"
 
@@ -72,37 +78,99 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def ignored_roots() -> tuple[str, ...]:
-    """The directory roots `.gitignore` declares, read from the file itself."""
-    entries = []
-    for line in (REPO_ROOT / ".gitignore").read_text(encoding="utf-8").splitlines():
-        entry = line.split("#", 1)[0].strip()
-        if entry.endswith("/") and not entry.startswith("!"):
-            entries.append(entry.rstrip("/").lstrip("/"))
-    return (".git", *sorted(set(entries)))
+class CarriedSourceIntegrity(BoundaryTestCase):
+    """Break scratch sources and local output independently of real Apply."""
 
+    def test_ignored_output_and_nested_repositories_do_not_change_snapshot(self) -> None:
+        self.repo.write(".gitignore", "/web/node_modules/\n/target/\n*.py[cod]\n")
+        self.repo.write("client/.gitignore", ".godot/\n")
+        self.repo.write("source.py", "accepted\n")
+        self.repo.track(".gitignore", "client/.gitignore", "source.py")
+        before = carried_tree(self.repo.path)
+        for name in ("web/node_modules/pkg/index.js", "target/debug/build",
+                     "client/.godot/cache", "nested/cache.pyc"):
+            self.repo.write(name, "disposable\n")
+        nested = self.repo.path / "agents/nested"
+        nested.mkdir(parents=True)
+        subprocess.run(["git", "init", "-q", str(nested)], check=True)
+        (nested / "source.py").write_text("another repository\n")
+        # A linked worktree has a .git file, not a directory. Both are boundaries.
+        identity = {f"GIT_{role}_{field}": value
+                    for role in ("AUTHOR", "COMMITTER")
+                    for field, value in (("NAME", "Fixture"), ("EMAIL", "fixture@example.invalid"))}
+        subprocess.run(["git", "-C", str(self.repo.path), "commit", "-qm", "fixture"],
+                       env={**os.environ, **identity}, check=True, capture_output=True)
+        self.repo._git("worktree", "add", "--detach", "agents/linked", "HEAD")
+        self.repo.write("agents/linked/web/node_modules/pkg/index.js", "unrelated\n")
+        self.assertEqual(carried_tree(self.repo.path), before)
 
-def carried_tree() -> dict[str, str]:
-    """Every carried file and its digest — "unchanged" measured, not claimed.
+    def test_nested_negation_and_force_tracked_ignored_files_remain_protected(self) -> None:
+        self.repo.write(".gitignore", "*.cache\n")
+        self.repo.write("nested/.gitignore", "*.txt\n!keep.txt\n")
+        self.repo.write("nested/hidden.txt", "ignored\n")
+        self.repo.write("nested/keep.txt", "untracked source\n")
+        self.repo.write("source.cache", "explicitly carried\n")
+        self.repo._git("add", "-f", "source.cache")
+        snapshot = carried_tree(self.repo.path)
+        self.assertIn("nested/keep.txt", snapshot)
+        self.assertIn("source.cache", snapshot)
+        self.assertNotIn("nested/hidden.txt", snapshot)
 
-    A filesystem walk rather than `git ls-files`, for two reasons. It is
-    STRONGER: it covers files that are carried but not yet committed, which is
-    exactly the state a slice under review is in, and a stray write into one of
-    them would be invisible to a tracked-only listing. And it needs no `.git` —
-    the clean-clone proof runs this suite inside a copy of the carried set with
-    no repository at all, and a test that shelled out to git there would error
-    on the one lane whose whole point is that the tree stands on its own.
-    """
-    skip = ignored_roots()
-    digests: dict[str, str] = {}
-    for path in REPO_ROOT.rglob("*"):
-        if not path.is_file() or path.is_symlink():
-            continue
-        relative = path.relative_to(REPO_ROOT)
-        if relative.parts[0] in skip:
-            continue
-        digests[str(relative)] = digest(path)
-    return digests
+    def test_source_edits_additions_and_deletions_change_snapshot(self) -> None:
+        self.repo.write("tracked.py", "original\n")
+        self.repo.track("tracked.py")
+        self.repo.write("untracked.py", "original\n")
+        for name in ("tracked.py", "untracked.py"):
+            with self.subTest(name=name):
+                before = carried_tree(self.repo.path)
+                path = self.repo.write(name, "mutated\n")
+                self.assertNotEqual(carried_tree(self.repo.path), before)
+                before = carried_tree(self.repo.path)
+                path.unlink()
+                self.assertNotEqual(carried_tree(self.repo.path), before)
+        before = carried_tree(self.repo.path)
+        self.repo.write("new.py", "stray source write\n")
+        self.assertNotEqual(carried_tree(self.repo.path), before)
+
+    def test_clean_copy_uses_the_same_inventory_after_its_fresh_git_init(self) -> None:
+        from run_clean_clone_proof import populate
+        from boundary_test_support import TempRepo
+
+        self.repo.write(".gitignore", "/web/node_modules/\n")
+        self.repo.write("tracked.py", "accepted\n")
+        self.repo.track(".gitignore", "tracked.py")
+        self.repo.write("untracked.py", "under review\n")
+        self.repo.write("web/node_modules/pkg/index.js", "dependency\n")
+        copied = TempRepo()
+        self.addCleanup(copied.cleanup)
+        populate(copied.path, self.repo.path)
+        copied._git("add", "-A")
+        self.assertEqual(carried_tree(copied.path), carried_tree(self.repo.path))
+
+    def test_missing_git_metadata_fails_instead_of_claiming_unchanged(self) -> None:
+        from boundary_common import ConfigError
+
+        shutil.rmtree(self.repo.path / ".git")
+        with self.assertRaises(ConfigError):
+            carried_tree(self.repo.path)
+
+    def test_demo_rejects_a_source_mutation_instead_of_only_printing_it(self) -> None:
+        import workbench_demo
+
+        self.repo.write("untracked.py", "before\n")
+
+        def mutate_source(*_args):
+            self.repo.write("untracked.py", "after\n")
+            return {"apply_id": "apply-test", "path": "rejection.json", "record": {
+                "stage": "validate", "assertion": "rejected", "operation": {
+                    "record_id": "operation-test", "verb": "move_landmark"}}}
+
+        with mock.patch.object(workbench_demo, "ROOT", self.repo.path), \
+                mock.patch.object(workbench_demo, "stage", return_value={"record_id": "operation-test"}), \
+                mock.patch.object(workbench_demo, "post", side_effect=mutate_source), \
+                contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, "changed carried files: untracked.py"):
+                workbench_demo.rejection_act("http://unused.invalid", "selection-test")
 
 
 class V1Session(unittest.TestCase):
@@ -207,11 +275,11 @@ class ReplayIsDeterministic(V1Session):
 class ApplyIsAtomic(V1Session):
     def test_a_rejected_apply_leaves_the_carried_tree_byte_identical(self) -> None:
         """The whole tree, file by file — the claim Apply makes about failure."""
-        before = carried_tree()
+        before = carried_tree(REPO_ROOT)
         self.stage("move_landmark", BAD_MOVE)
         applied = self.apply()
         self.assertFalse(applied.accepted)
-        self.assertEqual(carried_tree(), before)
+        self.assertEqual(carried_tree(REPO_ROOT), before)
 
     def test_a_rejected_apply_writes_the_rejection_record_and_nothing_else(self) -> None:
         """Kills a half-written candidate somebody could mistake for an outcome.

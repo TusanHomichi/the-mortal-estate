@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-08-27
-revision: 4
+last_updated: 2026-09-04
+revision: 5
 status: Owner-ruled Phase 10 packet. Section 13 records the 2026-08-21 rulings; S1 and S8 are implemented; the remaining S3-first order is bracketed by the presentation experiment, and the clean public-source ruling clarifies that its public-snapshot debt binds G11 release rather than source publication.
 public_safe: true
 routes:
@@ -10,6 +10,11 @@ summary: The ruled design packet for the charter's first identity proof — its 
 ---
 
 # The identity proof — design packet
+
+For the current pause and the separately authorized browser feel work, start
+with the [genesis checkpoint](genesis-ledger.md#current-checkpoint-2026-09-04).
+The implementation audit and file-line evidence below describe this packet's
+original baseline; they are not a current code index or permission to resume.
 
 ## §0 How to read this
 

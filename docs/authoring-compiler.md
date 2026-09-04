@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-21
-revision: 2
-status: Lane-authored at Phase 4; the fixture it compiles was owner-accepted at G4X (2026-08-19). Extended at slice S1 to compile a table of lands, of which the identity proof's is the first a runtime loads; its geography was owner-accepted on 2026-08-21 after a shape pass.
+last_updated: 2026-09-04
+revision: 3
+status: Compiler and land contracts; fixture accepted at G4X and identity-proof geography at S1. Audit clarifies diagnostic serving and remaining report obligations.
 public_safe: true
-summary: The authoring compiler's six properties, the land table it compiles, its fail-closed classes, the mutant that qualifies each one, and the staged-operation vocabulary the Workbench edits authored documents through.
+summary: Land declarations, compiler commands, promotion, deterministic output, Workbench operations, and proven rejection classes.
 routes:
   - crates/tme-authoring/**
   - content/lands/**
@@ -25,8 +25,8 @@ to the compiler.
 
 | Land | Members | Runtime | Attestation |
 | --- | --- | --- | --- |
-| `authoring_fixture` ([directory](../content/authoring-fixture/README.md)) | `surface`, `interior` | never loaded | owner-accepted at G4X |
-| `identity_proof` ([directory](../content/lands/identity-proof/README.md)) | `settlement` | **the world the server serves** | owner-accepted at S1 |
+| `authoring_fixture` ([directory](../content/authoring-fixture/README.md)) | `surface`, `interior` | diagnostic capture only; no production content authority | owner-accepted at G4X |
+| `identity_proof` ([directory](../content/lands/identity-proof/README.md)) | `settlement` | served through its explicit world declaration | owner-accepted at S1 |
 
 The fixture carries **zero content authority** — it exists so the compiler and
 the Workbench have an honest logical target, and it deliberately names nothing
@@ -318,8 +318,8 @@ Recorded rather than papered over.
    no instance here. The fixture is geography only; those artifacts arrive with
    the boundaries that consume them.
 6. **No agent-played first-playthrough report.** The standard requires one in a
-   geography round's evidence packet. This project has no runtime harness to
-   produce it. The gap is carried explicitly rather than the requirement being
+   geography round's evidence packet. The existing live and capture harnesses
+   prove bounded interactions; they do not produce that report. The gap is carried explicitly rather than the requirement being
    dropped.
 
 ## Running it

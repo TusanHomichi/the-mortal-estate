@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-02
-revision: 5
-status: Authored at genesis plan Phase 7, replacing the predecessor's workflow contract rather than editing it; amended after the 2026-08-20 CI disk exhaustion with the measured disk budget and the two-job CI composition; revision 5 records working in a linked worktree and the write/run split for sandboxed helpers. Pending owner acceptance at the phase stop point.
+last_updated: 2026-09-04
+revision: 6
+status: Working contract from Phase 7; owner acceptance remains at its recorded stop point. Audit clarifies context loading and verification ownership.
 public_safe: true
-summary: How work is scoped, authored, proven, and closed out here — document families and precedence, the drift rule, implementer autonomy, the refactor threshold, the no-compatibility-adapters default, where authoring a gameplay spec starts, the three verification lessons, the CI contract, and the measured disk budget the two CI jobs fit inside.
+summary: Scope, context loading, document precedence, implementation rules, verification lessons, CI, and closeout.
 always: true
 ---
 
@@ -15,6 +15,24 @@ without reopening settled decisions or widening a slice by accident.
 The contract is deliberately light. It exists to answer four questions: what owns
 this fact, where does this work start, what proves it, and what does finishing
 mean.
+
+## Context loading
+
+Read `AGENTS.md` once, then use `tools/agent_context.py --path <path>` for the
+files in scope. The router prints navigation metadata, not document bodies.
+Read each selected owner's relevant sections and expand into code, tests, and
+linked evidence as the task requires. Standing (`always`) documents remain
+applicable; that does not require copying their whole bodies into every brief.
+
+For resumption, read the current checkpoint in the
+[genesis ledger](plans/genesis-ledger.md), then the specific active plan only
+if this task touches it. A historical plan, a local memory, or an agent-specific
+configuration does not override a maintained owner or authorize a paused slice.
+
+Keep agent-specific entry files as pointers to this shared contract. Machine
+paths, credentials, installed MCP servers, and disposable lab state belong in
+local configuration, not repository-wide instructions. A handoff names the
+objective, owners, evidence, and next step; it does not repeat the manual.
 
 ## Slice workflow
 
@@ -39,25 +57,14 @@ message, and not in a conversation.
 
 Every document belongs to exactly one family:
 
-- **Contract** — [AGENTS.md](../AGENTS.md) and this file. Contract owns mandatory
-  workflow, boundaries, and standing verification. `CLAUDE.md` is a shim: it
-  points, it never adds a rule.
-- **Canonical** — the maintained owners. Each present fact class has exactly one
-  asserting owner:
-
-  | Document | Owns |
-  | --- | --- |
-  | [boundary-map.md](boundary-map.md) | who may mutate which fact class |
-  | [public-boundary-policy.md](public-boundary-policy.md) | external material, provenance, the public cut |
-  | [boundary-checks.md](boundary-checks.md) | the five fail-closed checks and their qualification |
-  | [authoring-contracts.md](authoring-contracts.md) | the contract-first authoring standard |
-  | [authoring-compiler.md](authoring-compiler.md) | authored document to proven runtime content |
-  | [server-notes.md](server-notes.md) | the implemented server decisions and the external-boundary policy |
-  | [client-architecture.md](client-architecture.md) | the client's standing architecture contract |
-  | [client-notes.md](client-notes.md) | the implemented client decisions |
-  | [presentation-direction.md](presentation-direction.md) | the visual target |
-  | [workbench-v0.md](workbench-v0.md) | the owner-agent spatial reference tool |
-  | [settled-conclusions.md](settled-conclusions.md) | what is closed and should not be re-litigated |
+- **Contract** — [AGENTS.md](../AGENTS.md), this file, and
+  [verification usage](verification.md). They own the entry rules, detailed
+  workflow, and how to run the baseline respectively. `CLAUDE.md` imports the
+  entry point and adds no rule. The runner owns the executable step table.
+- **Canonical** — maintained fact owners listed in
+  [the routing table](../AGENTS.md#read-first). Each fact has one asserting
+  owner; the router locates it. The settled-conclusions index links to those
+  owners and does not restate their detailed rulings.
 
 - **Planning** — a spec bounds the intended target; its plan owns execution order
   and proof. Neither is implemented truth before closeout, and a plan cannot
@@ -70,7 +77,8 @@ Resolve conflicting claims in this order:
 
 1. an explicit owner ruling;
 2. the charter and later owner-approved product direction;
-3. the Contract family — `AGENTS.md`, then this file;
+3. the Contract family — `AGENTS.md`, then this workflow and verification usage
+   in their respective scopes;
 4. the sole Canonical owner of the fact;
 5. an approved spec and its plan, for bounded in-flight work;
 6. History, as evidence of what happened — never an override.
@@ -95,6 +103,12 @@ step 2.
 serves: death as play, lineage continuity, the shared pulse, social dependence,
 dangerous geography, or the world's memory. A system that strengthens none of
 them is a scope question for the owner, not a spec.
+
+The checkout's product identity is in [README.md](../README.md); carried
+charter rulings are located through the [boundary map](boundary-map.md) and
+[genesis ledger](plans/genesis-ledger.md). There is no standalone charter file
+in this tree. If a needed ruling is not carried, ask the owner to supply that
+decision; a private archive is not an implicit prerequisite for starting work.
 
 **2. The reopened list.** Check [boundary-map.md](boundary-map.md) Part 2 and the
 charter's open-decisions list. If this system's values sit on either, the spec is
@@ -202,9 +216,9 @@ failure:
 Split by responsibility, not by line count. Migrate tests, fixtures, and goldens
 in the same cut, under the no-half-migration rule.
 
-Two files in this tree already sit above the first tier and are recorded as
-carried debt rather than pretended away; they are tracked on the repository's
-issue list.
+Existing oversized owners are debt, not exemptions. Check the size of the
+actual file being touched and its recorded decomposition work; a dated count
+of oversized files is not the current inventory.
 
 ## No compatibility adapters
 
@@ -244,10 +258,9 @@ version number. The policy that applies after activation is owned by
 ## Verification
 
 `tools/run_verification.py` owns the step table and the lanes;
-[AGENTS.md](../AGENTS.md) owns how to drive it. Three lessons about verification
-are owned here, because they are about method rather than commands. All three
-were paid for in real failures, and all three are honoured by artifacts in this
-tree.
+[verification usage](verification.md) owns how to drive it. The lessons below are
+owned here because they concern method rather than commands. Their evidence
+remains with the relevant proof.
 
 ### Prove the real path, not a reconstruction of it
 
@@ -327,15 +340,16 @@ fail-closed path is an assumption, not a guarantee. This is principle P9 of
 
 ### Working in a linked worktree
 
-An agent session usually runs in a linked worktree under `.claude/worktrees/`,
-not the main checkout. A fresh worktree lacks three things the lanes need, and
-each has one answer: the web dependencies (`npm ci`, which the `web` lane runs
-itself), the engine's class cache (rebuilt with the import command in the
-agent guide), and the private denylist, which the boundary check and the
-runner now resolve from the main checkout automatically. Build and deploy
-only from your own worktree, never from a checkout another agent is editing;
-a commit made there while its files are moving is a commit of someone else's
-half-finished work.
+Check `pwd`, `git status --short`, and `git rev-parse --show-toplevel` before
+editing. A session may use the main checkout or a linked worktree; no agent
+provider or directory name establishes which one. A fresh worktree lacks three
+things the lanes need: web dependencies (`npm ci`, run by the web lane),
+the engine's class cache (rebuilt by the client lane or the
+[import command](verification.md#capabilities)), and the private denylist
+(resolved from the main checkout when absent locally). Build and deploy only
+from your own worktree, never from a checkout another agent is editing;
+work there can mix with someone else's unfinished changes. Creating a
+worktree and all other Git lifecycle work remain owner-authorized actions.
 
 ### Helpers that cannot open a socket or a browser
 
@@ -363,10 +377,14 @@ and each of these cost a re-run or a send-back before it was written down.
   `EAGAIN` signature that is green on a quiet box (successor #15). A lane waits
   for the load to fall before its full run, and the supervisor's own full run on
   the final commit is the one that counts.
-- **The full scope outlives a tool's foreground limit.** Run it detached
-  (`setsid nohup … &`) with the exit code appended to its log, and watch the
-  log. A run killed from outside leaves no step summary, because the summary is
-  printed at the end.
+- **Freeze the carried tree during integrity proof.** Finish documentation and
+  source edits before running a suite that compares the tree before and after
+  an operation. The Workbench Apply test hashes documents too; an unrelated
+  edit during that interval is a real tree change and makes the proof unusable.
+  The September 4 documentation audit reproduced this with a workflow edit.
+- **The full scope can outlive a tool's foreground limit.** Follow
+  [process lifetime](verification.md#process-lifetime); retain its exit code and
+  log. A run killed from outside leaves no final step summary.
 - **A brief describes the invariant, not the guard.** "Reject a frame whose
   `ready_at` precedes its current time" would have broken idle play: in the
   rules, `ready_at <= now` *is* the ready state. Say "fail closed on an
@@ -383,7 +401,8 @@ and each of these cost a re-run or a send-back before it was written down.
 
 ## GitHub, CI, and issues
 
-The repository is `ConaryLabs/the-mortal-estate`.
+Resolve the current repository from `git remote get-url origin` and confirm it
+with `gh repo view --json nameWithOwner` before GitHub lifecycle work.
 
 `.github/workflows/verify.yml` runs on every pull request and on pushes to `main`.
 It has **two jobs**, and between them they run the complete lane: one runs
@@ -391,7 +410,7 @@ everything this checkout can prove, the other runs the clean-clone proof. Why
 two rather than one is [The disk budget](#the-disk-budget) below.
 
 ```
-python3 tools/run_verification.py --scope portable --scope client --scope gated --allow-unavailable --report-disk
+python3 tools/run_verification.py --scope portable --scope web --scope client --scope gated --allow-unavailable --report-disk
 python3 tools/run_verification.py --scope cleanclone --allow-unavailable --report-disk
 ```
 
@@ -437,8 +456,9 @@ They were absent until the whole-tree reformat landed on its own commit
 (private-archive issue #5), which is the order that issue asked for.
 
 Branch protection is an owner action and is not configured from the repository.
-It now requires **both** jobs; a rule naming only `verify` would let the
-clean-clone proof fail without blocking a merge.
+The required setup names **both** jobs; a rule naming only `verify` would let
+the clean-clone proof fail without blocking a merge. The tracked workflow and
+its tests do not prove the current remote branch-protection settings.
 
 ### The disk budget
 

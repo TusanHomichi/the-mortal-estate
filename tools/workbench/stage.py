@@ -13,7 +13,7 @@ this file — read `docs/workbench-v1.md` for the record shape and write it.
 just friction:
 
     python3 tools/workbench/stage.py open
-    python3 tools/workbench/stage.py verbs --session <session>
+    python3 tools/workbench/stage.py verbs
     python3 tools/workbench/stage.py point --session <session> --click 6,11
     python3 tools/workbench/stage.py add --session <session> --selection sel-0001 \\
         --verb move_landmark --parameters '{"landmark_id":"fixture_ruin_marker","to":{"x":6,"y":11}}'
