@@ -31,8 +31,8 @@ not a precedent.
 | `asset-provenance.json` | What that asset is, its digest and palette, and the authority it does **not** carry |
 
 The two members are Tiled JSON maps. They carry **no tileset image**: this
-project retired its predecessor's visual corpus and has accepted no successor
-visual vocabulary, so a tile class here is a NAME and nothing more. Opening
+project retired its predecessor's visual corpus and has accepted no visual
+master for this fixture, so a tile class here is a NAME and nothing more. Opening
 either file in Tiled shows correct geometry and blank tiles, which is the
 honest picture of where the project actually is.
 
@@ -68,7 +68,7 @@ master's second anchor exists because a compiled land reaches the runtime.
 ## Editing rules
 
 - The master's digest is pinned in **two** places: this directory's
-  `promotion.json` and a constant in `crates/tme-authoring/src/promotion.rs`.
+  `promotion.json` and the land contract in `crates/tme-authoring/src/contract/fixture.rs`.
   Changing a member means changing both, deliberately, in one commit.
 - `generated/` is written by `cargo run -p tme-authoring`. `--check` proves the
   tracked bytes are exactly what a fresh run would write, so a hand edit and a

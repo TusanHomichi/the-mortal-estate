@@ -28,9 +28,14 @@ development record and frozen private predecessor remain private and are not
 part of this repository. Publishing this source did not release a game, client,
 service, public API, or content snapshot. Where the work stands, phase by phase,
 is the
-[genesis ledger](docs/plans/genesis-ledger.md).
+[genesis ledger](docs/plans/genesis-ledger.md#current-checkpoint-2026-09-04).
+For what the clients implement now, read
+[client notes](docs/client-notes.md#current-implementation);
+[presentation direction](docs/presentation-direction.md) owns the accepted target.
 
 ## Working here
+
+Repository: [TusanHomichi/the-mortal-estate](https://github.com/TusanHomichi/the-mortal-estate).
 
 [AGENTS.md](AGENTS.md) is the first stop: the routing table, the operating
 rules, and the verification baseline.

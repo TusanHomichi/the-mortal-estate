@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-03
-revision: 31
-status: Owner-accepted visual target. Revision 23 records the viewport frame ruling, the prop scale ruling, the roof-weight direction, and the painted scene references as review candidates; revision 24 records the interior camera ruling; revision 25 records the chrome rulings — the screen's structure, its materials, the three gauges, and the log on the world; revision 26 records the action rulings — no button row, three readied spells, the warmed-spell crosshair, and floating effect icons; revision 27 records the accepted chrome layout; revision 28 records proportional scaling — the same world for every resolution; revision 29 records the visible cell count and the ultrawide treatment; revision 30 records the projection reaffirmed after the in-engine reference comparison; revision 31 records live characters — rigged meshes in the client, superseding cards for that class; no renderer, asset set, or production pipeline is accepted.
+last_updated: 2026-09-04
+revision: 32
+status: Owner-accepted visual target through the September 3 cell-count, ultrawide, projection reaffirmation, and live-character rulings. Superseded directions consolidated; no production presenter, asset set, or pipeline accepted.
 public_safe: true
-summary: The owner-accepted orthographic 2:1 dimetric target with visible-joint tile and relative-scale grammar, ordinary world-up structural geometry, card-based things, rooted shared-field vegetation wind, calm-field texture discipline, dedicated interiors, always-on exterior roofs, and the production rule and bounded-experiment context used to judge future presentation evidence.
+summary: Accepted visual grammar, construction, camera, chrome, actions, scaling, candidate rules, and unresolved taste decisions.
 routes:
   - web/**
   - client/presentation/**
@@ -17,28 +17,10 @@ getting there. The client's architecture is
 [client architecture](client-architecture.md); what is currently implemented is
 [client notes](client-notes.md).
 
-Earlier revisions established the charter-level direction, the bounded target
-packet, its evidence order, the first owner-selected projection, and the
-surface-pattern correction found while calibrating it. Revision 5 records the
-owner's exact packet acceptance. Revision 6 records the then-current
-high-oblique projection and screen-cell contract, both now superseded by
-Revision 12. Revision 7 records the relational scale discipline that survives
-that replacement and makes logical cells a common ruler rather than a common
-object size.
-Revision 8 recorded the now-superseded roof-off consequence; its cell-ruler
-conclusion survives, so footprint, wall, opening, and roof modules — not a
-whole-building card — establish scale. Revision 9 records the projection consequence: every elevated subject
-uses one shared diagonal screen direction for height while the tile plane remains
-screen-aligned. Revision 10 makes the structural construction consequence
-explicit: base runs remain H/V and corresponding elevated vertices use that
-shared direction. Revision 11 records the generated-source isolation and alpha
-validation rule proven during disposable visual iteration. Revision 12 records
-the owner's selection of the 2:1 dimetric challenger after native-size real-3D
-projection and matched production-art comparisons. Revision 13 scopes the old
-browser-first order to its paused experiment and removes the now-settled camera
-pitch from the open calibration list. The visual target is still the owner's to
-set, and this document is where the owner's version is recorded — not where an
-agent manufactures acceptance.
+Read the target and the applicable ruling below. Superseded camera,
+cutaway, and interface proposals remain historical evidence, not parallel
+implementation choices. The [paused experiment](#paused-experiment-presenter-evidence-order)
+has a separate stop line from the active browser feel work.
 
 ## The target
 
@@ -80,11 +62,12 @@ width is twice its full screen height. The choice is dimetric rather than true
 isometric: the shallower camera presents actors and vertical structures more
 frontally while retaining an orthographic 3D world.
 
-Standing geometry uses ordinary world up. Actors, walls, doors, posts, props,
-trees, and monsters receive no camera-facing shear and no shared northwest lean.
-Their volumetric construction, animation, lighting, self-occlusion, and shadows
-remain coherent in world space. Facing rotates a subject around world up; it does
-not change that subject's up direction or turn it into a billboard.
+Standing source geometry uses ordinary world up. Actors, walls, doors, posts,
+props, trees, and monsters receive no camera-facing shear or shared northwest
+lean in their three-dimensional construction. Facing rotates the source around
+world up. The later [construction ruling](#construction-and-viewport) determines
+which subjects remain runtime geometry and which are rendered into cards; it
+does not introduce compensation into the source model.
 
 An actor's feet/contact sit at the centre of its authoritative square ground
 cell. A nearby wall edge or doorway threshold does not replace or move that
@@ -112,9 +95,10 @@ wear, growth, breakage, or relief only where the surface calls for them. Repeate
 swirls, decorative meanders, and uniform high-frequency texture are generation
 defects to correct, not characteristics to preserve.
 
-This ruling selects the packet's visual projection. It does **not** select a
-renderer, engine, platform, logical-to-screen implementation, or production
-tool. Those remain downstream evidence questions.
+This camera ruling alone selected no engine, platform, or production tool.
+The later [browser-first contract](client-architecture.md#the-web-client) owns
+the current client choice; production presenter and tool acceptance still
+require the evidence gate below.
 
 **Reaffirmed (owner, 2026-09-03).** The owner asked to revisit the camera
 once more before locking it, this time in engine rather than by paintover:
@@ -407,22 +391,12 @@ is a claim that has to survive the same micro-scene gate as any new proposal.
 
 ## What is implemented today
 
-Nothing that is art. The current world view is a **diagnostic lattice**: flat
-colours, one rectangle per visible square, markers for addressable things, and a
-banner inside the picture saying exactly that.
-
-It exists to satisfy the renderer seam with real targeting and to discharge the
-capture obligation — not to look like anything. It is described, with its
-deliberate limits, in
-[client notes](client-notes.md#gridworldview-the-current-implementation), and it
-is **not a starting point for art**. A pixel-native renderer substitutes for it
-behind the seam and inherits its obligations
-([client architecture](client-architecture.md#the-renderer-seam)).
-
-Colour in the current view carries **no authority**: hues are spread across
-whatever terrain ids the frame contains, so a class can change colour between
-frames. That is a property of a placeholder, and it is one of the reasons the
-placeholder cannot quietly become the look.
+[Client notes](client-notes.md#current-implementation) owns the current split:
+the browser candidate scene and the retained Godot authoritative shell.
+Neither is an accepted production presenter or asset set. The Godot diagnostic
+lattice discharges targeting and capture obligations; it is not a visual master
+or a starting point for art. Browser experiment evidence does not imply
+authoritative wire integration or completion of the accepted interface.
 
 ## Who decides
 
@@ -441,24 +415,33 @@ next evidence step into the engine: a real 3D scene under the ruled camera, so
 lighting, foliage motion, weather, and time of day can be felt rather than
 inferred from stills.
 
-`client/presentation/feel/` holds that scene. It is a **bounded experiment
-beside the world-view seam**, not a presenter behind it: it consumes no
-authoritative frame, emits no targets, sends no command, and replaces nothing.
-`GridWorldView` remains the current world view. Whether anything in the feel
-scene earns a place behind `WorldViewSeam` is decided by the production rule
-above, not by this section.
+The scene began in `client/presentation/feel/`. The September 2 browser-first
+ruling moved active feel work to `web/`; the Godot experiment is retained and
+cold ([client architecture](client-architecture.md#the-web-client)). This is a
+bounded experiment beside the world-view seam: it consumes no authoritative
+frame, emits no authoritative targets, and sends no server command. Promotion
+behind the production seam still requires the production rule above.
 
-The browser feel scene now carries a local walk experiment under the same
-non-authoritative rule. Its movement lands on the beat: a drafted route of one
-to three squares lands whole when the beat strikes, and nothing slides between
-squares (owner ruling, 2026-09-02). Readiness shows in the cursor; the scene
-draws no pulse. Walls that would hide the player's tile fade gently rather than
-the camera or the wall height changing (owner ruling, 2026-09-02).
+### Movement and readiness
+
+Movement lands on the beat: a drafted route lands whole when the beat strikes,
+and nothing slides between squares (owner ruling, 2026-09-02). The browser's
+one-to-three-square route allowance and local beat are disposable experiment
+values, not settled gameplay tuning under D2. Readiness shows in the cursor;
+the scene draws no pulse. Walls that would hide the player's tile fade gently
+rather than the camera or wall height changing.
+
+The September 3 live-figure experiment presents movement between commitment
+and strike under owner test. It retains the authoritative landing above; the
+presentation verdict remains open. [Client notes](client-notes.md#the-web-feel-scenes-walk-experiment)
+owns the implemented behavior and the [live-figure plan](plans/2026-09-03-live-figure-rig.md)
+owns the pending review.
+
+### Construction and viewport
 
 Its construction follows the lab's conclusions rather than re-deriving them:
-the camera is orthographic at 45-degree yaw and 30-degree elevation, sized so
-one ground cell projects as a 179-pixel-wide diamond at 1280 × 800; ground
-cells are flat quads carrying material swatches in continuous world-plane
+the camera is orthographic at 45-degree yaw and 30-degree elevation, with the
+frame governed by [proportional scaling](#proportional-scaling); ground cells are flat quads carrying material swatches in continuous world-plane
 coordinates; walls are real geometry built from a member profile in world
 units (plinth, sill, plaster, posts at every cell boundary, braces, lintel and
 door, cap front and cap top) so courses never seam; standing subjects other
@@ -479,21 +462,25 @@ of the courtyard and the ground room (lab, review-candidate tier) in which the
 player stands about a sixth of the frame height; a further step out is
 expected once cards are re-baked at a higher density, and the client's `zoom`
 comparison step stays for that judgment. Rulings made beside it: **prop scale
-is one metre to one world unit** for three-dimensional source models rendered
-to cards, superseding the lab's 0.79 mapping, because metre-true furniture
+is one metre to one world unit** for three-dimensional source models, whether
+rendered to cards or placed as live characters, superseding the lab's 0.79 mapping, because metre-true furniture
 read as dollhouse scale beside the references; **the wall profile stays** and
 the roof gains its missing weight — steeper pitch, deeper eave, a darker and
 larger-scaled shingle swatch; and the two painted references are accepted as
 placement and scale targets at the review-candidate tier only, never as
 masters. Masters come from this project's own build once it matches them.
 
-**Interior camera ruling (owner, 2026-09-02).** Outdoors the camera is the
+### Interior camera
+
+**Owner ruling, 2026-09-02.** Outdoors the camera is the
 player's: centred on the caretaker and re-centred on each landing. Inside a
 building the camera belongs to the space: it is centred on the room and
 stops following the character, so a room that fits the frame is seen whole,
 as the painted references frame it. It follows the player again on the way
 out. The rule keys on the space, not the player's position: a dedicated
 interior is the space that carries no weather.
+
+### Structure and cards
 
 Anything that belongs to a building — a hearth, a doorway, a window, a shelf —
 is built from material swatches over math like the walls, because it is seen at
@@ -504,7 +491,9 @@ under this ruling and is not since 2026-09-03 (below). Characters were ruled on
 2026-09-02 as modelled and rigged in 3D but shipped as cards rendered at the
 ruled camera angle; that ruling is superseded below.
 
-**Live characters ruling (owner, 2026-09-03).** Characters are **live rigged
+### Live characters
+
+**Owner ruling, 2026-09-03.** Characters are **live rigged
 meshes in the client**, not cards: the rig stands in the scene under the
 ruled camera and the scene's own lights and shadows, its equipment is skinned
 parts on the shared skeleton, and its motion is animation clips played on the
@@ -521,38 +510,39 @@ has failed the same test, so the live class list today is characters alone.
 Everything else stays a card or structural geometry as ruled above. What this decides: the medium for
 characters, that equipment is modular parts, and that figures animate by
 clip. What stays open: the exact in-shader treatment (the lab's palette
-lookup and rim are the candidate; the cards' block grain is optional), which
-clips and how many, which further classes cross, and the character source
-pipeline itself.
+lookup and rim are the candidate; the cards' block grain is optional), clips
+beyond the subsequently decided idle and three gaits, which further classes
+cross, and the character source pipeline itself.
+[Client notes](client-notes.md#the-web-feel-scenes-walk-experiment) records
+the implemented clips and the current movement experiment.
 
 Vegetation cards take motion from one world-space wind field, phase from their
 position rather than a shared loop, and hold the root while art-derived canopy
 weight lets leaves move apart from trunk; grass follows the same rooted rule
 (owner ruling, 2026-09-02).
 
-**Chrome rulings (owner, 2026-09-03).** The screen is one built object and
-nothing on it floats: no windows, no panels, no glossy overlay. Its structure
-follows the mid-1990s online tactical RPG the owner holds as the feel
-reference, read from the owner's own screens and written here in this
-project's words: the play view sits top-left; a column on the right holds,
-top to bottom, one large region switched by a strip of carved tabs — what is
-worn, the rings, the sack, a single thing examined, who is near, and what is
-prepared — then the two hands as recessed slots, then three glass gauges with
-a number under each, then a door mark to leave; a strip along the bottom
-holds a row of carved action tiles. **The three gauges are health, stamina,
-and mana, left to right; one the character has none of is shown empty, not
-hidden.** The chrome is built from the estate's own materials — the packet's
-plaster, timber, and fieldstone — with serif ink for type, and it is lit by
-the world's practical light so it belongs to the scene. The game is mouse
-driven: there is no mode button, and the route preview and its walk, run, or
-sprint word live on the world, not in the chrome. Events and speech are
-written over the play view's bottom-left as plain coloured lines with no
-box, never in a chat window. The sack shows its things as pictures at their
-own sizes, placed freely; those pictures are an asset class of their own, not
-scene cards. The play surface's ruled frame is unchanged by the chrome: a
-larger screen shows more world beside the column, not a larger world. The
-look of the chrome — its painting, not its structure — is not yet accepted;
-the lab's layout compositions are evidence for the structure only.
+### Chrome and actions
+
+The September 3 rulings below give the current target. The accepted layout
+supersedes the earlier action-tile row, unboxed world log, freely scattered bag,
+and column sequence; proportional scaling supersedes the earlier claim that a
+larger screen shows more world. Those are closed revisions, not alternatives.
+
+**Shared direction (owner, 2026-09-03).** The screen is one built object: no
+floating windows or panels and no glossy overlay. The chrome belongs to the
+estate's materials and practical light, with serif ink for type; the accepted
+layout was judged in a blackened-iron treatment, whose assets are still
+candidates. The game is mouse driven, with no mode button. The route preview
+and its pace word live on the world. The three gauges are **health, stamina,
+and mana**, left to right; a resource the character lacks is shown empty. Bag
+item pictures are a separate asset class from scene cards. The hands are
+recessed slots; gauges have numeric readouts, and a door mark is the leave
+affordance. The six-tab region covers worn equipment, rings, the sack,
+inspection, nearby things, and the spell-book/preparation view.
+
+The initial structure came from the owner's reviewed reference screens,
+recorded in this project's words; the later lab plate supplied the accepted
+layout below.
 
 **Action rulings (owner, 2026-09-03).** There is no row of action buttons.
 Attacking is a double-click on the creature with whatever is in hand. The
@@ -565,7 +555,9 @@ rules already recorded, now with their surface. Effects active on the player
 are shown as small spell icons floating in the play view's top-left, icons
 and not frames, and nothing else floats over the world.
 
-**Chrome layout accepted (owner, 2026-09-03).** The layout is ruled from a
+### Accepted chrome layout
+
+**Owner ruling, 2026-09-03.** The layout is ruled from a
 painted plate in the lab, in the blackened-iron hand the owner chose: the
 play view takes about three quarters of the width and seven tenths of the
 height at 1920 × 1080; the column on the right is one fifth of the width and
@@ -583,7 +575,9 @@ layout but its assets: the slices, a nine-patch for every panel that
 stretches, this project's own engraved glyph set, and the accessibility
 floor's collapse.
 
-**Proportional scaling ruling (owner, 2026-09-03).** Every player sees the
+### Proportional scaling
+
+**Owner ruling, 2026-09-03.** Every player sees the
 same extent of world in the play view whatever their screen resolution, and
 the interface scales with it: the screen — chrome and window together — is
 designed once at 1920 × 1080 and scaled uniformly to the display; at 4K the
@@ -630,17 +624,17 @@ height only, and the play view never widens — sight range is not bought with
 a monitor. The side panels'
 pieces are not yet drawn; they are assets, and open with the rest.
 
-**The candidate-asset rule.** The scene's art is candidate material from the
-lab, and none of it is tracked. The scene loads assets only from the directory
-named by the environment variable `TME_FEEL_ASSETS`, through a manifest that
-binds every file to its digest; a mismatch is refused. With the variable unset
-the scene presents absence inside the picture and still runs. This is the
-same discipline the credential model and the capture output use: a private
-input is named out of band, never defaulted to, and never a tracked path. The
-tracked proof exercises the loader and the geometry against a tiny synthetic
-fixture under `client/tests/fixtures/feel/`. Presets — time of day, rain, fog,
-wind — are selected by `TME_FEEL_PRESET`, not by input actions, so the
-accessibility floor is untouched.
+### Candidate assets
+
+The scene's art is candidate material from the lab, and none of it is tracked.
+Assets enter through a digest-bound manifest from `TME_FEEL_ASSETS`; missing
+inputs and digest mismatches are refused. A missing packet is shown as absence
+inside the picture, never replaced with a private default. Tracked synthetic
+fixtures prove the loader and geometry without granting content authority.
+
+[Client notes](client-notes.md#browser-operation-and-proof) owns the browser
+commands, packet-serving boundary, presets, comparison zoom, and proof inputs.
+The Godot experiment's environment controls are not the browser's controls.
 
 Nothing this scene renders is an accepted master. Acceptance of any of it is
 the owner's, at play size, through the production rule.

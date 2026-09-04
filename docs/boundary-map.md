@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-20
-revision: 2
-status: Authored at genesis plan Phase 7, executing owner rulings D5 and D2; pending owner acceptance at the phase stop point.
+last_updated: 2026-09-04
+revision: 3
+status: Standing and authored ownership boundaries from Phase 7; path and protocol ownership corrections only. Phase 7 owner acceptance remains pending.
 public_safe: true
-summary: Who owns which fact class — the standing seams verified against this tree, the fact classes death-as-play requires and the predecessor's map never contemplated, the authoritative pulse and its ruled value, and the line AI may not cross.
+summary: Fact ownership, implemented seams, authored life/death boundaries, the pulse ruling, and the AI boundary.
 always: true
 ---
 
@@ -54,29 +54,13 @@ implemented as `GAMEPLAY_PULSE` in `crates/tme-server/src/scheduler.rs`.
 
 ## Where this sits
 
-The charter's decision order governs: explicit owner decisions, then the charter
-and later owner-approved product direction, then architecture and content
-ownership records, then implementation and tests, then plans and history, then
-agent proposals. This document is an ownership record — the third rung. An owner
-ruling overrides it; it overrides an implementation that disagrees with it, and
-the disagreement is a defect to be reported rather than a fact to be adopted.
+[Agent workflow](agent-workflow.md#document-families-and-precedence) owns
+document precedence. This map owns fact boundaries: an implementation that
+violates one is a defect to resolve, not a reason to silently rewrite the rule.
 
-Related owners, none of which this document duplicates:
-
-| Document | Owns |
-| --- | --- |
-| [Agent workflow](agent-workflow.md) | how work is scoped, authored, proven, and closed out |
-| [Public boundary policy](public-boundary-policy.md) | external reference material, provenance, and the public cut |
-| [Boundary checks](boundary-checks.md) | the five fail-closed public-boundary checks and their mutant qualification |
-| [Working-root policy](working-root-policy.md) | the ignored working root — what may live there, what may never depend on it, retention, and the promotion path (owner ruling D6) |
-| [Authoring contracts](authoring-contracts.md) | the contract-first authoring standard and its principles |
-| [Authoring compiler](authoring-compiler.md) | how an authored document becomes proven runtime content |
-| [Server notes](server-notes.md) | the one-world decision, credentials, persistence, external-boundary policy |
-| [Client architecture](client-architecture.md) | the client's state domains, codec, reconciliation, and proof |
-| [Client notes](client-notes.md) | the client decisions actually implemented |
-| [Presentation direction](presentation-direction.md) | the visual target |
-| [Workbench V0](workbench-v0.md) | the owner-agent spatial reference tool |
-| [Settled conclusions](settled-conclusions.md) | what is closed and should not be re-litigated |
+[AGENTS.md](../AGENTS.md#read-first) routes to the related owners for workflow,
+public and working-root policies, authoring, server and client implementation,
+presentation, and the Workbench.
 
 ## The boundaries
 
@@ -84,7 +68,8 @@ Related owners, none of which this document duplicates:
 | --- | --- | --- |
 | Rules | `crates/tme-rules` | gameplay truth: legality, resolution, timing semantics, life state, projection |
 | Content | `content/`, validated by `crates/tme-rules/src/content` | the authored facts the rules consume |
-| Server runtime | `crates/tme-server` | sessions, admission, wall-clock scheduling, durable authority, the wire |
+| Protocol | `crates/tme-protocol` | wire schema; the server converts rules projections and the clients consume it |
+| Server runtime | `crates/tme-server` | sessions, admission, wall-clock scheduling, durable authority, rules-to-wire conversion |
 | Client | `web/`, `client/` | input, presentation, accessibility, discardable local state |
 | Authoring | `crates/tme-authoring`, `content/lands/` | authored documents to proven runtime content |
 | Simulation | `crates/tme-sim` | fast deterministic gameplay proving over the same rules boundary |
@@ -97,7 +82,8 @@ Related owners, none of which this document duplicates:
 
 ## 1.1 The authored/runtime contract seam
 
-**Owner.** Four contracts, one owner per kind of fact:
+**Owner.** Four data contracts and two composition contracts, one owner per
+kind of fact:
 
 | Contract | Owns | Defined in |
 | --- | --- | --- |
@@ -108,7 +94,7 @@ Related owners, none of which this document duplicates:
 | Land contract | which lands exist, which members each carries, their envelopes, vocabularies, programs, receipts, and outputs | `crates/tme-authoring/src/contract/` |
 | Served world | which catalog, profile, compiled template, and seed make one land's world | `content/lands/<land>/world.json`, composed into a bootstrap manifest by whoever runs a server ([server notes](server-notes.md#which-world-the-one-process-serves)) |
 
-**Rule.** Each fact is authored in exactly one of the four. A fact that is
+**Rule.** Each fact is authored in exactly one contract. A fact that is
 immutable belongs in the catalog or the template; a fact that starts somewhere
 and then changes belongs in the seed.
 
@@ -240,7 +226,7 @@ their facts.
 **Never.** No provider adds an arbitrary predicate or effect callback, a parallel
 common mutation path, or a second receipt ledger.
 
-**Proof.** `crates/tme-rules/tests/service_transactions.rs`, in particular
+**Proof.** `crates/tme-rules/tests/cases/service_transactions.rs`, in particular
 `late_reward_failure_rolls_back_costs_and_all_world_state`.
 
 This seam is load-bearing for [succession](#24-succession) — an inheritance is

@@ -6,7 +6,7 @@ already establishes that the beat a real client observes against a real server
 is the ruled 3.0 seconds. What it cannot establish is that anything in the
 picture says so, because it runs headless and there is no picture.
 
-This driver provisions the same live server, drives the shipped
+This driver uses the shared live-server harness with a corpus fixture, drives the shipped
 `ClientRoot.tscn` under a virtual display, and captures the window at three
 known points inside **one** beat. Then it judges the result:
 
@@ -60,9 +60,8 @@ MANIFEST_NAME = "pulse.json"
 WINDOW = (1024, 768)
 XVFB_SCREEN = "1280x1024x24"
 
-#: The corpus land, as the live proof serves it. The pulse is a property of the
-#: server's scheduler and not of any particular world, so this deliberately uses
-#: the ordinary land rather than a special one.
+#: This capture uses the first-land corpus fixture; the sign-in live proof uses
+#: the authored identity-proof land. Both exercise the same server scheduler.
 FIRST_LAND = World(
     world_template="content/test-corpus/world_templates/first_land_structure.json",
     simulation_seed="content/test-corpus/simulation_seeds/first_land_structure.json",

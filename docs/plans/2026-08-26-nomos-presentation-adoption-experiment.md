@@ -1,12 +1,16 @@
 ---
-last_updated: 2026-08-31
-revision: 5
+last_updated: 2026-09-04
+revision: 6
 status: Owner-paused before P1. Revision 5 records the later orthographic 2:1 dimetric target selection without treating it as experiment resumption: the accepted camera changed after P0, the recording still supplies no dead layer, and no P1 work, tracked dependency, adoption, or final disposition exists.
 public_safe: true
 summary: The bounded, still-paused pre-P1 plan for testing a presentation-authoring boundary; the owner has since selected a new target projection, so any resumption must bind fresh target evidence and separately resolve the missing authoritative dead layer.
 ---
 
 # Nomos presentation-adoption experiment
+
+The later browser-first feel work is a separate authorization. Its current
+state is in [client notes](../client-notes.md#current-implementation); it does
+not resume P1 or turn this plan's historical inputs into current dependencies.
 
 ## 0. Authority and exact inputs
 

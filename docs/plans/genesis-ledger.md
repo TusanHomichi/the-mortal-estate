@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-31
-revision: 6
-status: The live ledger of the genesis plan. Phase 10, G10, and G11 remain open; the owner selected the orthographic 2:1 dimetric target while leaving the presentation experiment paused before P1, with fresh target evidence and the dead-layer choice still required for any resumption.
+last_updated: 2026-09-04
+revision: 7
+status: Live checkpoint: browser feel work active; presentation-adoption P1 and remaining identity-proof slices paused; G10 and G11 open.
 public_safe: true
-summary: One row per genesis-plan phase, its gate and evidence, plus the open gates and the owner's standing orders; revision 6 distinguishes the accepted dimetric target from the still-paused presentation experiment.
+summary: Current work checkpoint, dated genesis phase evidence, open gates, and standing owner orders.
 ---
 
 # The genesis ledger
@@ -25,6 +25,29 @@ the deployment reference; 6 client; 6W Workbench V0b; 7 documentation and the
 boundary map; 8 tooling and the verification lane split; 9 Workbench V1;
 10 the first identity proof; 11 the first external public release. Gates are the
 owner's and are numbered by the phase they guard.
+
+## Current checkpoint (2026-09-04)
+
+- **Active surface:** browser feel work under the September 2 browser-first
+  ruling. [Client notes](../client-notes.md#current-implementation) owns the
+  implemented scene, its local stand-ins, and missing production integration.
+- **Latest direction:** September 3 chrome, actions, accepted layout, cell-count
+  scaling and ultrawide treatment, reaffirmed dimetric projection, live characters,
+  and the Tauri desktop decision. Read the current
+  [presentation rulings](../presentation-direction.md#chrome-and-actions);
+  target acceptance does not mean those features have landed.
+- **Latest browser implementation:** schema-5 live figures and gait presentation
+  between pulses are implemented; the owner verdict remains with the
+  [live-figure plan](2026-09-03-live-figure-rig.md).
+- **Separate paused work:** the presentation-adoption experiment remains before
+  P1 and the remaining identity-proof slices remain undispatched. The active
+  feel experiment does not release that stop line, accept a production
+  presenter, or close G10/G11.
+- **Documentation handoff:** the [September 4 audit](2026-09-04-documentation-audit.md)
+  records context cleanup, corrected claims, and the checks actually run.
+
+The phase records below are dated evidence. Use the maintained owners above for
+today's client and presentation state.
 
 ## Phase records
 

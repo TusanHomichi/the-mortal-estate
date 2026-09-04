@@ -1,15 +1,16 @@
 ---
-last_updated: 2026-08-21
-revision: 2
-status: Complete at genesis plan Phase 9, under the G9 authorization to mutate through the Workbench; pending owner acceptance at the phase stop point. Updated at slice S1, when the compiler became a table of lands and every entry point began naming the land it addresses.
+last_updated: 2026-09-04
+revision: 3
+status: Implemented at Phase 9 under G9 mutation authorization; owner acceptance remains at the recorded stop point. Audit corrects agent CLI usage and carried-source integrity proof.
 public_safe: true
-summary: Workbench V1 — the typed staged-operation log, the verb vocabulary and the rejection each verb provably trips, the candidate preview, atomic Apply, the provider-neutral image operations and the preservation rule that makes them safe, the five plan-level rulings this slice owed, and the measured cost of the promotion ceremony.
+summary: Workbench staged operations, candidate preview, atomic Apply, image operations, agent CLI, and promotion limits.
 routes:
   - tools/workbench/operations.py
   - tools/workbench/replay.py
   - tools/workbench/apply.py
   - tools/workbench/stage.py
   - tools/workbench/bridge.py
+  - tools/workbench_integrity.py
   - tools/workbench/imageops/**
   - crates/tme-authoring/src/operations.rs
   - crates/tme-authoring/src/replay.rs
@@ -419,9 +420,17 @@ operation — proven by
 `test_a_rejected_apply_writes_the_rejection_record_and_nothing_else`, which
 compares the session's whole file set before and after, and by
 `test_a_rejected_apply_leaves_the_carried_tree_byte_identical`, which compares
-the digest of every carried file in the repository — a filesystem walk over
-everything `.gitignore` does not exclude, so a file that is carried but not yet
-committed is as protected as a committed one.
+the digest of every regular carried file in the repository. Both that test and
+`tools/workbench_demo.py` use `tools/workbench_integrity.py`, which delegates file
+selection to `boundary_common.carried_files`: tracked files and nonignored
+untracked files. Git owns ignore semantics and nested repository boundaries;
+there is no second ignore parser or recursive walk through disposable output.
+Symlinks are not followed. The clean-copy runner creates a fresh Git index over
+its exported sources before testing, so the same selector applies there.
+Inventory failures fail the proof; the demo raises on changed files instead of
+merely printing a warning. Scratch-tree mutants prove that tracked and untracked
+source edits, additions, and deletions are detected while dependency output and
+nested worktrees do not affect the snapshot.
 
 **Apply does not promote.** The receipt carries a `grants` block in which
 `promotion`, `tracked_write`, `runtime_input`, `receipt_resigned` and
@@ -548,11 +557,21 @@ JSON line to `operations.jsonl`; retracting is appending another.
 line by hand — no CLI, no browser, no import — and asserts it produces exactly
 the candidate the Workbench produces for the same operation.
 
-**With one command.**
+**With one command.** This example uses the default synthetic fixture.
+`open` and `verbs` select a land through the global `--projection` option,
+placed before the subcommand. `verbs` does not accept `--session`; the other
+session commands attach to the session's recorded projection. For example:
+
+```bash
+python3 tools/workbench/stage.py \
+  --projection content/lands/identity-proof/generated/workbench_projection.json verbs
+```
+
+The fixture loop:
 
 ```bash
 python3 tools/workbench/stage.py open
-python3 tools/workbench/stage.py verbs --session <session>
+python3 tools/workbench/stage.py verbs
 python3 tools/workbench/stage.py point   --session <session> --click 6,11
 python3 tools/workbench/stage.py add     --session <session> --selection sel-0001 \
     --verb move_landmark --parameters '{"landmark_id":"fixture_ruin_marker","to":{"x":6,"y":11}}'

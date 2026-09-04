@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-02
-revision: 2
-status: Built at Phase 3, before any payload; revision 2 records how a linked worktree reaches the private denylist. Pending owner acceptance at G3.
+last_updated: 2026-09-04
+revision: 3
+status: Initial four checks accepted at G3; current checks and their qualifications are listed below. Audit corrects lane-selection and acceptance wording.
 public_safe: true
-summary: The public-boundary checks — what each defends, its fail-closed semantics, and the P9 mutant kills that qualify it to block.
+summary: Public-boundary checks, private-terms resolution, scan scope, fail-closed behavior, and mutant qualification.
 routes:
   - tools/check_*.py
   - tools/boundary_common.py
@@ -29,7 +29,8 @@ is checked on arrival instead of audited afterward.
 They are qualified under `authoring-contracts.md` **P9**: a check earns blocking
 status only by killing a deliberate mutant, and runs advisory until it does. The
 table in [Qualification](#qualification) records every mutant and the exact test
-that kills it. Pending owner acceptance at G3.
+that kills it. The initial four checks were accepted at G3; the later Markdown-link check
+has its own qualification below.
 
 ## The checks
 
@@ -52,8 +53,9 @@ exist and where each lives. `tools/run_verification.py` reads that list to build
 one runner step per check rather than restating it, so a check joins the
 verification runner in the same edit that registers it and cannot be half-added.
 The `boundary` lane runs the first four; the `docs` lane owns `markdown-links`,
-because a documentation-only change must run it and must not pay for anything
-else.
+so a documentation-only change selects it. The fast resolver also selects
+the boundary lane for documentation changes, because prose can cross the
+public boundary.
 
 There is one check outside this family, because it is about the runner rather
 than the boundary: **step-targets**

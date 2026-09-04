@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-08-27
-revision: 3
-status: Owner-accepted at genesis Phase 7. Revision 3 records the owner-authorized clean public-source cut after independent review refused an in-place visibility change.
+last_updated: 2026-09-04
+revision: 4
+status: Owner-accepted at Phase 7 and amended for the clean public-source cut. Audit clarifies that quarantine remains outside this checkout.
 public_safe: true
-summary: How external reference material is quarantined and how a conclusion drawn from it may cross into this project — the payload rule, the marker contract, the evidence ladder, the naming guardrail, the standing spoiler exclusion, the mandatory clean break, and the checks that enforce all of it.
+summary: Source/product publication boundaries, external payloads, provenance, naming, and the clean public-source cut.
 routes:
   - content/**
   - docs/**
@@ -56,12 +56,13 @@ machinery that enforces it, and is not duplicated here.
 
 | Kind | Where it may live | May it reach the tree? |
 | --- | --- | --- |
-| **External reference material** — anything derived from someone else's work: files, assets, text, names, coordinate sets, geometry, bulk numeric tables, schemas, vocabularies, screenshots, recordings | a quarantine root, ignored by git, outside this repository's dependency graph | **No.** Never as payload, in any form, under any renaming |
+| **External reference material** — anything derived from someone else's work: files, assets, text, names, coordinate sets, geometry, bulk numeric tables, schemas, vocabularies, screenshots, recordings | a local-only quarantine root outside this checkout and its dependency graph | **No.** Never as payload, in any form, under any renaming |
 | **Private working material** — local prototypes, candidates, captures, session state, credentials, the private denylist | an ignored working root inside the checkout | No, except where a tracked file must exist to define or ignore it |
 | **Project expression** — original design, code, content, and documents authored here | the tree | Yes, that is what the tree is |
 
-A quarantine root is **local-only and not required to begin work**. A clean clone
-has none, and everything tracked must build, test, and run without one. That is
+A quarantine root is **outside this checkout, local-only, and not required to
+begin work**. A clean clone has none, and everything tracked must build, test,
+and run without one. That is
 not a convention; it is the property the clean-room check exists to prove.
 
 ## The payload rule
