@@ -3,8 +3,8 @@
 Three ideas live here and nothing else:
 
 **A capability** is something the *environment* either provides or does not —
-the pinned client binary, a PostgreSQL superuser URL, the private denylist, a
-usable display. A capability is probed once per run and the answer is recorded
+Node, a PostgreSQL superuser URL, the private denylist, or an external
+feel-asset packet. A capability is probed once per run and the answer is recorded
 with a reason, so an absent one is reported as an honest UNAVAILABLE rather
 than inferred from a step that quietly did nothing.
 

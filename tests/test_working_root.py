@@ -154,7 +154,7 @@ class NoTrackedLoaderReadsTheIgnoredRoot(unittest.TestCase):
 
     def test_neither_the_workspace_nor_the_client_names_the_session_root(self) -> None:
         completed = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "grep", "-lF", "--", ".workbench/", "--", "crates/", "client/"],
+            ["git", "-C", str(REPO_ROOT), "grep", "-lF", "--", ".workbench/", "--", "crates/", "web/"],
             capture_output=True,
             text=True,
             check=False,

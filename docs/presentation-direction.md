@@ -1,12 +1,11 @@
 ---
 last_updated: 2026-09-05
-revision: 33
-status: Owner-directed visual target through September 5, including individual movement intervals and first-land tree variety. Superseded directions consolidated; no production presenter, asset set, or pipeline accepted.
+revision: 38
+status: Accepted presentation direction including cursor-only availability; browser implementation routed separately. No new visual acceptance in the audit.
 public_safe: true
-summary: Accepted visual grammar, construction, camera, chrome, actions, scaling, candidate rules, and unresolved taste decisions.
+summary: Accepted visual grammar, movement/readiness separation, construction, camera, chrome, scaling, and candidate rules.
 routes:
   - web/**
-  - client/presentation/**
   - content/test-corpus/**
 ---
 
@@ -15,7 +14,7 @@ routes:
 This document owns **what the world should look like** and the rules that govern
 getting there. The client's architecture is
 [client architecture](client-architecture.md); what is currently implemented is
-[client notes](client-notes.md).
+[browser client](browser-client.md).
 
 Read the target and the applicable ruling below. Superseded camera,
 cutaway, and interface proposals remain historical evidence, not parallel
@@ -301,16 +300,10 @@ it requires the fresh current-target evidence and separate owner direction named
 by that plan; a future presentation slice that does not resume that experiment
 is not browser-first by inheritance.
 
-The browser/WebGL presenter is tested first because the authorized upstream
-already carries that evidence path. This is an economy of evidence, not a
-platform or feel-surface ruling. The current Godot client remains the standing
-client and feel surface.
-
-A Godot candidate is required only when the browser result leaves a named,
-consequential uncertainty about feel, accessibility, desktop integration,
-performance, deployment, or production cost. If tested, it consumes the same
-recorded TME facts and the same admitted, pinned Nomos artifacts. It does not
-receive a second gameplay interpretation.
+The experiment's earlier browser/Godot comparison order is historical. The
+September 5 owner retirement removes Godot as an implementation or proof target.
+Any resumed experiment must use the current browser architecture and still meet
+its independent acceptance gates.
 
 The owner judges every candidate at actual play size against the accepted
 target. A proceed verdict also requires a second matching asset or scene made by
@@ -391,12 +384,11 @@ is a claim that has to survive the same micro-scene gate as any new proposal.
 
 ## What is implemented today
 
-[Client notes](client-notes.md#current-implementation) owns the current split:
-the browser candidate scene and the retained Godot authoritative shell.
-Neither is an accepted production presenter or asset set. The Godot diagnostic
-lattice discharges targeting and capture obligations; it is not a visual master
-or a starting point for art. Browser experiment evidence does not imply
-authoritative wire integration or completion of the accepted interface.
+[Browser client](browser-client.md) owns the current Three.js candidate scene.
+It is not an accepted production presenter or asset set. Godot was retired by
+owner direction on September 5. Server wire observation remains covered by
+Python proof; authoritative browser integration and fresh identity-addressed
+Workbench capture remain unfinished.
 
 ## Who decides
 
@@ -416,8 +408,7 @@ lighting, foliage motion, weather, and time of day can be felt rather than
 inferred from stills.
 
 The scene began in `client/presentation/feel/`. The September 2 browser-first
-ruling moved active feel work to `web/`; the Godot experiment is retained and
-cold ([client architecture](client-architecture.md#the-web-client)). This is a
+ruling moved active feel work to `web/`; the September 5 ruling retired Godot ([client architecture](client-architecture.md#the-web-client)). This is a
 bounded experiment beside the world-view seam: it consumes no authoritative
 frame, emits no authoritative targets, and sends no server command. Promotion
 behind the production seam still requires the production rule above.
@@ -425,12 +416,27 @@ behind the production seam still requires the production rule above.
 ### Movement and readiness
 
 The September 5 owner direction supersedes shared-beat landing. Each accepted
-browser move receives a fresh three-second interval and locks out replacement
-movement until completion. Presentation interpolates the figure along its
-committed route. [Client notes](client-notes.md#the-web-feel-scenes-walk-experiment)
+browser move receives a fresh three-second cooldown and locks out replacement
+movement until that cooldown expires. The owner subsequently clarified that the
+figure may reach its destination before the cooldown ends, but must not arrive
+late. Early visual arrival cannot release the movement lock: the UI must make
+the remaining cooldown obvious. Travel animation and action readiness are
+separate presentation concerns; the figure follows its committed route. [Browser client](browser-client.md#movement-and-availability)
 owns current behavior; the [timing ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
 owns server authority and individual deadlines. Route allowance remains
-experiment tuning under D2. Readiness shows in the cursor; occluding walls fade.
+experiment tuning under D2; occluding walls fade.
+
+The owner's subsequent September 5 UI direction requires action availability to
+be immediately understandable. Ready, cooling down, and unreachable must have
+legible, distinct cursor marks; colour and shape both carry their meaning. The
+owner then clarified the surface: the cursor alone supplies visual movement
+availability. No ready notices, cooldown countdowns, or status panel appear over
+the world; the lower area belongs to the future chrome. The status-strip trial
+is superseded. An invalid target must not conceal an active cooldown.
+
+The same follow-up asks routes to search around obstacles when a legal route is
+available. This does not itself change the movement allowance; current local
+routing and its limits are owned by client notes.
 
 ### Construction and viewport
 
@@ -508,7 +514,7 @@ clip. What stays open: the exact in-shader treatment (the lab's palette
 lookup and rim are the candidate; the cards' block grain is optional), clips
 beyond the subsequently decided idle and three gaits, which further classes
 cross, and the character source pipeline itself.
-[Client notes](client-notes.md#the-web-feel-scenes-walk-experiment) records
+[Browser client](browser-client.md#movement-and-availability) records
 the implemented clips and the current movement experiment.
 
 **Tree placement variety (owner direction, 2026-09-05).** When authoring the first
@@ -634,9 +640,9 @@ inputs and digest mismatches are refused. A missing packet is shown as absence
 inside the picture, never replaced with a private default. Tracked synthetic
 fixtures prove the loader and geometry without granting content authority.
 
-[Client notes](client-notes.md#browser-operation-and-proof) owns the browser
+[Browser client](browser-client.md#operation-and-proof) owns the browser
 commands, packet-serving boundary, presets, comparison zoom, and proof inputs.
-The Godot experiment's environment controls are not the browser's controls.
+Retired experiment environment controls do not configure the browser.
 
 Nothing this scene renders is an accepted master. Acceptance of any of it is
 the owner's, at play size, through the production rule.

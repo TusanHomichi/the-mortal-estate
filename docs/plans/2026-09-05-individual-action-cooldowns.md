@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-05
 revision: 3
-status: Implementation and local verification complete; owner-authorized PR delivery follows. Visual acceptance remains separate.
+status: Merged in PR 41 as 9f3f284; dated cutover receipt. Current state is in the genesis checkpoint; visual acceptance remains separate.
 public_safe: true
 summary: Replace shared gameplay pulses with server-authoritative individual deadlines, alongside the current browser scene pass.
 ---

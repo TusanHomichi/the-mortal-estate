@@ -45,7 +45,6 @@ export async function setView(requested) {
   document.getElementById("banner-candidate").hidden = view !== CANDIDATE;
   document.getElementById("members").hidden = view === CAPTURE;
   document.getElementById("captures").hidden = view !== CAPTURE;
-  document.getElementById("capture-actions").hidden = view !== CAPTURE;
   /* A packet binds the exact bytes it was taken against. A candidate's bytes are
    * replaced by the next preview, so a packet bound to them would be stale by
    * design — worse than no packet. The reason is on screen beside the disabled

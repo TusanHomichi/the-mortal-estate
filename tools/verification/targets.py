@@ -69,8 +69,6 @@ def _module_path(token: str) -> str | None:
 def _looks_like_path(token: str) -> bool:
     if token in _NOT_A_PATH or token.startswith("$") or token.startswith("-"):
         return False
-    if token.startswith("res://"):
-        return True
     if token.endswith(_PATH_SUFFIXES):
         return True
     return "/" in token
@@ -84,9 +82,6 @@ def step_targets(step: Step) -> list[str]:
         module = _module_path(token)
         if module is not None:
             targets.append(module)
-        elif token.startswith("res://"):
-            # The client's resource root is `client/`.
-            targets.append("client/" + token[len("res://") :])
         elif previous in {"--path", "--prefix"}:
             targets.append(token)
         elif _looks_like_path(token):

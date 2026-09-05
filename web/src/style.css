@@ -74,16 +74,13 @@ body {
   text-shadow: 0 1px 4px #000;
 }
 
-.walk-experiment-label {
+.movement-announcement {
   position: absolute;
-  z-index: 2;
-  top: 18px;
-  left: 22px;
-  color: rgb(210 222 242 / 62%);
-  font-family: ui-monospace, "Cascadia Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  text-shadow: 0 1px 4px #000;
-  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

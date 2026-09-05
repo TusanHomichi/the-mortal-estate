@@ -67,7 +67,7 @@ export interface FigureRow {
   palette: [number, number, number][];
   rim: number;
   idle: string;
-  /** The clips for the walk between pulses, by the route's pace. */
+  /** The movement clips selected by route category. */
   gait: { walk: string; run: string; sprint: string };
 }
 

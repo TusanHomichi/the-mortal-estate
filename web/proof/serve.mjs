@@ -4,7 +4,6 @@
 // about the scene; it only gets a real tab in front of it.
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,13 +17,7 @@ export function refuseUnavailable(reason) {
   process.exit(3);
 }
 
-/**
- * The same refusal, thrown: for a capability found missing after a server is
- * already up, so the caller's cleanup runs before the process reports 3.
- */
-export class ProofUnavailable extends Error {
-  exitCode = 3;
-}
+export { ProofUnavailable, launchProofBrowser } from "./browser.mjs";
 
 /** Report a thrown refusal the way refuseUnavailable would, without exiting. */
 export function reportUnavailable(error) {
@@ -67,45 +60,6 @@ export function proofBrowsers() {
     selected.push({ name, engine, executablePath });
   }
   return selected;
-}
-
-/**
- * Launch one proof engine the way it can actually render the scene. Chromium
- * renders WebGL2 headless. Firefox has no GL context headless at all — probed
- * 2026-09-03: no preference enables it — so it runs headed with software GL
- * on a display: `DISPLAY` if the environment has one, otherwise an Xvfb this
- * helper starts and stops. No display and no Xvfb is a refusal, not a pass.
- */
-export async function launchProofBrowser({ name, engine, executablePath }) {
-  if (name === "chromium") {
-    const browser = await engine.launch({ executablePath, headless: true });
-    return { browser, stop: async () => { await browser.close(); } };
-  }
-  let display = process.env.DISPLAY?.trim() || "";
-  let xvfb = null;
-  if (display === "") {
-    let xvfbPath = "";
-    try { xvfbPath = execFileSync("which", ["Xvfb"], { encoding: "utf8" }).trim(); } catch { /* absent */ }
-    if (xvfbPath === "") throw new ProofUnavailable("Firefox needs a display for WebGL2: set DISPLAY or install Xvfb");
-    const number = 90 + Math.floor(Math.random() * 900);
-    display = `:${number}`;
-    xvfb = spawn(xvfbPath, [display, "-screen", "0", "1600x1000x24", "-nolisten", "tcp"], { stdio: "ignore" });
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    if (xvfb.exitCode !== null) throw new ProofUnavailable(`Xvfb ${display} exited with ${xvfb.exitCode}`);
-  }
-  const browser = await engine.launch({
-    executablePath,
-    headless: false,
-    firefoxUserPrefs: { "webgl.force-enabled": true, "webgl.forbid-software": false },
-    env: { ...process.env, DISPLAY: display, LIBGL_ALWAYS_SOFTWARE: "1" },
-  });
-  return {
-    browser,
-    stop: async () => {
-      await browser.close();
-      if (xvfb !== null && xvfb.exitCode === null) xvfb.kill("SIGTERM");
-    },
-  };
 }
 
 export async function freePort() {

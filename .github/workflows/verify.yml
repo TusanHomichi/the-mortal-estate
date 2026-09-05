@@ -10,8 +10,8 @@ name: verify
 #
 #     python3 tools/run_verification.py --list --scope full
 #
-# `--allow-unavailable` is CI declaring, out loud, that it cannot supply three
-# capabilities: the pinned Godot binary, a PostgreSQL superuser URL, and the
+# `--allow-unavailable` is CI declaring, out loud, that it cannot supply two
+# capabilities: a PostgreSQL superuser URL and the
 # private banned-term denylist. The runner reports each as UNAVAILABLE (or, for
 # the denylist, DEGRADED onto the tracked synthetic fixture) and prints an
 # INCOMPLETE verdict. That is a stated limit, not a silent skip: a step that
@@ -102,7 +102,7 @@ jobs:
       # What is about to run, printed before it runs, so a failed job's log
       # opens with the plan rather than only the wreckage.
       - name: resolved plan
-        run: python3 tools/run_verification.py --list --scope portable --scope web --scope client --scope gated
+        run: python3 tools/run_verification.py --list --scope portable --scope web --scope gated
 
       # No TME_* variable is set here, deliberately. `.cargo/config.toml`
       # supplies TME_BANNED_TERMS_FILE (force = false) pointing at the tracked
@@ -112,7 +112,7 @@ jobs:
       # not merely by an absent variable — and the `gated` lane, which does run
       # them, reports UNAVAILABLE here rather than passing vacuously.
       - name: the lanes this checkout can prove
-        run: python3 tools/run_verification.py --scope portable --scope web --scope client --scope gated --allow-unavailable --report-disk
+        run: python3 tools/run_verification.py --scope portable --scope web --scope gated --allow-unavailable --report-disk
 
   cleanclone:
     name: a clean copy builds and tests with no private root

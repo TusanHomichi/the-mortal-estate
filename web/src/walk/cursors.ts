@@ -1,11 +1,10 @@
 /**
  * Pure SVG cursor artwork for the local walk experiment.
  *
- * The pale fill and dark one-pixel outline stay legible over both plaster and
- * grass without borrowing the warm palette reserved for actual light sources.
+ * Large outlined badges distinguish a refused target from an active cooldown.
  */
 
-export const WALK_CURSOR_SIZE = 24;
+export const WALK_CURSOR_SIZE = 40;
 export const WALK_CURSOR_HOTSPOT = { x: 2, y: 2 } as const;
 
 export type WalkCursorKind = "ready" | "waiting" | "refused";
@@ -26,9 +25,9 @@ function svgDataUri(detail = ""): string {
 }
 
 export function walkCursorDataUris(): WalkCursorDataUris {
-  const hourglass = `<path d="M15 14.5h6v1c0 1.2-.8 1.9-2 2.5 1.2.6 2 1.3 2 2.5v1h-6v-1c0-1.2.8-1.9 2-2.5-1.2-.6-2-1.3-2-2.5z" fill="${PALE}" stroke="${DARK}" stroke-width="1" stroke-linejoin="round"/>`;
-  // A small cross at the heel: a lone diagonal reads as a tick, not a refusal.
-  const refusedCross = `<path d="M15.5 15.5l5 5M20.5 15.5l-5 5" fill="none" stroke="${DARK}" stroke-width="4.5" stroke-linecap="round"/><path d="M15.5 15.5l5 5M20.5 15.5l-5 5" fill="none" stroke="${PALE}" stroke-width="2.5" stroke-linecap="round"/>`;
+  const badge = (colour: string) => `<circle cx="27" cy="27" r="11" fill="${colour}" stroke="${DARK}" stroke-width="3"/><circle cx="27" cy="27" r="11.5" fill="none" stroke="${PALE}" stroke-width="1"/>`;
+  const hourglass = `${badge("#f2c66d")}<path d="M22 20h10v2c0 2-2 3-4 5 2 2 4 3 4 5v2H22v-2c0-2 2-3 4-5-2-2-4-3-4-5z" fill="${DARK}"/>`;
+  const refusedCross = `${badge("#f18d85")}<path d="M23 23l8 8M31 23l-8 8" fill="none" stroke="${DARK}" stroke-width="3.5" stroke-linecap="round"/>`;
   return {
     ready: svgDataUri(),
     waiting: svgDataUri(hourglass),

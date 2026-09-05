@@ -9,8 +9,12 @@ summary: The bounded, still-paused pre-P1 plan for testing a presentation-author
 # Nomos presentation-adoption experiment
 
 The later browser-first feel work is a separate authorization. Its current
-state is in [client notes](../client-notes.md#current-implementation); it does
+state is in [browser client](../browser-client.md); it does
 not resume P1 or turn this plan's historical inputs into current dependencies.
+
+The September 5 Godot retirement supersedes this plan's old comparison branch.
+Any separately authorized resumption must use the current client architecture;
+the P1 pause and independent acceptance requirements remain in force.
 
 ## 0. Authority and exact inputs
 

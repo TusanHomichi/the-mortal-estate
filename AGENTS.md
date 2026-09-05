@@ -37,10 +37,10 @@ operating rules; detailed workflow and verification usage have linked owners.
   actually observed. Complete the [closeout](docs/agent-workflow.md#closeout)
   before handing off.
 
-**The stack is chosen:** Rust for rules, protocol, simulation, authoring, and one
+**Stack:** Rust for rules, protocol, simulation, authoring, and one
 PostgreSQL-backed server; TypeScript and Three.js for the browser client; Tauri
-for its ruled desktop shell; the retained Godot shell; Python for checks and tools. Widening it needs an owner
-decision. Keep adjustable facts in validated content and each mutation in its
+for its ruled desktop shell; Python for checks and tools. Widening it needs an
+owner decision. Keep adjustable facts in validated content and each mutation in its
 owning boundary.
 
 ## Read first
@@ -58,11 +58,9 @@ python3 tools/agent_context.py --path <repository-relative-path>
 python3 tools/agent_context.py --list
 ```
 
-Each document below declares in its own front matter which paths it owns.
-`tools/agent_context.py --validate` asserts this table names exactly the
-documents `docs/` carries, and that no document claims a path the tree does not
-have — it runs in the `docs` lane, so the table cannot drift from the tree
-without turning a run red.
+Documents declare path ownership in front matter. The docs lane validates these
+routes and the table below. Read relevant sections; follow history links only
+when the task needs their evidence. Keep machine setup and session logs local.
 
 | Start here | When |
 | --- | --- |
@@ -77,7 +75,7 @@ without turning a run red.
 | [docs/authoring-compiler.md](docs/authoring-compiler.md) | when working on `crates/tme-authoring` or authored content |
 | [docs/server-notes.md](docs/server-notes.md) | server, persistence, credentials, migrations, the external boundary |
 | [docs/client-architecture.md](docs/client-architecture.md) | the client's standing contract |
-| [docs/client-notes.md](docs/client-notes.md) | what the client actually does today |
+| [docs/browser-client.md](docs/browser-client.md) | browser source map, movement, rendering, packet and proof contracts |
 | [docs/presentation-direction.md](docs/presentation-direction.md) | the visual target |
 | [docs/workbench-v0.md](docs/workbench-v0.md) | the owner-agent spatial reference tool — pointing |
 | [docs/workbench-v1.md](docs/workbench-v1.md) | the same tool's editing half — staged operations, candidates, Apply |
@@ -93,8 +91,7 @@ without turning a run red.
 | `crates/tme-server` | sessions, admission, scheduling, durable authority |
 | `crates/tme-sim` | deterministic proving through the same rules |
 | `crates/tme-authoring` | authored documents to proven runtime content |
-| `web/` | browser feel surface; current implementation limits in client notes |
-| `client/` | retained Godot shell and authoritative-client proof |
+| `web/` | browser feel surface; implementation and proof in browser client notes |
 | `content/lands/`, `content/` | authored lands, validated content, test corpus |
 | `tools/`, `tests/` | verification, Workbench, proof harnesses and Python tests |
 | `deploy/production/` | single-host deployment reference and runbooks |

@@ -61,7 +61,6 @@ FAMILY_SCOPES: dict[str, tuple[str, ...]] = {
     "rust": ("rust",),
     "authoring": ("rust", "workbench", "python", "boundary"),
     "content": ("rust", "boundary"),
-    "client": ("client",),
     "web": ("web",),
     "workbench": ("workbench", "python"),
 }
@@ -77,7 +76,6 @@ FAMILY_REASONS: dict[str, str] = {
         "OF, so its Python proof runs beside the workspace lane"
     ),
     "content": "authored content is validated by the Rust workspace",
-    "client": "client paths select the headless client suite",
     "web": "browser-client paths select only the web proof",
     "workbench": "Workbench paths select the Workbench proof and the Python suite",
 }
@@ -190,8 +188,6 @@ def classify(path: str) -> str | None:
         return "rust"
     if path.startswith("content/"):
         return "content"
-    if path.startswith("client/"):
-        return "client"
     if path.startswith("web/"):
         return "web"
     if path.startswith("tests/fixtures/"):
@@ -251,7 +247,7 @@ def _escalate(escalations: Sequence[str], families: Sequence[str]) -> Selection:
     have selected on their own still runs too: a web or client proof must not
     vanish because a workflow file changed in the same slice. Portable already
     contains every capability-free lane, so only the capability-bearing ones
-    (`web`, `client`) can be added here.
+    (`web`) can be added here.
     """
     baseline = frozenset(expand(("portable",)))
     scopes: list[str] = ["portable"]

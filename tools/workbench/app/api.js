@@ -96,9 +96,7 @@ export function acceptCandidate(body) {
  * route of its own on the server for that reason, and a function of its own
  * here so the cost is visible at every call site.
  */
-export function requestCapture() {
-  return post("/api/capture", {});
-}
+
 
 /* The three routes that run the authoring compiler. They are grouped and
  * labelled for the same reason the capture route is: each costs a moment rather

@@ -3,7 +3,7 @@
 
 The tracked fixture names only relocations of facts already carried by the
 identity-proof simulation seed. This driver derives an ordinary simulation
-seed, serves it through the real TLS server, and asks the shipped Godot client
+seed, serves it through the real TLS server, and uses the Python wire observer
 to record the first authoritative frame satisfying the fixture's semantic
 barrier. It never edits the standing seed.
 
@@ -32,19 +32,15 @@ REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPOSITORY_ROOT / "tools"))
 
 from live_server_harness import (  # noqa: E402
-    GODOT_VERSION,
     LiveServer,
     ProofError,
     World,
-    emit_client_output,
     read_admin_url,
-    resolve_godot,
     run,
 )
 
 SUCCESS_SENTINEL = "TME_PRESENTATION_ADOPTION_RECORDING_OK"
-CLIENT_SENTINEL = "TME_PRESENTATION_ADOPTION_FRAME_OK"
-CLIENT_SCRIPT = "res://tests/record_presentation_adoption_frame.gd"
+from live_wire_client import LiveWireClient
 FIXTURE_PATH = Path("tests/fixtures/presentation-adoption/representative-recording.json")
 TRACKED_FRAME_PATH = Path(
     "tests/fixtures/presentation-adoption/identity-proof-observer-frame.json"
@@ -294,7 +290,6 @@ def validate_frame(document: dict[str, Any], fixture: dict[str, Any]) -> dict[st
 
 
 def proof(arguments: argparse.Namespace) -> int:
-    godot = resolve_godot(arguments.godot)
     fixture_path = (REPOSITORY_ROOT / FIXTURE_PATH).resolve()
     fixture = load_fixture(fixture_path)
     source = fixture["source"]
@@ -316,11 +311,11 @@ def proof(arguments: argparse.Namespace) -> int:
     source_commit = git_value("rev-parse", "HEAD")
     source_tree = git_value("rev-parse", "HEAD^{tree}")
     tracked_status_before = git_value("status", "--short", "--untracked-files=no").splitlines()
-    runtime_paths = git_value("ls-files", "--cached", "--others", "--exclude-standard", "--", "crates", "client", "tools", "Cargo.toml", "Cargo.lock").splitlines()
+    runtime_paths = git_value("ls-files", "--cached", "--others", "--exclude-standard", "--", "crates", "web", "tools", "Cargo.toml", "Cargo.lock").splitlines()
     working_sources = {path: sha256(REPOSITORY_ROOT / path) for path in sorted(set(runtime_paths)) if (REPOSITORY_ROOT / path).is_file()}
     working_source_sha256 = sha256_bytes(canonical_json(working_sources))
     world = dataclasses.replace(declared, simulation_seed=None, generated_seed=effective_seed)
-    client_script = REPOSITORY_ROOT / "client/tests/record_presentation_adoption_frame.gd"
+    observer_script = REPOSITORY_ROOT / "tools/live_wire_client.py"
     started = time.monotonic()
     previous_cwd = Path.cwd()
     os.chdir(REPOSITORY_ROOT)
@@ -328,22 +323,37 @@ def proof(arguments: argparse.Namespace) -> int:
         with LiveServer(
             read_admin_url(arguments.admin_url_file), world, keep=arguments.keep
         ) as server:
-            client = server.run_client(
-                godot,
-                CLIENT_SCRIPT,
-                extra_environment={
-                    "TME_PRESENTATION_FRAME_OUT": str(frame_path),
-                    "TME_PRESENTATION_FIXTURE": str(fixture_path),
-                    "TME_PRESENTATION_SOURCE_COMMIT": source_commit,
-                    "TME_PRESENTATION_SOURCE_TREE": source_tree,
-                },
-                timeout=arguments.timeout,
-            )
-            emit_client_output(client)
-            if client.returncode != 0 or CLIENT_SENTINEL not in client.stdout:
-                raise ProofError(
-                    f"presentation-adoption recorder failed with status {client.returncode}"
-                )
+            with LiveWireClient(server, timeout=arguments.timeout) as client:
+                def document_for(frame):
+                    return {
+                        "schema_version": 1, "kind": FRAME_KIND,
+                        "provenance": {
+                            "route": "live_server_wire",
+                            "recorded_by": "tools/live_wire_client.py",
+                            "driver": "tools/run_presentation_adoption_recording.py",
+                            "source_commit": source_commit, "source_tree": source_tree,
+                            "world_revision": client.gameplay.latest_state["world_revision"],
+                            "server_sequence": client.gameplay.latest_state["server_sequence"],
+                            "semantic_barrier": fixture["capture_barrier"],
+                        },
+                        "frame_generation": client.gameplay.state_generation,
+                        # The recording format pairs both authoritative payloads;
+                        # static context is a sibling of frame on the wire.
+                        "frame": {
+                            **frame,
+                            "static_scene_context": client.gameplay.latest_state["static_scene_context"],
+                        },
+                    }
+
+                def matches(frame):
+                    try:
+                        validate_frame(document_for(frame), fixture)
+                        return True
+                    except ProofError:
+                        return False
+
+                frame = client.wait_for(matches, timeout=arguments.timeout)
+                frame_path.write_bytes(canonical_json(document_for(frame)))
             server_status = dict(server.status)
     finally:
         os.chdir(previous_cwd)
@@ -425,23 +435,20 @@ def proof(arguments: argparse.Namespace) -> int:
         "toolchain": {
             "host": platform.platform(),
             "python": platform.python_version(),
-            "godot_version": run([str(godot), "--version"]).strip(),
-            "godot_binary_sha256": sha256(godot),
             "postgres_client": command_version("psql", "--version"),
             "openssl": command_version("openssl", "version"),
             "server_binary_sha256": sha256(server_binary),
         },
         "proof_sources": {
             "driver_sha256": sha256(Path(__file__).resolve()),
-            "client_recorder_sha256": sha256(client_script),
+            "wire_observer_sha256": sha256(observer_script),
+            "wire_transport_sha256": sha256(REPOSITORY_ROOT / "tools/run_production_smoke.py"),
         },
         "canonical_command": [
             "python3",
             "tools/run_presentation_adoption_recording.py",
             "--admin-url-file",
             "$TME_PG_ADMIN_URL_FILE",
-            "--godot",
-            "$TME_GODOT",
             "--output",
             "$TME_CAPTURE_OUTPUT/presentation-adoption",
             "--expected-frame",
@@ -467,15 +474,12 @@ def proof(arguments: argparse.Namespace) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--admin-url-file", required=True)
-    parser.add_argument("--godot", default=os.environ.get("TME_GODOT", ""))
     parser.add_argument("--output", required=True)
     parser.add_argument("--expected-frame")
     parser.add_argument("--record-frame")
     parser.add_argument("--timeout", type=float, default=300.0)
     parser.add_argument("--keep", action="store_true")
     arguments = parser.parse_args()
-    if not arguments.godot:
-        parser.error(f"--godot or TME_GODOT must name pinned Godot {GODOT_VERSION}")
     try:
         return proof(arguments)
     except (OSError, ValueError, json.JSONDecodeError, ProofError) as error:

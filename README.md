@@ -29,8 +29,8 @@ part of this repository. Publishing this source did not release a game, client,
 service, public API, or content snapshot. Where the work stands, phase by phase,
 is the
 [genesis ledger](docs/plans/genesis-ledger.md#current-checkpoint-2026-09-05).
-For what the clients implement now, read
-[client notes](docs/client-notes.md#current-implementation);
+For what the browser implements now, read
+[browser client](docs/browser-client.md);
 [presentation direction](docs/presentation-direction.md) owns the accepted target.
 
 ## Working here

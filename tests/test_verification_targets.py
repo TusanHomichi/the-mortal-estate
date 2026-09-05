@@ -43,11 +43,11 @@ class Mutants(unittest.TestCase):
         self.assertIn("tools/no_such_tool.py", targets.missing_targets([planted])[0])
 
     def test_mutant_step_naming_a_missing_client_script_is_killed(self) -> None:
-        planted = Step("x", "client", "x", ("$TME_GODOT", "-s", "res://tests/no_such.gd"))
-        self.assertIn("client/tests/no_such.gd", targets.missing_targets([planted])[0])
+        planted = Step("x", "web", "x", ("node", "web/proof/no_such.mjs"))
+        self.assertIn("web/proof/no_such.mjs", targets.missing_targets([planted])[0])
 
     def test_mutant_step_with_an_unknown_capability_is_killed(self) -> None:
-        planted = Step("x", "client", "x", ("git", "diff"), requires=("teleportation",))
+        planted = Step("x", "web", "x", ("git", "diff"), requires=("teleportation",))
         self.assertIn("unknown capability", targets.missing_targets([planted])[0])
 
     def test_mutant_step_owned_by_a_scope_that_does_not_exist_is_killed(self) -> None:
@@ -73,7 +73,7 @@ class Mutants(unittest.TestCase):
 
 class TokenReading(unittest.TestCase):
     def test_environment_references_are_not_treated_as_paths(self) -> None:
-        step = Step("x", "client", "x", ("$TME_GODOT", "--headless"))
+        step = Step("x", "web", "x", ("$TME_NODE", "--version"))
         self.assertEqual(targets.step_targets(step), [])
 
     def test_option_words_are_not_treated_as_paths(self) -> None:
@@ -81,8 +81,8 @@ class TokenReading(unittest.TestCase):
         self.assertEqual(targets.step_targets(step), [])
 
     def test_the_path_option_names_a_directory(self) -> None:
-        step = Step("x", "client", "x", ("$TME_GODOT", "--path", "client", "--import"))
-        self.assertEqual(targets.step_targets(step), ["client"])
+        step = Step("x", "web", "x", ("npm", "--prefix", "web", "ci"))
+        self.assertEqual(targets.step_targets(step), ["web"])
 
     def test_the_npm_prefix_names_the_web_directory(self) -> None:
         step = Step("web.x", "web", "x", ("npm", "--prefix", "web", "run", "build"))

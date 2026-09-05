@@ -28,7 +28,7 @@ function tagStack(svg: string): string[] {
 }
 
 describe("walk cursor artwork", () => {
-  it("returns three well-formed SVG data URIs at the declared 24-pixel size", () => {
+  it("returns three well-formed SVG data URIs at the declared size", () => {
     const cursors = walkCursorDataUris();
     expect(Object.keys(cursors).sort()).toEqual(["ready", "refused", "waiting"]);
 
@@ -40,7 +40,7 @@ describe("walk cursor artwork", () => {
       expect(svg).toContain(`viewBox="0 0 ${WALK_CURSOR_SIZE} ${WALK_CURSOR_SIZE}"`);
       expect(tagStack(svg)).toEqual([]);
       expect(new Set(svg.match(/#[0-9a-f]{6}/gi))).toEqual(
-        new Set(["#eef2f3", "#17232b"]),
+        new Set(["#eef2f3", "#17232b", ...(svg.includes("#f2c66d") ? ["#f2c66d"] : []), ...(svg.includes("#f18d85") ? ["#f18d85"] : [])]),
       );
     }
   });

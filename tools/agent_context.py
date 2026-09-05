@@ -8,7 +8,8 @@
 
 **The routing is derived, not restated.** Every document under `docs/` declares
 in its own front matter what it owns — `routes:` for the paths it speaks for,
-`always: true` for the ones every task reads. This tool reads that and answers;
+`always: true` for standing guidance that applies to every task.
+Read the relevant sections; the marker does not require loading full documents. This tool reads that and answers;
 `--validate` asserts the "Read first" table in `AGENTS.md` agrees with it. A
 hand-maintained routing table drifts the first time somebody adds a document and
 forgets a row, and the drift is invisible because the table still reads

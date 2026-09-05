@@ -1,12 +1,11 @@
 ---
 last_updated: 2026-09-05
-revision: 7
-status: Owner-authorized browser-first contract with individual action timing; the Godot shell is retained and production presentation acceptance remains separate.
+revision: 11
+status: Three.js is the sole client runtime; owner retired Godot on September 5. Server integration contracts remain targets until implemented in the browser.
 public_safe: true
-summary: Browser-first client boundary, retained Godot shell, authoritative readiness, and individual action-interval presentation.
+summary: Browser client authority, state and protocol contracts, credentials, input/accessibility, desktop targets, and proof boundaries.
 routes:
   - web/**
-  - client/**
   - crates/tme-protocol/**
   - tests/fixtures/wire/**
 ---
@@ -16,12 +15,11 @@ routes:
 This document owns the client's **standing architecture**: the boundaries that
 hold whatever the client looks like.
 
-It does not own the visual target — that is
-[presentation direction](presentation-direction.md) — and it does not own the
-decisions already implemented and recorded, which are
-[client notes](client-notes.md). The split is deliberate: this project is
-changing what the world looks like while keeping the architecture, and one
-document cannot own both facts through that change.
+[Browser client](browser-client.md) owns current implementation and operation;
+[presentation direction](presentation-direction.md) owns the visual target.
+The owner retired Godot on September 5. The browser is the sole client runtime;
+its authoritative server integration and production UI are still unimplemented.
+Contracts below describe obligations, not claims of completed browser features.
 
 ## Authority
 
@@ -49,17 +47,11 @@ canonical decimal millisecond difference between `logical_time` and `ready_at`.
 The client may interpolate progress within that reported interval, clamped at
 completion, while it waits for the authoritative ready frame.
 
-In the retained Godot implementation, `client/presentation/action_cooldown.gd`
-owns this presentation state. The meter, world view, and feedback director use
-that same state. An idle character has no repeating meter. Implementation and
-refusal proof are in [client notes](client-notes.md#individual-cooldowns-made-visible).
-
 ## The web client
 
 **Owner ruling, 2026-09-02: browser first.** The client that carries feel,
 and the first client the project develops, runs in a browser tab. `web/` is
-that client. Every rule in this document binds it exactly as it binds the
-Godot shell — authority, the three state domains, strict wire consumption,
+that client. Every rule in this document binds it — authority, the three state domains, strict wire consumption,
 the epoch cursor, the renderer seam's four rules, the accessibility floor —
 because none of those rules was ever about an engine.
 
@@ -70,17 +62,16 @@ Its baseline:
   with `npm ci`; `web/node_modules/` and `web/dist/` are ignored roots
   ([working-root policy](working-root-policy.md#the-roots)).
 - **No other runtime dependency without a decision** that owns it, with the
-  same licensing, maintenance, and proof obligations the Godot baseline
-  carried. A rendering-backend change (WebGPU) is a contract change, not a
+  same licensing, maintenance, and proof obligations. A rendering-backend change (WebGPU) is a contract change, not a
   drift.
 - The wire codec's intended route is **no mirror at all**: `crates/tme-protocol`
   compiled to WebAssembly and called from TypeScript, so the schema authority
   is consumed rather than re-implemented. Until that lands, the web client
   carries no wire consumption, and any interim TypeScript codec is a verified
-  mirror proven against `tests/fixtures/wire/` exactly as the GDScript one is.
+  mirror proven against `tests/fixtures/wire/` when that implementation is introduced.
 - The accepted layout and display-scaling target is owned by
   [presentation direction](presentation-direction.md#proportional-scaling);
-  [client notes](client-notes.md#current-implementation) separates that target
+  [browser client](browser-client.md) separates that target
   from the current browser proof surface. Candidate art reaches the client
   only through a digest-bound packet named
   out of band (`TME_FEEL_ASSETS` at the dev server), never a tracked path —
@@ -93,18 +84,12 @@ Its baseline:
 owner reviews the preview in Firefox; the proofs and captures ran in headless
 Chromium. A picture judged in one browser is judged in both: the walk proof
 and the capture tool run in Chromium and in Firefox through Playwright, each
-engine with its own server, tab, and captures — Firefox headed on a display
-with software GL, because headless Firefox has no WebGL — and a run that
-cannot find one of them, or Firefox's display, is incomplete, never a pass on
-the other. The desktop webviews join
+engine with its own server, tab, and captures. Firefox requires a display for
+WebGL; [browser client](browser-client.md#renderer-capability) owns
+the hardware/software launcher and its capabilities. A run that cannot supply
+an engine or its requested renderer is incomplete, never a pass on the other. The desktop webviews join
 that list as targets are claimed. Narrowing a run to one engine is a look,
 not a proof.
-
-**The Godot shell is retained and cold.** It remains the reference
-implementation of the codec, reconciliation, and HUD contracts, and its proof
-keeps running; it is no longer the feel surface, and no presentation
-investment goes into it unless a decision gives it a desktop role. Retiring
-it is its own decision.
 
 **The desktop client is the web client (owner ruling, 2026-09-03).** The
 browser client is the one client; the desktop build is that client in a
@@ -116,36 +101,17 @@ through each platform's system webview rather than a bundled browser, so the
 desktop slice's proof obligation is stated now: the feel client must be
 proven on the webview of every desktop target — WebKitGTK on Linux and the
 Steam Deck, WebView2 on Windows, WKWebView on macOS — at the ruled play
-surface, before that target is claimed. The retained Godot shell stays cold pending a reason the
-browser cannot supply, and no other engine enters the stack: Unity was
-considered on 2026-09-03 and has no role.
-
-## Engine baseline (the retained Godot shell)
-
-- Godot `4.7.2.stable.official.ed1daf0bf`, project feature `4.7`.
-- The `gl_compatibility` renderer.
-- Typed GDScript authored here, with `treat_warnings_as_errors` on.
-- Godot's built-in HTTP, WebSocket, JSON, TLS, resource, scene, Control, and
-  InputMap APIs.
-
-**No third-party addon, C#, GDExtension, embedded native code, or other runtime
-dependency.** The tree carries no `addons/` directory and none is expected. A
-later decision may widen that boundary only for a measured need, with licensing,
-maintenance ownership, and proof on every target platform.
-
-An engine or renderer upgrade is a **direct contract change**: it reruns the
-affected import, suite, render, export, and native proof. It does not create a
-compatibility branch.
+surface, before that target is claimed. No second engine or client runtime is retained.
 
 ## Three state domains
 
-The client keeps three conceptually separate domains, and each has a file:
+The production client must keep three separate state domains:
 
-| Domain | Holds | Owner |
-| --- | --- | --- |
-| **Serialised control state** | session secrets, bootstrap, selected character, lifecycle, the active control epoch, the per-epoch sequence cursor, and at most one immutable pending command | `client/adapter/control_state.gd` |
-| **Latest authoritative state** | the latest complete observer frame plus accepted welcome/update metadata, with a frame generation counter | `client/adapter/authoritative_state.gd` |
-| **Discardable presentation state** | focus, hover, selection, drafts, layout, scrollback, text scale, and other local ergonomics | `client/adapter/presentation_state.gd` |
+| Domain | Holds |
+| --- | --- |
+| **Serialised control state** | session secrets, bootstrap, selected character, lifecycle, the active control epoch, the per-epoch sequence cursor, and at most one immutable pending command |
+| **Latest authoritative state** | the latest complete observer frame plus accepted welcome/update metadata, with a frame generation counter |
+| **Discardable presentation state** | focus, hover, selection, drafts, layout, scrollback, text scale, and other local ergonomics |
 
 **Each newer accepted welcome or update replaces the authoritative domain
 atomically. Events never patch it.**
@@ -155,27 +121,22 @@ action interval, which bounds a step's animation. It may not supply
 authority, legality, identity, balances, membership, command ordering, or
 reconnect state. Authentication secrets never enter presentation state or ordinary
 persisted settings — the credential model is
-[client notes](client-notes.md#the-credential-model-owner-ruling-d7), and it
-persists nothing.
+[credentials](#credentials-owner-ruling-d7).
 
 ## Control API consumption
 
 **One serialised adapter owns the whole connection lifecycle.** Scenes and UI do
 not call HTTP, WebSocket, JSON, cookie, or TLS primitives directly.
-`client/adapter/control_facade.gd` holds every route;
-`client/adapter/native_transport.gd` holds the transport;
-`client/adapter/connection_state_machine.gd` holds the states it may be in.
+The browser integration must provide that adapter before UI surfaces send commands.
 
 - Release configuration supplies one HTTPS/WSS endpoint and its exact canonical
   `Origin`. The client performs normal TLS hostname and certificate verification
   and sends that `Origin` on HTTP and WebSocket requests — **without** claiming
   that an `Origin` authenticates native software.
-- The session cookie is retained manually and sent on control requests only,
+- The session cookie is sent on control requests only,
   never on WebSocket traffic. WebSocket admission uses a one-use socket ticket.
 - The cookie, CSRF tokens, and tickets are **memory-only**. Passwords never enter
-  logs, error text, screenshots, crash text, state summaries, or settings;
-  `client/adapter/secret_redactor.gd` enforces it and
-  `client/tests/test_secret_redaction.gd` proves it.
+  logs, error text, screenshots, crash text, state summaries, or settings.
 - **Control work is serialised** because a successful session bootstrap rotates
   the CSRF token. Endpoint-specific placement is preserved rather than
   normalised: most routes carry the token in strict JSON, and player-kill
@@ -196,9 +157,8 @@ subprotocol `tme.v1`. It obtains a one-use ticket, opens WSS with the configured
 `Origin` and that exact subprotocol, sends `client_hello`, and accepts
 `server_welcome` only after exact version validation.
 
-**The GDScript codec is a verified mirror of the Rust schema, never a second
-schema authority.** `client/adapter/wire_codec.gd` and
-`client/adapter/strict_json.gd` implement it, in two stages:
+The browser codec must consume the Rust schema authority or prove a strict
+mirror against the shared corpus:
 
 1. Before any dictionary access, raw input is rejected for byte or nesting-depth
    overflow, invalid UTF-8, duplicate keys, and malformed JSON.
@@ -211,9 +171,8 @@ schema authority.** `client/adapter/wire_codec.gd` and
 never pass through a float.** The shared conformance corpus covers the boundary
 values where a double silently loses precision — 2^53−1, 2^53, 2^53+1, and
 `i64::MAX` — plus negative and out-of-range spellings at the applicable type
-boundary. Both sides run the same corpus, `tests/fixtures/wire/`, which the client
-**reads rather than copies**; the reasoning and the path mechanics are in
-[client notes](client-notes.md#the-wire-fixture-corpus-is-read-not-copied).
+boundary. `tests/fixtures/wire/` remains one shared positive/negative corpus.
+Rust consumes it today; the browser codec must consume it directly when added.
 
 **No fallback parser, ignored-field mode, alias, or previous-version path exists**
 before the external boundary activates. Retired envelope shapes are carried in the
@@ -223,7 +182,7 @@ proven.
 ## Results, updates, and the epoch cursor
 
 The client keeps **at most one immutable gameplay command** awaiting a terminal
-result (`client/adapter/pending_command.gd`). A result settles that command by its
+result. A result settles that command by its
 id; it does not carry or mutate authoritative state. Only a welcome or an update
 replaces the authoritative frame. Ordered observed events drive bounded feedback
 and never become a second state store.
@@ -257,8 +216,7 @@ The reconciliation rules, in the order they matter:
 Social messages are transient. Their dispositions are not durable receipts, local
 scrollback is presentation state, and display is not proof of delivery.
 
-Proof: `client/tests/test_epoch_cursor.gd`, `client/tests/test_state_reducer.gd`,
-and `client/tests/test_path_preview_state.gd`.
+Browser integration must prove these cases through the actual connection adapter.
 
 ## The renderer seam
 
@@ -281,24 +239,23 @@ Four architectural rules bind any implementation:
    It never owns readiness, never anticipates acceptance, and never lets
    a bounded animation change which square a thing is on.
 
-The seam's member contract, the current implementation, and the capture obligation
-a view inherits are owned by
-[client notes](client-notes.md#the-world-view-seam). A replacement renderer
-substitutes behind the same seam and inherits the same obligations unchanged.
+Authoritative browser capture must add matching color, identity raster, and
+sidecar output for [Workbench addressing](workbench-v0.md#what-a-capture-is).
+The current candidate-packet screenshot proof does not meet that integration obligation.
 
 ## Input and the accessibility floor
 
 - Every non-text action uses a namespaced semantic input action. Bindings are
   remappable and **persisted separately from authentication state**
-  (`client/input/binding_store.gd`).
+  independently of session secrets.
 - The shell is keyboard-operable with visible deterministic focus and focus
   restoration after a modal closes. Each pointer operation gains a keyboard route
   when its owning surface implements that operation.
 - **Essential state must not rely on colour alone.** A cue that only exists as a
   hue is not a cue.
 - The shell remains operable at `1280x720` with **enlarged text**, and readable at
-  higher resolutions. `client/tests/test_input_bindings.gd` asserts the exact
-  minimum viewport at 200 percent text scale with no clipped essential control.
+  higher resolutions. Prove the minimum viewport at 200 percent text scale
+  without clipping essential controls when the production UI is implemented.
 - Text scale and audio preferences are a versioned document that **fails back to
   defaults** rather than accepting a shape it does not recognise.
 - A destructive or irreversible confirmation names the action and its target, does
@@ -321,40 +278,31 @@ it is target-only, and partial proof stays labelled partial. Installers, stores,
 auto-update, crash reporting, public distribution, and web or mobile exports are
 later product decisions.
 
-Export presets exclude `tests/*`, which is why test-only code may use a
-source-tree path honestly.
+Production packaging must exclude proof fixtures, test code, and private packets.
 
-## The five layers of client proof
+## Proof surfaces
 
-| Layer | What it proves | Where |
+| Surface | What it proves | Limit |
 | --- | --- | --- |
-| 1 | strict codec, lifecycle, and state-reducer behaviour, headless | `client/tests/test_strict_json.gd`, `test_wire_codec.gd`, `test_connection_state_machine.gd`, `test_state_reducer.gd`, `test_epoch_cursor.gd` |
-| 2 | one shared positive/negative wire corpus consumed by **both** sides | `tests/fixtures/wire/`, asserted from Rust in `crates/tme-protocol/src/client_fixture_tests.rs` and from GDScript in `client/tests/test_wire_codec.gd` |
-| 3 | scene, input, focus, accessibility, and minimum-resolution behaviour | `client/tests/test_input_bindings.gd`, `test_full_hud.gd`, `test_domain_panel.gd`, `test_interaction_director.gd` |
-| 4 | a real server through the real contracts, from an empty database | `tools/run_client_live_proof.py` driving the shipped `ClientRoot.tscn` |
-| 5 | controlled render, capture, and export evidence | `client/tests/capture_fixture_frame.gd`, `client/tests/live_capture.gd`, `client/tests/pulse_capture.gd`, `client/tests/validate_export_presets.gd` |
+| `web` verification lane | Typecheck, browser unit tests, build | Synthetic inputs; no live server |
+| Two-engine walk proof | Real Three.js movement, cursor, facing, portals and rendering | Candidate packet; no authoritative wire |
+| Rust protocol corpus | Current and refused wire formats | Browser codec is still to be implemented |
+| `tools/run_server_live_proof.py` | Real TLS sign-in, admission, land, individual cooldowns, reconnect, logout | Python wire observer; no rendered browser claim |
+| PostgreSQL gated suite | Durable server, session, restart, and recovery invariants | Requires a scratch database administrator |
+| Recorded Workbench captures | Digest/raster/selection correspondence | Historical images; no fresh renderer claim |
 
-The table is the retained Godot shell's proof; the web client's standing
-proof is the `web` lane plus the real-tab walk proof and captures described
-in [client notes](client-notes.md). The packaged Tauri client adds a layer of
-its own when the desktop slice lands: the packaged app launched on each
-target and the same walk proof driven through its webview. Until that layer
-is green for a target, the target is not claimed, whatever the other layers
-say.
+Production browser integration needs end-to-end tests through shipped UI and
+transport wiring. A server wire proof cannot stand in for that. Tauri targets
+add native webview and packaging proof before support is claimed. Visual
+acceptance remains the owner's; it is not inferred from passing tests.
 
-Layer 4 is the one that matters most and the one most easily faked. It exists
-because **constructing a component in a test is not the same as exercising it
-through the wiring the product uses** — the lesson recorded in
-[agent workflow](agent-workflow.md#prove-the-real-path-not-a-reconstruction-of-it).
+## Credentials (owner ruling D7)
 
-Structural, state, focus, and layout contracts are automated. **Visual judgment is
-not**: it uses controlled same-environment captures or reviewed references, never
-cross-machine byte equality.
-
-Only individually reviewed resources with suitable licensing, provenance, and
-ownership may cross into `client/`. Private reference material is not a client
-seed, a schema authority, a content source, or cross-platform proof
-([public boundary policy](public-boundary-policy.md)).
+Persist no credentials in project settings or local files. Passwords, CSRF
+values, and admission tickets remain transient; session handling must respect
+the server's cookie and token contracts. Any durable credential store requires
+a separate owner decision and a platform secret facility. Keep preferences
+and bindings separate from authentication. There is no saved-login import path.
 
 ## Revisit boundaries
 
@@ -363,7 +311,6 @@ Each of these needs a new explicit decision and its own proof:
 - replacing the engine, or widening the dependency baseline — for the web
   client, adding any runtime dependency or changing the rendering backend;
 - changing the renderer;
-- giving the retained Godot shell a desktop role, or retiring it;
 - persisting any credential (today: nothing is persisted);
 - admitting outside players, or activating external compatibility;
 - adding distribution infrastructure.

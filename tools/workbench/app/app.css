@@ -149,7 +149,6 @@ textarea {
 .observed { list-style: none; margin: 0; padding: 0; font: 11px var(--mono); }
 .observed li { padding: 3px 0; border-bottom: 1px dotted var(--line); }
 
-#capture-cost { font: 11px var(--mono); color: var(--ink-soft); }
 
 /* The candidate view, the staging panel, and Apply. Marked apart from the
    accepted land throughout: a candidate is an unattested document, and the

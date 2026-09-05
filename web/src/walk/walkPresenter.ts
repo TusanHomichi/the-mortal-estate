@@ -2,8 +2,8 @@
  * Browser presentation for the feel scene's walk experiment.
  *
  * This is local and non-authoritative: packet-layout passability is a visual
- * guess and the beat is a stand-in for the server-owned pulse. The module is
- * intentionally the walk feature's only Three.js and DOM boundary.
+ * guess and the cooldown is a stand-in for server-owned readiness. This module
+ * owns Three.js presentation and cursor feedback.
  */
 import {
   AdditiveBlending,
@@ -23,7 +23,7 @@ import {
 import { CAMERA_TARGET_HEIGHT, focusFeelCamera } from "../camera";
 import type { FeelSpace, PortalTarget } from "../feelTypes";
 import { portalLandingFor } from "../space/portals";
-import { WALK_MOVE_SECONDS } from "./beat";
+import { WALK_MOVE_SECONDS } from "./movement";
 import { facingBetween, type FigureFacing } from "./facing";
 import type { FigureInstance } from "../space/figureRig";
 import {
@@ -182,11 +182,11 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   const cursorDataUris = walkCursorDataUris();
   scene.add(hoverOutline);
 
-  const label = document.createElement("div");
-  label.className = "walk-experiment-label";
-  label.textContent = "WALK EXPERIMENT — LOCAL, NOT AUTHORITY";
-  label.setAttribute("aria-hidden", "true");
-  stage.append(label);
+  const announcement = document.createElement("span");
+  announcement.className = "movement-announcement";
+  announcement.setAttribute("role", "status");
+  announcement.setAttribute("aria-live", "polite");
+  stage.append(announcement);
 
   let state = createWalkIntent(options.initialCell);
   let footprints: DrawnFootprint[] = [];
@@ -261,6 +261,11 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   };
 
   const setCursor = (kind: WalkCursorKind | "default"): void => {
+    if (stage.dataset.walkCursor !== kind) {
+      announcement.textContent = kind === "waiting" ? "Movement cooling down."
+        : kind === "refused" ? "That tile cannot be reached in this move."
+        : "Ready to move.";
+    }
     stage.dataset.walkCursor = kind;
     if (kind === "default") {
       canvas.style.cursor = "default";
@@ -274,23 +279,22 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     if (hoverCell === null) {
       hoverOutline.visible = false;
       stage.dataset.walkOutline = "hidden";
-      setCursor("default");
+      setCursor(state.committed !== null ? "waiting" : "default");
       return;
     }
     const authorable = state.committed === null && authorRoute(passability, state.caretakerCell, hoverCell) !== null;
-    hoverOutline.visible = authorable;
-    stage.dataset.walkOutline = authorable ? "visible" : "hidden";
-    if (authorable) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
+    const refused = state.committed === null && !authorable && !sameCell(state.caretakerCell, hoverCell);
+    hoverOutline.visible = authorable || refused;
+    hoverOutline.material.color.set(refused ? 0xf18d85 : 0xa6b8c9);
+    stage.dataset.walkOutline = hoverOutline.visible ? "visible" : "hidden";
+    if (hoverOutline.visible) hoverOutline.position.set(hoverCell.i, 0, hoverCell.j);
     if (state.committed !== null) setCursor("waiting");
     else if (authorable || sameCell(state.caretakerCell, hoverCell)) setCursor("ready");
     else setCursor("refused");
   };
 
-  // The walk between pulses (plan §6a): the figure is presented along the
-  // committed route between the commit and the strike; the authoritative
-  // square below is what the game believes and what the camera follows.
-  // The last frames of the presented walk, for the proof: a real tab under a
-  // slow rasteriser cannot be polled from outside fast enough to see a pulse.
+  // Record presented motion inside the page so the proof can inspect it even
+  // when an external screenshot call spans the whole movement interval.
   const presentedTrace: string[] = [];
   const presentWalk = (now: number): PresentedWalk => {
     const presented = presentedWalkPosition(state, now);
@@ -320,7 +324,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     }
     stage.dataset.caretakerCell = `${state.caretakerCell.i},${state.caretakerCell.j}`;
     const pace = walkPace(state);
-    label.textContent = `WALK EXPERIMENT — LOCAL, NOT AUTHORITY${pace === null ? "" : ` · ${pace.toUpperCase()}`}`;
     if (pace === null) delete stage.dataset.walkPace;
     else stage.dataset.walkPace = pace;
     const projection = new Vector3(
@@ -426,8 +429,8 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
         transition(advanced, now);
       }
       // The wall fade follows the figure as presented, not the square it is
-      // still authoritatively on: walking into a wall's cover mid-pulse must
-      // fade that wall then, not on the strike.
+      // still logically on: walking into a wall's cover during movement must
+      // fade that wall as soon as the figure reaches it.
       const presented = presentWalk(now);
       stage.dataset.walkFadedRuns = String(
         updateWallFade({ i: Math.round(presented.i), j: Math.round(presented.j) }, now),
@@ -462,7 +465,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       hoverOutline.material.dispose();
       soleTextures.draft.dispose();
       soleTextures.committed.dispose();
-      label.remove();
+      announcement.remove();
       canvas.style.cursor = "";
       delete stage.dataset.walkState;
       delete stage.dataset.walkPace;

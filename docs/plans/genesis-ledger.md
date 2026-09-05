@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 10
-status: Individual cooldown implementation and local proof complete; scene 03 private preview live; owner-authorized PR delivery follows. Other recorded gates remain open.
+revision: 16
+status: PR 41 merged; scene 06 source and Godot retirement verified for delivery. Private preview remains scene 06; recorded gates remain open.
 public_safe: true
-summary: Current scene and individual-cooldown checkpoint, dated genesis evidence, open gates, and standing owner orders.
+summary: Concise resume checkpoint, current-owner pointers, dated genesis evidence, and open gates.
 ---
 
 # The genesis ledger
@@ -28,38 +28,28 @@ owner's and are numbered by the phase they guard.
 
 ## Current checkpoint (2026-09-05)
 
-- **Verified server cutover:** the owner replaced shared gameplay pulses with
-  individual authoritative deadlines. The [cutover plan](2026-09-05-individual-action-cooldowns.md)
-  records completed implementation and local proof. The owner authorized commit,
-  pull request, merge after required checks, and task-branch cleanup on September 5.
-- **Private preview:** September 5 scene pass 03 is deployed with enlarged trees,
-  complete outdoor buildings, and full three-second movement commitments.
-  Both browser engines passed the real walk proof; this is local presentation,
-  not proof of the server cutover.
-- **First-land authoring:** [presentation direction](../presentation-direction.md#structure-and-cards)
-  records the owner’s tree-variety requirement; identical adjacent cards are refused.
-- **Active surface:** browser feel work under the September 2 browser-first
-  ruling. [Client notes](../client-notes.md#current-implementation) owns the
-  implemented scene, its local stand-ins, and missing production integration.
-- **Latest direction:** September 3 chrome, actions, accepted layout, cell-count
-  scaling and ultrawide treatment, reaffirmed dimetric projection, live characters,
-  and the Tauri desktop decision. Read the current
-  [presentation rulings](../presentation-direction.md#chrome-and-actions);
-  target acceptance does not mean those features have landed.
-- **Latest browser implementation:** September 4 schema-6 static structures,
-  eight-direction figure facing, shared gait clips, and scene-fit corrections.
-  [Client notes](../client-notes.md#the-web-feel-scenes-walk-experiment) owns
-  the implementation; the scene remains a candidate for owner judgment.
-  The [live-figure plan](2026-09-03-live-figure-rig.md) records its earlier slice.
-- **Separate paused work:** the presentation-adoption experiment remains before
-  P1 and the remaining identity-proof slices remain undispatched. The active
-  feel experiment does not release that stop line, accept a production
-  presenter, or close G10/G11.
-- **Documentation handoff:** the [September 4 audit](2026-09-04-documentation-audit.md)
-  records context cleanup, corrected claims, and the checks actually run.
+- **Server:** individual-deadline cutover merged in [PR #41](https://github.com/TusanHomichi/the-mortal-estate/pull/41)
+  as `9f3f284` after both CI checks passed. [D5](../boundary-map.md#21-authoritative-individual-deadlines-d5)
+  owns timing; the [cutover receipt](2026-09-05-individual-action-cooldowns.md) owns its proof.
+- **Private preview:** scene 06 is deployed: walking clips, full movement locks,
+  cursor-only feedback, and obstacle detours. Scene 05 is retained for rollback.
+  Scene 06 passed 152 browser tests and real movement proof in Chromium and Firefox.
+- **Source:** scene 06 routing/cursor changes, the GPU proof launcher, and the
+  Godot retirement are carried here. The [code/context audit](2026-09-05-code-and-context-audit.md)
+  records cleanup and verification; delivery does not update the private preview.
+  Python wire proof retains server coverage. Follow-ups: disconnected logout
+  [#42](https://github.com/TusanHomichi/the-mortal-estate/issues/42) and browser
+  Workbench capture [#43](https://github.com/TusanHomichi/the-mortal-estate/issues/43).
+- **Start browser work:** [browser client](../browser-client.md) maps source,
+  current behavior, limitations, and proof. Production wire integration,
+  proportional chrome, and distance-matched animation remain unfinished.
+  [Presentation direction](../presentation-direction.md) owns the target.
+- **Separate stop line:** the presentation-adoption experiment remains before P1;
+  remaining identity-proof slices are undispatched. Active browser work does not
+  release that pause, accept a production presenter, or close G10/G11.
 
-The phase records below are dated evidence. Use the maintained owners above for
-today's client and presentation state.
+The phase records below are dated history. Read them only when a task needs
+ancestry or an earlier gate decision.
 
 ## Phase records
 

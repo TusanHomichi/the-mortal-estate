@@ -55,7 +55,7 @@ def clock_from(values):
 
 
 ALWAYS = Step("ok.one", "docs", "always runs", ("always",))
-NEEDS_GODOT = Step("client.x", "client", "needs the client", ("godot",), requires=("godot",))
+NEEDS_POSTGRES = Step("gated.x", "gated", "needs the database", ("psql",), requires=("postgres",))
 
 
 class NodeCapability(unittest.TestCase):
@@ -88,26 +88,26 @@ class UnavailableIsNeverPass(unittest.TestCase):
         runner = fake_runner({})
         with redirect_stdout(io.StringIO()):
             verdict = execute.execute(
-                [NEEDS_GODOT], environ=self.environ(), runner=runner
+                [NEEDS_POSTGRES], environ=self.environ(), runner=runner
             )
         self.assertEqual(runner.calls, [])
         self.assertEqual(verdict.outcomes[0].status, "UNAVAILABLE")
 
     def test_an_unavailable_step_makes_the_run_incomplete(self) -> None:
         with redirect_stdout(io.StringIO()):
-            verdict = execute.execute([NEEDS_GODOT], environ=self.environ(), runner=fake_runner({}))
+            verdict = execute.execute([NEEDS_POSTGRES], environ=self.environ(), runner=fake_runner({}))
         self.assertFalse(verdict.complete)
         self.assertEqual(verdict.exit_code(allow_unavailable=False), EXIT_INCOMPLETE)
 
     def test_allow_unavailable_is_the_only_way_to_exit_zero_incomplete(self) -> None:
         with redirect_stdout(io.StringIO()):
-            verdict = execute.execute([NEEDS_GODOT], environ=self.environ(), runner=fake_runner({}))
+            verdict = execute.execute([NEEDS_POSTGRES], environ=self.environ(), runner=fake_runner({}))
         self.assertEqual(verdict.exit_code(allow_unavailable=True), EXIT_OK)
 
     def test_a_failure_outranks_allow_unavailable(self) -> None:
         with redirect_stdout(io.StringIO()):
             verdict = execute.execute(
-                [ALWAYS, NEEDS_GODOT],
+                [ALWAYS, NEEDS_POSTGRES],
                 environ=self.environ(),
                 runner=fake_runner({"always": 1}),
             )
@@ -122,16 +122,14 @@ class UnavailableIsNeverPass(unittest.TestCase):
     def test_the_reason_a_capability_is_absent_is_reported(self) -> None:
         stream = io.StringIO()
         with redirect_stdout(stream):
-            execute.execute([NEEDS_GODOT], environ=self.environ(), runner=fake_runner({}))
-        self.assertIn("TME_GODOT is not set", stream.getvalue())
+            execute.execute([NEEDS_POSTGRES], environ=self.environ(), runner=fake_runner({}))
+        self.assertIn("TME_PG_ADMIN_URL_FILE is not set", stream.getvalue())
 
 
 #: An environment with everything except the private denylist — a clean clone.
 NO_PRIVATE_TERMS = {
-    "godot": CapabilityState("godot", True, "pinned"),
     "postgres": CapabilityState("postgres", True, "present"),
     "private-terms": CapabilityState("private-terms", False, ".boundary/ is absent"),
-    "display": CapabilityState("display", True, "present"),
     "capture-output": CapabilityState("capture-output", True, "present"),
 }
 
@@ -308,7 +306,7 @@ class TheRunSaysWhatItIsSpending(unittest.TestCase):
                 report_disk=report_disk,
                 states={
                     name: CapabilityState(name, True, "supplied")
-                    for name in ("godot", "postgres", "private-terms", "display", "capture-output")
+                    for name in capabilities.BY_NAME
                 },
             )
         return stream.getvalue()

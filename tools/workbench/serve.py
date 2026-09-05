@@ -14,17 +14,10 @@ produced ahead of time by the authoring compiler (`cargo run -p tme-authoring`);
 if it is missing or stale this server refuses to open, and says which command
 produces it.
 
-**Two route families run a program, and only when asked.** Taking a capture runs
-the shipped client through `capture_harness`, because a picture of what the
-client draws can only come from the client drawing it. Asking what a candidate
-means — the vocabulary, a preview, an Apply — runs the authoring compiler through
-`bridge`, because the meaning of an authored document lives there and there is
-exactly one of it. Both are deliberate acts on routes of their own. Pointing,
-resolving, staging, retracting, reading a packet and listing a session all still
-start nothing at all: selecting over a capture that already exists is file reads,
-exactly like selecting over the logical view.
-
-Exit codes: 0 on clean shutdown, 3 when the tree cannot be served honestly.
+**Authoring operations run the compiler only when asked.** Selection over the
+logical projection or an existing capture reads files and starts no program.
+Fresh rendered capture belongs to the browser integration; this server does
+not carry a renderer launcher.
 """
 
 from __future__ import annotations
@@ -45,7 +38,6 @@ from workbench import VERSION  # noqa: E402
 from workbench import apply as apply_module  # noqa: E402
 from workbench import bridge  # noqa: E402
 from workbench import capture as capture_reader  # noqa: E402
-from workbench import capture_harness  # noqa: E402
 from workbench import imageops  # noqa: E402
 from workbench import operations as operation_log  # noqa: E402
 from workbench import replay as replay_module  # noqa: E402
@@ -148,13 +140,6 @@ class Workbench:
                 self.broken_captures[child.name] = str(error)
                 continue
             self.captures[child.name] = taken
-
-    def take_capture(self) -> capture_reader.Capture:
-        """Run the client once and register what it produced. Seconds, not free."""
-        taken = capture_harness.request(self.root, self.session.directory)
-        capture_reader.bind(self.projection, taken)
-        self.captures[Path(taken.directory).name] = taken
-        return taken
 
     def capture(self, identifier: str) -> capture_reader.Capture:
         try:
@@ -300,8 +285,6 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, self._resolve_gesture(body))
             elif path == "/api/selection":
                 self._json(HTTPStatus.CREATED, self._record(body))
-            elif path == "/api/capture":
-                self._json(HTTPStatus.CREATED, self._take_capture())
             elif path == "/api/capture/preview":
                 self._json(HTTPStatus.OK, self._resolve_capture_gesture(body))
             elif path == "/api/capture/selection":
@@ -366,11 +349,6 @@ class Handler(BaseHTTPRequestHandler):
         gesture = str(body["gesture"])
         cells = cells_for_gesture(member, gesture, body)
         return {"member": member.member, "gesture": gesture, **resolve(member, cells)}
-
-    def _take_capture(self) -> dict:
-        """The one route that runs a program. Deliberate, and never automatic."""
-        taken = self.workbench.take_capture()
-        return {"capture": self.workbench.capture_summary(taken)}
 
     def _capture_gesture(self, body: dict) -> tuple:
         """A gesture over a capture, resolved through the identity raster."""

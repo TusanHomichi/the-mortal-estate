@@ -11,11 +11,9 @@ every target's rectangle in draw order and the bytes must equal the raster the
 presenter wrote. If they do, the raster is not an approximation of the target
 list, it is the target list.
 
-The other half of criterion 3 — that the target list is the presenter's own
-semantic-target list — is proven on the presenter's side, in
-`client/tests/test_grid_world_view.gd`, where both can be compared in one
-process. What is checked here is everything a consumer can check from the files
-alone, which is what a consumer actually has.
+These retained fixtures prove correspondence within their recorded files. A
+fresh browser producer must separately prove that its identity targets match
+its own hit testing; that integration is still open in docs/workbench-v0.md.
 """
 
 from __future__ import annotations

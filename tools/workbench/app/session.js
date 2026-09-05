@@ -10,14 +10,9 @@
  * staged operation looks; what this module owns is that it is re-rendered from
  * the same answer as everything else on the page.
  *
- * Taking a capture lives here rather than with the drawing because it is a
- * session event, not a view event: it runs the real client, it costs seconds,
- * and what it produces is a new row in this session. The button is disabled for
- * the duration and the elapsed time is shown, because a tool that hides its own
- * cost is lying about it.
  */
 
-import { readState, requestCapture } from "./api.js";
+import { readState } from "./api.js";
 import { loadCaptureImage } from "./capture.js";
 import { clearSelection } from "./identities.js";
 import { noteSelections, renderStaged } from "./staging.js";
@@ -78,26 +73,4 @@ export async function selectCapture(identifier) {
   renderCaptureButtons();
   renderLegend();
   fit();
-}
-
-export async function takeCapture() {
-  const button = document.getElementById("take-capture");
-  const cost = document.getElementById("capture-cost");
-  button.disabled = true;
-  cost.textContent = "running the client…";
-  const started = performance.now();
-  try {
-    const answer = await requestCapture();
-    const elapsed = ((performance.now() - started) / 1000).toFixed(1);
-    cost.textContent = `${answer.capture.capture_id} took ${elapsed}s`;
-    await refreshSession(null);
-    await selectCapture(answer.capture.capture_id);
-  } catch (error) {
-    /* The hint claimed the client was running. It is not running now, and the
-     * hint says what actually happened instead of leaving the claim standing. */
-    cost.textContent = "the capture did not complete — see the refusal above";
-    throw error;
-  } finally {
-    button.disabled = false;
-  }
 }
