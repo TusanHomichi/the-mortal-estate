@@ -93,6 +93,11 @@ for (const name of ["chromium", "firefox"]) {
     await pages[0].locator("#text-scale").selectOption("200");
     const overflow = await pages[0].evaluate(() => document.documentElement.scrollWidth > innerWidth);
     assert.equal(overflow, false, "200% text clips horizontally");
+    assert(await pages[0].evaluate(() => {
+      const canvas = document.querySelector("#world-canvas").getBoundingClientRect();
+      const controls = document.querySelector(".controls").getBoundingClientRect();
+      return Math.abs(canvas.top - controls.top) > 2 || canvas.right <= controls.left;
+    }), "200% text makes the world overlap controls");
     await mkdir(config.output, { recursive: true });
     await pages[0].screenshot({ path: path.join(config.output, `${name}-200-percent.png`), fullPage: true });
     const storage = await pages[0].evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } }));
