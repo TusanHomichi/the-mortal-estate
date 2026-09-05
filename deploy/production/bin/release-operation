@@ -625,7 +625,7 @@ commit_release_operation() {
     [ -n "$RELEASE_VERIFIED_MIGRATION_SHA256" ] || fail 'verified migration result is absent'
     [ "$RELEASE_VERIFIED_ADMISSION_STATUS" = 503 ] || fail 'verified admission result is absent'
     [ "$RELEASE_VERIFIED_GAMEPLAY_READY" = true ] || fail 'verified readiness result is absent'
-    [ "$RELEASE_VERIFIED_CONTROL_API_VERSION" = 3 ] || fail 'verified control API result is absent'
+    [ "$RELEASE_VERIFIED_CONTROL_API_VERSION" = 4 ] || fail 'verified control API result is absent'
     [ "$RELEASE_VERIFIED_PROTOCOL_MINOR" = 8 ] || fail 'verified protocol result is absent'
     [ "$RELEASE_VERIFIED_SMOKE" = admission ] || fail 'verified authenticated smoke result is absent'
     prepared=$(mktemp "$RELEASE_OPERATIONS_ROOT/.success.XXXXXX") || \

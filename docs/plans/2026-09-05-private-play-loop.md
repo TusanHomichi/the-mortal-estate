@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-05
 revision: 2
-status: In progress; private development deployment followed by authoritative browser controls.
+status: Private deployment and browser play implemented; PR #47 owns final baseline and delivery evidence.
 public_safe: true
 summary: Authorized two-slice execution, findings, and proof for a persistent private two-client play loop.
 ---
@@ -17,7 +17,7 @@ The owner accepted this sequence on September 5, starting from `510b6e4`:
    movement, reconciliation, reconnect, and logout against that deployment.
    Prove two independently controlled characters through the real browser UI.
 
-This Planning receipt owns execution and observed evidence. Server configuration
+This History receipt records execution and observed integration evidence. Server configuration
 and operational semantics belong to [server notes](../server-notes.md); browser
 control and credential contracts belong to [client architecture](../client-architecture.md).
 The runtime remains private. The presentation pause remains in force.
@@ -87,4 +87,17 @@ split by responsibility, preserving exact runner-selected test names.
 
 Observed focused proof: 278 shared codec and real-adapter tests passed. Normal
 TLS navigation to the installed host passed in both hardware-rendered engines.
-Complete UI proof and the browser slice's full baseline are pending.
+The installed two-tab UI proof passed in Chromium and Firefox with normal TLS
+verification and observed Intel hardware rendering. Both characters saw each
+other, received independently offset deadlines, reconnected during cooldown,
+moved through buttons/keys, and reconciled the other character's movement.
+Logout revoked its token without interrupting the other tab's continued play.
+Reload required sign-in, browser storage retained preferences only, and 200%
+text passed an overlap guard plus screenshot review. The shared diagnostic
+renderer now leaves CSS sizing to its containing surface.
+
+The installed restart-during-action and fenced restore proof passed again after
+the publication repair. Control document roots explicitly refuse positional
+arrays, including the new empty-object bootstrap request. Final full-baseline
+and required CI results belong to [PR #47](https://github.com/TusanHomichi/the-mortal-estate/pull/47),
+which also owns this slice's delivery state. Machine receipts remain external.

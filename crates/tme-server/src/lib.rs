@@ -48,7 +48,7 @@ mod tests {
         assert_eq!(config::COMMAND_RATE_PER_SECOND, 20);
         assert_eq!(config::DRAIN_TIMEOUT, std::time::Duration::from_secs(5));
         assert_eq!(wire::PROTOCOL_MINOR, 8);
-        assert_eq!(wire::CONTROL_API_VERSION, 3);
+        assert_eq!(wire::CONTROL_API_VERSION, 4);
         assert_eq!(wire::MAX_CONTROL_INPUT_BYTES, 16 * 1024);
         assert_eq!(wire::MAX_CONTROL_JSON_NESTING, 16);
         assert_eq!(postgres::MAX_ACCOUNTS, 64);
