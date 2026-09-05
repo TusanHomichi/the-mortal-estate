@@ -70,7 +70,9 @@ def stage_release(site):
             copied = staging / name
             copied.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, copied)
-        write(staging / "web/index.html", '<!doctype html><meta charset="utf-8"><title>TME private server</title><h1>Private development server</h1><p>The authoritative service is installed.</p>\n', 0o644)
+        run(["npm", "--prefix", REPO / "web", "ci"], timeout=300, cwd=REPO)
+        run(["node", REPO / "web/proof/build-play.mjs", staging / "web"], timeout=600, cwd=REPO)
+        (staging / "web/play.html").rename(staging / "web/index.html")
         if run(["git", "-C", REPO, "write-tree"]) != tree or run(["git", "-C", REPO, "diff", "--name-only"]):
             raise RuntimeError("source changed while building the release")
         document(staging / "release.json", {"schema_version": 1, "source_tree": tree, "base_commit": revision,

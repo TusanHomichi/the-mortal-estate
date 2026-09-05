@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 18
-status: Private persistent deployment carried; authoritative browser controls are next. Preview remains scene 06.
+revision: 19
+status: Private persistent deployment and authoritative browser controls carried; preview remains scene 06.
 public_safe: true
-summary: Current source checkpoint, follow-up implementation receipt, owner pointers, historical genesis evidence, and open gates.
+summary: Current private play checkpoint, execution receipt, owner pointers, historical genesis evidence and open gates.
 ---
 
 # The genesis ledger
@@ -46,8 +46,9 @@ owner's and are numbered by the phase they guard.
   and verification evidence; [server notes](../server-notes.md#private-development-deployment)
   routes its operational contract.
 - **Start browser work:** [browser client](../browser-client.md) maps source,
-  current behavior, limitations, and proof. Production wire integration,
-  proportional chrome, and distance-matched animation remain unfinished.
+  current behavior, limitations, and proof. The private play shell now consumes
+  server authority; candidate artwork integration, proportional chrome and
+  distance-matched animation remain unfinished.
   [Presentation direction](../presentation-direction.md) owns the target.
 - **Separate stop line:** the presentation-adoption experiment remains before P1;
   remaining identity-proof slices are undispatched. Active browser work does not

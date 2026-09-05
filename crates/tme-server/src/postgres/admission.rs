@@ -213,23 +213,7 @@ impl PostgresState {
                 .await
                 .map_err(|error| error.to_string())?;
             if let Some((_, checkpoint, linked)) = &prepared_pending {
-                let updated = sqlx::query(
-                    "UPDATE tme.facets SET checkpoint_bytes=$2,checkpoint_sha256=$3, \
-                     facet_revision=$4,updated_at=statement_timestamp() WHERE facet_id=$1 \
-                     AND facet_revision=$5 AND last_server_sequence=$6",
-                )
-                .bind(checkpoint.facet_id.as_uuid())
-                .bind(checkpoint.checkpoint.as_bytes())
-                .bind(checkpoint.checkpoint.sha256().as_slice())
-                .bind(checked_i64(checkpoint.after_revision)?)
-                .bind(checked_i64(checkpoint.before_revision)?)
-                .bind(checked_i64(checkpoint.server_sequence)?)
-                .execute(&mut *control_tx)
-                .await
-                .map_err(|error| error.to_string())?;
-                if updated.rows_affected() != 1 {
-                    return Err("world revision moved during admission".to_string());
-                }
+                Self::persist_prepared_checkpoint(&mut control_tx, checkpoint).await.map_err(|_| "admission checkpoint commit failed".to_string())?;
                 // Clearing rides the same transaction as the checkpoint above.
                 // Crash before it commits and the rows survive to be applied at
                 // the next admission; crash after and they are gone for good.

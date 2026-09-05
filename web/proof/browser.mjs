@@ -1,3 +1,4 @@
+import { trustAuthority } from "./trusted-authority.mjs";
 // Browser/display lifetime and observed rendering capability for local proofs.
 import { spawn, execFileSync } from 'node:child_process';
 import { accessSync, constants, readdirSync } from 'node:fs';
@@ -38,7 +39,7 @@ async function stopChild(child) {
   } finally { clearTimeout(timer); }
 }
 
-async function startDisplay(mode) {
+async function startDisplay(mode, multipleWindows) {
   const env = { ...process.env };
   if (mode === 'hardware') {
     delete env.LIBGL_ALWAYS_SOFTWARE;
@@ -49,7 +50,7 @@ async function startDisplay(mode) {
     const runtime = await mkdtemp(path.join(os.tmpdir(), 'tme-proof-wayland-'));
     Object.assign(env, { XDG_RUNTIME_DIR: runtime, WAYLAND_DISPLAY: 'tme-proof', MOZ_ENABLE_WAYLAND: '1' });
     delete env.DISPLAY;
-    const child = spawn(weston, ['--backend=headless', '--renderer=gl', '--socket=tme-proof', '--width=1600', '--height=1000', '--idle-time=0', '--no-config', '--shell=kiosk-shell.so'], { env, stdio: ['ignore', 'ignore', 'pipe'] });
+    const child = spawn(weston, ['--backend=headless', '--renderer=gl', '--socket=tme-proof', '--width=1600', '--height=1000', '--idle-time=0', '--no-config', multipleWindows ? '--shell=desktop-shell.so' : '--shell=kiosk-shell.so'], { env, stdio: ['ignore', 'ignore', 'pipe'] });
     let output = '';
     child.stderr.on('data', chunk => { output = (output + chunk).slice(-8_000); });
     let launchError;
@@ -102,7 +103,7 @@ export async function probeRenderer(browser) {
   } finally { await page.close(); }
 }
 
-export async function launchProofBrowser({ name, engine, executablePath }) {
+export async function launchProofBrowser({ name, engine, executablePath, trustedAuthority, multipleWindows = false }) {
   const requested = process.env.TME_PROOF_RENDERER?.trim() || 'auto';
   if (!['auto', 'hardware', 'software'].includes(requested)) throw new ProofUnavailable(`Unknown TME_PROOF_RENDERER: ${requested}`);
   const linux = process.platform === 'linux';
@@ -110,8 +111,9 @@ export async function launchProofBrowser({ name, engine, executablePath }) {
   const mode = requested === 'auto'
     ? (!linux || (renderDeviceAccessible() && (name !== 'firefox' || displayAvailable)) ? 'hardware' : 'software')
     : requested;
-  let display, browser;
+  let display, browser, trust;
   try {
+    if (trustedAuthority) trust = await trustAuthority(name, trustedAuthority);
     if (name === 'chromium') {
       const args = mode === 'software' ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']
         : linux ? ['--enable-gpu', '--use-gl=angle', '--use-angle=gl-egl'] : [];
@@ -119,8 +121,9 @@ export async function launchProofBrowser({ name, engine, executablePath }) {
       if (mode === 'hardware') delete env.LIBGL_ALWAYS_SOFTWARE;
       browser = await engine.launch({ executablePath, headless: true, args, env });
     } else {
-      display = await startDisplay(mode);
-      browser = await engine.launch({ executablePath, headless: false, env: display.env,
+      display = await startDisplay(mode, multipleWindows);
+      const launch = trust?.profile ? options => engine.launchPersistentContext(trust.profile, options) : options => engine.launch(options);
+      browser = await launch({ executablePath, headless: false, env: display.env,
         firefoxUserPrefs: { 'webgl.force-enabled': true, 'webgl.forbid-software': mode === 'hardware',
           // Ephemeral proof profiles disclose the actual adapter, not a privacy bucket.
           'webgl.sanitize-unmasked-renderer': false },
@@ -130,11 +133,11 @@ export async function launchProofBrowser({ name, engine, executablePath }) {
     const observed = rendererKind(renderer);
     if (observed !== mode) throw new ProofUnavailable(`${name}: requested ${mode}, observed ${observed} (${renderer ?? 'no WebGL2'}). No renderer substitution is accepted.`);
     console.log(`RENDERER ${name}: ${observed} — ${renderer}`);
-    return { browser, renderer, rendering: observed,
-      stop: async () => { try { await browser.close(); } finally { await display?.stop(); } },
+    return { browser, context: trust?.profile ? browser : undefined, renderer, rendering: observed,
+      stop: async () => { try { await browser.close(); } finally { try { await display?.stop(); } finally { await trust?.stop(); } } },
     };
   } catch (error) {
-    try { await browser?.close(); } finally { await display?.stop(); }
+    try { await browser?.close(); } finally { try { await display?.stop(); } finally { await trust?.stop(); } }
     if (error instanceof ProofUnavailable) throw error;
     throw new ProofUnavailable(`${name} ${mode} browser could not start: ${error.message}`);
   }

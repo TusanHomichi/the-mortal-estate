@@ -68,8 +68,8 @@ def proof(arguments: argparse.Namespace) -> int:
             report = "\n".join(observations)
             print(report)
             check_cooldowns(report)
-            cookie = client.session.cookie
-        client.public.request("GET", "/v3/session", cookie=cookie, expected=(401,))
+            token = client.session.token
+        client.public.request("POST", "/v4/session", body={}, token=token, expected=(401,))
         prove_disconnected_logout(server)
         print("sign-in, admission, cooldown rejection, reconnect, and logout passed")
     print(SUCCESS_SENTINEL)

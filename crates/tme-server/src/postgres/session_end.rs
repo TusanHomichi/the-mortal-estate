@@ -3,12 +3,12 @@ use super::*;
 impl PostgresState {
     pub async fn logout(
         &self,
-        session_cookie: &str,
+        session_token: &str,
         request: wire::LogoutRequestV1,
     ) -> Result<(), SessionError> {
         let _transition = self.coordinator.transition().await;
         let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
-        let session = active_session(&mut tx, session_cookie, false)
+        let session = active_session(&mut tx, session_token, false)
             .await?
             .ok_or(SessionError::AuthenticationRequired)?;
         validate_csrf(session.csrf_digest, &request.csrf_token)?;
@@ -31,7 +31,7 @@ impl PostgresState {
             let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
             Self::revalidate_exit_session(
                 &mut tx,
-                session_cookie,
+                session_token,
                 &session,
                 &request.csrf_token,
                 false,

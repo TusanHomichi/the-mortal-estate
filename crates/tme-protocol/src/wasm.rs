@@ -60,3 +60,12 @@ pub extern "C" fn codec_output_length() -> usize {
 pub extern "C" fn codec_protocol_minor() -> u32 {
     u32::from(crate::PROTOCOL_MINOR)
 }
+
+#[unsafe(no_mangle)]
+pub extern "C" fn codec_control_version() -> u32 {
+    u32::from(crate::CONTROL_API_VERSION)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn codec_control_limit() -> usize {
+    crate::MAX_CONTROL_INPUT_BYTES
+}

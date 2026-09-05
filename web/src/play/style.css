@@ -1,0 +1,22 @@
+:root { font: 100%/1.55 system-ui, sans-serif; color: #e7e5da; background: #141c1c; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 85rem; margin: auto; padding: clamp(1rem,3vw,3rem); }
+header { border-bottom: 1px solid #55635c; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+h1 { font: normal 2.3rem/1.15 Georgia,serif; margin: .7rem 0; } h2 { font-size: 1.1rem; }
+.eyebrow { color: #c9b78d; font-size: .75rem; letter-spacing: .12em; }
+button,input,select,summary { font: inherit; } button,input,select { padding: .55rem .7rem; border: 1px solid #89978d; border-radius: .3rem; }
+button { background: #c4b48b; color: #151e1d; cursor: pointer; } button:disabled { opacity: .45; cursor: default; }
+:focus-visible { outline: 3px solid #e9c875; outline-offset: 3px; }
+label { display: grid; gap: .3rem; margin-bottom: 1rem; } input,select { width: 100%; min-width: 0; background: #23302c; color: #fff; }
+form { max-width: 26rem; } nav { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 1.5rem; }
+.world-grid { display: grid; grid-template-columns: minmax(0,2fr) minmax(15rem,1fr); gap: 2rem; }
+canvas { display: block; width: 100%; height: auto; border: 1px solid #647569; touch-action: manipulation; }
+progress { width: 100%; accent-color: #c4b48b; }
+.directions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .35rem; }
+.directions button:first-child { grid-column: 2; } .directions button:nth-child(2) { grid-column: 1; } .directions button:last-child { grid-column: 2; }
+.legend { color: #b8c4bb; font-size: .85rem; } #position,#feedback { overflow-wrap: anywhere; }
+#occupants { padding-left: 1.2rem; } details { border-top: 1px solid #55635c; padding-top: 1rem; } summary { cursor: pointer; margin-bottom: 1rem; }
+#bindings { display: grid; grid-template-columns: repeat(auto-fit,minmax(12rem,1fr)); gap: 1rem; }
+[hidden] { display: none !important; }
+@media (max-width: 70rem) { .world-grid { grid-template-columns: 1fr; } .controls { max-width: 30rem; } }

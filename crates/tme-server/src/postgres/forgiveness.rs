@@ -3,7 +3,7 @@ use super::*;
 impl PostgresState {
     pub async fn forgive_player_kill_mark(
         &self,
-        session_cookie: &str,
+        session_token: &str,
         csrf_token: &wire::CsrfToken,
         mark_id: wire::PlayerKillMarkId,
         request: wire::ForgivePlayerKillMarkRequestV1,
@@ -21,7 +21,7 @@ impl PostgresState {
         // Authenticate and discover immutable routing facts without retaining
         // SQL row locks while a facet candidate is prepared.
         let mut discovery = serializable(self.store.pool()).await.map_err(unavailable)?;
-        let discovered_session = active_session(&mut discovery, session_cookie, true)
+        let discovered_session = active_session(&mut discovery, session_token, true)
             .await?
             .ok_or(SessionError::AuthenticationRequired)?;
         validate_csrf(discovered_session.csrf_digest, csrf_token)?;
@@ -193,13 +193,13 @@ impl PostgresState {
                             .map_err(unavailable)?,
                     )
                     .map_err(unavailable)?
-                        != checkpoint.server_sequence
+                        != checkpoint.before_sequence
                 {
                     return Err(SessionError::Unavailable);
                 }
             }
 
-            let session = active_session(&mut tx, session_cookie, false)
+            let session = active_session(&mut tx, session_token, false)
                 .await?
                 .ok_or(SessionError::AuthenticationRequired)?;
             validate_csrf(session.csrf_digest, csrf_token)?;
@@ -379,23 +379,7 @@ impl PostgresState {
             }
 
             if let Some((_, checkpoint, _)) = &prepared_forgiveness {
-                let updated = sqlx::query(
-                    "UPDATE tme.facets SET checkpoint_bytes=$2,checkpoint_sha256=$3, \
-                     facet_revision=$4,updated_at=statement_timestamp() WHERE facet_id=$1 \
-                     AND facet_revision=$5 AND last_server_sequence=$6",
-                )
-                .bind(checkpoint.facet_id.as_uuid())
-                .bind(checkpoint.checkpoint.as_bytes())
-                .bind(checkpoint.checkpoint.sha256().as_slice())
-                .bind(checked_i64(checkpoint.after_revision).map_err(unavailable)?)
-                .bind(checked_i64(checkpoint.before_revision).map_err(unavailable)?)
-                .bind(checked_i64(checkpoint.server_sequence).map_err(unavailable)?)
-                .execute(&mut *tx)
-                .await
-                .map_err(unavailable)?;
-                if updated.rows_affected() != 1 {
-                    return Err(SessionError::Unavailable);
-                }
+                Self::persist_prepared_checkpoint(&mut tx, checkpoint).await?;
             }
 
             let updated = sqlx::query(

@@ -17,7 +17,7 @@ pub type Socket =
     tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>;
 
 pub struct Client {
-    pub cookie: String,
+    pub token: String,
     pub csrf: wire::CsrfToken,
     pub socket: Socket,
     pub actor_id: wire::ActorId,
@@ -86,7 +86,7 @@ pub async fn login_select_connect(
         host,
         origin,
         "POST",
-        "/v3/login",
+        "/v4/login",
         None,
         Some(
             &serde_json::to_string(&wire::LoginRequestV1 {
@@ -98,19 +98,17 @@ pub async fn login_select_connect(
     )
     .await;
     assert_eq!(login.status, 200, "login failed for {username}");
-    let cookie = login.headers["set-cookie"]
-        .split(';')
-        .next()
-        .unwrap()
-        .to_string();
-    let bootstrap: wire::SessionBootstrapV1 = serde_json::from_slice(&login.body).unwrap();
+    assert!(!login.headers.contains_key("set-cookie"));
+    let login: wire::LoginResponseV1 = serde_json::from_slice(&login.body).unwrap();
+    let token = login.session_token.expose_for_validation().to_string();
+    let bootstrap = login.bootstrap;
     let csrf = bootstrap.csrf_token;
     let selection = post_json(
         address,
         host,
         origin,
-        "/v3/characters/select",
-        &cookie,
+        "/v4/characters/select",
+        &token,
         &wire::CharacterSelectRequestV1 {
             csrf_token: csrf.clone(),
             character_id,
@@ -118,10 +116,10 @@ pub async fn login_select_connect(
     )
     .await;
     assert_eq!(selection.status, 200, "character selection failed");
-    let ticket = issue_ticket(address, host, origin, &cookie, &csrf).await;
+    let ticket = issue_ticket(address, host, origin, &token, &csrf).await;
     let (socket, welcome) = connect_ticket(address, host, origin, &ticket).await;
     let mut client = Client {
-        cookie,
+        token,
         csrf,
         socket,
         actor_id: wire::ActorId::new("temporary").unwrap(),
@@ -184,7 +182,7 @@ pub async fn replacement_connection(
     origin: &str,
     client: &Client,
 ) -> (Socket, wire::ServerEnvelope) {
-    let ticket = issue_ticket(address, host, origin, &client.cookie, &client.csrf).await;
+    let ticket = issue_ticket(address, host, origin, &client.token, &client.csrf).await;
     connect_ticket(address, host, origin, &ticket).await
 }
 
@@ -341,15 +339,15 @@ pub async fn issue_ticket(
     address: SocketAddr,
     host: &str,
     origin: &str,
-    cookie: &str,
+    token: &str,
     csrf: &wire::CsrfToken,
 ) -> wire::AdmissionTicket {
     let response = post_json(
         address,
         host,
         origin,
-        "/v3/socket-tickets",
-        cookie,
+        "/v4/socket-tickets",
+        token,
         &wire::SocketTicketRequestV1 {
             csrf_token: csrf.clone(),
         },
@@ -367,7 +365,7 @@ pub async fn connect_ticket(
     origin: &str,
     ticket: &wire::AdmissionTicket,
 ) -> (Socket, wire::ServerEnvelope) {
-    let mut request = format!("ws://{address}/v3/socket")
+    let mut request = format!("ws://{address}/v4/socket")
         .into_client_request()
         .unwrap();
     request
@@ -423,7 +421,7 @@ async fn post_json<T: serde::Serialize>(
     host: &str,
     origin: &str,
     path: &str,
-    cookie: &str,
+    token: &str,
     value: &T,
 ) -> HttpResponse {
     http_request(
@@ -432,7 +430,7 @@ async fn post_json<T: serde::Serialize>(
         origin,
         "POST",
         path,
-        Some(cookie),
+        Some(token),
         Some(&serde_json::to_string(value).unwrap()),
     )
     .await
@@ -450,14 +448,14 @@ async fn http_request(
     origin: &str,
     method: &str,
     path: &str,
-    cookie: Option<&str>,
+    token: Option<&str>,
     body: Option<&str>,
 ) -> HttpResponse {
     let host = host.to_string();
     let origin = origin.to_string();
     let method = method.to_string();
     let path = path.to_string();
-    let cookie = cookie.map(str::to_string);
+    let token = token.map(str::to_string);
     let body = body.unwrap_or_default().as_bytes().to_vec();
     tokio::task::spawn_blocking(move || {
         let mut request = format!(
@@ -467,8 +465,8 @@ async fn http_request(
             request.push_str("Content-Type: application/json\r\n");
             request.push_str(&format!("Content-Length: {}\r\n", body.len()));
         }
-        if let Some(cookie) = cookie {
-            request.push_str(&format!("Cookie: {cookie}\r\n"));
+        if let Some(token) = token {
+            request.push_str(&format!("Authorization: Bearer {token}\r\n"));
         }
         request.push_str("\r\n");
         let mut stream = TcpStream::connect(address).expect("HTTP connect");

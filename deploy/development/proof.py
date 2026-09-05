@@ -69,9 +69,9 @@ def prove(site, *, restart=False):
             assert not first.frame["can_act"] and int(first.frame["ready_at"]) == deadline, "restart cleared the remaining action interval"
             first.wait_for(lambda frame: frame["can_act"])
             observations.append({"restart_preserved_deadline": True, "deadline": deadline})
-        cookies = [(client.public, client.session.cookie) for client in clients]
-    for public, cookie in cookies:
-        public.request("GET", "/v3/session", cookie=cookie, expected=(401,))
+        tokens = [(client.public, client.session.token) for client in clients]
+    for public, token in tokens:
+        public.request("POST", "/v4/session", body={}, token=token, expected=(401,))
     saved = backup(site)
     restored = restore_drill(site, saved)
     result = {"observations": observations, "old_sessions_refused": True,

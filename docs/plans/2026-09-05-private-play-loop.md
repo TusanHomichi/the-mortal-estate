@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-05
-revision: 1
+revision: 2
 status: In progress; private development deployment followed by authoritative browser controls.
 public_safe: true
 summary: Authorized two-slice execution, findings, and proof for a persistent private two-client play loop.
@@ -45,7 +45,9 @@ The runtime remains private. The presentation pause remains in force.
 | Finding | Owner and disposition |
 | --- | --- |
 | Existing production provisioning assumes a dedicated host and owns its default database/proxy configuration | Development operations use separate units, cluster, listeners and storage. No production bootstrap is run on this shared host. |
-| Login sets a persistent all-path cookie, conflicting with the browser's transient credentials and ticket-only socket contract | Browser-control slice must resolve the transport mechanism at the client/protocol boundary; do not conceal it with a proxy cookie strip or a second auth truth. |
+| Login sets a persistent all-path cookie, conflicting with the browser's transient credentials and ticket-only socket contract | Resolved by control API v4: explicit transient bearer token, strict POST bootstrap, ticket-only socket, retired routes/cookies refused, and every internal caller migrated. |
+
+| Prepared lifecycle mutation publishes a new revision under an existing server sequence, disconnecting the other strict browser on logout | Fixed at the server publication boundary: prepared checkpoints bind before/after sequences, durable writes and runtime commit advance together, and all prepared-mutation callers use the same persistence owner. Real two-tab logout and a prepared-publication regression prove it. |
 
 ## Evidence
 
@@ -69,6 +71,20 @@ responded with its authentication challenge.
 completed in 873.457 s with every selected step passing, using an independent
 scratch PostgreSQL cluster and the real private denylist. This includes the
 installed tests, native/WebAssembly corpus, PostgreSQL, trusted wire, both browser
-capture engines and clean-copy build/test proof. Git delivery is PR #46.
+capture engines and clean-copy build/test proof. PR #46 merged as `7907c56` after both required CI checks passed; #40 is closed.
 Machine inventory, generated inputs and detailed receipts remain local; GitHub
 owns delivered revisions and issue closure state.
+
+## Browser slice
+
+The private play shell consumes the diagnostic renderer through the existing
+frame/pointer seam. The connection adapter owns auth, one pending immutable
+command, epoch reconciliation and reconnect. Settings persist only text size and
+semantic key bindings. The candidate feel preview and presentation pause are
+unchanged. Browser and server bundle activation remains gated by equal storage
+and content contracts. Oversized persistence and certification test files were
+split by responsibility, preserving exact runner-selected test names.
+
+Observed focused proof: 278 shared codec and real-adapter tests passed. Normal
+TLS navigation to the installed host passed in both hardware-rendered engines.
+Complete UI proof and the browser slice's full baseline are pending.

@@ -559,7 +559,8 @@ pub(crate) struct PreparedFacetCheckpoint {
     pub facet_id: wire::FacetId,
     pub before_revision: u64,
     pub after_revision: u64,
-    pub server_sequence: u64,
+    pub before_sequence: u64,
+    pub after_sequence: u64,
     pub checkpoint: tme_rules::FacetCheckpointV5,
 }
 
@@ -985,3 +986,6 @@ fn certification_step(
 #[cfg(test)]
 #[path = "facet/certification_tests.rs"]
 mod certification_tests;
+
+#[cfg(test)]
+mod publication_tests;

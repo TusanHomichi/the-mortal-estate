@@ -66,7 +66,7 @@ http {{
         root {site.current}/web;
         location /internal/ {{ return 404; }}
         location /health/ {{ proxy_pass http://127.0.0.1:{ports['server']}; }}
-        location /v3/ {{
+        location ~ ^/v[0-9]+/ {{
             proxy_pass http://127.0.0.1:{ports['server']};
             proxy_http_version 1.1;
             proxy_set_header Host $http_host;

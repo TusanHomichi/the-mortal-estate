@@ -37,7 +37,7 @@ try {
   await page.goto(`${origin}/capture`);
   await page.waitForFunction(() => document.body.dataset.captureReady === "true");
   if (config.ticket) {
-    await page.evaluate(({ origin, ticket }) => window.authoritativeCapture.connect(origin.replace("https:", "wss:") + "/v3/socket", ticket), { origin, ticket: config.ticket });
+    await page.evaluate(({ origin, ticket }) => window.authoritativeCapture.connect(origin.replace("https:", "wss:") + "/v4/socket", ticket), { origin, ticket: config.ticket });
     delete config.ticket;
     await page.waitForFunction(() => window.authoritativeCapture.snapshot?.generation >= 2, null, { timeout: 30_000 });
   } else {

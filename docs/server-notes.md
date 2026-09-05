@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 19
-status: Standing server contract with an isolated private development deployment and offline contract identity.
+revision: 20
+status: Standing server contract with private deployment and transient control API v4 authentication.
 public_safe: true
-summary: Server authority, private development deployment, storage identity, deadlines, teardown and external-boundary limits.
+summary: Server authority, transient browser-compatible authentication, private development deployment, storage identity and teardown.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -81,6 +81,27 @@ world" (`RejectionCode::WrongFacet`, `PathPreviewRejectionCode::WrongFacet`) are
 gone, and the wire fixture corpus carries the retired shapes as *reject* cases so
 they cannot come back unnoticed.
 
+## Prepared lifecycle publication
+
+A prepared world mutation reserves both its next revision and server sequence.
+The guarded durable checkpoint write and runtime commit install that same pair
+before publishing a full update. Rollback consumes neither. Character exit,
+expiry, admission consequences and forgiveness use one prepared-checkpoint
+persistence function; no path may publish changed state under an existing
+sequence. The private two-tab proof caught the former logout violation.
+
+## Transient control authentication
+
+Control API v4 returns an explicit redacted-debug session token with the login
+bootstrap. Control requests carry one canonical Bearer header; cookies and
+ambiguous headers are refused. Session bootstrap uses a strict empty-JSON POST,
+matching its CSRF rotation and browser Origin requirements. Socket upgrades
+refuse both authorization and cookie headers; admission remains ticket-only.
+No storage migration accompanies this transport cutover. Every internal caller,
+shared codec fixture and production release version check moves together.
+[Client architecture](client-architecture.md#control-api-consumption) owns client
+handling, serialization and memory lifetime.
+
 ## Private development deployment
 
 [The development runbook](../deploy/development/README.md) owns the isolated
@@ -156,7 +177,7 @@ ordering; expiry also shares the character-exit persistence/publication helpers.
 `tools/logout_proof.py`, called by the gated server live proof, verifies a
 completed disconnect and forces the failing overlap using a PostgreSQL session
 row lock. The waiter and durable revision establish the ordering. Both return
-204, revoke the old cookie, and remove an unused ticket; connected logout remains
+204, revoke the old session token, and remove an unused ticket; connected logout remains
 covered by the same live proof. The [follow-up receipt](plans/2026-09-05-follow-up-closeout.md)
 records before/after evidence.
 

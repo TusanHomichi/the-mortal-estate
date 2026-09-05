@@ -6,10 +6,12 @@ use serde::Deserialize;
 
 use super::*;
 
-const DECODERS: [&str; 15] = [
+const DECODERS: [&str; 17] = [
     "decimal_u64",
     "decimal_i64",
     "login_request_v1",
+    "login_response_v1",
+    "session_bootstrap_request_v1",
     "logout_request_v1",
     "character_select_request_v1",
     "socket_ticket_request_v1",

@@ -89,9 +89,9 @@ def produce(projection, destination: Path, *, world_document: str | None = None,
                             document = {"origin": server.origin, "ticket": session.ticket(), "sources": sources}
                             _run(root, ["node", "web/proof/authoritative-capture.mjs"], document={**document, "engine": engine, "output": str(staging / engine)})
                         finally:
-                            cookie = session.cookie
+                            token = session.token
                             session.logout()
-                            public.request("GET", "/v3/session", cookie=cookie, expected=(401,))
+                            public.request("POST", "/v4/session", body={}, token=token, expected=(401,))
                 finally:
                     shutil.copyfile(server.server_log, staging / "server.log")
         for configuration in configurations:
