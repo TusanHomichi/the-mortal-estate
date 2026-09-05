@@ -87,9 +87,9 @@ fn interactive_quit_mid_session_prints_final_state() {
     );
 
     assert!(output.contains("mode: interactive\n"));
-    assert!(output.contains("> wait\n\nplayer ready: Delver at 1\n"));
+    assert!(output.contains("> wait\n\nplayer ready: Delver at 3000ms\n"));
     assert!(output.contains("> quit\n\nfinal state\n"));
-    assert!(!output.contains("player ready: Delver at 2\n"));
+    assert!(!output.contains("player ready: Delver at 6000ms\n"));
     assert!(output.ends_with("Mireling at realm_0/room_0:2,1 hp=7 alive\n"));
 }
 
@@ -126,8 +126,8 @@ fn parse_error_reprompts_without_costing_a_round() {
     );
 
     assert!(output.contains("> frobnicate\nerror: unknown command: frobnicate\n"));
-    assert!(output.contains("> wait\n\nplayer ready: Delver at 1\n"));
-    assert!(!output.contains("player ready: Delver at 2\n"));
+    assert!(output.contains("> wait\n\nplayer ready: Delver at 3000ms\n"));
+    assert!(!output.contains("player ready: Delver at 6000ms\n"));
 }
 
 #[test]
@@ -139,8 +139,8 @@ fn engine_step_error_reprompts_without_costing_the_next_round() {
     );
 
     assert!(output.contains("> fight mireling\nerror: fight target is out of range\n"));
-    assert!(output.contains("> wait\n\nplayer ready: Delver at 1\n"));
-    assert!(!output.contains("player ready: Delver at 2\n"));
+    assert!(output.contains("> wait\n\nplayer ready: Delver at 3000ms\n"));
+    assert!(!output.contains("player ready: Delver at 6000ms\n"));
     assert!(output.contains("> quit\n\nfinal state\n"));
     assert!(output.ends_with("Mireling at realm_0/room_0:2,1 hp=7 alive\n"));
 }
@@ -166,9 +166,9 @@ fn interactive_living_player_resolves_and_searches_stacked_corpses() {
         "fight scavenger\nfight lookout\nsearch corpse\nsearch 2 corpse\nquit\n",
     );
 
-    assert!(output.contains("> search corpse\n\nplayer ready: Wayfarer at 3\n"));
+    assert!(output.contains("> search corpse\n\nplayer ready: Wayfarer at 9000ms\n"));
     assert!(output.contains("Wayfarer searched corpse:2: items_released=0 gold_released=0\n"));
-    assert!(output.contains("> search 2 corpse\n\nplayer ready: Wayfarer at 4\n"));
+    assert!(output.contains("> search 2 corpse\n\nplayer ready: Wayfarer at 12000ms\n"));
     assert!(output.contains("Wayfarer searched corpse:1: items_released=1 gold_released=3\n"));
     assert!(output.contains("> quit\n\nfinal state\n"));
     assert!(output.contains("Wayfarer (Fighter) at realm_0/room_0:1,1 hp=6 alive\n"));
@@ -241,8 +241,8 @@ fn inventory_step_error_reprompts_without_costing_next_round() {
     assert!(output.contains(
         "> move_item missing_item to sack_item_1\nerror: unknown item instance \"missing_item\"\n"
     ));
-    assert!(output.contains("> wait\n\nplayer ready: Delver at 1\n"));
-    assert!(!output.contains("player ready: Delver at 2\n"));
+    assert!(output.contains("> wait\n\nplayer ready: Delver at 3000ms\n"));
+    assert!(!output.contains("player ready: Delver at 6000ms\n"));
 }
 
 #[test]

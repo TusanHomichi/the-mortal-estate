@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 6
-status: Owner-authorized browser-first contract; documentation audit separates the accepted layout target from current client implementations.
+last_updated: 2026-09-05
+revision: 7
+status: Owner-authorized browser-first contract with individual action timing; the Godot shell is retained and production presentation acceptance remains separate.
 public_safe: true
-summary: Client authority, browser and Godot baselines, state domains, wire consumption, accessibility, and proof obligations.
+summary: Browser-first client boundary, retained Godot shell, authoritative readiness, and individual action-interval presentation.
 routes:
   - web/**
   - client/**
@@ -40,30 +40,19 @@ maintain a gameplay, balance, group, offer, quest, resource, or world ledger.
 
 Presentation may explain an authoritative event. It may not patch game truth,
 infer hidden legality, keep a competing ledger, or create a second gameplay clock
-([boundary map](boundary-map.md#21-the-authoritative-pulse-d5)).
+([boundary map](boundary-map.md#21-authoritative-individual-deadlines-d5)).
 
-**The beat is the sharpest case of that rule, and the client presents it.**
-Ruling D5 permits presentation to remain fluid between authoritative beats and
-forbids two things absolutely: a second gameplay clock, and inferring readiness
-from elapsed seconds. So the client draws the pulse, under three structural
-constraints:
+**Cooldown presentation follows each action's authoritative deadline.**
+Ruling D5 requires independent deadlines. Readiness comes only from the frame's
+`can_act`; local elapsed time cannot unlock an action. Remaining time is the
+canonical decimal millisecond difference between `logical_time` and `ready_at`.
+The client may interpolate progress within that reported interval, clamped at
+completion, while it waits for the authoritative ready frame.
 
-1. **Readiness is the frame's `can_act`.** Nothing else may produce it, and
-   elapsed time may never turn a waiting observer into a ready one.
-2. **The wait is the frame's own arithmetic** — the whole-round distance between
-   its `logical_time` and its `ready_at`, on the digits.
-3. **The one local derivation is how far the current beat has got, and it is
-   measured rather than declared.** The wire carries no cadence, so the client
-   times the interval between the arrival of one round and the next and
-   interpolates inside it. It never extrapolates past what it measured, and it
-   draws no fill at all until an interval has been observed.
-
-In the retained Godot implementation, one owner holds all three:
-`client/presentation/pulse_clock.gd`. Every surface
-that presents the beat — the meter, the world view, the feedback director — is
-handed that one account, so they cannot describe different beats. The
-implementation and its refusals are
-[client notes](client-notes.md#the-pulse-made-visible).
+In the retained Godot implementation, `client/presentation/action_cooldown.gd`
+owns this presentation state. The meter, world view, and feedback director use
+that same state. An idle character has no repeating meter. Implementation and
+refusal proof are in [client notes](client-notes.md#individual-cooldowns-made-visible).
 
 ## The web client
 
@@ -162,7 +151,7 @@ The client keeps three conceptually separate domains, and each has a file:
 atomically. Events never patch it.**
 
 Presentation may lag authoritative state for bounded animation — bounded by the
-beat, which is where a step's animation both starts and ends. It may not supply
+action interval, which bounds a step's animation. It may not supply
 authority, legality, identity, balances, membership, command ordering, or
 reconnect state. Authentication secrets never enter presentation state or ordinary
 persisted settings — the credential model is
@@ -287,9 +276,9 @@ Four architectural rules bind any implementation:
    emits pointer facts; the shell decides what they mean.
 3. **Targets come from one neutral owner**, so every consumer sees one identity
    space regardless of what drew them.
-4. **A view may spread motion across a beat and may not manufacture one.** The
-   shell hands it the beat's progress; a view uses it to animate or ignores it.
-   It never times a beat itself, never anticipates the next one, and never lets
+4. **A view may animate within the supplied action interval.** The
+   shell hands it cooldown progress; a view uses it to animate or ignores it.
+   It never owns readiness, never anticipates acceptance, and never lets
    a bounded animation change which square a thing is on.
 
 The seam's member contract, the current implementation, and the capture obligation

@@ -30,9 +30,8 @@ export async function decodeTextures(
     ),
   );
   if (packet.assets.has("props/grass_clump")) windTextureKeys.add("props/grass_clump");
-  // Only the sheets decode as images; a figure's glTF, buffers, and clip
-  // library live under `figures/` and are decoded by the figure loader.
-  const sheets = [...packet.assets.entries()].filter(([key]) => !isFigureKey(key));
+  // Figure and structure models have their own verified-byte decoders.
+  const sheets = [...packet.assets.entries()].filter(([key]) => !isModelKey(key));
   await Promise.all(
     sheets.map(async ([key, asset]) => {
       const blob = new Blob([asset.bytes], { type: "image/png" });
@@ -104,8 +103,8 @@ export function assertNormalSheetsMatch(
   }
 }
 
-export function isFigureKey(key: string): boolean {
-  return key.startsWith("figures/");
+export function isModelKey(key: string): boolean {
+  return key.startsWith("figures/") || key.startsWith("structures/");
 }
 
 export function isNormalSheetKey(key: string): boolean {

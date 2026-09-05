@@ -277,7 +277,7 @@ func test_reconnect_logout_and_tree_exit_close_the_owned_socket() -> void:
 	_support.expect(client.login_screen.visible, "successful logout returns to login")
 	_support.expect(client.presentation_state.feedback_presenter.chat_entries.is_empty(), "successful logout discards prior-session presentation")
 	_support.expect_equal(client.world_screen.hud.hp_label.text, "HP —/—", "successful logout clears authoritative resources")
-	_support.expect_equal(client.world_screen.readiness_status.text, "◇ Beat: no authoritative frame", "successful logout clears authoritative readiness")
+	_support.expect_equal(client.world_screen.readiness_status.text, "◇ No authoritative frame", "successful logout clears authoritative readiness")
 	_support.expect_equal(fake.socket_close_count, 2, "logout closes the re-entered socket once")
 	_cleanup(client)
 

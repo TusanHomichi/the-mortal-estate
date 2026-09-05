@@ -29,7 +29,7 @@ function figureRow(): Record<string, unknown> {
 
 function validManifest(): Record<string, unknown> {
   return {
-    schema_version: 5,
+    schema_version: 6,
     assets: {
       terrain: requiredRows(REQUIRED_TERRAIN),
       walls: requiredRows(REQUIRED_WALLS),
@@ -53,6 +53,7 @@ function validManifest(): Record<string, unknown> {
         roofs: [],
         props: [],
         fixtures: [],
+    structures: [],
         light_sources: { lantern_glass: null, candles: [[0, 0.5, 0]] },
         weather: false,
         portals: [],
@@ -62,9 +63,9 @@ function validManifest(): Record<string, unknown> {
 }
 
 describe("candidate feel manifest", () => {
-  it("parses the exact schema-5 spaces packet", () => {
+  it("parses the exact schema-6 spaces packet", () => {
     const parsed = parseFeelManifest(validManifest());
-    expect(parsed.schema_version).toBe(5);
+    expect(parsed.schema_version).toBe(6);
     expect(parsed.start).toEqual({ space: "room", cell: [1, 1] });
     expect(parsed.spaces.room?.light_sources.lantern_glass).toBeNull();
   });
@@ -144,8 +145,8 @@ describe("candidate feel manifest", () => {
     expect(() => parseFeelManifest(retired)).toThrow(/schema 1 is retired and refused/);
   });
 
-  it("refuses the retired schemas 2, 3, and 4 by name", () => {
-    for (const version of [2, 3, 4]) {
+  it("refuses the retired schemas 2, 3, 4, and 5 by name", () => {
+    for (const version of [2, 3, 4, 5]) {
       const retired = validManifest();
       retired.schema_version = version;
       expect(() => parseFeelManifest(retired)).toThrow(new RegExp(`schema ${version} is retired and refused`));
@@ -266,7 +267,7 @@ describe("candidate feel manifest", () => {
     packet.spaces.room.portals = [
       { cell: [0, 0], to: { space: "room", cell: [1, 1] } },
     ];
-    expect(() => parseFeelManifest(packet)).toThrow(/portal is not a door tile: room\/0,0/);
+    expect(() => parseFeelManifest(packet)).toThrow(/portal is not a door tile or structure entrance: room\/0,0/);
   });
 
   it("refuses a portal target naming an absent space", () => {

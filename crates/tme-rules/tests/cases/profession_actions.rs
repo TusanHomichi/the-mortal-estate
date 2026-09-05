@@ -64,7 +64,7 @@ fn martial_artist_block_engine_for_class(class_id: &str, hand_level: u8, armed: 
 #[test]
 fn martial_artist_unarmed_hand_level_can_block_before_damage() {
     let mut engine = martial_artist_block_engine(19, false);
-    let events = engine.advance_realtime_boundary().expect("monster attacks");
+    let events = engine.advance_action_interval().expect("monster attacks");
 
     assert!(events.iter().any(|event| matches!(
         event,
@@ -88,9 +88,7 @@ fn martial_artist_unarmed_hand_level_can_block_before_damage() {
 #[test]
 fn martial_hand_block_requires_martial_artist_unarmed_defender() {
     let mut fighter = martial_artist_block_engine_for_class("fighter", 19, false);
-    let fighter_events = fighter
-        .advance_realtime_boundary()
-        .expect("monster attacks");
+    let fighter_events = fighter.advance_action_interval().expect("monster attacks");
     assert!(!fighter_events.iter().any(|event| matches!(
         event,
         Event::AttackBlocked {
@@ -100,7 +98,7 @@ fn martial_hand_block_requires_martial_artist_unarmed_defender() {
     )));
 
     let mut armed = martial_artist_block_engine(19, true);
-    let armed_events = armed.advance_realtime_boundary().expect("monster attacks");
+    let armed_events = armed.advance_action_interval().expect("monster attacks");
     assert!(!armed_events.iter().any(|event| matches!(
         event,
         Event::AttackBlocked {
@@ -113,7 +111,7 @@ fn martial_hand_block_requires_martial_artist_unarmed_defender() {
 #[test]
 fn martial_hand_block_requires_hand_level_at_or_above_minimum() {
     let mut engine = martial_artist_block_engine(0, false);
-    let events = engine.advance_realtime_boundary().expect("monster attacks");
+    let events = engine.advance_action_interval().expect("monster attacks");
 
     assert!(!events.iter().any(|event| matches!(
         event,

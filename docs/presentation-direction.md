@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-04
-revision: 32
-status: Owner-accepted visual target through the September 3 cell-count, ultrawide, projection reaffirmation, and live-character rulings. Superseded directions consolidated; no production presenter, asset set, or pipeline accepted.
+last_updated: 2026-09-05
+revision: 33
+status: Owner-directed visual target through September 5, including individual movement intervals and first-land tree variety. Superseded directions consolidated; no production presenter, asset set, or pipeline accepted.
 public_safe: true
 summary: Accepted visual grammar, construction, camera, chrome, actions, scaling, candidate rules, and unresolved taste decisions.
 routes:
@@ -424,18 +424,13 @@ behind the production seam still requires the production rule above.
 
 ### Movement and readiness
 
-Movement lands on the beat: a drafted route lands whole when the beat strikes,
-and nothing slides between squares (owner ruling, 2026-09-02). The browser's
-one-to-three-square route allowance and local beat are disposable experiment
-values, not settled gameplay tuning under D2. Readiness shows in the cursor;
-the scene draws no pulse. Walls that would hide the player's tile fade gently
-rather than the camera or wall height changing.
-
-The September 3 live-figure experiment presents movement between commitment
-and strike under owner test. It retains the authoritative landing above; the
-presentation verdict remains open. [Client notes](client-notes.md#the-web-feel-scenes-walk-experiment)
-owns the implemented behavior and the [live-figure plan](plans/2026-09-03-live-figure-rig.md)
-owns the pending review.
+The September 5 owner direction supersedes shared-beat landing. Each accepted
+browser move receives a fresh three-second interval and locks out replacement
+movement until completion. Presentation interpolates the figure along its
+committed route. [Client notes](client-notes.md#the-web-feel-scenes-walk-experiment)
+owns current behavior; the [timing ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
+owns server authority and individual deadlines. Route allowance remains
+experiment tuning under D2. Readiness shows in the cursor; occluding walls fade.
 
 ### Construction and viewport
 
@@ -515,6 +510,13 @@ beyond the subsequently decided idle and three gaits, which further classes
 cross, and the character source pipeline itself.
 [Client notes](client-notes.md#the-web-feel-scenes-walk-experiment) records
 the implemented clips and the current movement experiment.
+
+**Tree placement variety (owner direction, 2026-09-05).** When authoring the first
+land, do not place identical tree cards beside one another. Mix distinct
+silhouettes and sizes, distribute repeated assets across the landscape, and
+review the composition from the actual game camera. Mirroring or resizing the
+same card alone does not establish enough variety. This is an authoring
+requirement; it does not accept the current candidate tree set as a master.
 
 Vegetation cards take motion from one world-space wind field, phase from their
 position rather than a shared loop, and hold the root while art-derived canopy

@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-08-20
-revision: 1
-status: Tracked capture fixtures for Workbench V0b's proof set.
+last_updated: 2026-09-05
+revision: 2
+status: Paired captures freshly recorded for observer frame contract 8 and individual cooldown timing.
 public_safe: true
 summary: What produced the recorded frame and the two captures here, why they are tracked rather than generated at test time, and the exact commands that re-record them.
 ---
@@ -25,8 +25,8 @@ names the digests of the other two. They are only meaningful as a set.
 
 The two captures are of **the same frame in the same land, framed differently**.
 The live one was taken inside the world shell, so its lattice is inset around the
-HUD and its squares are 57 pixels; the fixture one had the window to itself, so
-its squares are 68. Different pixels, identical addresses — which is exactly the
+HUD; the fixture one has the window to itself. The sidecars record each
+route's current square pitch. Different pixels, identical addresses — which is exactly the
 claim acceptance criterion 2 makes, and it cannot be proven with one capture.
 
 `tests/test_capture_addressing.py` replays the same world region through both
@@ -81,3 +81,11 @@ an old frame.
 Nothing. They are proof material. No runtime reads them, no content references
 them, and the land they show is the tracked authoring fixture, whose own
 authority lives in `content/authoring-fixture/`.
+
+## September 5 re-recording
+
+Both routes and their authoritative frame were re-recorded after the observer
+contract changed to version 8 with millisecond timestamps. The live capture was
+taken first through the real server; the fixture capture replays that exact
+recording. The diagnostic image, identity raster, and sidecar were replaced as
+one set for each route. These remain proof fixtures, not accepted game artwork.

@@ -105,7 +105,7 @@ GATED_TESTS: tuple[GatedTest, ...] = (
     GatedTest(
         "ev_database_fault",
         ("--lib",),
-        "postgres::ev_database_fault_certification",
+        "postgres::database_recovery_tests::ev_database_fault_certification",
         provisioning="ev",
         seconds=3600.0,
     ),
@@ -208,6 +208,12 @@ def run_cargo_test(test: GatedTest, extra_env: dict[str, str]) -> None:
         "--test-threads=1",
     ]
     environment = {**os.environ, **extra_env}
+    listing = subprocess.run(
+        [*command[:-2], "--list"], cwd=str(ROOT), env=environment,
+        timeout=test.seconds, capture_output=True, text=True,
+    )
+    if listing.returncode != 0 or f"{test.filter}: test" not in listing.stdout.splitlines():
+        raise GatedError(f"{test.name} did not select its exact required test")
     print(f"--- {test.name} :: {' '.join(command)}", flush=True)
     completed = subprocess.run(command, cwd=str(ROOT), env=environment, timeout=test.seconds)
     if completed.returncode != 0:

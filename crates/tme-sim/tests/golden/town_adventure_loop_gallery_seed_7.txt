@@ -8,8 +8,8 @@ monster Road Scavenger at realm_0/trailhead:1,1 hp=1
 monster Return Sentinel at realm_0/trailhead:3,1 hp=100
 npc Route Keeper at realm_0/waystation:2,1 hp=20
 
-player ready: Mira at 1
-Mira intent at 1: fight road_scavenger
+player ready: Mira at 3000ms
+Mira intent at 3000ms: fight road_scavenger
 Mira attacked Road Scavenger: roll=2 damage=43 label=fatal hp=0
 contribution to road_scavenger: character=Some(CharacterId("character:town_adventure_loop_gallery:primary")) class=Some(Physical) damage=1
 Road Scavenger was defeated: cause=physical claim=character:town_adventure_loop_gallery:primary/killing_blow
@@ -22,214 +22,213 @@ shared defeat reward for Road Scavenger: available=0 awarded=0 reason=zero_autho
 Mira's fight fatal_blow practice on staff: risk=practice raw=2
 Mira gained 2 Staff practice points (pool: 2)
 Mira's Staff skill advanced to level 1, critique 1 (First Measure)
-readiness scheduled: Mira cost=1 ready_at=2
-Mira regenerated 1 Hp (11/40, Active, time 2)
-Mira regenerated 1 Mp (1/40, Active, time 2)
-time 2
-monster ready: Return Sentinel at 2
+readiness scheduled: Mira cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Return Sentinel at 6000ms
 Return Sentinel intent: hold
-readiness scheduled: Return Sentinel cost=100 ready_at=102
-npc ready: Route Keeper at 2
+readiness scheduled: Return Sentinel cost=100 ready_at=306000ms
+npc ready: Route Keeper at 6000ms
 Route Keeper intent: hold
-readiness scheduled: Route Keeper cost=100 ready_at=102
+readiness scheduled: Route Keeper cost=100 ready_at=306000ms
 
-player ready: Mira at 2
-Mira intent at 2: search corpse corpse:1
+player ready: Mira at 6000ms
+Mira intent at 6000ms: search corpse corpse:1
 Mira released Waystone Token from corpse:1 at (1,1)
 Mira released Trade Charm from corpse:1 at (1,1)
 Mira relocated 20 gold: corpse:1 -> ground:gold:1@realm_0/trailhead:1,1 reason=corpse_search claim=character:town_adventure_loop_gallery:primary/killing_blow
 Mira searched corpse:1: items_released=2 gold_released=20
-readiness scheduled: Mira cost=1 ready_at=3
-time 3
+readiness scheduled: Mira cost=1 ready_at=9000ms
+time 9000ms
+Mira regenerated 1 Hp (11/40, Active, time 9000ms)
+Mira regenerated 1 Mp (1/40, Active, time 9000ms)
 
-player ready: Mira at 3
-Mira intent at 3: move_item waystone_token to sack_item_2
+player ready: Mira at 9000ms
+Mira intent at 9000ms: move_item waystone_token to sack_item_2
 Mira moved Waystone Token from (1,1) to sack_item_2
-readiness scheduled: Mira cost=1 ready_at=4
-Mira regenerated 1 Hp (12/40, Active, time 4)
-Mira regenerated 1 Mp (2/40, Active, time 4)
-time 4
+readiness scheduled: Mira cost=1 ready_at=12000ms
+time 12000ms
 
-player ready: Mira at 4
-Mira intent at 4: move_item trade_charm to sack_item_3
+player ready: Mira at 12000ms
+Mira intent at 12000ms: move_item trade_charm to sack_item_3
 Mira moved Trade Charm from (1,1) to sack_item_3
-readiness scheduled: Mira cost=1 ready_at=5
-time 5
+readiness scheduled: Mira cost=1 ready_at=15000ms
+time 15000ms
+Mira regenerated 1 Hp (12/40, Active, time 15000ms)
+Mira regenerated 1 Mp (2/40, Active, time 15000ms)
 
-player ready: Mira at 5
-Mira intent at 5: move_gold Ground { gold_pile_id: GoldPileId("gold:1") } Carried { position: Sack } All
+player ready: Mira at 15000ms
+Mira intent at 15000ms: move_gold Ground { gold_pile_id: GoldPileId("gold:1") } Carried { position: Sack } All
 Mira relocated 20 gold: ground:gold:1@realm_0/trailhead:1,1 -> carried:player:sack reason=player_move claim=character:town_adventure_loop_gallery:primary/killing_blow
-readiness scheduled: Mira cost=1 ready_at=6
-Mira regenerated 1 Hp (13/40, Active, time 6)
-Mira regenerated 1 Mp (3/40, Active, time 6)
-time 6
+readiness scheduled: Mira cost=1 ready_at=18000ms
+time 18000ms
 
-player ready: Mira at 6
-Mira intent at 6: walk east
+player ready: Mira at 18000ms
+Mira intent at 18000ms: walk east
 Mira walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Mira step east -> (2,1): terrain=Waystation Stairs Up cost=1 remaining=2
 Mira moved from (1,1) to (2,1)
-readiness scheduled: Mira cost=1 ready_at=7
-time 7
+readiness scheduled: Mira cost=1 ready_at=21000ms
+time 21000ms
+Mira regenerated 1 Hp (13/40, Active, time 21000ms)
+Mira regenerated 1 Mp (3/40, Active, time 21000ms)
 
-player ready: Mira at 7
-Mira intent at 7: traverse stairs_up
+player ready: Mira at 21000ms
+Mira intent at 21000ms: traverse stairs_up
 --- Mira uses up stairs: realm_0/trailhead:2,1 -> realm_0/waystation:2,1 ---
-readiness scheduled: Mira cost=1 ready_at=8
-Mira regenerated 1 Hp (14/40, Active, time 8)
-Mira regenerated 1 Mp (4/40, Active, time 8)
-time 8
+readiness scheduled: Mira cost=1 ready_at=24000ms
+time 24000ms
 
-player ready: Mira at 8
-Mira intent at 8: interact_with_npc route_keeper ask_about_waystone none
+player ready: Mira at 24000ms
+Mira intent at 24000ms: interact_with_npc route_keeper ask_about_waystone none
 Route Keeper [ask_about_waystone]: A marked stone went missing along the trail.
 quest waystone_recovery for character:town_adventure_loop_gallery:primary: unstarted -> awaiting_waystone
 Mira completes NPC interaction ask_about_waystone with route_keeper.
   costs: []
   rewards: [{"kind":"npc_interaction","npc_actor_id":"route_keeper","interaction_id":"ask_about_waystone","outcome":{"kind":"speak"}},{"kind":"quest_stage","character_id":"character:town_adventure_loop_gallery:primary","quest_id":"waystone_recovery","before_stage_id":null,"after_stage_id":"awaiting_waystone"}]
-readiness scheduled: Mira cost=1 ready_at=9
-time 9
+readiness scheduled: Mira cost=1 ready_at=27000ms
+time 27000ms
+Mira regenerated 1 Hp (14/40, Active, time 27000ms)
+Mira regenerated 1 Mp (4/40, Active, time 27000ms)
 
-player ready: Mira at 9
-Mira intent at 9: interact_with_npc route_keeper return_waystone waystone_token
+player ready: Mira at 27000ms
+Mira intent at 27000ms: interact_with_npc route_keeper return_waystone waystone_token
 Route Keeper [return_waystone]: The trail marker is whole again.
 quest waystone_recovery for character:town_adventure_loop_gallery:primary: awaiting_waystone -> completed
 Mira gained 7 experience points (total: 7)
 Mira completes NPC interaction return_waystone with route_keeper.
   costs: [{"kind":"selected_carried_item","item_instance_id":"waystone_token","item_definition_id":"waystone_token","consumed_quantity":1,"remaining_quantity":0}]
   rewards: [{"kind":"npc_interaction","npc_actor_id":"route_keeper","interaction_id":"return_waystone","outcome":{"kind":"speak"}},{"kind":"quest_stage","character_id":"character:town_adventure_loop_gallery:primary","quest_id":"waystone_recovery","before_stage_id":"awaiting_waystone","after_stage_id":"completed"},{"kind":"experience","amount":7,"total_xp":7}]
-readiness scheduled: Mira cost=1 ready_at=10
-Mira regenerated 1 Hp (15/40, Active, time 10)
-Mira regenerated 1 Mp (5/40, Active, time 10)
-time 10
+readiness scheduled: Mira cost=1 ready_at=30000ms
+time 30000ms
 
-player ready: Mira at 10
-Mira intent at 10: use_item_service waystation_counter appraisal appraise trade_charm
+player ready: Mira at 30000ms
+Mira intent at 30000ms: use_item_service waystation_counter appraisal appraise trade_charm
 Mira appraised Trade Charm at 8 gold
 Mira completes appraise for trade_charm.
-readiness scheduled: Mira cost=1 ready_at=11
-time 11
+readiness scheduled: Mira cost=1 ready_at=33000ms
+time 33000ms
+Mira regenerated 1 Hp (15/40, Active, time 33000ms)
+Mira regenerated 1 Mp (5/40, Active, time 33000ms)
 
-player ready: Mira at 11
-Mira intent at 11: sell_to_merchant waystation_counter trail_wares trade_charm
+player ready: Mira at 33000ms
+Mira intent at 33000ms: sell_to_merchant waystation_counter trail_wares trade_charm
 Mira sold Trade Charm to a merchant
 Mira gained 8 gold
 Mira completes sale of trade_charm.
-readiness scheduled: Mira cost=1 ready_at=12
-Mira regenerated 1 Hp (16/40, Active, time 12)
-Mira regenerated 1 Mp (6/40, Active, time 12)
-time 12
+readiness scheduled: Mira cost=1 ready_at=36000ms
+time 36000ms
 
-player ready: Mira at 12
-Mira intent at 12: move_gold Carried { position: Sack } GroundHere Exact { amount: 15 }
+player ready: Mira at 36000ms
+Mira intent at 36000ms: move_gold Carried { position: Sack } GroundHere Exact { amount: 15 }
 Mira relocated 15 gold: carried:player:sack -> ground:gold:2@realm_0/waystation:2,1 reason=player_move
-readiness scheduled: Mira cost=1 ready_at=13
-time 13
+readiness scheduled: Mira cost=1 ready_at=39000ms
+time 39000ms
+Mira regenerated 1 Hp (16/40, Active, time 39000ms)
+Mira regenerated 1 Mp (6/40, Active, time 39000ms)
 
-player ready: Mira at 13
-Mira intent at 13: deposit_bank_gold waystation_counter bank_access gold:2
+player ready: Mira at 39000ms
+Mira intent at 39000ms: deposit_bank_gold waystation_counter bank_access gold:2
 Mira relocated 15 gold: ground:gold:2@realm_0/waystation:2,1 -> bank:waystation_bank:character:town_adventure_loop_gallery:primary reason=bank_deposit
 Mira deposited 15 gold at bank waystation_bank: 0 -> 15
 Mira completes bank deposit of gold:2 at waystation_bank.
-readiness scheduled: Mira cost=1 ready_at=14
-Mira regenerated 1 Hp (17/40, Active, time 14)
-Mira regenerated 1 Mp (7/40, Active, time 14)
-time 14
+readiness scheduled: Mira cost=1 ready_at=42000ms
+time 42000ms
 
-player ready: Mira at 14
-Mira intent at 14: deposit_locker_item waystation_counter locker_access weathered_staff
+player ready: Mira at 42000ms
+Mira intent at 42000ms: deposit_locker_item waystation_counter locker_access weathered_staff
 Mira stored Weathered Staff in a locker
-readiness scheduled: Mira cost=1 ready_at=15
-time 15
+readiness scheduled: Mira cost=1 ready_at=45000ms
+time 45000ms
+Mira regenerated 1 Hp (17/40, Active, time 45000ms)
+Mira regenerated 1 Mp (7/40, Active, time 45000ms)
 
-player ready: Mira at 15
-Mira intent at 15: move_item field_spell_book to right_hand
+player ready: Mira at 45000ms
+Mira intent at 45000ms: move_item field_spell_book to right_hand
 Mira moved Field Spell Book from sack_item_1 to right_hand
-readiness scheduled: Mira cost=1 ready_at=16
-Mira regenerated 1 Hp (18/40, Active, time 16)
-Mira regenerated 1 Mp (8/40, Active, time 16)
-time 16
+readiness scheduled: Mira cost=1 ready_at=48000ms
+time 48000ms
 
-player ready: Mira at 16
-Mira intent at 16: critique waystation_counter wizard_magic
+player ready: Mira at 48000ms
+Mira intent at 48000ms: critique waystation_counter wizard_magic
 Mira's Wizard Magic critique: level 1, no critique rank (First Measure)
-readiness scheduled: Mira cost=1 ready_at=17
-time 17
+readiness scheduled: Mira cost=1 ready_at=51000ms
+time 51000ms
+Mira regenerated 1 Hp (18/40, Active, time 51000ms)
+Mira regenerated 1 Mp (8/40, Active, time 51000ms)
 
-player ready: Mira at 17
-Mira intent at 17: train waystation_counter 7
+player ready: Mira at 51000ms
+Mira intent at 51000ms: train waystation_counter 7
 Mira spent 7 gold
 Mira trained wizard_magic with waystation_counter: learning rate 1 -> 2, offered 7 gold, spent 7, retained 0
 Mira gained 3 experience points (total: 10)
-readiness scheduled: Mira cost=1 ready_at=18
-Mira regenerated 1 Hp (19/40, Active, time 18)
-Mira regenerated 1 Mp (9/40, Active, time 18)
-time 18
+readiness scheduled: Mira cost=1 ready_at=54000ms
+time 54000ms
 
-player ready: Mira at 18
-Mira intent at 18: learn_spell ember_bolt
+player ready: Mira at 54000ms
+Mira intent at 54000ms: learn_spell ember_bolt
 Mira spent 25 gold
 Waystation Counter records Ember Bolt (wizard_magic) in Mira's retained Field Spell Book for 25 gold
-readiness scheduled: Mira cost=1 ready_at=19
-time 19
+readiness scheduled: Mira cost=1 ready_at=57000ms
+time 57000ms
+Mira regenerated 1 Hp (19/40, Active, time 57000ms)
+Mira regenerated 1 Mp (9/40, Active, time 57000ms)
 
-player ready: Mira at 19
-Mira intent at 19: move_item field_spell_book to sack_item_1
+player ready: Mira at 57000ms
+Mira intent at 57000ms: move_item field_spell_book to sack_item_1
 Mira moved Field Spell Book from right_hand to sack_item_1
-readiness scheduled: Mira cost=1 ready_at=20
-Mira regenerated 1 Hp (20/40, Active, time 20)
-Mira regenerated 1 Mp (10/40, Active, time 20)
-time 20
+readiness scheduled: Mira cost=1 ready_at=60000ms
+time 60000ms
 
-player ready: Mira at 20
-Mira intent at 20: buy_from_merchant waystation_counter trail_wares bright_staff_stock
+player ready: Mira at 60000ms
+Mira intent at 60000ms: buy_from_merchant waystation_counter trail_wares bright_staff_stock
 Mira spent 12 gold
 Mira bought Bright Staff into sack_item_2
 Mira completes purchase of bright_staff_stock.
-readiness scheduled: Mira cost=1 ready_at=21
-time 21
+readiness scheduled: Mira cost=1 ready_at=63000ms
+time 63000ms
+Mira regenerated 1 Hp (20/40, Active, time 63000ms)
+Mira regenerated 1 Mp (10/40, Active, time 63000ms)
 
-player ready: Mira at 21
-Mira intent at 21: move_item bright_staff_stock to right_hand
+player ready: Mira at 63000ms
+Mira intent at 63000ms: move_item bright_staff_stock to right_hand
 Mira moved Bright Staff from sack_item_2 to right_hand
-readiness scheduled: Mira cost=1 ready_at=22
-Mira regenerated 1 Hp (21/40, Active, time 22)
-Mira regenerated 1 Mp (11/40, Active, time 22)
-time 22
+readiness scheduled: Mira cost=1 ready_at=66000ms
+time 66000ms
 
-player ready: Mira at 22
-Mira intent at 22: use_restoration_service waystation_counter restoration restore_hit_points none none
+player ready: Mira at 66000ms
+Mira intent at 66000ms: use_restoration_service waystation_counter restoration restore_hit_points none none
 Mira spent 3 gold
-Mira restored Hp from 21 to 40/40
+Mira restored Hp from 20 to 40/40
 Mira completes restoration service restore_hit_points.
-readiness scheduled: Mira cost=1 ready_at=23
-time 23
+readiness scheduled: Mira cost=1 ready_at=69000ms
+time 69000ms
+Mira regenerated 1 Mp (11/40, Active, time 69000ms)
 
-player ready: Mira at 23
-Mira intent at 23: use_restoration_service waystation_counter restoration restore_magic_points none none
+player ready: Mira at 69000ms
+Mira intent at 69000ms: use_restoration_service waystation_counter restoration restore_magic_points none none
 Mira spent 2 gold
 Mira restored Mp from 11 to 40/40
 Mira completes restoration service restore_magic_points.
-readiness scheduled: Mira cost=1 ready_at=24
-time 24
+readiness scheduled: Mira cost=1 ready_at=72000ms
+time 72000ms
 
-player ready: Mira at 24
-Mira intent at 24: traverse stairs_down
+player ready: Mira at 72000ms
+Mira intent at 72000ms: traverse stairs_down
 --- Mira uses down stairs: realm_0/waystation:2,1 -> realm_0/trailhead:3,1 ---
-readiness scheduled: Mira cost=1 ready_at=25
-time 25
+readiness scheduled: Mira cost=1 ready_at=75000ms
+time 75000ms
 
-player ready: Mira at 25
-Mira intent at 25: fight return_sentinel
+player ready: Mira at 75000ms
+Mira intent at 75000ms: fight return_sentinel
 Mira attacked Return Sentinel: roll=8 damage=44 label=heavy hp=56
 contribution to return_sentinel: character=Some(CharacterId("character:town_adventure_loop_gallery:primary")) class=Some(Physical) damage=44
 Mira's fight damaging_hit practice on staff: risk=practice raw=1
 Mira gained 1 Staff practice point (pool: 2)
-readiness scheduled: Mira cost=1 ready_at=26
-time 26
+readiness scheduled: Mira cost=1 ready_at=78000ms
+time 78000ms
 
-player ready: Mira at 26
-Mira intent at 26: cast ember_bolt on return_sentinel
+player ready: Mira at 78000ms
+Mira intent at 78000ms: cast ember_bolt on return_sentinel
 Return Sentinel resolves ember_bolt save [arcane]: roll=11 threshold=5/20 natural=5 boost=0 result=failure mitigation=none damage=3->3.
 Mira's Ember Bolt hits Return Sentinel for 3 damage (53 hp).
 contribution to return_sentinel: character=Some(CharacterId("character:town_adventure_loop_gallery:primary")) class=Some(DirectedSpell) damage=3
@@ -237,11 +236,12 @@ Mira's Ember Bolt practice on wizard_magic: raw=3 reason=eligible_successful_cas
 Mira gained 3 raw Wizard Magic practice points at learning rate 2, credited as 6 practice points (pool: 6)
 Mira's Wizard Magic skill advanced to level 1, critique 1 (First Measure)
 Mira's Wizard Magic skill advanced to level 1, critique 2 (First Measure)
-readiness scheduled: Mira cost=1 ready_at=27
-time 27
+readiness scheduled: Mira cost=1 ready_at=81000ms
+time 81000ms
+Mira regenerated 1 Mp (39/40, Active, time 81000ms)
 
-player ready: Mira at 27
-Mira intent at 27: inspect
+player ready: Mira at 81000ms
+Mira intent at 81000ms: inspect
 Mira inspected at realm_0/trailhead:3,1: tile=Trail Stone
   current tile: terrain=Trail Stone cost=1
   north -> realm_0/trailhead:3,0: blocked terrain terrain=Trail Wall
@@ -252,7 +252,6 @@ Mira inspected at realm_0/trailhead:3,1: tile=Trail Stone
   southwest -> realm_0/trailhead:2,2: blocked terrain terrain=Trail Wall
   west -> realm_0/trailhead:2,1: walkable terrain=Waystation Stairs Up cost=1
   northwest -> realm_0/trailhead:2,0: blocked terrain terrain=Trail Wall
-readiness scheduled: Mira cost=0 ready_at=27
 
 final state
 Mira (Wizard) at realm_0/trailhead:3,1 hp=40 alive

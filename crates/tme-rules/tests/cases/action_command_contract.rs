@@ -533,10 +533,10 @@ fn validate_rejects_wrong_contract_version() {
 
 #[test]
 fn eu_contract_versions_are_exact_and_trace_envelopes_remain_current() {
-    assert_eq!(tme_rules::EVENT_CONTRACT_VERSION, 40);
-    assert_eq!(tme_rules::SNAPSHOT_CONTRACT_VERSION, 30);
-    assert_eq!(tme_rules::OBSERVED_SNAPSHOT_CONTRACT_VERSION, 29);
-    assert_eq!(tme_rules::ACTION_CONTEXT_CONTRACT_VERSION, 31);
+    assert_eq!(tme_rules::EVENT_CONTRACT_VERSION, 41);
+    assert_eq!(tme_rules::SNAPSHOT_CONTRACT_VERSION, 31);
+    assert_eq!(tme_rules::OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
+    assert_eq!(tme_rules::ACTION_CONTEXT_CONTRACT_VERSION, 32);
     assert_eq!(tme_rules::COMMAND_CONTRACT_VERSION, 26);
     assert_eq!(tme_rules::PATH_PREVIEW_CONTRACT_VERSION, 8);
     assert_eq!(tme_rules::TRACE_V2_CONTRACT_VERSION, 2);

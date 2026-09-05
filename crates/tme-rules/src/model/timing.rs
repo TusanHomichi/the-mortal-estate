@@ -1,44 +1,67 @@
 use serde::{Deserialize, Serialize};
 
-/// Deterministic rules time measured in logical rounds.
-///
-/// This is deliberately independent of wall-clock seconds. The first authored
-/// actor opportunity is [`LogicalTime::FIRST`]; zero is retained for initial
-/// lifecycle state that must tick after the first completed logical round.
+/// One authored action-cost unit currently lasts three seconds. This converts
+/// durations, not a shared phase or a global gameplay pulse.
+pub const ACTION_TIME_UNIT_MILLIS: u64 = 3_000;
+
+/// Deterministic authoritative elapsed time with millisecond precision.
+/// Whole-unit constructors remain useful for authored durations and simulation
+/// examples; live deadlines preserve the offset of the action that starts them.
 #[derive(
     Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
 )]
-#[serde(transparent)]
+#[serde(from = "TimeMilliseconds", into = "TimeMilliseconds")]
 pub struct LogicalTime(u64);
 
-impl std::fmt::Display for LogicalTime {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(formatter, "{}", self.0)
-    }
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TimeMilliseconds {
+    milliseconds: u64,
 }
 
+impl From<TimeMilliseconds> for LogicalTime {
+    fn from(value: TimeMilliseconds) -> Self {
+        Self(value.milliseconds)
+    }
+}
+impl From<LogicalTime> for TimeMilliseconds {
+    fn from(value: LogicalTime) -> Self {
+        Self {
+            milliseconds: value.0,
+        }
+    }
+}
+impl std::fmt::Display for LogicalTime {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "{}ms", self.0)
+    }
+}
 impl LogicalTime {
     pub const ZERO: Self = Self(0);
-    pub const FIRST: Self = Self(1);
+    pub const FIRST: Self = Self(ACTION_TIME_UNIT_MILLIS);
 
-    pub const fn new(value: u64) -> Self {
-        Self(value)
+    /// A whole authored duration-unit position, used by deterministic callers.
+    pub const fn new(units: u64) -> Self {
+        Self(units.saturating_mul(ACTION_TIME_UNIT_MILLIS))
     }
-
-    pub const fn value(self) -> u64 {
+    pub const fn from_millis(milliseconds: u64) -> Self {
+        Self(milliseconds)
+    }
+    pub const fn as_millis(self) -> u64 {
         self.0
     }
-
-    pub fn saturating_add_rounds(self, rounds: u32) -> Self {
-        Self(self.0.saturating_add(u64::from(rounds)))
+    /// Completed whole units; never use this truncated view for live deadlines.
+    pub const fn value(self) -> u64 {
+        self.0 / ACTION_TIME_UNIT_MILLIS
     }
-
+    pub fn saturating_add_millis(self, milliseconds: u64) -> Self {
+        Self(self.0.saturating_add(milliseconds))
+    }
+    pub fn saturating_add_rounds(self, units: u32) -> Self {
+        self.saturating_add_millis(u64::from(units).saturating_mul(ACTION_TIME_UNIT_MILLIS))
+    }
     pub fn elapsed_rounds_since(self, earlier: Self) -> u64 {
-        self.0.saturating_sub(earlier.0)
-    }
-
-    pub fn is_multiple_of(self, rounds: u32) -> bool {
-        rounds != 0 && self.0.is_multiple_of(u64::from(rounds))
+        self.0.saturating_sub(earlier.0) / ACTION_TIME_UNIT_MILLIS
     }
 }
 
@@ -108,9 +131,22 @@ mod tests {
     }
 
     #[test]
-    fn logical_time_multiple_checks_reject_zero_cadence() {
-        assert!(LogicalTime::new(6).is_multiple_of(3));
-        assert!(!LogicalTime::new(7).is_multiple_of(3));
-        assert!(!LogicalTime::new(6).is_multiple_of(0));
+    fn action_deadlines_preserve_sub_unit_offsets_and_refuse_old_scalar_time() {
+        let start = LogicalTime::from_millis(4_127);
+        assert_eq!(start.saturating_add_rounds(1).as_millis(), 7_127);
+        assert_eq!(
+            LogicalTime::from_millis(7_126).elapsed_rounds_since(start),
+            0
+        );
+        assert_eq!(
+            LogicalTime::from_millis(7_127).elapsed_rounds_since(start),
+            1
+        );
+        assert_eq!(
+            serde_json::to_string(&start).unwrap(),
+            r#"{"milliseconds":4127}"#
+        );
+        assert!(serde_json::from_str::<LogicalTime>("1").is_err());
+        assert!(serde_json::from_str::<LogicalTime>(r#"{"milliseconds":4127,"round":1}"#).is_err());
     }
 }

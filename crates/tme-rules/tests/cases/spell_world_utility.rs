@@ -29,6 +29,8 @@ fn bu_locate_portal_spell_engine_mutate(
     mutate: impl FnOnce(&mut ContentParts),
 ) -> Engine {
     let mut parts = bu_locate_portal_spell_parts(known_spell_ids);
+    parts.selected_by_runtime_id_mut("spells", "blue_gate")["effect"]["duration"]["rounds"] =
+        serde_json::json!(2);
     mutate(&mut parts);
     parts.engine(7).expect("world utility engine should start")
 }
@@ -551,7 +553,7 @@ fn portal_creation_transition_movement_and_expiration_use_effective_edges() {
         .find_map(|event| event_payload_value(event, "portal_created"))
         .expect("portal creation event should be emitted");
     assert_eq!(created["actor_id"], "player");
-    assert_eq!(created["instance_id"], "portal:blue_gate:1:start:2:1");
+    assert_eq!(created["instance_id"], "portal:blue_gate:3000ms:start:2:1");
     assert_eq!(
         created["location"],
         serde_json::json!({
@@ -564,7 +566,7 @@ fn portal_creation_transition_movement_and_expiration_use_effective_edges() {
             "realm": "realm_0", "level": "vault", "position": {"x": 1, "y": 1}
         })
     );
-    assert_eq!(created["remaining_rounds"], 1);
+    assert_eq!(created["remaining_rounds"], 2);
     assert_eq!(created["two_way"], true);
 
     let preview = engine

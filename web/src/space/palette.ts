@@ -34,20 +34,20 @@ export function paletteFor(
     ? {
         background: new Color("#4b394d"),
         ambient: new Color("#d2ddf0"),
-        ambientIntensity: 1.2,
+        ambientIntensity: 0.9,
         key: new Color("#c5d9ff"),
-        keyIntensity: 1.5,
-        lanternIntensity: 65,
+        keyIntensity: 1.2,
+        lanternIntensity: 14,
         candleIntensity: 7,
         practicalShaderStrength: 5,
       }
     : {
         background: new Color("#091426"),
-        ambient: new Color("#f2f7ff"),
-        ambientIntensity: 1.2,
+        ambient: new Color("#9fb6d2"),
+        ambientIntensity: 0.75,
         key: new Color("#a9caff"),
-        keyIntensity: 1,
-        lanternIntensity: 55,
+        keyIntensity: 0.8,
+        lanternIntensity: 12,
         candleIntensity: 5,
         practicalShaderStrength: 4,
       };

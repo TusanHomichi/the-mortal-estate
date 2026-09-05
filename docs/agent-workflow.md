@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-04
-revision: 6
+last_updated: 2026-09-05
+revision: 7
 status: Working contract from Phase 7; owner acceptance remains at its recorded stop point. Audit clarifies context loading and verification ownership.
 public_safe: true
 summary: Scope, context loading, document precedence, implementation rules, verification lessons, CI, and closeout.
@@ -100,7 +100,7 @@ gameplay system. It is followed in order, and step 5 is not reachable by skippin
 step 2.
 
 **1. The charter.** Name which of the product's identity truths this system
-serves: death as play, lineage continuity, the shared pulse, social dependence,
+serves: death as play, lineage continuity, authoritative individual timing, social dependence,
 dangerous geography, or the world's memory. A system that strengthens none of
 them is a scope question for the owner, not a spec.
 

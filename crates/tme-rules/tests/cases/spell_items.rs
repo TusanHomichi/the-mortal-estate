@@ -30,6 +30,7 @@ fn bu_item_spell_engine(known_spell_ids: &[&str]) -> Engine {
         "spell/keen_edge/utility_door_secret_item_spells",
         "spell/shape_token/utility_door_secret_item_spells"
     ]);
+    parts.selected_mut("spells", 1)["effect"]["duration"]["rounds"] = serde_json::json!(2);
     parts.selected_mut("spells", 0)["target"] = serde_json::json!({"kind": "item"});
     parts.selected_mut("spells", 2)["effect"]["item_utility"]["output_item_definition_id"] =
         serde_json::json!("polished_token");
@@ -248,7 +249,7 @@ fn weapon_enchant_modifies_active_weapon_damage_until_it_expires() {
             && item_instance_id == "utility_blade"
             && *combat_add_rating_bonus == 5
             && tags == &vec!["keen".to_string()]
-            && *remaining_rounds == Some(1)
+            && *remaining_rounds == Some(2)
     )));
 
     let mut baseline = bu_item_spell_engine(&[]);
@@ -292,7 +293,7 @@ fn weapon_enchant_modifies_active_weapon_damage_until_it_expires() {
             enchantment_instance_id,
             ..
         } if item_instance_id == "utility_blade"
-            && enchantment_instance_id == "spell:keen_edge:1:utility_blade"
+            && enchantment_instance_id == "spell:keen_edge:3000ms:utility_blade"
     )));
     let expired_attack = expired
         .apply_actor_intent(

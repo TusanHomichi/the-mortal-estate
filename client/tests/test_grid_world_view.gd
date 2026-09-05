@@ -221,20 +221,20 @@ func test_a_step_is_presented_across_its_beat_rather_than_snapped() -> void:
 	_support.expect_equal(steps.size(), 1, "only the marker that moved is animated")
 	_support.expect_equal(steps.get("actor:other"), Vector2i(-1, 0), "its travel is the square it came from")
 
-	view.present_pulse(_pulse(0.0))
+	view.present_cooldown(_pulse(0.0))
 	var pitch: int = int(view.layout()["pitch"])
 	_support.expect_equal(
 		_occupant_rect(view, "actor:other").position,
 		landing.position - Vector2i(pitch, 0),
 		"at the start of the beat the marker is still drawn where it was",
 	)
-	view.present_pulse(_pulse(0.5))
+	view.present_cooldown(_pulse(0.5))
 	_support.expect_equal(
 		_occupant_rect(view, "actor:other").position,
 		landing.position - Vector2i(pitch / 2, 0),
 		"half a beat is half the step",
 	)
-	view.present_pulse(_pulse(1.0))
+	view.present_cooldown(_pulse(1.0))
 	_support.expect_equal(
 		_occupant_rect(view, "actor:other").position,
 		landing.position,
@@ -247,7 +247,7 @@ func test_a_marker_mid_step_resolves_a_pointer_where_it_is_drawn() -> void:
 	var view: GridWorldView = _add_view()
 	view.present_frame(_walking_frame(Vector2i(2, 1), Vector2i(0, 1)), 1)
 	view.present_frame(_walking_frame(Vector2i(2, 1), Vector2i(1, 1)), 2)
-	view.present_pulse(_pulse(0.25))
+	view.present_cooldown(_pulse(0.25))
 	for record: Dictionary in view.screen_targets():
 		var resolved: Dictionary = view.semantic_target_for_display_position(Vector2(record["anchor"] as Vector2i))
 		_support.expect_equal(
@@ -279,7 +279,7 @@ func test_the_lattice_holds_still_inside_a_beat_and_the_controlled_marker_with_i
 	var tile: Rect2i = _target_rect(view, "tile:2:1")
 	var controlled: Rect2i = _occupant_rect(view, "actor:player")
 	for fill: float in [0.0, 0.5, 1.0]:
-		view.present_pulse(_pulse(fill))
+		view.present_cooldown(_pulse(fill))
 		_support.expect_equal(view.layout()["origin"], origin, "the lattice placement a capture reads never moves inside a beat")
 		_support.expect_equal(_target_rect(view, "tile:2:1"), tile, "and neither does a square's rectangle")
 		_support.expect_equal(
@@ -320,14 +320,14 @@ func test_an_unmeasured_beat_animates_nothing() -> void:
 	view.present_frame(_walking_frame(Vector2i(2, 1), Vector2i(0, 1)), 1)
 	view.present_frame(_walking_frame(Vector2i(2, 1), Vector2i(1, 1)), 2)
 	var landing: Rect2i = _occupant_rect(view, "actor:other")
-	view.present_pulse({"measured": false, "fill": 0.0})
+	view.present_cooldown({"known_duration": false, "fill": 0.0})
 	_support.expect_equal(view.step_motion(), 0.0, "with no measured beat there is no interval to spread a step over")
 	_support.expect_equal(_occupant_rect(view, "actor:other").position, landing.position, "so the marker sits on its authoritative square")
 	view.free()
 
 
 func _pulse(fill: float) -> Dictionary:
-	return {"measured": true, "fill": fill}
+	return {"known_duration": true, "fill": fill}
 
 
 func _target_rect(view: GridWorldView, identity: String) -> Rect2i:

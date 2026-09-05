@@ -15,15 +15,15 @@ import {
 import { WALL_PROFILE } from "../src/wallGeometry";
 
 describe("the ruled feel camera", () => {
-  it("projects one cell to a 179.2-pixel-wide diamond at 1280 by 800 (the ruled frame)", () => {
+  it("projects one cell to a nine-cell-high field at 1280 by 800 (the ruled frame)", () => {
     const camera = createFeelCamera(1280, 800, { i: 5, j: 5 });
-    expect(projectedCellDiamondWidth(camera, 1280)).toBeCloseTo(179.2, 6);
+    expect(projectedCellDiamondWidth(camera, 1280)).toBeCloseTo(1600 / 9, 6);
   });
 
   it("one comparison step out widens the frame by the step ratio and keeps the focus centred", () => {
     const ruled = createFeelCamera(1280, 800, { i: 5, j: 5 });
     const stepOut = createFeelCamera(1280, 800, { i: 5, j: 5 }, -1);
-    expect(projectedCellDiamondWidth(stepOut, 1280)).toBeCloseTo(179.2 / CAMERA_ZOOM_STEP_RATIO, 6);
+    expect(projectedCellDiamondWidth(stepOut, 1280)).toBeCloseTo((1600 / 9) / CAMERA_ZOOM_STEP_RATIO, 6);
     expect(stepOut.top - stepOut.bottom).toBeCloseTo((ruled.top - ruled.bottom) * CAMERA_ZOOM_STEP_RATIO, 9);
     const projected = new Vector3(5, CAMERA_TARGET_HEIGHT, 5).project(stepOut);
     expect(projected.x).toBeCloseTo(0, 12);

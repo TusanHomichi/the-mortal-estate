@@ -7,38 +7,39 @@ player Cedar Oath (Knight) at realm_0/civic_court:1,1 hp=60
 monster Meadow Hare at realm_0/civic_court:1,1 hp=1
 monster Quiet Witness at realm_0/civic_court:1,1 hp=1
 
-player ready: Cedar Oath at 1
-Cedar Oath intent at 1: cast civic_beacon on realm_0/civic_court:1,1
+player ready: Cedar Oath at 3000ms
+Cedar Oath intent at 3000ms: cast civic_beacon on realm_0/civic_court:1,1
 player alignment: lawful -> neutral
 tile effect applied: civic_beacon at realm_0/civic_court:1,1 passability=none sight=clear hazard=none cost=none remaining=1
 Cedar Oath's Civic Beacon practice on knight_magic: raw=0 reason=class_has_no_magic_practice
-readiness scheduled: Cedar Oath cost=1 ready_at=2
-Cedar Oath regenerated 1 Mp (16/18, Active, time 2)
-time 2
-monster ready: Meadow Hare at 2
-Meadow Hare intent: hold
-readiness scheduled: Meadow Hare cost=1 ready_at=3
-monster ready: Quiet Witness at 2
-Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=3
-
-player ready: Cedar Oath at 2
-Cedar Oath intent at 2: cast steadfast_heart on self
-Cedar Oath gains steadfast_heart (attribute_buff) for 2 rounds.
-Cedar Oath's Steadfast Heart practice on knight_magic: raw=0 reason=class_has_no_magic_practice
-readiness scheduled: Cedar Oath cost=1 ready_at=3
+readiness scheduled: Cedar Oath cost=1 ready_at=6000ms
+time 6000ms
 tile effect ticked: civic_beacon at realm_0/civic_court:1,1 remaining=0
 tile effect expired: civic_beacon at realm_0/civic_court:1,1
-time 3
-monster ready: Meadow Hare at 3
+monster ready: Meadow Hare at 6000ms
 Meadow Hare intent: hold
-readiness scheduled: Meadow Hare cost=1 ready_at=4
-monster ready: Quiet Witness at 3
+readiness scheduled: Meadow Hare cost=1 ready_at=9000ms
+monster ready: Quiet Witness at 6000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=4
+readiness scheduled: Quiet Witness cost=1 ready_at=9000ms
 
-player ready: Cedar Oath at 3
-Cedar Oath intent at 3: kick --unsafe meadow_hare
+player ready: Cedar Oath at 6000ms
+Cedar Oath intent at 6000ms: cast steadfast_heart on self
+Cedar Oath gains steadfast_heart (attribute_buff) for 2 rounds.
+Cedar Oath's Steadfast Heart practice on knight_magic: raw=0 reason=class_has_no_magic_practice
+readiness scheduled: Cedar Oath cost=1 ready_at=9000ms
+time 9000ms
+steadfast_heart ticks on Cedar Oath (1 rounds remain).
+Cedar Oath regenerated 1 Mp (13/18, Active, time 9000ms)
+monster ready: Meadow Hare at 9000ms
+Meadow Hare intent: hold
+readiness scheduled: Meadow Hare cost=1 ready_at=12000ms
+monster ready: Quiet Witness at 9000ms
+Quiet Witness intent: hold
+readiness scheduled: Quiet Witness cost=1 ready_at=12000ms
+
+player ready: Cedar Oath at 9000ms
+Cedar Oath intent at 9000ms: kick --unsafe meadow_hare
 Cedar Oath attacked Meadow Hare: roll=11 damage=102 label=fatal hp=0
 contribution to meadow_hare: character=Some(CharacterId("character:knight_social_consequence:primary")) class=Some(Physical) damage=1
 Meadow Hare was defeated: cause=physical claim=character:knight_social_consequence:primary/killing_blow
@@ -47,16 +48,16 @@ shared defeat reward for Meadow Hare: available=0 awarded=0 reason=zero_authored
 Cedar Oath's kick fatal_blow practice on hand: risk=practice raw=2
 Cedar Oath gained 2 hand practice points (pool: 2)
 Cedar Oath's hand skill advanced to level 1, critique 1
-readiness scheduled: Cedar Oath cost=1 ready_at=4
-steadfast_heart ticks on Cedar Oath (1 rounds remain).
-Cedar Oath regenerated 1 Mp (14/18, Active, time 4)
-time 4
-monster ready: Quiet Witness at 4
+readiness scheduled: Cedar Oath cost=1 ready_at=12000ms
+time 12000ms
+steadfast_heart ticks on Cedar Oath (0 rounds remain).
+steadfast_heart expires on Cedar Oath.
+monster ready: Quiet Witness at 12000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=5
+readiness scheduled: Quiet Witness cost=1 ready_at=15000ms
 
-player ready: Cedar Oath at 4
-Cedar Oath intent at 4: kick --unsafe quiet_witness
+player ready: Cedar Oath at 12000ms
+Cedar Oath intent at 12000ms: kick --unsafe quiet_witness
 Cedar Oath attacked Quiet Witness: roll=2 damage=102 label=fatal hp=0
 contribution to quiet_witness: character=Some(CharacterId("character:knight_social_consequence:primary")) class=Some(Physical) damage=1
 player karma: 0 -> 1
@@ -67,13 +68,12 @@ shared defeat reward for Quiet Witness: available=0 awarded=0 reason=zero_author
 Cedar Oath's kick fatal_blow practice on hand: risk=practice raw=2
 Cedar Oath gained 2 hand practice points (pool: 3)
 Cedar Oath's hand skill advanced to level 1, critique 2
-readiness scheduled: Cedar Oath cost=1 ready_at=5
-steadfast_heart ticks on Cedar Oath (0 rounds remain).
-steadfast_heart expires on Cedar Oath.
-time 5
+readiness scheduled: Cedar Oath cost=1 ready_at=15000ms
+time 15000ms
+Cedar Oath regenerated 1 Mp (14/18, Active, time 15000ms)
 
-player ready: Cedar Oath at 5
-Cedar Oath intent at 5: inspect
+player ready: Cedar Oath at 15000ms
+Cedar Oath intent at 15000ms: inspect
 Cedar Oath inspected at realm_0/civic_court:1,1: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/civic_court:1,0: blocked terrain terrain=Stone Wall
@@ -84,7 +84,6 @@ Cedar Oath inspected at realm_0/civic_court:1,1: tile=Flagstone
   southwest -> realm_0/civic_court:0,2: blocked terrain terrain=Stone Wall
   west -> realm_0/civic_court:0,1: blocked terrain terrain=Stone Wall
   northwest -> realm_0/civic_court:0,0: blocked terrain terrain=Stone Wall
-readiness scheduled: Cedar Oath cost=0 ready_at=5
 
 final state
 Cedar Oath (Fighter) at realm_0/civic_court:1,1 hp=60 alive

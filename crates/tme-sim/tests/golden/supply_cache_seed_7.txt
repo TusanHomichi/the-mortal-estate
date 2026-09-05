@@ -6,8 +6,8 @@ loaded "Supply Cache" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:1,1 hp=12
 monster Watcher at realm_0/room_0:3,1 hp=7
 
-player ready: Delver at 1
-Delver intent at 1: inspect
+player ready: Delver at 3000ms
+Delver intent at 3000ms: inspect
 Delver inspected at realm_0/room_0:1,1: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/room_0:1,0: blocked terrain terrain=Stone Wall
@@ -20,85 +20,81 @@ Delver inspected at realm_0/room_0:1,1: tile=Flagstone
   northwest -> realm_0/room_0:0,0: blocked terrain terrain=Stone Wall
   ground here: Hemp Rope at (1,1)
   ground east: Waterskin at (2,1)
-readiness scheduled: Delver cost=0 ready_at=1
 
-player ready: Delver at 1
-Delver intent at 1: move_item hemp_rope to sack_item_1
+player ready: Delver at 3000ms
+Delver intent at 3000ms: move_item hemp_rope to sack_item_1
 Delver moved Hemp Rope from (1,1) to sack_item_1
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Watcher at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Watcher at 6000ms
 Watcher intent: hold
-readiness scheduled: Watcher cost=1 ready_at=3
+readiness scheduled: Watcher cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: show_sack
+player ready: Delver at 6000ms
+Delver intent at 6000ms: show_sack
 Delver's sack:
   sack_item_1: Hemp Rope
   gold: 0
-readiness scheduled: Delver cost=0 ready_at=2
 
-player ready: Delver at 2
-Delver intent at 2: walk east
+player ready: Delver at 6000ms
+Delver intent at 6000ms: walk east
 Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
 Delver moved from (1,1) to (2,1)
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Watcher at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Watcher at 9000ms
 Watcher intent: hold
-readiness scheduled: Watcher cost=1 ready_at=4
+readiness scheduled: Watcher cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: move_item waterskin to sack_item_2
+player ready: Delver at 9000ms
+Delver intent at 9000ms: move_item waterskin to sack_item_2
 Delver moved Waterskin from (2,1) to sack_item_2
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Watcher at 4
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Watcher at 12000ms
 Watcher intent: hold
-readiness scheduled: Watcher cost=1 ready_at=5
+readiness scheduled: Watcher cost=1 ready_at=15000ms
 
-player ready: Delver at 4
-Delver intent at 4: show_sack
+player ready: Delver at 12000ms
+Delver intent at 12000ms: show_sack
 Delver's sack:
   sack_item_1: Hemp Rope
   sack_item_2: Waterskin
   gold: 0
-readiness scheduled: Delver cost=0 ready_at=4
 
-player ready: Delver at 4
-Delver intent at 4: walk west
+player ready: Delver at 12000ms
+Delver intent at 12000ms: walk west
 Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step west -> (1,1): terrain=Flagstone cost=1 remaining=2
 Delver moved from (2,1) to (1,1)
-readiness scheduled: Delver cost=1 ready_at=5
-time 5
-monster ready: Watcher at 5
+readiness scheduled: Delver cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Watcher at 15000ms
 Watcher intent: hold
-readiness scheduled: Watcher cost=1 ready_at=6
+readiness scheduled: Watcher cost=1 ready_at=18000ms
 
-player ready: Delver at 5
-Delver intent at 5: move_item hemp_rope to ground_here
+player ready: Delver at 15000ms
+Delver intent at 15000ms: move_item hemp_rope to ground_here
 Delver moved Hemp Rope from sack_item_1 to (1,1)
-readiness scheduled: Delver cost=1 ready_at=6
-time 6
-monster ready: Watcher at 6
+readiness scheduled: Delver cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Watcher at 18000ms
 Watcher intent: hold
-readiness scheduled: Watcher cost=1 ready_at=7
+readiness scheduled: Watcher cost=1 ready_at=21000ms
 
-player ready: Delver at 6
-Delver intent at 6: move_item waterskin to ground_here
+player ready: Delver at 18000ms
+Delver intent at 18000ms: move_item waterskin to ground_here
 Delver moved Waterskin from sack_item_2 to (1,1)
-readiness scheduled: Delver cost=1 ready_at=7
-time 7
-monster ready: Watcher at 7
+readiness scheduled: Delver cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Watcher at 21000ms
 Watcher intent: hold
-readiness scheduled: Watcher cost=1 ready_at=8
+readiness scheduled: Watcher cost=1 ready_at=24000ms
 
-player ready: Delver at 7
-Delver intent at 7: show_sack
+player ready: Delver at 21000ms
+Delver intent at 21000ms: show_sack
 Delver's sack is empty
-readiness scheduled: Delver cost=0 ready_at=7
 
 final state
 Delver at realm_0/room_0:1,1 hp=12 alive

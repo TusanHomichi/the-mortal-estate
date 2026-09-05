@@ -835,11 +835,12 @@ mod tests {
     #[test]
     fn logical_time_cannot_regress_or_disagree_across_surfaces() {
         let mut trace = trace_v2();
-        trace["steps"][0]["after_debug_snapshot"]["logical_time"] = Value::from(0);
+        trace["steps"][0]["after_debug_snapshot"]["logical_time"]["milliseconds"] = Value::from(0);
         rejected(trace, "logical_time");
 
         let mut trace = trace_v2();
-        trace["steps"][0]["after_observed_snapshot"]["logical_time"] = Value::from(999);
+        trace["steps"][0]["after_observed_snapshot"]["logical_time"]["milliseconds"] =
+            Value::from(999);
         rejected(trace, "logical times disagree");
     }
 
@@ -887,7 +888,7 @@ mod tests {
         rejected(trace, "final_position");
 
         let mut trace = trace_v2();
-        trace["final"]["final_debug_snapshot"]["logical_time"] = Value::from(99);
+        trace["final"]["final_debug_snapshot"]["logical_time"]["milliseconds"] = Value::from(99);
         rejected(trace, "terminal step surface");
     }
 }

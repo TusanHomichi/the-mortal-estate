@@ -146,6 +146,7 @@ class TheSemanticBarrier(unittest.TestCase):
         rerun = copy.deepcopy(self.document)
         rerun["provenance"]["server_sequence"] = "another-run"
         rerun["frame_generation"] = 91
+        rerun["frame"]["logical_time"] = "7127"
         rerun["frame"]["actors"][0]["character_id"] = "another-character"
         self.assertEqual(first, recording.normalized_projection(rerun))
         rerun["frame"]["actors"][0]["life_state"] = "dead"
@@ -182,7 +183,11 @@ class TheTrackedRecording(unittest.TestCase):
 
     def test_receipt_binds_every_tracked_source_and_observed_projection(self) -> None:
         source = self.receipt["source"]
-        self.assertEqual([], source["tracked_status_before"])
+        # A current working-tree capture must disclose its edits and bind its
+        # source bytes; the base commit alone cannot identify an uncommitted run.
+        self.assertIsInstance(source["tracked_status_before"], list)
+        self.assertRegex(source["working_source_sha256"], re.compile(r"^[0-9a-f]{64}$"))
+        self.assertGreater(source["working_source_file_count"], 0)
         self.assertRegex(source["commit"], re.compile(r"^[0-9a-f]{40}$"))
         self.assertRegex(source["tree"], re.compile(r"^[0-9a-f]{40}$"))
         self.assertEqual(recording.sha256(self.frame_path), self.receipt["observed"]["frame_sha256"])

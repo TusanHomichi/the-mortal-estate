@@ -8,83 +8,82 @@ monster Quiet Witness at realm_0/room_0:3,3 hp=99
 Wayfarer gains mist_blindness (blindness) for 30 rounds.
 Wayfarer gains marsh_poison (poison) for 30 rounds.
 
-player ready: Wayfarer at 1
-Wayfarer intent at 1: use_restoration_service tme_healer healer_restoration restore_hit_points none none
+player ready: Wayfarer at 3000ms
+Wayfarer intent at 3000ms: use_restoration_service tme_healer healer_restoration restore_hit_points none none
 Wayfarer spent 3 gold
 Wayfarer restored Hp from 6 to 12/12
 Wayfarer completes restoration service restore_hit_points.
-readiness scheduled: Wayfarer cost=1 ready_at=2
+readiness scheduled: Wayfarer cost=1 ready_at=6000ms
+time 6000ms
 mist_blindness ticks on Wayfarer (29 rounds remain).
-time 2
-monster ready: Quiet Witness at 2
+monster ready: Quiet Witness at 6000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=3
+readiness scheduled: Quiet Witness cost=1 ready_at=9000ms
 
-player ready: Wayfarer at 2
-Wayfarer intent at 2: use_restoration_service tme_healer healer_restoration restore_magic_points none none
+player ready: Wayfarer at 6000ms
+Wayfarer intent at 6000ms: use_restoration_service tme_healer healer_restoration restore_magic_points none none
 Wayfarer spent 2 gold
 Wayfarer restored Mp from 3 to 8/8
 Wayfarer completes restoration service restore_magic_points.
-readiness scheduled: Wayfarer cost=1 ready_at=3
+readiness scheduled: Wayfarer cost=1 ready_at=9000ms
+time 9000ms
 mist_blindness ticks on Wayfarer (28 rounds remain).
-time 3
-monster ready: Quiet Witness at 3
+monster ready: Quiet Witness at 9000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=4
+readiness scheduled: Quiet Witness cost=1 ready_at=12000ms
 
-player ready: Wayfarer at 3
-Wayfarer intent at 3: use_restoration_service tme_healer healer_restoration restore_stamina none none
+player ready: Wayfarer at 9000ms
+Wayfarer intent at 9000ms: use_restoration_service tme_healer healer_restoration restore_stamina none none
 Wayfarer restored Stamina from 4 to 10/10
 Wayfarer completes restoration service restore_stamina.
-readiness scheduled: Wayfarer cost=1 ready_at=4
+readiness scheduled: Wayfarer cost=1 ready_at=12000ms
+time 12000ms
 mist_blindness ticks on Wayfarer (27 rounds remain).
-time 4
-monster ready: Quiet Witness at 4
+monster ready: Quiet Witness at 12000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=5
+readiness scheduled: Quiet Witness cost=1 ready_at=15000ms
 
-player ready: Wayfarer at 4
-Wayfarer intent at 4: use_restoration_service tme_healer healer_restoration cure_blindness_for_token clearwater_token none
+player ready: Wayfarer at 12000ms
+Wayfarer intent at 12000ms: use_restoration_service tme_healer healer_restoration cure_blindness_for_token clearwater_token none
 mist_blindness is removed from Wayfarer: restoration_service:cure_blindness_for_token.
 Wayfarer completes restoration service cure_blindness_for_token.
-readiness scheduled: Wayfarer cost=1 ready_at=5
-time 5
-monster ready: Quiet Witness at 5
+readiness scheduled: Wayfarer cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Quiet Witness at 15000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=6
+readiness scheduled: Quiet Witness cost=1 ready_at=18000ms
 
-player ready: Wayfarer at 5
-Wayfarer intent at 5: use_restoration_service tme_healer healer_restoration cure_poison none none
+player ready: Wayfarer at 15000ms
+Wayfarer intent at 15000ms: use_restoration_service tme_healer healer_restoration cure_poison none none
 Wayfarer spent 1 gold
 marsh_poison is removed from Wayfarer: restoration_service:cure_poison.
 Wayfarer completes restoration service cure_poison.
-readiness scheduled: Wayfarer cost=1 ready_at=6
-time 6
-monster ready: Quiet Witness at 6
+readiness scheduled: Wayfarer cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Quiet Witness at 18000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=7
+readiness scheduled: Quiet Witness cost=1 ready_at=21000ms
 
-player ready: Wayfarer at 6
-Wayfarer intent at 6: show_sack
+player ready: Wayfarer at 18000ms
+Wayfarer intent at 18000ms: show_sack
 Wayfarer's sack:
   gold: 4
-readiness scheduled: Wayfarer cost=0 ready_at=6
 
-player ready: Wayfarer at 6
-Wayfarer intent at 6: run east,east
+player ready: Wayfarer at 18000ms
+Wayfarer intent at 18000ms: run east,east
 Wayfarer run: requested=2 accepted=2 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Wayfarer step east -> (2,1): terrain=Flagstone cost=1 remaining=2
 Wayfarer moved from (1,1) to (2,1)
   Wayfarer step east -> (3,1): terrain=Flagstone cost=1 remaining=1
 Wayfarer moved from (2,1) to (3,1)
-readiness scheduled: Wayfarer cost=1 ready_at=7
-time 7
-monster ready: Quiet Witness at 7
+readiness scheduled: Wayfarer cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Quiet Witness at 21000ms
 Quiet Witness intent: hold
-readiness scheduled: Quiet Witness cost=1 ready_at=8
+readiness scheduled: Quiet Witness cost=1 ready_at=24000ms
 
-player ready: Wayfarer at 7
-Wayfarer intent at 7: inspect
+player ready: Wayfarer at 21000ms
+Wayfarer intent at 21000ms: inspect
 Wayfarer inspected at realm_0/room_0:3,1: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/room_0:3,0: blocked terrain terrain=Stone Wall
@@ -95,7 +94,6 @@ Wayfarer inspected at realm_0/room_0:3,1: tile=Flagstone
   southwest -> realm_0/room_0:2,2: walkable terrain=Flagstone cost=1
   west -> realm_0/room_0:2,1: walkable terrain=Flagstone cost=1
   northwest -> realm_0/room_0:2,0: blocked terrain terrain=Stone Wall
-readiness scheduled: Wayfarer cost=0 ready_at=7
 
 final state
 Wayfarer (Fighter) at realm_0/room_0:3,1 hp=12 alive

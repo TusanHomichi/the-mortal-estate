@@ -60,7 +60,10 @@ fn setup_assigns_first_ready_time_and_stable_authored_order() {
     assert_eq!(engine.world().timing.next_tie_break_order, 2);
     assert_eq!(engine.world().actors[0].timing.ready_at, LogicalTime::FIRST);
     assert_eq!(engine.world().actors[0].timing.tie_break_order, 0);
-    assert_eq!(engine.world().actors[1].timing.ready_at, LogicalTime::FIRST);
+    assert_eq!(
+        engine.world().actors[1].timing.ready_at,
+        LogicalTime::FIRST.saturating_add_rounds(1)
+    );
     assert_eq!(engine.world().actors[1].timing.tie_break_order, 1);
 }
 
@@ -131,12 +134,15 @@ fn inspect_and_show_sack_are_repeatable_free_actions() {
 
         assert_eq!(engine.world().timing.now, LogicalTime::FIRST);
         assert_eq!(engine.world().actors[0].timing.ready_at, LogicalTime::FIRST);
-        assert_eq!(engine.world().actors[1].timing.ready_at, LogicalTime::FIRST);
+        assert_eq!(
+            engine.world().actors[1].timing.ready_at,
+            LogicalTime::FIRST.saturating_add_rounds(1)
+        );
         assert!(!events.iter().any(|event| matches!(
             event,
             Event::AutomaticActorDecision { .. } | Event::LogicalTimeAdvanced { .. }
         )));
-        assert!(events.iter().any(|event| matches!(
+        assert!(!events.iter().any(|event| matches!(
             event,
             Event::ActorReadinessScheduled {
                 actor_id,
@@ -236,6 +242,7 @@ fn different_actor_readiness_values_interleave_independently() {
     assert_eq!(
         monster_ready_pairs(&at_one.events),
         [
+            ("kobold_skulker".to_string(), LogicalTime::FIRST),
             ("kobold_skulker".to_string(), LogicalTime::new(2)),
             ("kobold_runt".to_string(), LogicalTime::new(2)),
         ]
@@ -299,6 +306,7 @@ fn invalid_addressed_actor_states_are_atomic_and_ready_peers_do_not_block() {
         let actors = &mut not_next.world_mut().actors;
         actors[0].timing.tie_break_order = 1;
         actors[1].kind = ActorKind::Player;
+        actors[1].timing.ready_at = LogicalTime::FIRST;
         actors[1].timing.tie_break_order = 0;
     }
     let outcome = not_next
@@ -327,6 +335,7 @@ fn ready_controlled_actors_act_independently() {
         peer_character.resources.peak_hp = peer_character.resources.peak_hp.max(100);
         actors[0].location.position = Coord { x: 3, y: 1 };
         actors[1].kind = ActorKind::Player;
+        actors[1].timing.ready_at = LogicalTime::FIRST;
         actors[1].character_id = Some(tme_rules::CharacterId::new("character:timing:peer"));
         actors[1].character = Some(peer_character);
         actors[1].social.alignment_source = tme_rules::SocialAlignmentSource::Character {};
@@ -654,9 +663,6 @@ fn defeated_and_expired_actors_never_act_again_or_renumber_survivors() {
             _ => None,
         })
         .expect("summoned actor id");
-    expired
-        .apply_actor_intent(&tme_rules::ActorId::from("player"), PlayerIntent::Wait)
-        .expect("first duration boundary should resolve");
     let expiry_events = expired
         .apply_actor_intent(&tme_rules::ActorId::from("player"), PlayerIntent::Wait)
         .expect("expiry boundary should resolve");
@@ -711,6 +717,8 @@ fn lifecycle_ticks_before_due_monsters_in_complete_domain_order() {
         .expect("setup action should drink the balm");
     {
         let world = engine.world_mut();
+        world.actors[0].resource_activity.last_recovered_at =
+            LogicalTime::from_millis(world.timing.now.as_millis().saturating_sub(3000));
         world
             .item_instances
             .insert("enchantment_target".to_string(), enchantment_target);
@@ -770,6 +778,9 @@ fn lifecycle_ticks_before_due_monsters_in_complete_domain_order() {
             last_ticked_at: LogicalTime::new(2),
             hostile_authority: None,
         });
+        world.actors[0].resource_activity.last_active_at = None;
+        world.actors[0].hp = 4;
+        world.actors[0].character.as_mut().unwrap().resources.hp = 4;
         world.actors[0].stamina = 8;
         world.actors[0]
             .character
@@ -859,7 +870,7 @@ fn serialized_timing_contract_has_no_global_round_or_phase_scaffold() {
     assert!(
         event_entries
             .iter()
-            .any(|entry| entry.get("actor_readiness_scheduled").is_some())
+            .all(|entry| entry.get("actor_readiness_scheduled").is_none())
     );
     assert!(
         event_entries
@@ -873,7 +884,10 @@ fn serialized_timing_contract_has_no_global_round_or_phase_scaffold() {
     );
 
     let snapshot = serde_json::to_value(engine.snapshot()).expect("snapshot should serialize");
-    assert_eq!(snapshot.get("logical_time"), Some(&serde_json::json!(1)));
+    assert_eq!(
+        snapshot.get("logical_time"),
+        Some(&serde_json::json!({"milliseconds": 3000}))
+    );
     assert!(snapshot.get("round").is_none());
     let actor = &snapshot["actors"][0];
     assert!(actor.get("ready_at").is_some());

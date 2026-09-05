@@ -1,32 +1,10 @@
 #!/usr/bin/env python3
-"""Prove the authoritative pulse is visible, by photographing it moving.
+"""Photograph progress within one server-authoritative action cooldown.
 
-Charter item 3 asks for one clock, felt. `tools/run_client_live_proof.py`
-already establishes that the beat a real client observes against a real server
-is the ruled 3.0 seconds. What it cannot establish is that anything in the
-picture says so, because it runs headless and there is no picture.
-
-This driver uses the shared live-server harness with a corpus fixture, drives the shipped
-`ClientRoot.tscn` under a virtual display, and captures the window at three
-known points inside **one** beat. Then it judges the result:
-
-* the samples belong to one round of logical time — three pictures spread over
-  two beats would show a meter advancing without proving it ever reset;
-* the fill strictly increases across them, and spans enough of the beat that a
-  frozen or jittering meter could not produce it;
-* the beat the client measured for itself is the ruled cadence — the client is
-  never told the pulse, it observes it, so this is a real agreement between two
-  independent statements of the same fact rather than a constant checked
-  against itself;
-* every sample's meter text agrees with the frame's own readiness, because a
-  meter that decided readiness locally is the exact defect ruling D5 forbids.
-
-Usage:
-
-    tools/run_pulse_capture.py \\
-        --admin-url-file <postgres superuser url file> \\
-        --godot <pinned godot binary> \\
-        --output <directory>
+The historical command name is retained for the capture route. The driver
+accepts only samples from one action deadline, an advancing fill across the
+full reported three-second interval, and text that agrees with authoritative
+readiness. Use --admin-url-file, --godot, and --output to run it.
 """
 
 from __future__ import annotations
@@ -50,8 +28,8 @@ from live_server_harness import (  # noqa: E402
     resolve_godot,
 )
 from run_client_live_proof import (  # noqa: E402
-    PULSE_TOLERANCE_MSEC,
-    RULED_PULSE_MSEC,
+    COOLDOWN_TOLERANCE_MSEC,
+    STANDARD_ACTION_MSEC,
 )
 
 SUCCESS_SENTINEL = "TME_PULSE_CAPTURE_OK"
@@ -129,26 +107,22 @@ def check_manifest(manifest: dict, output: Path) -> None:
         )
 
     failures: list[str] = []
-    span = float(manifest.get("measured_span_msec", 0))
-    drift = span - RULED_PULSE_MSEC
-    verdict = "ok" if abs(drift) <= PULSE_TOLERANCE_MSEC else "OUT OF BAND"
+    span = float(manifest.get("measured_duration_msec", 0))
+    drift = span - STANDARD_ACTION_MSEC
+    verdict = "ok" if abs(drift) <= COOLDOWN_TOLERANCE_MSEC else "OUT OF BAND"
     print(
         f"the client measured its own beat at {span:.0f} ms "
-        f"({drift:+.0f} ms from the ruled {RULED_PULSE_MSEC:.0f} ms) {verdict}"
+        f"({drift:+.0f} ms from the ruled {STANDARD_ACTION_MSEC:.0f} ms) {verdict}"
     )
-    if abs(drift) > PULSE_TOLERANCE_MSEC:
+    if abs(drift) > COOLDOWN_TOLERANCE_MSEC:
         failures.append(
             f"the client measured a {span:.0f} ms beat, outside "
-            f"{RULED_PULSE_MSEC:.0f} +/- {PULSE_TOLERANCE_MSEC:.0f} ms"
+            f"{STANDARD_ACTION_MSEC:.0f} +/- {COOLDOWN_TOLERANCE_MSEC:.0f} ms"
         )
 
-    rounds = {str(sample.get("logical_time", "")) for sample in samples}
-    if len(rounds) != 1:
-        failures.append(
-            "the samples span logical rounds "
-            + ", ".join(f"T{value}" for value in sorted(rounds))
-            + "; one beat's advance cannot be read across a beat boundary"
-        )
+    deadlines = {str(sample.get("ready_at", "")) for sample in samples}
+    if len(deadlines) != 1:
+        failures.append("samples must belong to the same individual action deadline")
 
     previous = None
     for sample in samples:
@@ -204,14 +178,14 @@ def _check_agreement(sample: dict) -> list[str]:
     can_act = bool(sample.get("can_act", False))
     if can_act and "◆ Ready" not in text:
         failures.append(f"sample {index} was ready but the meter did not say so: {text!r}")
-    if not can_act and "◇ Ready in" not in text:
+    if not can_act and "◇ Action cooldown" not in text:
         failures.append(f"sample {index} was waiting but the meter did not say so: {text!r}")
-    if can_act and int(sample.get("beats_until_ready", -1)) != 0:
+    if can_act and int(sample.get("remaining_msec", -1)) != 0:
         failures.append(
             f"sample {index} claims readiness and a wait of "
-            f"{sample.get('beats_until_ready')} beats at the same time"
+            f"{sample.get('remaining_msec')} beats at the same time"
         )
-    if not bool(sample.get("measured", False)):
+    if not bool(sample.get("known_duration", False)):
         failures.append(f"sample {index} drew a fill without having measured a beat")
     if not 0.0 <= float(sample.get("fill", -1.0)) <= 1.0:
         failures.append(f"sample {index} reports a fill of {sample.get('fill')}")

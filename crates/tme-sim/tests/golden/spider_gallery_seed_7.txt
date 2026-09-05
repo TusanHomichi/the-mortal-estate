@@ -6,56 +6,56 @@ loaded "Spider Gallery" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:1,1 hp=12
 monster Giant Spider at realm_0/room_0:6,1 hp=8
 
-player ready: Delver at 1
-Delver intent at 1: run east,east
+player ready: Delver at 3000ms
+Delver intent at 3000ms: run east,east
 Delver run: requested=2 accepted=2 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step east -> (2,1): terrain=Gallery Floor cost=1 remaining=2
 Delver moved from (1,1) to (2,1)
   Delver step east -> (3,1): terrain=Gallery Floor cost=1 remaining=1
 Delver moved from (2,1) to (3,1)
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Giant Spider at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Giant Spider at 6000ms
 Giant Spider intent: wait
-readiness scheduled: Giant Spider cost=1 ready_at=3
+readiness scheduled: Giant Spider cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: walk east
+player ready: Delver at 6000ms
+Delver intent at 6000ms: walk east
 Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step east -> (4,1): terrain=Gallery Floor cost=1 remaining=2
 Delver moved from (3,1) to (4,1)
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Giant Spider at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Giant Spider at 9000ms
 Giant Spider intent: move west
 Giant Spider walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Giant Spider step west -> (5,1): terrain=Gallery Floor cost=1 remaining=0
 Giant Spider moved from (6,1) to (5,1)
-readiness scheduled: Giant Spider cost=1 ready_at=4
+readiness scheduled: Giant Spider cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: run west,west
+player ready: Delver at 9000ms
+Delver intent at 9000ms: run west,west
 Delver run: requested=2 accepted=2 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step west -> (3,1): terrain=Gallery Floor cost=1 remaining=2
 Delver moved from (4,1) to (3,1)
   Delver step west -> (2,1): terrain=Gallery Floor cost=1 remaining=1
 Delver moved from (3,1) to (2,1)
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Giant Spider at 4
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Giant Spider at 12000ms
 Giant Spider intent: return east
 Giant Spider walk: requested=1 accepted=1 points=1 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Giant Spider step east -> (6,1): terrain=Gallery Floor cost=1 remaining=0
 Giant Spider moved from (5,1) to (6,1)
-readiness scheduled: Giant Spider cost=1 ready_at=5
+readiness scheduled: Giant Spider cost=1 ready_at=15000ms
 
-player ready: Delver at 4
-Delver intent at 4: wait
-readiness scheduled: Delver cost=1 ready_at=5
-time 5
-monster ready: Giant Spider at 5
+player ready: Delver at 12000ms
+Delver intent at 12000ms: wait
+readiness scheduled: Delver cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Giant Spider at 15000ms
 Giant Spider intent: home
-readiness scheduled: Giant Spider cost=1 ready_at=6
+readiness scheduled: Giant Spider cost=1 ready_at=18000ms
 
 final state
 Delver at realm_0/room_0:2,1 hp=12 alive

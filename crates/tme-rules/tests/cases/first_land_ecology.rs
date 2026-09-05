@@ -686,7 +686,7 @@ fn gate_two_tracked_partial_replenishment_is_exact_deferred_and_checkpoint_stabl
 }
 
 #[test]
-fn gate_two_tracked_full_clears_use_180_units_and_cap_each_simultaneous_site() {
+fn gate_two_tracked_full_clears_use_180_units_and_materialize_each_due_site() {
     let mut engine = first_land_engine();
     let sites = [
         (
@@ -752,11 +752,11 @@ fn gate_two_tracked_full_clears_use_180_units_and_cap_each_simultaneous_site() {
                 _ => None,
             })
             .collect::<Vec<_>>();
-        assert_eq!(spawned, member_ids[..2]);
+        assert_eq!(spawned, *member_ids);
         assert!(
             engine.world().ecology_sites[*site_id].member_slots[member_ids[2]]
                 .due_at
-                .is_some()
+                .is_none()
         );
     }
     assert_eq!(engine.world().corpses.len(), 6);
@@ -764,7 +764,7 @@ fn gate_two_tracked_full_clears_use_180_units_and_cap_each_simultaneous_site() {
 
     let second = advance_to_boundary(&mut engine, LogicalTime::new(boundary.value() + 1));
     for (site_id, member_ids) in &sites {
-        assert!(second.events.iter().any(|event| matches!(
+        assert!(!second.events.iter().any(|event| matches!(
             event,
             Event::EcologyActorSpawned {
                 site_id: spawned_site,

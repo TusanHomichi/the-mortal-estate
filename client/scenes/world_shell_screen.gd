@@ -18,7 +18,7 @@ signal social_message_requested(scope: Dictionary, body: String)
 @onready var hud: FullHud = %FullHud
 @onready var connection_status: Label = hud.connection_status
 @onready var readiness_status: Label = hud.readiness_status
-@onready var pulse_meter: PulseMeter = hud.pulse_meter
+@onready var cooldown_meter: CooldownMeter = hud.cooldown_meter
 @onready var action_indicator: Label = hud.action_indicator
 @onready var world_view: WorldViewSeam = %WorldView
 @onready var stairs_up_button: Button = hud.stairs_up_button
@@ -54,7 +54,7 @@ var _connection_state: String = ""
 var interaction_director: InteractionDirector = InteractionDirector.new()
 var interaction_preferences: InteractionPreferences = InteractionPreferences.new()
 var _active_character_id: String = ""
-var pulse_clock: PulseClock = PulseClock.new()
+var action_cooldown: ActionCooldown = ActionCooldown.new()
 var audio_manifest_loader: AudioManifestLoader = AudioManifestLoader.new()
 var audio_cue_player: AudioCuePlayer
 var combat_feel_director: CombatFeelDirector
@@ -132,7 +132,7 @@ func configure_audio_mix(muted: bool, volume_percent: int) -> bool:
 
 
 func note_command_installed(intent: Dictionary) -> void:
-	pulse_clock.note_prepared_intent(intent)
+	action_cooldown.note_prepared_intent(intent)
 	if combat_feel_director != null:
 		combat_feel_director.note_command_installed(intent)
 
@@ -148,7 +148,7 @@ func refresh_discarded_presentation() -> void:
 		set_command_pending(false)
 		_frame_generation += 1
 		_frame.clear()
-		pulse_clock.clear()
+		action_cooldown.clear()
 		confirmation.invalidate_if_generation_changed(_frame_generation)
 		world_view.present_frame({}, _frame_generation)
 		interaction_director.cancel_local_state()
@@ -161,7 +161,7 @@ func refresh_discarded_presentation() -> void:
 		domain_panel.present_frame({})
 		hud.reset_presentation_surface()
 		_reset_inspect_placeholder()
-		_present_pulse()
+		_present_cooldown()
 
 
 func set_connection_state(state_text: String, online: bool) -> void:
@@ -187,7 +187,7 @@ func set_command_pending(pending: bool) -> void:
 	if pending:
 		clear_pointer_draft(false)
 	else:
-		pulse_clock.clear_prepared_intent()
+		action_cooldown.clear_prepared_intent()
 	hud.set_command_pending(pending)
 	_refresh_context_palette()
 	_update_special_controls()
@@ -205,7 +205,7 @@ func present_frame(
 	_frame = frame.duplicate(true)
 	_frame_generation = frame_generation
 	confirmation.invalidate_if_generation_changed(frame_generation)
-	pulse_clock.note_frame(_frame)
+	action_cooldown.note_frame(_frame)
 	world_view.present_frame(_frame, frame_generation)
 	_active_character_id = str(_frame.get("social", {}).get("character_id", ""))
 	var saved_mode: String = interaction_preferences.ranged_mode(_active_character_id)
@@ -218,7 +218,7 @@ func present_frame(
 	hud.present_frame(_frame)
 	hud.set_spell_state(interaction_director.selected_spell_id(), interaction_director.preparing_spell_id())
 	hud.set_ranged_state(saved_mode, interaction_director.engagement_states(interaction_director.selected_actor_id()) if not interaction_director.selected_actor_id().is_empty() else {})
-	_present_pulse()
+	_present_cooldown()
 	_refresh_context_palette()
 	_update_special_controls()
 	if reconcile_pointer_intent:
@@ -476,7 +476,7 @@ func _process(_delta: float) -> void:
 	process_movement_batch()
 	process_pointer_preview_timeout()
 	process_pointer_draft_idle_timeout()
-	_present_pulse()
+	_present_cooldown()
 	if combat_feel_director != null:
 		combat_feel_director.advance()
 
@@ -813,12 +813,12 @@ func _reconcile_pointer_draft(preview_request_current: bool) -> void:
 			action_indicator.text = _preview_summary(_path_preview)
 		return
 	if not request_current:
-		# World revision advances on every pulse, so an in-flight request goes
+		# World revision advances when authoritative state changes, so an in-flight request goes
 		# stale on a timer the player never sees. Reissue it against current
 		# authority without restarting the total unanswered-response clock.
 		path_preview_requested.emit(path.duplicate())
 	# Keep the last returned preview on screen while the refresh is in flight.
-	# Dropping the marker back to pending every pulse read as the world
+	# Dropping the marker back to pending on every update read as the world
 	# refusing to move.
 	if _path_preview.is_empty():
 		world_view.show_pending(_observation_center(), _draft_path)
@@ -897,24 +897,17 @@ func _configure_traversal_button(button: Button, traversal: String, label: Strin
 		button.accessibility_description = "Unavailable: " + reason
 
 
-## The beat, presented. Runs every drawn frame as well as on every accepted
-## frame, because a pulse that only refreshed when authority arrived would be a
-## still picture of one.
-##
-## The readiness line and the meter are one statement in two forms, and the
-## world view and the feedback director are handed the same account, so none of
-## the four can describe a different beat from the others. Nothing here reads a
-## clock for gameplay: readiness is the frame's `can_act` throughout, and the
-## only local quantity is how far the measured beat has got.
-func _present_pulse() -> void:
-	var state: Dictionary = pulse_clock.state()
-	pulse_meter.present_pulse(state)
-	var line: String = pulse_meter.meter_text()
+## Present the same action interval to the meter, world view, and feedback.
+## Local frames animate progress; authoritative can_act alone grants readiness.
+func _present_cooldown() -> void:
+	var state: Dictionary = action_cooldown.state()
+	cooldown_meter.present_cooldown(state)
+	var line: String = cooldown_meter.meter_text()
 	if readiness_status.text != line:
 		readiness_status.text = line
-	world_view.present_pulse(state)
+	world_view.present_cooldown(state)
 	if combat_feel_director != null:
-		combat_feel_director.set_beat_deadline(int(state.get("beat_deadline_msec", -1)))
+		combat_feel_director.set_cooldown_deadline(int(state.get("cooldown_deadline_msec", -1)))
 
 
 func _is_dedicated_traversal(option: Dictionary) -> bool:

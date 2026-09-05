@@ -88,22 +88,6 @@ async function groundCellPoint(page, _focus, target) {
   );
 }
 
-// The fresh-beat window is the first 8 % of a beat — 240 ms. Polled on
-// animation frames it can be missed on every beat by a rasteriser whose
-// frames are 300 ms apart (headless Chromium here), so it polls on a timer.
-async function waitForFreshStandInBeat(page, clockStartedAt) {
-  await page.waitForFunction(
-    async (readyAt) => {
-      const { WALK_STAND_IN_BEAT_SECONDS } = await import("/src/walk/beat.ts");
-      const nowSeconds = performance.now() / 1_000;
-      const phase = (nowSeconds - readyAt) % WALK_STAND_IN_BEAT_SECONDS;
-      return phase >= 0 && phase < WALK_STAND_IN_BEAT_SECONDS * 0.08;
-    },
-    clockStartedAt,
-    { polling: 16, timeout: 8_000 }, // two beats and slack
-  );
-}
-
 async function assertCaretakerCentred(page) {
   const projection = await stageAttribute(page, "data-caretaker-projection");
   const [x, y] = projection.split(",").map(Number);
@@ -181,7 +165,7 @@ async function captureWindSequence(page) {
   await rm(sequenceFrames, { recursive: true, force: true });
 }
 
-async function draftAndCommit(page, clockStartedAt, from, target, afterCommit = null) {
+async function draftAndCommit(page, from, target, afterCommit = null) {
   const point = await groundCellPoint(page, from, target);
   const spaceBefore = await stageAttribute(page, "data-walk-space");
   await page.mouse.move(point.x, point.y);
@@ -191,9 +175,7 @@ async function draftAndCommit(page, clockStartedAt, from, target, afterCommit = 
   const trace = [];
   const snap = async (label) => trace.push(`${label}: ${await page.locator("#feel-stage").evaluate((stage) => `${stage.dataset.walkState}@${stage.dataset.caretakerCell} cursor=${stage.dataset.walkCursor} t=${(performance.now() / 1000).toFixed(3)}`)}`);
   await snap("after click");
-  await waitForFreshStandInBeat(page, clockStartedAt);
-  await snap("after fresh beat");
-  await page.locator("#feel-stage").evaluate((stage, position) => {
+  const committedWindow = await page.locator("#feel-stage").evaluate((stage, position) => {
     const canvas = stage.querySelector("canvas");
     if (!(canvas instanceof HTMLCanvasElement)) throw new Error("the proof found no canvas");
     canvas.dispatchEvent(new MouseEvent("dblclick", {
@@ -205,7 +187,18 @@ async function draftAndCommit(page, clockStartedAt, from, target, afterCommit = 
       clientY: position.y,
       detail: 2,
     }));
+    const timing = { start: Number(stage.dataset.walkCommittedAt), end: Number(stage.dataset.walkLandsAt) };
+    // A competing target, double-click, and cancellation in this same turn
+    // must leave the active route and its full interval untouched.
+    const before = `${stage.dataset.caretakerPresented}|${stage.dataset.walkLandsAt}`;
+    canvas.dispatchEvent(new MouseEvent("click", { bubbles: true, button: 0, detail: 1, clientX: position.x + 60, clientY: position.y }));
+    canvas.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, button: 0 }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    canvas.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true }));
+    return { ...timing, locked: stage.dataset.walkState === "committed" && before === `${stage.dataset.caretakerPresented}|${stage.dataset.walkLandsAt}` };
   }, point);
+  assert.ok(Math.abs(committedWindow.end - committedWindow.start - 3) < 1e-6);
+  assert.equal(committedWindow.locked, true);
   // A pulse observer starts the instant the commitment is dispatched: on a
   // slow rasteriser, waiting first can mean the strike has already landed.
   if (afterCommit !== null) await afterCommit();
@@ -297,11 +290,10 @@ function paceFor(from, target) {
 
 let pulseFramesObserved = 0;
 
-async function walkWithinSpace(page, clockStartedAt, space, from, target, cameraFollows = true, observePulse = false) {
+async function walkWithinSpace(page, space, from, target, cameraFollows = true, observePulse = false) {
   await draftAndCommit(
     page,
-    clockStartedAt,
-    from,
+      from,
     target,
     observePulse ? async () => { pulseFramesObserved = await capturePulse(page, from, target, paceFor(from, target)); } : null,
   );
@@ -315,18 +307,26 @@ async function walkWithinSpace(page, clockStartedAt, space, from, target, camera
     { expectedSpace: space, expectedCell: `${target.i},${target.j}` },
     { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
   );
+  // The last segment of a direct route completes along the larger axis when
+  // the two deltas differ; equal deltas keep their diagonal heading.
+  const di = target.i - from.i;
+  const dj = target.j - from.j;
+  const i = Math.abs(di) >= Math.abs(dj) ? Math.sign(di) : 0;
+  const j = Math.abs(dj) >= Math.abs(di) ? Math.sign(dj) : 0;
+  assert.equal(await stageAttribute(page, "data-caretaker-facing"), `${i},${j}`);
+  const yaw = Number(await stageAttribute(page, "data-caretaker-yaw"));
+  assert.ok(Math.abs(yaw - Math.atan2(i, j)) < 1e-6);
   if (cameraFollows) await assertCaretakerCentred(page);
 }
 
 async function walkThroughPortal(
   page,
-  clockStartedAt,
   from,
   door,
   targetSpace,
   targetCell,
 ) {
-  await draftAndCommit(page, clockStartedAt, from, door);
+  await draftAndCommit(page, from, door);
   await page.waitForFunction(
     ({ expectedSpace, expectedCell }) => {
       const stage = document.querySelector("#feel-stage");
@@ -370,8 +370,6 @@ try {
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
   );
-  const clockStartedAt = Number(await stageAttribute(page, "data-walk-clock-started-at"));
-  assert.ok(Number.isFinite(clockStartedAt));
   assert.equal(await stageAttribute(page, "data-walk-space"), "estate-grounds");
   const grassInstances = Number(await stageAttribute(page, "data-grass-instances"));
   assert.ok(grassInstances > 0 && grassInstances <= 1_800);
@@ -382,6 +380,14 @@ try {
   assert.equal(await stageAttribute(page, "data-caretaker-figure"), "caretaker");
   assert.ok((await stageAttribute(page, "data-caretaker-clip")).length > 0, "the caretaker plays no clip");
   await assertCaretakerCentred(page);
+  for (const [i, j] of [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]) {
+    const point = await groundCellPoint(page, start, { i: start.i + i, j: start.j + j });
+    await page.mouse.move(point.x, point.y);
+    await page.waitForFunction((heading) => document.querySelector("#feel-stage")?.dataset.caretakerFacing === heading, `${i},${j}`);
+    const yaw = Number(await stageAttribute(page, "data-caretaker-yaw"));
+    assert.ok(Math.abs(Math.sin(yaw) - i / Math.hypot(i, j)) < 1e-6);
+    assert.ok(Math.abs(Math.cos(yaw) - j / Math.hypot(i, j)) < 1e-6);
+  }
 
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
   await page.screenshot({ path: path.join(captureRoot, "walk-wind.png") });
@@ -395,13 +401,12 @@ try {
   const courtyardStaging = { i: 12, j: 8 };
   const doorApproach = { i: 11, j: 7 };
   // The first route is photographed across its pulse: the gait is the route's pace.
-  await walkWithinSpace(page, clockStartedAt, "estate-grounds", start, courtyardStaging, true, true);
+  await walkWithinSpace(page, "estate-grounds", start, courtyardStaging, true, true);
 
-  await walkWithinSpace(page, clockStartedAt, "estate-grounds", courtyardStaging, doorApproach);
+  await walkWithinSpace(page, "estate-grounds", courtyardStaging, doorApproach);
   await walkThroughPortal(
     page,
-    clockStartedAt,
-    doorApproach,
+      doorApproach,
     { i: 11, j: 6 },
     "estate-ground-room",
     { i: 4, j: 3 },
@@ -410,14 +415,13 @@ try {
   assert.equal(await stageAttribute(page, "data-grass-instances"), "0");
   const roomCentre = { i: 4, j: 2 };
   await assertCameraBelongsToSpace(page, roomCentre);
-  await walkWithinSpace(page, clockStartedAt, "estate-ground-room", { i: 4, j: 3 }, { i: 3, j: 3 }, false);
+  await walkWithinSpace(page, "estate-ground-room", { i: 4, j: 3 }, { i: 3, j: 3 }, false);
   await assertCameraBelongsToSpace(page, roomCentre);
-  await walkWithinSpace(page, clockStartedAt, "estate-ground-room", { i: 3, j: 3 }, { i: 4, j: 3 }, false);
+  await walkWithinSpace(page, "estate-ground-room", { i: 3, j: 3 }, { i: 4, j: 3 }, false);
 
   await walkThroughPortal(
     page,
-    clockStartedAt,
-    { i: 4, j: 3 },
+      { i: 4, j: 3 },
     { i: 4, j: 4 },
     "estate-grounds",
     { i: 11, j: 7 },

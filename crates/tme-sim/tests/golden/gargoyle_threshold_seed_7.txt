@@ -6,60 +6,60 @@ loaded "Gargoyle Threshold" realms=[realm_0] levels=[realm_0/room_0]
 player Delver at realm_0/room_0:1,2 hp=12
 monster Gargoyle at realm_0/room_0:3,2 hp=10
 
-player ready: Delver at 1
-Delver intent at 1: wait
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Gargoyle at 2
+player ready: Delver at 3000ms
+Delver intent at 3000ms: wait
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Gargoyle at 6000ms
 Gargoyle intent: hold
-readiness scheduled: Gargoyle cost=1 ready_at=3
+readiness scheduled: Gargoyle cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: walk east
+player ready: Delver at 6000ms
+Delver intent at 6000ms: walk east
 Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step east -> (2,2): terrain=Hall Floor cost=1 remaining=2
 Delver moved from (1,2) to (2,2)
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Gargoyle at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Gargoyle at 9000ms
 Gargoyle intent: poke Delver
 Gargoyle missed Delver: roll=2 attack_score=2 defense_score=13
-readiness scheduled: Gargoyle cost=1 ready_at=4
+readiness scheduled: Gargoyle cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: walk east
+player ready: Delver at 9000ms
+Delver intent at 9000ms: walk east
 Delver walk: requested=1 accepted=1 points=3 burden=None exertion=None stamina_cost=None stop=FullPathAccepted
   Delver step east -> (3,2): terrain=Hall Floor cost=1 remaining=2
 Delver moved from (2,2) to (3,2)
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Gargoyle at 4
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Gargoyle at 12000ms
 Gargoyle intent: poke Delver
 Gargoyle missed Delver: roll=8 attack_score=2 defense_score=13
-readiness scheduled: Gargoyle cost=1 ready_at=5
+readiness scheduled: Gargoyle cost=1 ready_at=15000ms
 
-player ready: Delver at 4
-Delver intent at 4: fight gargoyle
+player ready: Delver at 12000ms
+Delver intent at 12000ms: fight gargoyle
 Delver missed Gargoyle: roll=2 attack_score=3 defense_score=13
-readiness scheduled: Delver cost=1 ready_at=5
-time 5
-monster ready: Gargoyle at 5
+readiness scheduled: Delver cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Gargoyle at 15000ms
 Gargoyle intent: poke Delver
 Gargoyle attacked Delver: roll=16 damage=4 label=moderate hp=8
 contribution to player: character=None class=None damage=4
-readiness scheduled: Gargoyle cost=1 ready_at=6
+readiness scheduled: Gargoyle cost=1 ready_at=18000ms
 
-player ready: Delver at 5
-Delver intent at 5: fight gargoyle
+player ready: Delver at 15000ms
+Delver intent at 15000ms: fight gargoyle
 Delver attacked Gargoyle: roll=14 damage=6 label=heavy hp=4
 contribution to gargoyle: character=None class=None damage=6
-readiness scheduled: Delver cost=1 ready_at=6
-time 6
-monster ready: Gargoyle at 6
+readiness scheduled: Delver cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Gargoyle at 18000ms
 Gargoyle intent: poke Delver
 Gargoyle attacked Delver: roll=16 damage=4 label=heavy hp=4
 contribution to player: character=None class=None damage=4
-readiness scheduled: Gargoyle cost=1 ready_at=7
+readiness scheduled: Gargoyle cost=1 ready_at=21000ms
 
 final state
 Delver at realm_0/room_0:3,2 hp=4 alive

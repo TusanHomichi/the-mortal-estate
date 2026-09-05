@@ -6,37 +6,37 @@ loaded "Gold Ledger and Training V1" realms=[realm_0] levels=[realm_0/room_0]
 player Delver (Fighter) at realm_0/room_0:1,1 hp=12
 monster Dummy at realm_0/room_0:1,2 hp=99
 
-player ready: Delver at 1
-Delver intent at 1: critique sword_trainer sword
+player ready: Delver at 3000ms
+Delver intent at 3000ms: critique sword_trainer sword
 Delver's Sword critique: level 0, no critique rank (Unversed)
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Dummy at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Dummy at 6000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=3
+readiness scheduled: Dummy cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: train sword_trainer 40
+player ready: Delver at 6000ms
+Delver intent at 6000ms: train sword_trainer 40
 Delver spent 7 gold
 Delver trained sword with sword_trainer: learning rate 1 -> 2, offered 40 gold, spent 7, retained 33
 Delver gained 3 experience points (total: 303)
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Dummy at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Dummy at 9000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=4
+readiness scheduled: Dummy cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: poke dummy
+player ready: Delver at 9000ms
+Delver intent at 9000ms: poke dummy
 Delver missed Dummy: roll=2 attack_score=2 defense_score=13
 Delver's poke miss practice on sword: risk=practice raw=1
 Delver gained 1 raw Sword practice point at learning rate 2, credited as 2 practice points (pool: 2)
 Delver's Sword skill advanced to level 1, critique 1 (First Measure)
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Dummy at 4
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Dummy at 12000ms
 Dummy intent: hold
-readiness scheduled: Dummy cost=1 ready_at=5
+readiness scheduled: Dummy cost=1 ready_at=15000ms
 
 final state
 Delver (Fighter) at realm_0/room_0:1,1 hp=12 alive

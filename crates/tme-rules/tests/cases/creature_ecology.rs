@@ -773,7 +773,7 @@ fn slot_replenishment_preserves_partial_and_full_clear_state_across_checkpoints(
 }
 
 #[test]
-fn full_site_materialization_is_capped_at_two_in_stable_member_order() {
+fn full_site_materializes_all_due_members_in_stable_order() {
     let mut parts = parts_with_remote_level();
     let extra_member = json!({
         "member_id": "extra",
@@ -788,12 +788,31 @@ fn full_site_materialization_is_capped_at_two_in_stable_member_order() {
         parts.world_seed["ecology_sites"][0]["member_locations"]["keeper"].clone();
     let mut engine = parts.engine(7).expect("three-member full-site engine");
     for member in ["runner", "keeper", "extra"] {
-        engine
-            .apply_actor_intent(
-                &ActorId::from("player"),
-                attack(&format!("ecology:gallery_pack:{member}:0")),
-            )
-            .unwrap_or_else(|error| panic!("{member} defeat: {error}"));
+        let id = format!("ecology:gallery_pack:{member}:0");
+        // Combat can miss. Establish the full-clear precondition explicitly.
+        for _ in 0..10 {
+            if !engine
+                .world()
+                .actors
+                .iter()
+                .any(|actor| actor.id == id && actor.is_alive())
+            {
+                break;
+            }
+            engine
+                .apply_actor_intent(
+                    &ActorId::from("player"),
+                    attack(&format!("ecology:gallery_pack:{member}:0")),
+                )
+                .unwrap_or_else(|error| panic!("{member} defeat: {error}"));
+        }
+        assert!(
+            !engine
+                .world()
+                .actors
+                .iter()
+                .any(|actor| actor.id == id && actor.is_alive())
+        );
     }
 
     move_player_to_level(&mut engine, "remote");
@@ -810,11 +829,11 @@ fn full_site_materialization_is_capped_at_two_in_stable_member_order() {
             _ => None,
         })
         .collect::<Vec<_>>();
-    assert_eq!(first_members, ["runner", "keeper"]);
+    assert_eq!(first_members, ["runner", "keeper", "extra"]);
     let site = &engine.world().ecology_sites["gallery_pack"];
     assert_eq!(site.generation, 1);
-    assert!(site.member_slots["extra"].actor_id.is_none());
-    assert!(site.member_slots["extra"].due_at.is_some());
+    assert!(site.member_slots["extra"].actor_id.is_some());
+    assert!(site.member_slots["extra"].due_at.is_none());
     engine = checkpoint_round_trip(&engine);
 
     let second = engine
@@ -833,7 +852,7 @@ fn full_site_materialization_is_capped_at_two_in_stable_member_order() {
             _ => None,
         })
         .collect::<Vec<_>>();
-    assert_eq!(second_members, [("extra".to_string(), 1)]);
+    assert!(second_members.is_empty());
     assert_eq!(engine.world().ecology_sites["gallery_pack"].generation, 1);
     checkpoint_round_trip(&engine);
 }

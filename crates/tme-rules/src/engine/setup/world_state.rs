@@ -44,7 +44,11 @@ pub(super) fn seed(definition: &GameDefinition, source: &WorldSeedDef) -> Result
                         .unwrap_or(10),
                     timing: ActorTimingState {
                         ready_at: if is_ready_automatic {
-                            LogicalTime::FIRST
+                            if actor_definition.kind == crate::model::ActorKind::Player {
+                                LogicalTime::FIRST
+                            } else {
+                                LogicalTime::FIRST.saturating_add_rounds(1)
+                            }
                         } else {
                             LogicalTime::new(u64::MAX)
                         },

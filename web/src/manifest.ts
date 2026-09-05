@@ -1,3 +1,4 @@
+import { parseStructures } from "./space/structures";
 import {
   type FigureRow,
   ASSET_GROUPS,
@@ -381,6 +382,7 @@ function parseSpace(
       "roofs",
       "props",
       "fixtures",
+      "structures",
       "light_sources",
       "weather",
       "portals",
@@ -533,6 +535,7 @@ function parseSpace(
     roofs,
     props,
     fixtures,
+    structures: parseStructures(value.structures, { i: extentI, j: extentJ }),
     light_sources: {
       lantern_glass: lights.lantern_glass === null
         ? null
@@ -567,22 +570,27 @@ function validateSpaces(spaces: Record<string, FeelSpace>, start: PortalTarget):
     const { doorTiles } = wallAndDoorTiles(space.wall_runs, cells);
     for (const portal of space.portals) {
       const sourceKey = cellKey({ i: portal.cell[0], j: portal.cell[1] });
-      if (!doorTiles.has(sourceKey)) {
-        throw new Error(`the candidate feel portal is not a door tile: ${spaceName}/${sourceKey}`);
+      const [i, j] = portal.cell;
+      const structureEntrance = space.structures.some(({ footprint: f }) =>
+        i >= f.i0 && i <= f.i1 && j >= f.j0 && j <= f.j1 &&
+        (i === f.i0 || i === f.i1 || j === f.j0 || j === f.j1));
+      if (!doorTiles.has(sourceKey) && !structureEntrance) {
+        throw new Error(`the candidate feel portal is not a door tile or structure entrance: ${spaceName}/${sourceKey}`);
       }
+      validateLanding(spaces, { space: spaceName, cell: portal.cell }, "portal source");
       validateLanding(spaces, portal.to, "portal target");
     }
   }
 }
 
 export function parseFeelManifest(value: unknown): FeelManifest {
-  if (isRecord(value) && [1, 2, 3, 4].includes(value.schema_version as number)) {
+  if (isRecord(value) && [1, 2, 3, 4, 5].includes(value.schema_version as number)) {
     throw new Error(`candidate feel manifest schema ${value.schema_version} is retired and refused`);
   }
   if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "figures", "caretaker", "start", "spaces"])) {
     throw new Error("the candidate feel manifest has unknown or missing top-level fields");
   }
-  if (value.schema_version !== 5 || !isRecord(value.assets)) {
+  if (value.schema_version !== 6 || !isRecord(value.assets)) {
     throw new Error("the candidate feel manifest schema version or assets are invalid");
   }
   if (!hasExactKeys(value.assets, ASSET_GROUPS)) {
@@ -627,7 +635,7 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     }),
   );
   validateSpaces(spaces, start);
-  return { schema_version: 5, assets, figures, caretaker, start, spaces };
+  return { schema_version: 6, assets, figures, caretaker, start, spaces };
 }
 
 function bytesToHex(bytes: Uint8Array): string {
@@ -681,6 +689,9 @@ export async function fetchVerifiedAssetPacket(
   for (const [name, figure] of Object.entries(manifest.figures)) {
     const files = [figure.rig, ...figure.sidecars, figure.clips, ...figure.parts, ...figure.parts.flatMap((part) => part.sidecars)];
     for (const file of files) await verified(`figures/${name}/${file.file}`, file);
+  }
+  for (const [space, plan] of Object.entries(manifest.spaces)) {
+    for (const [index, structure] of plan.structures.entries()) await verified(`structures/${space}/${index}`, structure);
   }
   return { manifest, assets };
 }

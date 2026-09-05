@@ -14,6 +14,7 @@ function layout(wallRuns: WallRun[] = [], props: FeelSpace["props"] = []): FeelS
     roofs: [],
     props,
     fixtures: [],
+    structures: [],
     light_sources: { lantern_glass: null, candles: [] },
     weather: false,
     portals: [],
@@ -123,6 +124,16 @@ describe("packet-layout passability", () => {
     expect(passability.roofTiles).toEqual(new Set(["0,0", "1,0", "2,0", "0,1", "1,1", "2,1"]));
     expect(passability.blocked.has("0,0")).toBe(true);
     expect(passability.blocked.has("1,1")).toBe(false);
+  });
+
+  it("a static structure blocks its footprint and diagonal corner", () => {
+    const space = layout();
+    space.structures = [{ file: "house.glb", sha256: "a".repeat(64),
+      cell_anchor: [1, 1], yaw: 0, footprint: { i0: 1, j0: 0, i1: 2, j1: 1 } }];
+    const passability = passabilityFrom(space);
+    for (const cell of ["1,0", "2,0", "1,1", "2,1"]) expect(passability.blocked.has(cell)).toBe(true);
+    expect(canStep(passability, { i: 0, j: 2 }, { i: 1, j: 2 })).toBe(true);
+    expect(canStep(passability, { i: 0, j: 1 }, { i: 1, j: 2 })).toBe(false);
   });
 
   it("a fixture blocks its tile", () => {

@@ -19,6 +19,7 @@ function room(): FeelSpace {
     roofs: [],
     props: [],
     fixtures: [],
+    structures: [],
     light_sources: { lantern_glass: null, candles: [] },
     weather: false,
     portals: [],

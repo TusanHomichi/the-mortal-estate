@@ -1,23 +1,8 @@
 extends SceneTree
 
-## Photographs the beat.
-##
-## Charter item 3 asks for the authoritative pulse to be visible, and a claim
-## that something is visible is settled by looking at it. This mounts the
-## shipped `ClientRoot.tscn` against a real server, waits until the client has
-## actually observed a beat, and then captures the same window a player would be
-## looking at at several known points inside **one** beat — so the meter's
-## advance is in the pictures rather than in a description of them.
-##
-## Every sample records the frame it was taken under alongside the picture: the
-## frame's own logical time and readiness time, whether the frame said the
-## observer could act, the span the client measured, and the fill and words the
-## meter was showing. `tools/run_pulse_capture.py` judges those, and refuses a
-## run where the meter did not move, where the samples straddled a beat, or
-## where the fill and the frame disagreed.
-##
-## Provisioned and driven by `tools/run_pulse_capture.py`. A real display is
-## required; the driver supplies one.
+## Photographs three points within one accepted action cooldown.
+## Every sample carries the authoritative deadline, readiness, and displayed
+## progress. The driver judges their agreement and their visible advance.
 
 const SUCCESS_SENTINEL: String = "TME_PULSE_CAPTURE_OK"
 const MANIFEST_NAME: String = "pulse.json"
@@ -70,20 +55,10 @@ func _run() -> void:
 	for _index: int in SETTLE_FRAMES:
 		await process_frame
 
-	var clock: PulseClock = shell.pulse_clock
-	# Two consecutive beats have to arrive before the client has observed an
-	# interval at all. Until then it draws no fill, on purpose, and there is
-	# nothing here worth photographing.
-	if not await _session.wait_until(func() -> bool: return clock.has_measured_span(), STEP_TIMEOUT_MSEC):
-		_fail("the client never observed a beat interval to draw")
-		return
-	print("measured_span_msec = %d" % clock.span_msec())
-
-	# Start the samples at the top of a fresh beat so all three belong to one
-	# round of logical time rather than to whichever ones happened to pass.
-	var before: String = clock.logical_time()
-	if not await _session.wait_until(func() -> bool: return clock.logical_time() != before, STEP_TIMEOUT_MSEC):
-		_fail("logical time stalled at T%s" % before)
+	var clock: ActionCooldown = shell.action_cooldown
+	client._on_intent_requested({"kind": "wait"})
+	if not await _session.wait_until(func() -> bool: return clock.has_duration() and not clock.is_ready(), STEP_TIMEOUT_MSEC):
+		_fail("the accepted action did not expose a cooldown")
 		return
 
 	var samples: Array = []
@@ -101,7 +76,7 @@ func _run() -> void:
 		"kind": "pulse_capture_manifest",
 		"produced_by": "client/tests/pulse_capture.gd",
 		"driver": "tools/run_pulse_capture.py",
-		"measured_span_msec": clock.span_msec(),
+		"measured_duration_msec": clock.duration_msec(),
 		"requested_fills": SAMPLE_FILLS,
 		"samples": samples,
 	}
@@ -132,9 +107,9 @@ func _sample(
 	target: float,
 	index: int,
 ) -> Dictionary:
-	var clock: PulseClock = shell.pulse_clock
+	var clock: ActionCooldown = shell.action_cooldown
 	var reached: bool = await _session.wait_until(func() -> bool:
-		return clock.beat_fill() >= target
+		return clock.cooldown_fill() >= target
 	, STEP_TIMEOUT_MSEC)
 	if not reached:
 		_fail("the beat never filled to %.2f" % target)
@@ -146,7 +121,7 @@ func _sample(
 		_fail(str(report.get("error", "the capture refused without a reason")))
 		return {}
 
-	var meter: PulseMeter = shell.pulse_meter
+	var meter: CooldownMeter = shell.cooldown_meter
 	var fills: Array = []
 	for segment: Dictionary in meter.segments():
 		fills.append(float(segment["fill"]))
@@ -159,10 +134,10 @@ func _sample(
 		"logical_time": clock.logical_time(),
 		"ready_at": clock.ready_at(),
 		"can_act": clock.is_ready(),
-		"beats_until_ready": clock.beats_until_ready(),
-		"measured": clock.has_measured_span(),
-		"span_msec": clock.span_msec(),
-		"fill": clock.beat_fill(),
+		"remaining_msec": clock.remaining_msec(),
+		"known_duration": clock.has_duration(),
+		"duration_msec": clock.duration_msec(),
+		"fill": clock.cooldown_fill(),
 		"segment_fills": fills,
 		"meter_text": meter.meter_text(),
 		"world_revision": client.authoritative_state.world_revision(),

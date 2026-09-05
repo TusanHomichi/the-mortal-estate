@@ -6,161 +6,161 @@ loaded "Balm Cache" realms=[realm_0] levels=[realm_0/room_0]
 player Delver (Fighter) at realm_0/room_0:1,1 hp=8
 monster Stone Warden at realm_0/room_0:4,1 hp=5
 
-player ready: Delver at 1
-Delver intent at 1: move_item healing_balm to sack_item_1
+player ready: Delver at 3000ms
+Delver intent at 3000ms: move_item healing_balm to sack_item_1
 Delver moved Healing Balm from (1,1) to sack_item_1
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Stone Warden at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Stone Warden at 6000ms
 Stone Warden intent: hold
-readiness scheduled: Stone Warden cost=1 ready_at=3
+readiness scheduled: Stone Warden cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: move_item spare_balm to sack_item_2
+player ready: Delver at 6000ms
+Delver intent at 6000ms: move_item spare_balm to sack_item_2
 Delver moved Spare Balm from (1,1) to sack_item_2
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Stone Warden at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Stone Warden at 9000ms
 Stone Warden intent: hold
-readiness scheduled: Stone Warden cost=1 ready_at=4
+readiness scheduled: Stone Warden cost=1 ready_at=12000ms
 
-player ready: Delver at 3
-Delver intent at 3: run east,east
+player ready: Delver at 9000ms
+Delver intent at 9000ms: run east,east
 Delver run: requested=2 accepted=2 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
 Delver moved from (1,1) to (2,1)
   Delver step east -> (3,1): terrain=Flagstone cost=1 remaining=1
 Delver moved from (2,1) to (3,1)
-readiness scheduled: Delver cost=1 ready_at=4
-time 4
-monster ready: Stone Warden at 4
+readiness scheduled: Delver cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Stone Warden at 12000ms
 Stone Warden intent: hold
-readiness scheduled: Stone Warden cost=1 ready_at=5
+readiness scheduled: Stone Warden cost=1 ready_at=15000ms
 
-player ready: Delver at 4
-Delver intent at 4: walk east
+player ready: Delver at 12000ms
+Delver intent at 12000ms: walk east
 Delver walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Delver step east -> (4,1): terrain=Flagstone cost=1 remaining=2
 Delver moved from (3,1) to (4,1)
-readiness scheduled: Delver cost=1 ready_at=5
-time 5
-monster ready: Stone Warden at 5
+readiness scheduled: Delver cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Stone Warden at 15000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=11 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=6
+readiness scheduled: Stone Warden cost=1 ready_at=18000ms
 
-player ready: Delver at 5
-Delver intent at 5: fight warden
+player ready: Delver at 15000ms
+Delver intent at 15000ms: fight warden
 Delver missed Stone Warden: roll=2 attack_score=1 defense_score=14
 Delver's fight miss practice on hand: risk=practice raw=1
 Delver gained 1 hand practice point (pool: 1)
 Delver's hand skill advanced to level 1, critique 1
-readiness scheduled: Delver cost=1 ready_at=6
-time 6
-monster ready: Stone Warden at 6
+readiness scheduled: Delver cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Stone Warden at 18000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=9 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=7
+readiness scheduled: Stone Warden cost=1 ready_at=21000ms
 
-player ready: Delver at 6
-Delver intent at 6: fight warden
+player ready: Delver at 18000ms
+Delver intent at 18000ms: fight warden
 Delver missed Stone Warden: roll=8 attack_score=1 defense_score=14
 Delver's fight miss practice on hand: risk=practice raw=1
 Delver gained 1 hand practice point (pool: 1)
-readiness scheduled: Delver cost=1 ready_at=7
-time 7
-monster ready: Stone Warden at 7
+readiness scheduled: Delver cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Stone Warden at 21000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=11 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=8
+readiness scheduled: Stone Warden cost=1 ready_at=24000ms
 
-player ready: Delver at 7
-Delver intent at 7: wait
-readiness scheduled: Delver cost=1 ready_at=8
-time 8
-monster ready: Stone Warden at 8
+player ready: Delver at 21000ms
+Delver intent at 21000ms: wait
+readiness scheduled: Delver cost=1 ready_at=24000ms
+time 24000ms
+monster ready: Stone Warden at 24000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=2 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=9
+readiness scheduled: Stone Warden cost=1 ready_at=27000ms
 
-player ready: Delver at 8
-Delver intent at 8: wait
-readiness scheduled: Delver cost=1 ready_at=9
-time 9
-monster ready: Stone Warden at 9
+player ready: Delver at 24000ms
+Delver intent at 24000ms: wait
+readiness scheduled: Delver cost=1 ready_at=27000ms
+time 27000ms
+monster ready: Stone Warden at 27000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=9 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=10
+readiness scheduled: Stone Warden cost=1 ready_at=30000ms
 
-player ready: Delver at 9
-Delver intent at 9: drink healing_balm
+player ready: Delver at 27000ms
+Delver intent at 27000ms: drink healing_balm
 Delver drinks the Healing Balm and the empty bottle shatters
-readiness scheduled: Delver cost=1 ready_at=10
-time 10
-monster ready: Stone Warden at 10
+readiness scheduled: Delver cost=1 ready_at=30000ms
+time 30000ms
+monster ready: Stone Warden at 30000ms
 Stone Warden intent: fight Delver
 Stone Warden attacked Delver: roll=16 damage=1 label=light hp=7
 contribution to player: character=None class=None damage=1
-readiness scheduled: Stone Warden cost=1 ready_at=11
+readiness scheduled: Stone Warden cost=1 ready_at=33000ms
 
-player ready: Delver at 10
-Delver intent at 10: fight warden
+player ready: Delver at 30000ms
+Delver intent at 30000ms: fight warden
 Delver attacked Stone Warden: roll=19 damage=1 label=moderate hp=4
 contribution to warden: character=Some(CharacterId("character:balm_cache:primary")) class=Some(Physical) damage=1
 Delver's fight damaging_hit practice on hand: risk=practice raw=1
 Delver gained 1 hand practice point (pool: 2)
-readiness scheduled: Delver cost=1 ready_at=11
-time 11
-monster ready: Stone Warden at 11
+readiness scheduled: Delver cost=1 ready_at=33000ms
+time 33000ms
+Delver regenerated 1 Hp (8/8, Active, time 33000ms)
+monster ready: Stone Warden at 33000ms
 Stone Warden intent: fight Delver
-Stone Warden attacked Delver: roll=14 damage=1 label=light hp=6
+Stone Warden attacked Delver: roll=14 damage=1 label=light hp=7
 contribution to player: character=None class=None damage=1
-readiness scheduled: Stone Warden cost=1 ready_at=12
+readiness scheduled: Stone Warden cost=1 ready_at=36000ms
 
-player ready: Delver at 11
-Delver intent at 11: fight warden
+player ready: Delver at 33000ms
+Delver intent at 33000ms: fight warden
 Delver attacked Stone Warden: roll=17 damage=1 label=moderate hp=3
 contribution to warden: character=Some(CharacterId("character:balm_cache:primary")) class=Some(Physical) damage=1
 Delver's fight damaging_hit practice on hand: risk=practice raw=1
 Delver gained 1 hand practice point (pool: 3)
 Delver's hand skill advanced to level 1, critique 2
-readiness scheduled: Delver cost=1 ready_at=12
-Delver regenerated 1 Hp (7/8, Active, time 12)
-time 12
-monster ready: Stone Warden at 12
+readiness scheduled: Delver cost=1 ready_at=36000ms
+time 36000ms
+monster ready: Stone Warden at 36000ms
 Stone Warden intent: fight Delver
 Stone Warden attacked Delver: roll=16 damage=1 label=light hp=6
 contribution to player: character=None class=None damage=1
-readiness scheduled: Stone Warden cost=1 ready_at=13
+readiness scheduled: Stone Warden cost=1 ready_at=39000ms
 
-player ready: Delver at 12
-Delver intent at 12: fight warden
+player ready: Delver at 36000ms
+Delver intent at 36000ms: fight warden
 Delver attacked Stone Warden: roll=15 damage=1 label=moderate hp=2
 contribution to warden: character=Some(CharacterId("character:balm_cache:primary")) class=Some(Physical) damage=1
 Delver's fight damaging_hit practice on hand: risk=practice raw=1
 Delver gained 1 hand practice point (pool: 1)
-readiness scheduled: Delver cost=1 ready_at=13
-time 13
-monster ready: Stone Warden at 13
+readiness scheduled: Delver cost=1 ready_at=39000ms
+time 39000ms
+Delver regenerated 1 Hp (7/8, Active, time 39000ms)
+monster ready: Stone Warden at 39000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=10 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=14
+readiness scheduled: Stone Warden cost=1 ready_at=42000ms
 
-player ready: Delver at 13
-Delver intent at 13: drink spare_balm
+player ready: Delver at 39000ms
+Delver intent at 39000ms: drink spare_balm
 Delver drinks the Spare Balm and the empty bottle shatters
-The balm knits Delver's wounds: regained 2 hp (8 hp)
-readiness scheduled: Delver cost=1 ready_at=14
-time 14
-monster ready: Stone Warden at 14
+The balm knits Delver's wounds: regained 1 hp (8 hp)
+readiness scheduled: Delver cost=1 ready_at=42000ms
+time 42000ms
+monster ready: Stone Warden at 42000ms
 Stone Warden intent: fight Delver
 Stone Warden missed Delver: roll=1 attack_score=0 defense_score=13
-readiness scheduled: Stone Warden cost=1 ready_at=15
+readiness scheduled: Stone Warden cost=1 ready_at=45000ms
 
-player ready: Delver at 14
-Delver intent at 14: show_sack
+player ready: Delver at 42000ms
+Delver intent at 42000ms: show_sack
 Delver's sack is empty
-readiness scheduled: Delver cost=0 ready_at=14
 
 final state
 Delver (Fighter) at realm_0/room_0:4,1 hp=8 alive

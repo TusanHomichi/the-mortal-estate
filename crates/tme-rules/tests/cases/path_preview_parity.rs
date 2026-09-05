@@ -8,7 +8,12 @@ use tme_rules::{
 
 fn tracked(case_id: &str) -> ContentParts {
     let profile = format!("profile/{case_id}");
-    ContentParts::tracked(case_id, &profile)
+    let mut parts = ContentParts::tracked(case_id, &profile);
+    if case_id == "utility_door_secret_item_spells" {
+        parts.selected_by_runtime_id_mut("spells", "blue_gate")["effect"]["duration"]["rounds"] =
+            serde_json::json!(2);
+    }
+    parts
 }
 
 fn engine(parts: ContentParts) -> Engine {

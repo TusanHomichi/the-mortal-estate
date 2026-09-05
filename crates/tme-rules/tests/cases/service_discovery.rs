@@ -174,8 +174,8 @@ fn action_context_26_requires_services_here_in_both_current_views() {
             .expect("v2 context"),
     )
     .expect("v2 serializes");
-    assert_eq!(v1["contract_version"], 31);
-    assert_eq!(v2["contract_version"], 31);
+    assert_eq!(v1["contract_version"], 32);
+    assert_eq!(v2["contract_version"], 32);
     v1.as_object_mut().unwrap().remove("services_here");
     v2.as_object_mut().unwrap().remove("services_here");
     assert!(serde_json::from_value::<PlayerActionContextV1>(v1).is_err());

@@ -251,9 +251,6 @@ fn summon_spell_expires_after_duration_ticks_and_leaves_snapshot() {
         )
         .expect("summon cast should succeed");
 
-    engine
-        .apply_actor_intent(&tme_rules::ActorId::from("player"), PlayerIntent::Wait)
-        .expect("first waiting round should keep summon alive");
     assert!(
         engine
             .snapshot()
@@ -689,6 +686,7 @@ fn player_cannot_attack_owned_hostile_summon_or_gain_xp() {
         parts.summon_actor_definition_mut(0)["social"]["alignment_source"] =
             serde_json::json!({"kind": "inherent", "alignment": "chaotic"});
         parts.summon_actor_definition_mut(0)["ai"]["behavior"] = serde_json::json!("simple_chase");
+        parts.selected_mut("spells", 0)["effect"]["duration"]["rounds"] = serde_json::json!(3);
         parts.summon_actor_definition_mut(0)["xp_value"] = serde_json::json!(9);
         parts.summon_actor_definition_mut(0)["stats"]["hp"] = serde_json::json!(1);
         parts.summon_actor_definition_mut(0)["stats"]["attack"] = serde_json::json!(0);

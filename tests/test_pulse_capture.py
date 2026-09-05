@@ -30,9 +30,9 @@ def sample(index: int, fill: float, **overrides: object) -> dict:
         "logical_time": "41",
         "ready_at": "41",
         "can_act": True,
-        "beats_until_ready": 0,
-        "measured": True,
-        "span_msec": 3004,
+        "remaining_msec": 0,
+        "known_duration": True,
+        "duration_msec": 3004,
         "fill": fill,
         "segment_fills": [fill],
         "meter_text": f"◆ Ready · beat {int(fill * 100)}% · world T41 · ready T41",
@@ -45,7 +45,7 @@ def manifest(*samples: dict, span: float = 3004.0) -> dict:
     return {
         "schema_version": 1,
         "kind": "pulse_capture_manifest",
-        "measured_span_msec": span,
+        "measured_duration_msec": span,
         "requested_fills": [0.15, 0.5, 0.85],
         "samples": list(samples),
     }
@@ -89,10 +89,10 @@ class PulseCaptureVerdictTests(unittest.TestCase):
                 manifest(
                     sample(1, 0.16),
                     sample(2, 0.51),
-                    sample(3, 0.86, logical_time="42"),
+                    sample(3, 0.86, ready_at="42"),
                 )
             )
-        self.assertIn("span logical rounds", str(refusal.exception))
+        self.assertIn("same individual action deadline", str(refusal.exception))
 
     def test_a_barely_moving_meter_is_refused(self) -> None:
         self.write_captures(1, 2, 3)
@@ -118,7 +118,7 @@ class PulseCaptureVerdictTests(unittest.TestCase):
                     # Readiness decided anywhere but the frame is the exact
                     # defect ruling D5 forbids, so the words and the frame have
                     # to agree in every sample.
-                    sample(3, 0.86, can_act=False, beats_until_ready=2),
+                    sample(3, 0.86, can_act=False, remaining_msec=2),
                 )
             )
         self.assertIn("did not say so", str(refusal.exception))
@@ -127,7 +127,7 @@ class PulseCaptureVerdictTests(unittest.TestCase):
         self.write_captures(1, 2, 3)
         with self.assertRaises(ProofError) as refusal:
             self.judge(
-                manifest(sample(1, 0.16), sample(2, 0.51), sample(3, 0.86, measured=False))
+                manifest(sample(1, 0.16), sample(2, 0.51), sample(3, 0.86, known_duration=False))
             )
         self.assertIn("without having measured a beat", str(refusal.exception))
 
@@ -150,8 +150,8 @@ class PulseCaptureVerdictTests(unittest.TestCase):
         # on the wire carries the cadence. The judgement here is therefore an
         # agreement between two independent statements, which is only worth
         # anything while the tolerance stays narrow.
-        self.assertEqual(3000.0, pulse.RULED_PULSE_MSEC)
-        self.assertLess(pulse.PULSE_TOLERANCE_MSEC, pulse.RULED_PULSE_MSEC - 1000.0)
+        self.assertEqual(3000.0, pulse.STANDARD_ACTION_MSEC)
+        self.assertLess(pulse.COOLDOWN_TOLERANCE_MSEC, pulse.STANDARD_ACTION_MSEC - 1000.0)
 
     def test_a_manifest_with_an_absolute_directory_is_read_where_it_says(self) -> None:
         self.write_captures(1, 2, 3)

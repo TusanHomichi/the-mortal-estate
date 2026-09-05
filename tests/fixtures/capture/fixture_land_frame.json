@@ -206,7 +206,7 @@
       {
         "actor_id": "player",
         "attack_safety": "invalid",
-        "character_id": "9c986cd6-22f0-4820-844d-4182b9ca51e7",
+        "character_id": "662b878e-6141-450f-9e52-f5f4346817e0",
         "hp": 20,
         "kind": "player",
         "life_state": "alive",
@@ -296,7 +296,7 @@
         }
       ]
     },
-    "contract_version": 7,
+    "contract_version": 8,
     "corpses": [],
     "corpses_truncated": false,
     "gold_piles": [],
@@ -304,7 +304,7 @@
     "ground_items": [],
     "ground_items_truncated": false,
     "incoming_item_offers": [],
-    "logical_time": "10",
+    "logical_time": "9645",
     "npcs_here": [],
     "observation_center": {
       "level": "surface",
@@ -318,11 +318,11 @@
     "observer_actor_id": "player",
     "outgoing_item_offers": [],
     "quest_log": [],
-    "ready_at": "1",
+    "ready_at": "3000",
     "services_here": [],
     "social": {
       "blocked_character_ids": [],
-      "character_id": "9c986cd6-22f0-4820-844d-4182b9ca51e7",
+      "character_id": "662b878e-6141-450f-9e52-f5f4346817e0",
       "following_character_id": null,
       "group": null,
       "incoming_invitations": [],
@@ -365,7 +365,7 @@
           "y": 8
         }
       },
-      "content_digest": "24e5040e9c4480aff892a7ca1d2404b628c3478260ff07ba26640529f510cd9f",
+      "content_digest": "b1a8f15a1e76712b48a452010fa9379aa6fca2b0e1fd112d095afe687e492bb4",
       "contract_version": 1,
       "presentation_mode": "overworld_town",
       "scene_role": "overworld",
@@ -3369,8 +3369,8 @@
     "driver": "tools/run_fixture_land_capture.py",
     "recorded_by": "client/tests/live_capture.gd",
     "route": "live",
-    "server_sequence": "11",
-    "world_revision": "11"
+    "server_sequence": "4",
+    "world_revision": "4"
   },
   "schema_version": 1
 }

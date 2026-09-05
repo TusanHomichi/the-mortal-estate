@@ -132,18 +132,18 @@ func present_frame(frame: Dictionary, frame_generation: int) -> void:
 	_refresh()
 
 
-## Installs the beat this view is drawing inside of, as [PulseClock] accounts for
-## it. Motion is the beat run backwards: a fill of nothing means the step has not
-## started and the picture still shows where everything was, and a full beat
-## means the step has landed. Nothing here decides when a beat ends — the fill
-## does, and the fill comes from the frame's own arrivals.
-func present_pulse(state: Dictionary) -> void:
+## Installs the action interval this view is drawing inside of, as [ActionCooldown] accounts for
+## it. Motion is the action interval run backwards: a fill of nothing means the step has not
+## started and the picture still shows where everything was, and a full action interval
+## means the step has landed. Nothing here decides when a action interval ends — the fill
+## does, and the fill comes from the observer's reported deadline.
+func present_cooldown(state: Dictionary) -> void:
 	var motion: float = 0.0
-	if _stepping() and bool(state.get("measured", false)):
+	if _stepping() and bool(state.get("known_duration", false)):
 		motion = clampf(1.0 - float(state.get("fill", 0.0)), 0.0, 1.0)
 	# Rebuilt only when the step has actually moved a whole pixel. A fill
 	# advances every drawn frame and the lattice does not, so quantising here is
-	# what keeps a beat's worth of motion from being a beat's worth of layout.
+	# what keeps a action interval's worth of motion from being a action interval's worth of layout.
 	var quantum: int = int(round(motion * float(_layout.get("pitch", 0))))
 	if is_equal_approx(motion, _motion) or (quantum == _motion_quantum and not _screen_targets.is_empty()):
 		_motion = motion
@@ -288,7 +288,7 @@ func screen_targets() -> Array[Dictionary]:
 ## at, and the frame's square bounds. A consumer converts between squares and
 ## pixels with these three facts and nothing else.
 ##
-## The lattice itself never moves within a beat. Only the markers standing on it
+## The lattice itself never moves within a action interval. Only the markers standing on it
 ## do, and each one's displacement is carried on its own screen rectangle rather
 ## than on the camera, so this placement stays exactly as true mid-step as it is
 ## between steps — which is what a capture's sidecar depends on.
@@ -297,7 +297,7 @@ func layout() -> Dictionary:
 
 
 ## The steps this view is currently animating, as identity to squares-remaining.
-## Empty between beats, and empty for a frame that snapped rather than stepped.
+## Empty between action intervals, and empty for a frame that snapped rather than stepped.
 func animated_steps() -> Dictionary:
 	if not _stepping():
 		return {}
@@ -308,7 +308,7 @@ func animated_steps() -> Dictionary:
 
 
 ## How much of the current step is still to be presented, `1.0` at the start of
-## a beat and `0.0` once it has landed.
+## a action interval and `0.0` once it has landed.
 func step_motion() -> float:
 	return _motion
 
@@ -469,7 +469,7 @@ func _outline_path(start: Vector2i, path: Array, colour: Color) -> void:
 		draw_rect(Rect2(_square_rect(current)), colour, false, 2.0)
 
 
-# -- the step across the beat -------------------------------------------------
+# -- the step across the action interval -------------------------------------------------
 
 
 func _stepping() -> bool:
@@ -490,7 +490,7 @@ func _stepping() -> bool:
 ## a snap rather than a step:
 ##
 ## [br]- the frame is the immediate successor of the one before it, so the two
-##   pictures are a beat apart rather than either side of a discard;
+##   pictures are a action interval apart rather than either side of a discard;
 ## [br]- the marker was in the previous frame, so there is a place to come from;
 ## [br]- the displacement is a step and not a transition
 ##   ([constant MAXIMUM_ANIMATED_SQUARES]);
@@ -518,9 +518,9 @@ func _note_step(frame_generation: int) -> void:
 				continue
 			_step_squares[identity] = travel
 
-	# The step is recorded, not started. Motion only exists once a measured beat
-	# has been presented through [method present_pulse], so a view nobody hands a
-	# beat to draws every frame exactly where authority put it.
+	# The step is recorded, not started. Motion only exists once a reported action interval
+	# has been presented through [method present_cooldown], so a view nobody hands a
+	# action interval to draws every frame exactly where authority put it.
 	_previous_squares = current_squares
 	_previous_center = current_center
 	_previous_generation = frame_generation
@@ -544,7 +544,7 @@ func _is_a_step(travel: Vector2i) -> bool:
 
 
 ## Whether a marker travelling this far stays inside the lattice for the whole
-## beat. Only the two extremes need checking: the displacement is linear, so a
+## action interval. Only the two extremes need checking: the displacement is linear, so a
 ## rectangle inside the area at both ends of the travel is inside it throughout.
 func _travel_stays_inside(landing: Rect2i, travel: Vector2i) -> bool:
 	var area: Rect2i = Rect2i(_lattice_area())
@@ -634,8 +634,8 @@ func _rebuild_screen_targets() -> void:
 		if travel != null:
 			var displaced: Rect2i = Rect2i(rect.position + _motion_offset(travel as Vector2i), rect.size)
 			# The whole travel is checked, not just where the marker is right
-			# now: a step that would leave the lattice at any point in the beat
-			# is presented as a snap for the whole beat rather than sliding out
+			# now: a step that would leave the lattice at any point in the action interval
+			# is presented as a snap for the whole action interval rather than sliding out
 			# of the picture partway through it.
 			if _travel_stays_inside(rect, travel as Vector2i):
 				rect = displaced

@@ -133,6 +133,7 @@ export interface PortalPlacement {
 }
 
 export interface FeelSpace {
+  structures: StructurePlacement[];
   grid_extents: { i: number; j: number };
   cells: CellPlan[];
   wall_runs: WallRun[];
@@ -148,13 +149,20 @@ export interface FeelSpace {
 }
 
 export interface FeelManifest {
-  schema_version: 5;
+  schema_version: 6;
   assets: Record<AssetGroup, AssetRows>;
   figures: FigureRows;
   /** Which figure the start places; the client carries no caretaker of its own. */
   caretaker: { figure: string };
   start: PortalTarget;
   spaces: Record<string, FeelSpace>;
+}
+
+/** Static candidate geometry and its authored occupied ground cells. */
+export interface StructurePlacement extends AssetFile {
+  cell_anchor: [number, number];
+  yaw: number;
+  footprint: { i0: number; j0: number; i1: number; j1: number };
 }
 
 export interface VerifiedAsset {

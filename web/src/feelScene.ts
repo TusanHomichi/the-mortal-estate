@@ -1,3 +1,5 @@
+import { decodeStructures } from "./space/structures";
+import type { FigureFacing } from "./walk/facing";
 import {
   Clock,
   DataTexture,
@@ -23,7 +25,7 @@ import { describeView, type Preset } from "./presets";
 import { fogFragmentShader, fogVertexShader } from "./shaders";
 import { SpaceScene } from "./space/SpaceScene";
 import { decodeTextures } from "./space/textures";
-import { decodeFigures, disposeDecodedFigures, type DecodedFigure } from "./space/figureRig";
+import { decodeFigures, disposeDecodedFigures, disposeFigureSources, type DecodedFigure } from "./space/figureRig";
 import type { Cell } from "./walk/layoutPassability";
 import { createWalkPresenter, type WalkPresenter } from "./walk/walkPresenter";
 
@@ -118,6 +120,16 @@ export async function startFeelScene(
     canvas.remove();
     throw error;
   }
+  let structures;
+  try {
+    structures = await decodeStructures(packet);
+  } catch (error) {
+    disposeDecodedFigures(figures);
+    for (const decoded of textures.values()) decoded.texture.dispose();
+    renderer.dispose();
+    canvas.remove();
+    throw error;
+  }
   const windWeightTextures = new Map<string, DataTexture>();
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const scene = new Scene();
@@ -129,14 +141,13 @@ export async function startFeelScene(
     view.zoomStep,
   );
   const clock = new Clock();
-  const startedAt = performance.now() / 1000;
   let activeSpace: SpaceScene | null = null;
   let activePresenter: WalkPresenter | null = null;
   let activeFog: FogOverlay | null = null;
   let animationFrame = 0;
   let stopped = false;
 
-  const swapSpace = (target: PortalTarget, facing: 1 | -1): void => {
+  const swapSpace = (target: PortalTarget, facing: FigureFacing): void => {
     const space = packet.manifest.spaces[target.space];
     if (space === undefined) {
       throw new Error(`portal landing names absent verified space ${target.space}`);
@@ -161,6 +172,7 @@ export async function startFeelScene(
       caretakerCell: targetCell,
       caretakerFacing: facing,
       figures,
+      structures,
       caretakerFigure: packet.manifest.caretaker.figure,
     });
     activeSpace = nextSpace;
@@ -192,11 +204,10 @@ export async function startFeelScene(
       onCellChanged: (previous, next) => nextSpace.focusLighting(previous, next),
       onPortalLanding: swapSpace,
       cameraFollowsCaretaker: cameraFollowsCaretaker(space),
-      startedAt,
     });
   };
 
-  swapSpace(packet.manifest.start, 1);
+  swapSpace(packet.manifest.start, { i: 1, j: 0 });
 
   const devHook: FeelDevHook | null = import.meta.env["DEV"]
     ? {
@@ -245,6 +256,7 @@ export async function startFeelScene(
       for (const decoded of textures.values()) decoded.texture.dispose();
       for (const texture of windWeightTextures.values()) texture.dispose();
       disposeDecodedFigures(figures);
+      disposeFigureSources([...structures.values()]);
       delete stage.dataset.caretakerFigure;
       delete stage.dataset.caretakerClip;
       if (devHook !== null && window.__tmeFeel === devHook) delete window.__tmeFeel;

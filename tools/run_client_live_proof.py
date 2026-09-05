@@ -42,34 +42,11 @@ from live_server_harness import (  # noqa: E402
 SUCCESS_SENTINEL = "TME_CLIENT_LIVE_PROOF_OK"
 CLIENT_SCRIPT = "res://tests/live_server_play.gd"
 
-#: Owner ruling D5 (2026-08-19): one authoritative gameplay pulse at 3.0 seconds.
-#:
-#: The runtime constant is `GAMEPLAY_PULSE` in
-#: `crates/tme-server/src/scheduler.rs`. This proof deliberately restates the
-#: ruled value instead of importing it: an end-to-end proof that reads the very
-#: constant it is proving would only establish that the constant equals itself.
-#: What is checked here is that a real client, against a real server, observes
-#: the beat the ruling promises.
-RULED_PULSE_MSEC = 3000.0
-
-#: Scheduling slack allowed between two observed beats on a real host — client
-#: frame quantisation, TLS, and database commit time. Wide enough that ordinary
-#: jitter never fails the proof, far narrower than the distance to any other
-#: candidate cadence.
-PULSE_TOLERANCE_MSEC = 750.0
-
-#: `pulse_observation = T<logical time> at <wall clock ms> ms`, as printed by
-#: `client/tests/live_server_play.gd`.
-PULSE_OBSERVATION = re.compile(r"^pulse_observation = T(\d+) at (\d+) ms$", re.MULTILINE)
-
-#: `shell = Observation centre <x>,<y> ...`, as printed by the same script from
-#: the view's own status line.
+# Owner ruling September 5: every accepted move/wait gets its own full duration.
+STANDARD_ACTION_MSEC = 3000
+COOLDOWN_TOLERANCE_MSEC = 750
+COOLDOWN_OBSERVATION = re.compile(r"^cooldown_observation = start (\d+) ready (\d+) elapsed (\d+) ms$", re.MULTILINE)
 OBSERVATION_CENTRE = re.compile(r"^shell = Observation centre (\d+),(\d+) ", re.MULTILINE)
-
-#: The land this proof serves: the identity proof's, compiled by the authoring
-#: compiler and declared by the land itself. Naming the document rather than the
-#: files is what keeps this proof and the tree from disagreeing about which land
-#: the runtime loads.
 PROOF_WORLD_DOCUMENT = "content/lands/identity-proof/world.json"
 
 
@@ -87,8 +64,8 @@ def proof(arguments: argparse.Namespace) -> int:
             raise ProofError(f"the client proof failed with status {client.returncode}")
         print("--- the land the client is standing in ---")
         check_land(client.stdout, world, server.run_directory)
-        print("--- authoritative pulse ---")
-        check_pulse(client.stdout)
+        print("--- individual cooldowns ---")
+        check_cooldowns(client.stdout)
         print("--- server log tail ---")
         print(server.log_tail())
         print(SUCCESS_SENTINEL)
@@ -130,49 +107,18 @@ def check_land(stdout: str, world: World, run_directory) -> None:
     print(f"the seed stands {len(others)} other cast member(s) in this land: {', '.join(others)}")
 
 
-def check_pulse(stdout: str) -> None:
-    """Judge the observed beats against ruling D5.
-
-    The client reports one line per authoritative beat: the frame's own logical
-    time and the wall-clock millisecond it arrived. Logical time must advance by
-    exactly one round per beat, and the wall-clock gap between beats must be the
-    ruled pulse within tolerance. A one-second cadence fails this by two full
-    seconds, which is the regression this proof exists to catch.
-    """
-    beats = [
-        (int(logical), int(wall)) for logical, wall in PULSE_OBSERVATION.findall(stdout)
-    ]
-    if len(beats) < 2:
-        raise ProofError(
-            f"the client reported {len(beats)} authoritative beat(s); "
-            "at least two are needed to observe a cadence"
-        )
-    failures = []
-    for (before_logical, before_wall), (after_logical, after_wall) in zip(beats, beats[1:]):
-        interval = after_wall - before_wall
-        drift = interval - RULED_PULSE_MSEC
-        verdict = "ok" if abs(drift) <= PULSE_TOLERANCE_MSEC else "OUT OF BAND"
-        print(
-            f"T{before_logical} -> T{after_logical} in {interval} ms "
-            f"({drift:+.0f} ms from the ruled {RULED_PULSE_MSEC:.0f} ms) {verdict}"
-        )
-        if after_logical != before_logical + 1:
-            failures.append(
-                f"logical time went T{before_logical} -> T{after_logical}; "
-                "one beat must advance exactly one round"
-            )
-        if abs(drift) > PULSE_TOLERANCE_MSEC:
-            failures.append(
-                f"T{before_logical} -> T{after_logical} took {interval} ms, "
-                f"outside {RULED_PULSE_MSEC:.0f} +/- {PULSE_TOLERANCE_MSEC:.0f} ms"
-            )
-    if failures:
-        raise ProofError(
-            "the observed cadence contradicts ruling D5: " + "; ".join(failures)
-        )
-    print(
-        f"{len(beats)} beats observed at the ruled {RULED_PULSE_MSEC / 1000:.1f} s pulse"
-    )
+def check_cooldowns(stdout: str) -> None:
+    observations = [tuple(map(int, row)) for row in COOLDOWN_OBSERVATION.findall(stdout)]
+    if len(observations) < 3:
+        raise ProofError("at least three offset action cooldowns must be observed")
+    for started, ready, elapsed in observations:
+        if ready - started != STANDARD_ACTION_MSEC:
+            raise ProofError("an action did not receive its complete individual cooldown")
+        if abs(elapsed - STANDARD_ACTION_MSEC) > COOLDOWN_TOLERANCE_MSEC:
+            raise ProofError("observed readiness did not follow the individual deadline")
+    if len({started % STANDARD_ACTION_MSEC for started, _, _ in observations}) < 2:
+        raise ProofError("the actions were aligned to a shared phase")
+    print(f"{len(observations)} complete individual action cooldowns observed")
 
 
 def main() -> int:

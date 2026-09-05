@@ -178,7 +178,7 @@ fn catalog_six_combat_contract_is_required_strict_and_projected() {
     let mut canonical = first_room();
     let engine = engine_from_value(canonical.clone(), 7);
     let snapshot = serde_json::to_value(engine.snapshot()).expect("snapshot should serialize");
-    assert_eq!(snapshot["contract_version"], 30);
+    assert_eq!(snapshot["contract_version"], 31);
     assert_eq!(
         snapshot["rules"]["combat"],
         canonical.rules_source_mut()["combat"]

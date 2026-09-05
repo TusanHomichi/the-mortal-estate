@@ -1,3 +1,4 @@
+const STANDARD_ACTION_DURATION: std::time::Duration = std::time::Duration::from_millis(3_000);
 mod support;
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -16,8 +17,8 @@ use sha2::{Digest, Sha256};
 use sqlx::Row;
 use tme_protocol as wire;
 use tme_server::{
-    AppState, GAMEPLAY_PULSE, PostgresBootstrap, PostgresCharacterBootstrap, PostgresState,
-    PostgresWorldBootstrap, ServerConfig,
+    AppState, PostgresBootstrap, PostgresCharacterBootstrap, PostgresState, PostgresWorldBootstrap,
+    ServerConfig,
 };
 use uuid::Uuid;
 
@@ -334,7 +335,7 @@ async fn ev_postgres_certification() {
     // Twelve toggle/wait pairs paced to the authoritative pulse, plus the
     // standing headroom for real PostgreSQL I/O on a loaded runner.
     let mut packet_watchdog =
-        WallClockWatchdog::start(WAIT_ROUNDS * GAMEPLAY_PULSE + PACKET_IO_HEADROOM);
+        WallClockWatchdog::start(WAIT_ROUNDS * STANDARD_ACTION_DURATION + PACKET_IO_HEADROOM);
     let packet = async {
         let baseline = facet_baseline(&pool, world_facet).await;
 
@@ -422,9 +423,9 @@ async fn ev_postgres_certification() {
             }
             if is_wait {
                 // One authoritative pulse, at the one cadence the server owns
-                // (D5; `tme_server::GAMEPLAY_PULSE`). Advancing anything less
+                // (D5; `tme_server::STANDARD_ACTION_DURATION`). Advancing anything less
                 // strikes no boundary and no client would ever become ready.
-                tokio::time::advance(GAMEPLAY_PULSE).await;
+                tokio::time::advance(STANDARD_ACTION_DURATION).await;
                 tokio::task::yield_now().await;
                 for (client, prior_time) in clients.iter_mut().zip(prior_times) {
                     support::wait_until_ready_after(client, prior_time).await;
@@ -436,7 +437,7 @@ async fn ev_postgres_certification() {
                     .take()
                     .expect("toggle/wait pair start")
                     .elapsed();
-                if let Some(remaining) = GAMEPLAY_PULSE.checked_sub(elapsed) {
+                if let Some(remaining) = STANDARD_ACTION_DURATION.checked_sub(elapsed) {
                     wall_clock_delay(remaining).await;
                 }
             }
@@ -628,7 +629,7 @@ async fn ev_postgres_certification() {
     assert!(
         mismatch_audits
             .keys()
-            .all(|action| action == "facet_presence" || action == "facet_tick")
+            .all(|action| action == "facet_presence" || action == "facet_deadlines")
     );
     assert_eq!(
         Some(&false),
@@ -983,7 +984,7 @@ async fn prove_child_process_restart(
         assert!(
             audits
                 .keys()
-                .all(|action| action == "facet_presence" || action == "facet_tick"),
+                .all(|action| action == "facet_presence" || action == "facet_deadlines"),
             "startup recovery committed an unexpected action: {audits:?}"
         );
         assert_ne!(
@@ -993,10 +994,17 @@ async fn prove_child_process_restart(
         assert!(
             after
                 .presence
-                .values()
-                .all(|(connected, absent_since)| !connected
-                    && *absent_since == Some(before.logical_time)),
-            "startup recovery did not reset every absence to the killed checkpoint time"
+                .iter()
+                .all(|(character_id, (connected, absent_since))| {
+                    let (was_connected, previous_absence) = before.presence[character_id];
+                    let expected = if was_connected || previous_absence.is_none() {
+                        Some(before.logical_time)
+                    } else {
+                        previous_absence
+                    };
+                    !connected && *absent_since == expected
+                }),
+            "startup recovery must preserve existing absence deadlines"
         );
     }
     assert_eq!(
@@ -1045,7 +1053,9 @@ async fn prove_child_process_restart(
         &replay_audits,
     );
     assert!(
-        replay_audits.keys().all(|action| action == "facet_tick"),
+        replay_audits
+            .keys()
+            .all(|action| action == "facet_deadlines"),
         "durable replay committed a non-tick mutation: {replay_audits:?}"
     );
     assert_eq!(
@@ -1230,7 +1240,7 @@ async fn facet_durable_state(pool: &sqlx::PgPool, facet_id: wire::FacetId) -> Fa
     assert_eq!(Sha256::digest(&checkpoint).as_slice(), checkpoint_sha256);
     let payload: serde_json::Value = serde_json::from_slice(&checkpoint).unwrap();
     let world = payload["world"].as_object().expect("checkpoint world");
-    let logical_time = world["timing"]["now"]
+    let logical_time = world["timing"]["now"]["milliseconds"]
         .as_u64()
         .expect("checkpoint logical time");
     let presence = world["character_presence"]
@@ -1244,7 +1254,7 @@ async fn facet_durable_state(pool: &sqlx::PgPool, facet_id: wire::FacetId) -> Fa
                     value["connected"]
                         .as_bool()
                         .expect("checkpoint connected presence"),
-                    value["absent_since"].as_u64(),
+                    value["absent_since"]["milliseconds"].as_u64(),
                 ),
             )
         })

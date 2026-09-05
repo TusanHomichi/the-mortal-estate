@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 7
-status: Live checkpoint: browser feel work active; presentation-adoption P1 and remaining identity-proof slices paused; G10 and G11 open.
+last_updated: 2026-09-05
+revision: 10
+status: Individual cooldown implementation and local proof complete; scene 03 private preview live; owner-authorized PR delivery follows. Other recorded gates remain open.
 public_safe: true
-summary: Current work checkpoint, dated genesis phase evidence, open gates, and standing owner orders.
+summary: Current scene and individual-cooldown checkpoint, dated genesis evidence, open gates, and standing owner orders.
 ---
 
 # The genesis ledger
@@ -26,8 +26,18 @@ boundary map; 8 tooling and the verification lane split; 9 Workbench V1;
 10 the first identity proof; 11 the first external public release. Gates are the
 owner's and are numbered by the phase they guard.
 
-## Current checkpoint (2026-09-04)
+## Current checkpoint (2026-09-05)
 
+- **Verified server cutover:** the owner replaced shared gameplay pulses with
+  individual authoritative deadlines. The [cutover plan](2026-09-05-individual-action-cooldowns.md)
+  records completed implementation and local proof. The owner authorized commit,
+  pull request, merge after required checks, and task-branch cleanup on September 5.
+- **Private preview:** September 5 scene pass 03 is deployed with enlarged trees,
+  complete outdoor buildings, and full three-second movement commitments.
+  Both browser engines passed the real walk proof; this is local presentation,
+  not proof of the server cutover.
+- **First-land authoring:** [presentation direction](../presentation-direction.md#structure-and-cards)
+  records the owner’s tree-variety requirement; identical adjacent cards are refused.
 - **Active surface:** browser feel work under the September 2 browser-first
   ruling. [Client notes](../client-notes.md#current-implementation) owns the
   implemented scene, its local stand-ins, and missing production integration.
@@ -36,9 +46,11 @@ owner's and are numbered by the phase they guard.
   and the Tauri desktop decision. Read the current
   [presentation rulings](../presentation-direction.md#chrome-and-actions);
   target acceptance does not mean those features have landed.
-- **Latest browser implementation:** schema-5 live figures and gait presentation
-  between pulses are implemented; the owner verdict remains with the
-  [live-figure plan](2026-09-03-live-figure-rig.md).
+- **Latest browser implementation:** September 4 schema-6 static structures,
+  eight-direction figure facing, shared gait clips, and scene-fit corrections.
+  [Client notes](../client-notes.md#the-web-feel-scenes-walk-experiment) owns
+  the implementation; the scene remains a candidate for owner judgment.
+  The [live-figure plan](2026-09-03-live-figure-rig.md) records its earlier slice.
 - **Separate paused work:** the presentation-adoption experiment remains before
   P1 and the remaining identity-proof slices remain undispatched. The active
   feel experiment does not release that stop line, accept a production

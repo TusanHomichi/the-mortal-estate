@@ -6,32 +6,32 @@ loaded "Skill Progression V1" realms=[realm_0] levels=[realm_0/room_0]
 player Delver (Fighter) at realm_0/room_0:1,1 hp=20
 monster Mireling at realm_0/room_0:3,1 hp=20
 
-player ready: Delver at 1
-Delver intent at 1: run east,east
+player ready: Delver at 3000ms
+Delver intent at 3000ms: run east,east
 Delver run: requested=2 accepted=2 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
   Delver step east -> (2,1): terrain=Flagstone cost=1 remaining=2
 Delver moved from (1,1) to (2,1)
   Delver step east -> (3,1): terrain=Flagstone cost=1 remaining=1
 Delver moved from (2,1) to (3,1)
-readiness scheduled: Delver cost=1 ready_at=2
-time 2
-monster ready: Mireling at 2
+readiness scheduled: Delver cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Mireling at 6000ms
 Mireling intent: fight Delver
 Mireling missed Delver: roll=11 attack_score=0 defense_score=14
-readiness scheduled: Mireling cost=1 ready_at=3
+readiness scheduled: Mireling cost=1 ready_at=9000ms
 
-player ready: Delver at 2
-Delver intent at 2: fight mireling
+player ready: Delver at 6000ms
+Delver intent at 6000ms: fight mireling
 Delver missed Mireling: roll=9 attack_score=3 defense_score=13
 Delver's fight miss practice on sword: risk=practice raw=1
 Delver gained 1 Sword practice point (pool: 1)
 Delver's Sword skill advanced to level 1, critique 1 (First Measure)
-readiness scheduled: Delver cost=1 ready_at=3
-time 3
-monster ready: Mireling at 3
+readiness scheduled: Delver cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Mireling at 9000ms
 Mireling intent: fight Delver
 Mireling missed Delver: roll=8 attack_score=0 defense_score=14
-readiness scheduled: Mireling cost=1 ready_at=4
+readiness scheduled: Mireling cost=1 ready_at=12000ms
 
 final state
 Delver (Fighter) at realm_0/room_0:3,1 hp=20 alive

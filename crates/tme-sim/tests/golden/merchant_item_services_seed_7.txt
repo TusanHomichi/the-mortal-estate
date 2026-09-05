@@ -6,85 +6,85 @@ loaded "Crossroads Commerce" realms=[realm_0] levels=[realm_0/room_0]
 player Tessa (Fighter) at realm_0/room_0:1,1 hp=12
 monster Practice Marker at realm_0/room_0:1,2 hp=99
 
-player ready: Tessa at 1
-Tessa intent at 1: use_item_service crossroads_counter item_care appraise moon_pebble
+player ready: Tessa at 3000ms
+Tessa intent at 3000ms: use_item_service crossroads_counter item_care appraise moon_pebble
 Tessa appraised Moon Pebble at 7 gold
 Tessa completes appraise for moon_pebble.
-readiness scheduled: Tessa cost=1 ready_at=2
-time 2
-monster ready: Practice Marker at 2
+readiness scheduled: Tessa cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Practice Marker at 6000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=3
+readiness scheduled: Practice Marker cost=1 ready_at=9000ms
 
-player ready: Tessa at 2
-Tessa intent at 2: sell_to_merchant crossroads_counter shop_and_pawn moon_pebble
+player ready: Tessa at 6000ms
+Tessa intent at 6000ms: sell_to_merchant crossroads_counter shop_and_pawn moon_pebble
 Tessa sold Moon Pebble to a merchant
 Tessa gained 7 gold
 Tessa completes sale of moon_pebble.
-readiness scheduled: Tessa cost=1 ready_at=3
-time 3
-monster ready: Practice Marker at 3
+readiness scheduled: Tessa cost=1 ready_at=9000ms
+time 9000ms
+monster ready: Practice Marker at 9000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=4
+readiness scheduled: Practice Marker cost=1 ready_at=12000ms
 
-player ready: Tessa at 3
-Tessa intent at 3: buy_from_merchant crossroads_counter shop_and_pawn moon_pebble
+player ready: Tessa at 9000ms
+Tessa intent at 9000ms: buy_from_merchant crossroads_counter shop_and_pawn moon_pebble
 Tessa spent 28 gold
 Tessa bought Moon Pebble into sack_item_1
 Tessa completes purchase of moon_pebble.
-readiness scheduled: Tessa cost=1 ready_at=4
-time 4
-monster ready: Practice Marker at 4
+readiness scheduled: Tessa cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Practice Marker at 12000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=5
+readiness scheduled: Practice Marker cost=1 ready_at=15000ms
 
-player ready: Tessa at 4
-Tessa intent at 4: buy_from_merchant crossroads_counter shop_and_pawn copper_compass_stock,trail_lantern_stock
+player ready: Tessa at 12000ms
+Tessa intent at 12000ms: buy_from_merchant crossroads_counter shop_and_pawn copper_compass_stock,trail_lantern_stock
 Tessa spent 14 gold
 Tessa bought Copper Compass into sack_item_3
 Tessa bought Trail Lantern into sack_item_4
 Tessa completes purchase of copper_compass_stock, trail_lantern_stock.
-readiness scheduled: Tessa cost=1 ready_at=5
-time 5
-monster ready: Practice Marker at 5
+readiness scheduled: Tessa cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Practice Marker at 15000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=6
+readiness scheduled: Practice Marker cost=1 ready_at=18000ms
 
-player ready: Tessa at 5
-Tessa intent at 5: buy_from_merchant trail_vendor wares berry_tonic_stock
+player ready: Tessa at 15000ms
+Tessa intent at 15000ms: buy_from_merchant trail_vendor wares berry_tonic_stock
 Tessa spent 5 gold
 Tessa bought Berry Tonic into sack_item_5
 Tessa completes purchase of berry_tonic_stock.
-readiness scheduled: Tessa cost=1 ready_at=6
-time 6
-monster ready: Practice Marker at 6
+readiness scheduled: Tessa cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Practice Marker at 18000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=7
+readiness scheduled: Practice Marker cost=1 ready_at=21000ms
 
-player ready: Tessa at 6
-Tessa intent at 6: use_item_service crossroads_counter item_care identify sealed_charm
+player ready: Tessa at 18000ms
+Tessa intent at 18000ms: use_item_service crossroads_counter item_care identify sealed_charm
 Tessa spent 2 gold
 Tessa identified Sealed Charm in sack_item_2
 Tessa completes identify for sealed_charm.
-readiness scheduled: Tessa cost=1 ready_at=7
-time 7
-monster ready: Practice Marker at 7
+readiness scheduled: Tessa cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Practice Marker at 21000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=8
+readiness scheduled: Practice Marker cost=1 ready_at=24000ms
 
-player ready: Tessa at 7
-Tessa intent at 7: use_item_service crossroads_counter item_care enchant_weapon river_blade
+player ready: Tessa at 21000ms
+Tessa intent at 21000ms: use_item_service crossroads_counter item_care enchant_weapon river_blade
 Tessa spent 3 gold
 river_blade gains +2 combat add
 Tessa completes enchant_weapon for river_blade.
-readiness scheduled: Tessa cost=1 ready_at=8
-time 8
-monster ready: Practice Marker at 8
+readiness scheduled: Tessa cost=1 ready_at=24000ms
+time 24000ms
+monster ready: Practice Marker at 24000ms
 Practice Marker intent: hold
-readiness scheduled: Practice Marker cost=1 ready_at=9
+readiness scheduled: Practice Marker cost=1 ready_at=27000ms
 
-player ready: Tessa at 8
-Tessa intent at 8: inspect
+player ready: Tessa at 24000ms
+Tessa intent at 24000ms: inspect
 Tessa inspected at realm_0/room_0:1,1: tile=Flagstone
   current tile: terrain=Flagstone cost=1
   north -> realm_0/room_0:1,0: blocked terrain terrain=Stone Wall
@@ -96,7 +96,6 @@ Tessa inspected at realm_0/room_0:1,1: tile=Flagstone
   west -> realm_0/room_0:0,1: blocked terrain terrain=Stone Wall
   northwest -> realm_0/room_0:0,0: blocked terrain terrain=Stone Wall
   nearby south: monster Practice Marker at (1,2) hp=99
-readiness scheduled: Tessa cost=0 ready_at=8
 
 final state
 Tessa (Fighter) at realm_0/room_0:1,1 hp=12 alive

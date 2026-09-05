@@ -60,7 +60,12 @@ fn add_modifier(
 }
 
 fn engine_from_value(value: ContentParts) -> Engine {
-    value.engine(7).expect("MP fixture should start")
+    let mut engine = value.engine(7).expect("MP fixture should start");
+    // Modifier tests begin midway through an existing recovery interval.
+    engine.world_mut().actors[0]
+        .resource_activity
+        .last_recovered_at = LogicalTime::ZERO;
+    engine
 }
 
 fn mp_events(events: &[Event]) -> Vec<&Event> {

@@ -6,106 +6,106 @@ loaded "World Topology Gallery" realms=[realm_0, realm_1] levels=[realm_0/door_h
 player Wayfinder (Wizard) at realm_0/workroom:1,1 hp=20
 monster Gallery Sentinel at realm_0/hidden_room:1,1 hp=7
 
-player ready: Wayfinder at 1
-Wayfinder intent at 1: cast blue_gate on realm_0/workroom:2,1
---- Portal created (two-way): realm_0/workroom:2,1 -> realm_0/vault:1,1 for 1 rounds ---
+player ready: Wayfinder at 3000ms
+Wayfinder intent at 3000ms: cast blue_gate on realm_0/workroom:2,1
+--- Portal created (two-way): realm_0/workroom:2,1 -> realm_0/vault:1,1 for 2 rounds ---
 Wayfinder's Blue Gate practice on wizard_magic: raw=2 reason=eligible_successful_cast
 Wayfinder gained 2 wizard_magic practice points (pool: 2)
-readiness scheduled: Wayfinder cost=1 ready_at=2
-Wayfinder regenerated 1 Mp (40/40, Active, time 2)
-time 2
-monster ready: Gallery Sentinel at 2
+readiness scheduled: Wayfinder cost=1 ready_at=6000ms
+time 6000ms
+monster ready: Gallery Sentinel at 6000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=3
+readiness scheduled: Gallery Sentinel cost=1 ready_at=9000ms
 
-player ready: Wayfinder at 2
-Wayfinder intent at 2: walk east
+player ready: Wayfinder at 6000ms
+Wayfinder intent at 6000ms: walk east
 Wayfinder walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=Transitioned
   Wayfinder step east -> (2,1): terrain=Topology Floor cost=1 remaining=2
 --- Wayfinder transitions via Portal: realm_0/workroom:1,1 -> realm_0/vault:1,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=3
+readiness scheduled: Wayfinder cost=1 ready_at=9000ms
+time 9000ms
 --- Portal expired: realm_0/workroom:2,1 ---
-time 3
-monster ready: Gallery Sentinel at 3
+Wayfinder regenerated 1 Mp (40/40, Active, time 9000ms)
+monster ready: Gallery Sentinel at 9000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=4
+readiness scheduled: Gallery Sentinel cost=1 ready_at=12000ms
 
-player ready: Wayfinder at 3
-Wayfinder intent at 3: run east,east
+player ready: Wayfinder at 9000ms
+Wayfinder intent at 9000ms: run east,east
 Wayfinder run: requested=2 accepted=2 points=3 burden=Some(LightlyLoaded) exertion=Rapid stamina_cost=Some(2) stop=FullPathAccepted
   Wayfinder step east -> (2,1): terrain=Topology Floor + Topology Shallows cost=2 remaining=1
 Wayfinder moved from (1,1) to (2,1)
   Wayfinder step east -> (3,1): terrain=Topology Floor cost=1 remaining=0
 Wayfinder moved from (2,1) to (3,1)
 Wayfinder spent 2 stamina (run Rapid): 18/20
-readiness scheduled: Wayfinder cost=1 ready_at=4
-time 4
-monster ready: Gallery Sentinel at 4
+readiness scheduled: Wayfinder cost=1 ready_at=12000ms
+time 12000ms
+monster ready: Gallery Sentinel at 12000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=5
+readiness scheduled: Gallery Sentinel cost=1 ready_at=15000ms
 
-player ready: Wayfinder at 4
-Wayfinder intent at 4: traverse stairs_down
+player ready: Wayfinder at 12000ms
+Wayfinder intent at 12000ms: traverse stairs_down
 --- Wayfinder uses down stairs: realm_0/vault:3,1 -> realm_0/lower:1,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=5
-time 5
-monster ready: Gallery Sentinel at 5
+readiness scheduled: Wayfinder cost=1 ready_at=15000ms
+time 15000ms
+monster ready: Gallery Sentinel at 15000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=6
+readiness scheduled: Gallery Sentinel cost=1 ready_at=18000ms
 
-player ready: Wayfinder at 5
-Wayfinder intent at 5: traverse climb_up
+player ready: Wayfinder at 15000ms
+Wayfinder intent at 15000ms: traverse climb_up
 --- Wayfinder transitions via Climb { direction: Up }: realm_0/lower:1,1 -> realm_0/overlook:1,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=6
-time 6
-monster ready: Gallery Sentinel at 6
+readiness scheduled: Wayfinder cost=1 ready_at=18000ms
+time 18000ms
+monster ready: Gallery Sentinel at 18000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=7
+readiness scheduled: Gallery Sentinel cost=1 ready_at=21000ms
 
-player ready: Wayfinder at 6
-Wayfinder intent at 6: walk east
+player ready: Wayfinder at 18000ms
+Wayfinder intent at 18000ms: walk east
 Wayfinder walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=Transitioned
   Wayfinder step east -> (2,1): terrain=Topology Floor cost=1 remaining=2
 --- Wayfinder transitions via Pit: realm_0/overlook:1,1 -> realm_0/pit_landing:1,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=7
-time 7
-monster ready: Gallery Sentinel at 7
+readiness scheduled: Wayfinder cost=1 ready_at=21000ms
+time 21000ms
+monster ready: Gallery Sentinel at 21000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=8
+readiness scheduled: Gallery Sentinel cost=1 ready_at=24000ms
 
-player ready: Wayfinder at 7
-Wayfinder intent at 7: walk east
+player ready: Wayfinder at 21000ms
+Wayfinder intent at 21000ms: walk east
 Wayfinder walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=Transitioned
   Wayfinder step east -> (2,1): terrain=Topology Floor cost=1 remaining=2
 --- Wayfinder transitions via Passage: realm_0/pit_landing:1,1 -> realm_1/far_side:1,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=8
-time 8
-monster ready: Gallery Sentinel at 8
+readiness scheduled: Wayfinder cost=1 ready_at=24000ms
+time 24000ms
+monster ready: Gallery Sentinel at 24000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=9
+readiness scheduled: Gallery Sentinel cost=1 ready_at=27000ms
 
-player ready: Wayfinder at 8
-Wayfinder intent at 8: walk east
+player ready: Wayfinder at 24000ms
+Wayfinder intent at 24000ms: walk east
 Wayfinder walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=Transitioned
   Wayfinder step east -> (2,1): terrain=Topology Floor cost=1 remaining=2
 --- Wayfinder transitions via Portal: realm_1/far_side:1,1 -> realm_0/return_hall:1,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=9
-time 9
-monster ready: Gallery Sentinel at 9
+readiness scheduled: Wayfinder cost=1 ready_at=27000ms
+time 27000ms
+monster ready: Gallery Sentinel at 27000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=10
+readiness scheduled: Gallery Sentinel cost=1 ready_at=30000ms
 
-player ready: Wayfinder at 9
-Wayfinder intent at 9: walk east
+player ready: Wayfinder at 27000ms
+Wayfinder intent at 27000ms: walk east
 Wayfinder walk: requested=1 accepted=1 points=3 burden=Some(LightlyLoaded) exertion=None stamina_cost=Some(0) stop=FullPathAccepted
 --- Door opened: realm_0/return_hall:2,1 ---
   Wayfinder step east -> (2,1): terrain=Topology Floor cost=1 remaining=2
 --- Wayfinder transitions via Door: realm_0/return_hall:1,1 -> realm_0/door_hall:2,1 ---
-readiness scheduled: Wayfinder cost=1 ready_at=10
-time 10
-monster ready: Gallery Sentinel at 10
+readiness scheduled: Wayfinder cost=1 ready_at=30000ms
+time 30000ms
+monster ready: Gallery Sentinel at 30000ms
 Gallery Sentinel intent: hold
-readiness scheduled: Gallery Sentinel cost=1 ready_at=11
+readiness scheduled: Gallery Sentinel cost=1 ready_at=33000ms
 
 final state
 Wayfinder (Wizard) at realm_0/door_hall:2,1 hp=20 alive

@@ -12,7 +12,12 @@ fn parts() -> ContentParts {
 }
 
 fn engine() -> Engine {
-    parts().engine(7).expect("resource movement engine starts")
+    let mut engine = parts().engine(7).expect("resource movement engine starts");
+    // This fixture begins midway through an existing recovery interval.
+    engine.world_mut().actors[0]
+        .resource_activity
+        .last_recovered_at = LogicalTime::ZERO;
+    engine
 }
 
 fn set_player_resources(engine: &mut Engine, hp: i32, mp: i32, stamina: i32) {
@@ -625,16 +630,16 @@ fn recovery_is_hp_then_mp_then_inactive_full_hp_stamina_with_caps_and_mirrors() 
 
 #[test]
 fn dn_component_versions_and_direct_shapes_are_exact() {
-    assert_eq!(EVENT_CONTRACT_VERSION, 40);
-    assert_eq!(SNAPSHOT_CONTRACT_VERSION, 30);
-    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 29);
-    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 31);
+    assert_eq!(EVENT_CONTRACT_VERSION, 41);
+    assert_eq!(SNAPSHOT_CONTRACT_VERSION, 31);
+    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
+    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 32);
     assert_eq!(COMMAND_CONTRACT_VERSION, 26);
     assert_eq!(PATH_PREVIEW_CONTRACT_VERSION, 8);
 
     let engine = engine();
     let snapshot = serde_json::to_value(engine.snapshot()).expect("snapshot serializes");
-    assert_eq!(snapshot["contract_version"], 30);
+    assert_eq!(snapshot["contract_version"], 31);
     assert!(snapshot["rules"]["movement"].is_object());
     assert!(snapshot["rules"]["burden"].is_object());
     assert!(snapshot["rules"]["resources"].is_object());
@@ -651,9 +656,9 @@ fn dn_component_versions_and_direct_shapes_are_exact() {
             .expect("observed frame"),
     )
     .expect("observed frame serializes");
-    assert_eq!(observed["contract_version"], 29);
-    assert_eq!(observed["observed_snapshot"]["contract_version"], 29);
-    assert_eq!(observed["action_context"]["contract_version"], 31);
+    assert_eq!(observed["contract_version"], 30);
+    assert_eq!(observed["observed_snapshot"]["contract_version"], 30);
+    assert_eq!(observed["action_context"]["contract_version"], 32);
 
     let preview = serde_json::to_value(
         engine

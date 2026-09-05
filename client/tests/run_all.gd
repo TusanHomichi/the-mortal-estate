@@ -21,7 +21,7 @@ const FullHudSuite: Script = preload("res://tests/test_full_hud.gd")
 const CombatFeelDirectorSuite: Script = preload("res://tests/test_combat_feel_director.gd")
 const AudioManifestLoaderSuite: Script = preload("res://tests/test_audio_manifest_loader.gd")
 const SpellPaletteSuite: Script = preload("res://tests/test_spell_palette.gd")
-const PulseClockSuite: Script = preload("res://tests/test_pulse_clock.gd")
+const ActionCooldownSuite: Script = preload("res://tests/test_action_cooldown.gd")
 const WorldTargetsSuite: Script = preload("res://tests/test_world_targets.gd")
 const GridWorldViewSuite: Script = preload("res://tests/test_grid_world_view.gd")
 const InteractionDirectorSuite: Script = preload("res://tests/test_interaction_director.gd")
@@ -97,7 +97,7 @@ func _run() -> void:
 		"combat_feel_director": CombatFeelDirectorSuite,
 		"audio_manifest_loader": AudioManifestLoaderSuite,
 		"spell_palette": SpellPaletteSuite,
-		"pulse_clock": PulseClockSuite,
+		"action_cooldown": ActionCooldownSuite,
 		"world_targets": WorldTargetsSuite,
 		"grid_world_view": GridWorldViewSuite,
 		"interaction_director": InteractionDirectorSuite,

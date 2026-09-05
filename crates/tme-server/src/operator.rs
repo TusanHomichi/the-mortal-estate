@@ -6,7 +6,7 @@ use sha2::{Digest, Sha256};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, Row};
 use tme_protocol as wire;
-use tme_rules::FacetCheckpointV4;
+use tme_rules::FacetCheckpointV5;
 use uuid::Uuid;
 
 use crate::auth::{AuthService, normalize, validate_enrollment};
@@ -325,7 +325,7 @@ pub async fn verify_store(pool: &PgPool) -> Result<(), String> {
         if Sha256::digest(&bytes).as_slice() != expected.as_slice() {
             return Err("a durable checkpoint hash differs from its bytes".to_string());
         }
-        FacetCheckpointV4::from_bytes(bytes).map_err(|error| error.to_string())?;
+        FacetCheckpointV5::from_bytes(bytes).map_err(|error| error.to_string())?;
     }
     let receipts =
         sqlx::query("SELECT request_digest,disposition,outcome_bytes FROM tme.command_receipts")
