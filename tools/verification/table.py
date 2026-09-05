@@ -66,15 +66,14 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
     ),
     "harness": (
         "tests.test_live_proof_land",
-        "tests.test_live_proof_pulse",
+        "tests.test_live_wire_client",
+        "tests.test_live_proof_cooldowns",
         "tests.test_presentation_adoption_recording",
-        "tests.test_pulse_capture",
         "tests.test_run_clean_clone_proof",
         "tests.test_run_gated_postgres",
     ),
     "verification": (
         "tests.test_agent_context",
-        "tests.test_audio_provenance",
         "tests.test_ci_workflow",
         "tests.test_verification_execute",
         "tests.test_verification_footprint",
@@ -216,20 +215,8 @@ _STATIC: tuple[Step, ...] = (
         argv=("npm", "--prefix", "web", "run", "build"),
         requires=("node",),
     ),
-    Step(
-        key="client.import",
-        owner="client",
-        label="client: engine import",
-        argv=("$TME_GODOT", "--headless", "--path", "client", "--import"),
-        requires=("godot",),
-    ),
-    Step(
-        key="client.suite",
-        owner="client",
-        label="client: headless suite",
-        argv=("$TME_GODOT", "--headless", "--path", "client", "-s", "res://tests/run_all.gd"),
-        requires=("godot",),
-    ),
+
+
     Step(
         key="workbench.demo",
         owner="workbench",
@@ -257,49 +244,8 @@ _STATIC: tuple[Step, ...] = (
         label="meta: every step target exists",
         argv=("python3", "tools/run_verification.py", "--check-step-targets"),
     ),
-    Step(
-        key="capture.fixture_land",
-        owner="capture",
-        label="capture: fixture-land frame, identity raster, sidecar",
-        argv=(
-            "python3",
-            "tools/run_fixture_land_capture.py",
-            "--admin-url-file",
-            "$TME_PG_ADMIN_URL_FILE",
-            "--output",
-            "$TME_CAPTURE_OUTPUT",
-        ),
-        requires=("godot", "postgres", "display", "capture-output"),
-        timeout=1800.0,
-    ),
-    Step(
-        key="capture.pulse",
-        owner="capture",
-        label="capture: the authoritative beat photographed advancing inside one round",
-        argv=(
-            "python3",
-            "tools/run_pulse_capture.py",
-            "--admin-url-file",
-            "$TME_PG_ADMIN_URL_FILE",
-            "--output",
-            "$TME_CAPTURE_OUTPUT",
-        ),
-        requires=("godot", "postgres", "display", "capture-output"),
-        timeout=1800.0,
-    ),
-    Step(
-        key="capture.live_proof",
-        owner="capture",
-        label="capture: real client against a real server from an empty database",
-        argv=(
-            "python3",
-            "tools/run_client_live_proof.py",
-            "--admin-url-file",
-            "$TME_PG_ADMIN_URL_FILE",
-        ),
-        requires=("godot", "postgres"),
-        timeout=1800.0,
-    ),
+
+
     Step(
         key="capture.presentation_adoption",
         owner="capture",
@@ -312,7 +258,23 @@ _STATIC: tuple[Step, ...] = (
             "--output",
             "$TME_CAPTURE_OUTPUT/presentation-adoption",
         ),
-        requires=("godot", "postgres", "capture-output"),
+        requires=("postgres", "capture-output"),
+        timeout=1800.0,
+    ),
+    Step(
+        key="gated.live_wire",
+        owner="gated",
+        label="server: trusted TLS sign-in, admission, individual cooldowns, reconnect, and logout",
+        argv=("python3", "tools/run_server_live_proof.py", "--admin-url-file", "$TME_PG_ADMIN_URL_FILE"),
+        requires=("postgres",),
+        timeout=1800.0,
+    ),
+    Step(
+        key="capture.browser",
+        owner="capture",
+        label="browser: two-engine movement and scene capture",
+        argv=("node", "web/proof/walk-proof.mjs"),
+        requires=("node", "feel-assets", "capture-output"),
         timeout=1800.0,
     ),
 )
@@ -344,7 +306,6 @@ OWNER_SCOPES: tuple[str, ...] = (
     "rust",
     "workbench",
     "web",
-    "client",
     "gated",
     "cleanclone",
     "meta",
@@ -364,14 +325,14 @@ CARGO_OWNERS: frozenset[str] = frozenset({"rust", "cleanclone"})
 #: steps run in: cheap and diagnostic first, expensive last.
 COMPOSED: dict[str, tuple[str, ...]] = {
     "portable": ("@meta", "@docs", "@boundary", "@python", "@rust", "@workbench"),
-    "full": ("@portable", "@web", "@client", "@gated", "@cleanclone"),
+    "full": ("@portable", "@web", "@gated", "@cleanclone"),
 }
 
 #: Standing rule, encoded: the fast lane is defined by what it excludes.
 #: Nothing in this set may ever appear in a `fast` resolution, whatever the
 #: changed paths were, unless the matching family was actually touched.
 FAST_FORBIDDEN_WITHOUT_CAUSE: frozenset[str] = frozenset(
-    {"rust", "web", "client", "gated", "cleanclone", "capture"}
+    {"rust", "web", "gated", "cleanclone", "capture"}
 )
 
 ALL_SCOPES: tuple[str, ...] = tuple(sorted({*OWNER_SCOPES, *COMPOSED, "fast"}))

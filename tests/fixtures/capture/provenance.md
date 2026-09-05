@@ -1,4 +1,8 @@
 ---
+
+The Godot producer and commands below were retired on September 5. These are
+dated receipts. Existing correspondence remains testable; fresh authoritative
+browser capture is an open obligation in `docs/workbench-v0.md`.
 last_updated: 2026-09-05
 revision: 2
 status: Paired captures freshly recorded for observer frame contract 8 and individual cooldown timing.

@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 7
-status: Working contract from Phase 7; owner acceptance remains at its recorded stop point. Audit clarifies context loading and verification ownership.
+revision: 9
+status: Standing workflow; selective context loading and single-agent/delegated closeout clarified. Historical disk measurements moved to a linked receipt.
 public_safe: true
-summary: Scope, context loading, document precedence, implementation rules, verification lessons, CI, and closeout.
+summary: Scope, selective context loading, ownership, implementation, verification method, CI, and closeout.
 always: true
 ---
 
@@ -150,23 +150,10 @@ document — the full rule, including quarantine and provenance, is
 
 ### What this replaced, and why
 
-The predecessor's workflow contract made the first step of authoring **any**
-gameplay spec a research pass over a private corpus of another game's material.
-That pass produced the base spec; owner conversation then adjusted it.
-Conversation was explicitly not allowed to originate a system.
-
-That rule is **deleted, not adapted.** Two reasons, and the second is the one that
-matters:
-
-- The corpus does not exist in this repository and will never be a dependency of
-  it. A first-step rule that cannot be followed here is not a rule.
-- Anything authored under it is provenance-tainted **by process**, even where the
-  output reads perfectly clean. The design started from someone else's expression;
-  what the words ended up looking like does not change where they came from.
-
-Deleting a first-step rule and leaving the gap unmarked would have quietly made
-"start wherever" the standard, which is worse than the rule that was removed. The
-five steps above are the replacement, and they are a rule.
+The retired workflow required private-corpus research before any gameplay spec.
+The authoring steps above replace that dependency: owner conversation can
+originate design; external reference payload cannot enter the tree. Follow the
+[public boundary](public-boundary-policy.md#the-quarantine-flow).
 
 ## Implementer autonomy
 
@@ -177,9 +164,9 @@ engineering findings and reports the complete result at the end.
   migrations, version-literal updates, and fixes that follow as a consequence of
   the agreed cut — are resolved by the implementer's judgment and recorded, with
   what was chosen and why.
-- **The supervisor adjudicates once, at the end:** the ledger, the full diff, and
-  independent verification, before any commit. Disagreement is resolved by fixing
-  or discarding the tree, not by re-running the slice.
+- **For delegated work, the supervising agent reviews the complete result:**
+  findings, full diff, and independent verification before any commit. A single
+  agent performs its own review; this rule does not require delegation.
 - **Hard stops are ownership questions, not engineering ones:** the owner's play
   and gate verdicts, Git operations, boundary crossings, external-boundary
   activation, spending, and product decisions.
@@ -264,71 +251,31 @@ remains with the relevant proof.
 
 ### Prove the real path, not a reconstruction of it
 
-A play session once found a client broken at seams that had passed a complete
-green baseline. The production chain from HUD to interaction director to domain
-panel had no coverage: the suites built components directly and drove them through
-method calls, so a crash that only happened when a control was activated through
-its live pressed signal could not be reached by any test.
-
-Constructing a component in a test is not the same as exercising it through the
-wiring the product actually uses. **A green baseline that never touches that
-wiring is evidence about the test harness, not about the software.**
-
-How this tree honours it: `client/tests/run_all.gd` preloads every suite, so one
-unparseable file breaks the harness rather than silently dropping a suite;
-`test_support.test_all_client_scripts_parse` additionally loads every script in
-the tree; and `tools/run_client_live_proof.py` drives the shipped `ClientRoot.tscn`
-against the real server from an empty database rather than a stand-in.
+Exercise shipped wiring as well as isolated components. Browser proof drives real canvas input and inspects scene output.
+`tools/run_server_live_proof.py` drives the real wire on a scratch database;
+production browser UI/transport integration still needs its own proof. A component test
+alone cannot establish that a player's click reaches it.
 
 ### Assert the real device, session, or backend is in use
 
-The same slice could not judge its audio, because the launcher sandboxed the
-runtime directory and the engine fell back to a dummy audio driver **without
-complaint**. A silent driver fallback is indistinguishable from a working mix that
-happens to be quiet.
-
-Where a proof depends on a real device, display, session, database, or backend,
-**assert that the real one is in use.** Never infer it from the absence of an
-error.
-
-How this tree honours it: `client/presentation/capture_emitter.gd` asks the
-display server first and refuses with a reason rather than writing a blank picture
-with a confident sidecar; the PostgreSQL-gated tests require a real fresh database
-and are `#[ignore]`d rather than silently passing without one; and every boundary
-check exits **3 (FAIL CLOSED)** when its configuration is missing, which is never a
-skip and never a pass.
+Probe required devices, displays, databases, and renderers. A successful launch
+can silently use a dummy backend. Browser proof logs the actual WebGL renderer; gated tests require fresh
+PostgreSQL databases. Missing capabilities report UNAVAILABLE, never PASS.
 
 ### The single source of truth may not name something that is not there
 
-The predecessor's verification runner listed a Python module that existed
-nowhere in its repository. One scope failed on every run, and nothing noticed
-until somebody ran that scope. The defect is not the missing module — it is that
-**the document which decides what "verified" means was allowed to be wrong about
-its own contents.**
-
-So the fix is not "remove the bad line". `tools/verification/targets.py` reads
-the step table and asserts that every script, module, binary, client resource,
-capability, and owner scope it names exists; it is itself a step
-(`meta.step_targets`), it runs in every lane including the fast one, and its P9
-mutant is a planted step naming a module that does not exist. The same rule
-applies to the Python test inventory: an unclassified `tests/test_*.py` module
-makes **every** scope refuse to resolve, so a test nobody runs cannot exist
-quietly.
+`tools/verification/targets.py` checks every script, module, client resource,
+capability, and scope named by the step table. Its missing-module mutant proves
+refusal. Every Python test module must be classified in the table or all scope
+resolution fails. Update callers and the inventory together when moving proof.
 
 ### Prove it in the environment the product configures
 
-Cargo's `[env]` table applies to processes **cargo** launches. A scheduler that
-runs the compiled test binaries itself is faster and wrong: the workspace's
-`TME_BANNED_TERMS_FILE` never arrives, and the tests run against whichever
-denylist the machine happens to have — a red that has nothing to do with the
-code, or on another machine a green that means nothing. This was found by the
-Phase 8 runner's own first complete run.
-
-The rule generalises past cargo: **a runner may not quietly become a second
-place where the product's environment is decided.** `tools/verification/rust_tests.py`
-therefore asks cargo to launch every target, and
-`tme-rules`'s `cargos_env_table_reaches_this_test_process` is a tripwire that
-fails loudly if any future runner stops doing that.
+Use the product's configured environment. In particular, cargo must launch Rust
+test binaries so `.cargo/config.toml` reaches them; a direct binary scheduler
+silently loses those settings. `tools/verification/rust_tests.py` preserves that
+path, and `cargos_env_table_reaches_this_test_process` proves it. Use the runner's
+resolved environment for Python groups too.
 
 ### A check earns its blocking status
 
@@ -344,8 +291,7 @@ Check `pwd`, `git status --short`, and `git rev-parse --show-toplevel` before
 editing. A session may use the main checkout or a linked worktree; no agent
 provider or directory name establishes which one. A fresh worktree lacks three
 things the lanes need: web dependencies (`npm ci`, run by the web lane),
-the engine's class cache (rebuilt by the client lane or the
-[import command](verification.md#capabilities)), and the private denylist
+Rust build outputs (rebuilt by the Rust lane), and the private denylist
 (resolved from the main checkout when absent locally). Build and deploy only
 from your own worktree, never from a checkout another agent is editing;
 work there can mix with someone else's unfinished changes. Creating a
@@ -365,39 +311,20 @@ own command line — it matches your own shell.
 
 ### Running lanes on one host — observed, 2026-08-21
 
-Phase 10's first two slices ran as parallel implementer lanes on one machine,
-and each of these cost a re-run or a send-back before it was written down.
-
-- **The predecessor's private root must not exist in this checkout.**
-  `tools/check_clean_room.py` requires it absent, so a brief that sends capture
-  output to that directory name (a predecessor habit) fails the boundary lane.
-  Capture output goes to `TME_CAPTURE_OUTPUT` outside the tree.
-- **One `--scope full` per host at a time.** The gated PostgreSQL suite carries
-  fixed socket timeouts and fails under a parallel lane's build load with an
-  `EAGAIN` signature that is green on a quiet box (successor #15). A lane waits
-  for the load to fall before its full run, and the supervisor's own full run on
-  the final commit is the one that counts.
-- **Freeze the carried tree during integrity proof.** Finish documentation and
-  source edits before running a suite that compares the tree before and after
-  an operation. The Workbench Apply test hashes documents too; an unrelated
-  edit during that interval is a real tree change and makes the proof unusable.
-  The September 4 documentation audit reproduced this with a workflow edit.
-- **The full scope can outlive a tool's foreground limit.** Follow
-  [process lifetime](verification.md#process-lifetime); retain its exit code and
-  log. A run killed from outside leaves no final step summary.
-- **A brief describes the invariant, not the guard.** "Reject a frame whose
-  `ready_at` precedes its current time" would have broken idle play: in the
-  rules, `ready_at <= now` *is* the ready state. Say "fail closed on an
-  inconsistent frame" and let the implementer derive the guards from the rules
-  crate.
-- **Open the capture before accepting client work.** A width-floor test was
-  green while the readiness line rendered as "◆ Ready · beat …". Tests that
-  assert a floor are not proof of legibility; the supervisor looks at the PNG.
-- **Lanes list, the supervisor files.** An implementer lane has no Git or GitHub
-  lifecycle; it reports fix-or-file items with evidence and the supervisor files
-  them in the same turn.
-- **A lane that goes idle without a report is asked, not assumed.** Messages
-  cross; a clean tree at the old commit means the instruction never landed.
+- Write captures outside the checkout through `TME_CAPTURE_OUTPUT`.
+- Run one full verification per host. Gated PostgreSQL tests have fixed socket
+  timeouts and can fail under competing build load (issue #15).
+- Freeze source and documentation during integrity proof. Workbench Apply hashes
+  the carried tree; an unrelated concurrent edit invalidates that proof.
+- Do not run `npm ci` concurrently with a browser proof using that dependency tree.
+- Preserve logs and exit status for long runs; use the
+  [process-lifetime guidance](verification.md#process-lifetime).
+- Describe invariants rather than guessed guards: `ready_at <= now` is valid for
+  an idle character. Derive legality from the owning rules.
+- Open captures before claiming visual verification. Size assertions alone do
+  not prove legibility.
+- With delegated work, collect explicit reports and resolve every fix-or-file
+  item. Silence or an unchanged tree is not a completion report.
 
 ## GitHub, CI, and issues
 
@@ -410,7 +337,7 @@ everything this checkout can prove, the other runs the clean-clone proof. Why
 two rather than one is [The disk budget](#the-disk-budget) below.
 
 ```
-python3 tools/run_verification.py --scope portable --scope web --scope client --scope gated --allow-unavailable --report-disk
+python3 tools/run_verification.py --scope portable --scope web --scope gated --allow-unavailable --report-disk
 python3 tools/run_verification.py --scope cleanclone --allow-unavailable --report-disk
 ```
 
@@ -433,8 +360,7 @@ understanding them:
 
 - **The pins are verified, not assumed.** The workflow records the exact run that
   established each one.
-- **`--allow-unavailable` is a declaration, not a skip.** CI has no pinned client
-  binary, no PostgreSQL superuser, and no private denylist, so the `client` and
+- **`--allow-unavailable` is a declaration, not a skip.** CI has no PostgreSQL superuser or private denylist, so the
   `gated` steps report UNAVAILABLE with their reasons and the run prints an
   INCOMPLETE verdict before exiting 0. A step that *fails* still turns CI red, and
   a boundary check with a missing input still exits 3 from inside itself.
@@ -460,93 +386,22 @@ The required setup names **both** jobs; a rule naming only `verify` would let
 the clean-clone proof fail without blocking a merge. The tracked workflow and
 its tests do not prove the current remote branch-protection settings.
 
+**GitHub Issues are the working index** for defects and deferred findings. Issue
+order does not reorder product priority, and an open issue is not a plan.
+
 ### The disk budget
 
-On 2026-08-20, both attempts of run 32438837232 died twelve minutes in with
-`System.IO.IOException: No space left on device` — thrown by the runner itself,
-so **no step log survived at all**. The lane had just gained the clean-clone
-proof, which builds this workspace a second time, and nothing anywhere in the
-run had ever said what a build cost or how much room it had.
+`tools/verification/footprint.py` owns disposable-build settings, used by CI and
+the clean-copy proof. Disable incremental artifacts and retain line-table debug
+information there; do not change developer Cargo profiles to fit a CI runner.
+CI separates the normal and clean-copy builds onto two jobs and reclaims unused
+preinstalled payloads with `.github/disk-budget.sh`.
 
-Two defects, and both are fixed rather than worked around: the builds were
-larger than they needed to be, and the run could not say so.
-
-**Measured**, in a fresh `CARGO_TARGET_DIR` on rustc 1.96.0, running
-`cargo build --workspace --locked`, then `cargo clippy --workspace --locked
---all-targets -- -D warnings`, then `python3 tools/run_rust_tests.py`, with
-`du -sm` after each:
-
-| after | default profile | disposable-build profile | no debuginfo at all |
-| --- | --- | --- | --- |
-| `cargo build` | 3,679 MiB | 1,334 MiB | 951 MiB |
-| `cargo clippy --all-targets` | 4,607 MiB | 1,653 MiB | 1,075 MiB |
-| the test suite | **21,245 MiB** | **5,910 MiB** | **3,467 MiB** |
-| wall clock, all three | 893 s | 689 s | 628 s |
-
-Of the default figure, 9,426 MiB is `debug/incremental` — state whose entire
-purpose is making a build nobody will run faster — and most of the rest is
-DWARF the test binaries carry. The disposable-build profile
-(`CARGO_INCREMENTAL=0`, `CARGO_PROFILE_DEV_DEBUG=line-tables-only`,
-`CARGO_PROFILE_TEST_DEBUG=line-tables-only`) drops the first entirely and keeps
-exactly enough of the second to resolve a backtrace to a file and a line. It is
-also 23% faster, because writing 15 GB is not free.
-
-The third column is the option that was measured and **not** taken.
-`CARGO_PROFILE_*_DEBUG=0` saves a further 2,443 MiB and would let the complete
-lane fit one runner — at the price of test failures whose backtraces name no
-line. A proof lane exists to say what broke; buying a runner by blinding it is
-the wrong trade when a second runner is free.
-
-**It is set in the environment, not in `Cargo.toml`.** The tracked `[profile]`
-tables are the *developer's* build, and quietly degrading everybody's debugger
-to make a runner fit is paying for CI out of everyone's tooling. The
-environment is where a caller declares "this build is disposable", and the two
-callers that declare it are the workflow's `env:` block and
-`tools/run_clean_clone_proof.py`. A local `--scope full` still builds the way
-this tree is configured to build.
-
-**The peak is bigger than the leftovers, and the peak is what has to fit.** The
-table above is `du` at rest between steps. `python3 tools/run_clean_clone_proof.py`
-samples while it runs, and on 2026-08-20 two runs reported
-`TME_CLEAN_CLONE_PEAK_MiB=6831` and `=6792` for the same work that leaves
-5,910 MiB behind — about 15% more, because cargo holds superseded artifacts
-alongside their replacements before dropping them. A budget computed from the
-resting figure is a budget that is 900 MiB wrong in the direction that kills a
-job.
-
-**The arithmetic, and why two jobs.** A GitHub-hosted `ubuntu-latest` runner
-offers on the order of 14 GB free before the job reclaims anything. One lean
-cold build peaks at 6,831 MiB, so a single job running `full` needs two of them
-— 13.3 GiB — plus the toolchain, the cargo registry, and the checkout. That is
-not a tight fit; it is the same failure again with a smaller number in front of
-it. One runner per cold build leaves roughly 7 GiB spare in each, and the two
-finish in parallel rather than in series. So CI runs `full` as two jobs, and
-the test described above holds them to covering it exactly.
-
-Elapsed, measured on the same day: the clean-clone proof takes 12m 04s
-end to end, of which the inner `portable` lane is 12m 01s.
-
-Each job's own log carries the numbers this argument rests on: `df -h /` before
-and after the reclamation, the target directory's size after every step that
-built, and the clean-clone proof's sampled peak. If the workspace grows past
-what this fits, the log says so long before a runner dies of it.
-
-`.github/disk-budget.sh` runs first in both jobs: it prints `df -h /`, removes
-the preinstalled payloads this repository has no use for (a .NET SDK, an
-Android SDK, a Haskell toolchain, a CodeQL bundle), and prints `df -h /` again.
-That is margin, not the fix — the lane is measured to fit without it — and it
-is why the reclamation never fails the job.
-
-**And the run says what it is spending.** `--report-disk` prints the target
-directory's size and its filesystem's free space after every step that builds,
-and the clean-clone proof samples its own build directory while it runs and
-prints `TME_CLEAN_CLONE_PEAK_MiB` whether it passed or failed. A run that dies
-of a full disk now leaves a log that says how it got there — which is the part
-of 2026-08-20 that made the failure expensive.
-
-**GitHub Issues are the working index** for defects and deferred findings. An
-issue is where a fix-or-file finding lands. Issue order does not reorder product
-priority, and an open issue is not a plan.
+Budget for peak usage, not just artifacts left afterward. `--report-disk` logs
+size/free space after build steps; the clean-copy proof samples its peak.
+The [August 20 measurements](plans/2026-08-20-verification-footprint.md) explain
+the split and retained debugging information. They are historical evidence,
+not today's build size or runtime guarantee.
 
 ## Closeout
 
@@ -568,8 +423,9 @@ Complete these in order. An item may be `N/A` only with a stated reason.
 7. Record the decisions that will matter later in the document that owns them.
 8. File or fix every finding that is not in scope. Nothing carries forward
    unrecorded.
-9. Hand the complete packet to the supervisor for all Git, pull request,
-   required-check, and merge-state work.
+9. Report the complete result. The responsible agent handles Git, pull requests,
+   required checks, and merge state when the owner has authorized that lifecycle.
+   With delegated work, that responsibility stays with the supervising agent.
 
 ## Handoffs
 

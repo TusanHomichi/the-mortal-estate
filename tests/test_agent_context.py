@@ -70,7 +70,7 @@ class ThisTree(unittest.TestCase):
     def test_a_client_path_reaches_the_client_documents(self) -> None:
         subjects = {
             item.subject
-            for item in agent_context.read_first(self.documents, "client/presentation/grid_world_view.gd")
+            for item in agent_context.read_first(self.documents, "web/src/walk/walkPresenter.ts")
         }
         self.assertIn("client-architecture", subjects)
         self.assertIn("presentation-direction", subjects)
@@ -84,7 +84,7 @@ class ThisTree(unittest.TestCase):
         self.assertIn("working-root-policy", subjects)
 
     def test_the_always_documents_are_always_included(self) -> None:
-        for path in ("crates/tme-rules/src/lib.rs", "client/project.godot", "nothing/at/all.bin"):
+        for path in ("crates/tme-rules/src/lib.rs", "web/src/main.ts", "nothing/at/all.bin"):
             subjects = {item.subject for item in agent_context.read_first(self.documents, path)}
             self.assertTrue({"boundary-map", "agent-workflow", "settled-conclusions"} <= subjects, path)
 

@@ -50,11 +50,10 @@ class TheFastLane(unittest.TestCase):
         self.assertIn("rust.build", keys)
         self.assertFalse({key for key in keys if key.startswith("client.")})
 
-    def test_a_client_change_selects_the_client_and_not_the_workspace(self) -> None:
-        selection = resolve.select_changed_paths(["client/tests/run_all.gd"])
-        keys = {step.key for step in resolve.steps_for(selection.scopes)}
-        self.assertIn("client.suite", keys)
-        self.assertNotIn("rust.build", keys)
+    def test_the_retired_client_scope_is_refused(self) -> None:
+        with self.assertRaises(ResolutionError):
+            resolve.steps_for(("client",))
+        self.assertIsNone(resolve.classify("client/project.godot"))
 
     def test_a_web_change_selects_only_the_web_proof(self) -> None:
         selection = resolve.select_changed_paths(["web/src/main.ts"])
@@ -75,12 +74,12 @@ class TheFastLane(unittest.TestCase):
         self.assertNotIn("rust.build", keys)
 
     def test_the_meta_check_runs_in_every_fast_resolution(self) -> None:
-        for path in ("docs/server-notes.md", "crates/tme-sim/src/loading.rs", "client/project.godot"):
+        for path in ("docs/server-notes.md", "crates/tme-sim/src/loading.rs", "web/src/main.ts"):
             selection = resolve.select_changed_paths([path])
             self.assertIn("meta", selection.scopes, path)
 
     def test_the_owner_invoked_lane_is_never_selected_automatically(self) -> None:
-        for path in ("docs/workbench-v0.md", "tools/workbench/capture.py", "client/project.godot"):
+        for path in ("docs/workbench-v0.md", "tools/workbench/capture.py", "web/src/main.ts"):
             selection = resolve.select_changed_paths([path])
             self.assertNotIn("capture", selection.scopes, path)
 
@@ -163,7 +162,7 @@ class TheExclusionRule(unittest.TestCase):
     def test_the_forbidden_set_names_everything_expensive(self) -> None:
         self.assertEqual(
             table.FAST_FORBIDDEN_WITHOUT_CAUSE,
-            {"rust", "web", "client", "gated", "cleanclone", "capture"},
+            {"rust", "web", "gated", "cleanclone", "capture"},
         )
 
 
@@ -174,7 +173,6 @@ class Classification(unittest.TestCase):
             "AGENTS.md": "docs",
             "crates/tme-server/src/main.rs": "rust",
             ".sqlx/query-abc.json": "rust",
-            "client/presentation/grid_world_view.gd": "client",
             "web/src/main.ts": "web",
             "tools/check_hostnames.py": "python",
             "tests/test_run_checks.py": "python",

@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-04
-revision: 3
-status: Implemented at Phase 9 under G9 mutation authorization; owner acceptance remains at the recorded stop point. Audit corrects agent CLI usage and carried-source integrity proof.
+last_updated: 2026-09-05
+revision: 4
+status: Implemented under G9 mutation authorization; compiler bridge is the only process-spawning module. Owner acceptance remains at the recorded stop point.
 public_safe: true
 summary: Workbench staged operations, candidate preview, atomic Apply, image operations, agent CLI, and promotion limits.
 routes:
@@ -120,13 +120,10 @@ is a rejected candidate, never an accepted lie. Two mutants hold that:
 **Ruled: the `dressing` class exists in the vocabulary, its downward-honest rule
 is specified, and it ships zero verbs.**
 
-The presentation layer is not bound. This project has accepted no authored
-presentation fact: the only presentation the tree carries is a diagnostic
-lattice whose per-class colour is **derived from the projection rather than
-authored** ([presentation direction](presentation-direction.md), [client
-notes](client-notes.md)). There is no authored visual fact to change, so there
-is nothing a dressing verb could target and nothing a downward-honest check could
-bind against.
+The authored presentation layer is not bound to Workbench edits. The browser
+loads external candidate packets; those packets are not accepted editable
+masters in this contract. There is no authored dressing fact for these verbs to
+target ([presentation direction](presentation-direction.md#candidate-assets)).
 
 The rule stands, written down, for the slice that binds it: *a dressing edit may
 not imply a gameplay fact that is not true* — it may not paint a walkable-looking
@@ -455,9 +452,8 @@ strength:
 
 ## The compiler bridge
 
-One module in the Workbench runs the compiler, and it is the second and last
-module in the package that starts a program at all
-(`tools/workbench/bridge.py`; the first is `capture_harness`). Four subcommands,
+Only `tools/workbench/bridge.py` starts a program: the authoring compiler.
+Four subcommands,
 each writing one JSON document to stdout:
 
 | Command | Answers |
@@ -651,7 +647,7 @@ Every clause, with what holds it.
 | `promotion::load` remains the sole path to a compiled `Land` for the projection | `Land` is constructed only there; `build_land` takes one |
 | the reviewed digest remains the human-reviewed anchor | `test_the_promotion_anchors_are_byte_identical_after_a_full_loop` runs a complete loop and compares both anchors, both members, and every generated projection |
 | the receipt's authority block stays bounded | `tests/promotion_gate.rs` kills its mutants against **every** land, and the authority must match the contract exactly in both directions |
-| no candidate, log, operation or receipt becomes an input to the build | `test_the_promoted_path_still_passes_its_own_check_afterwards` runs `--check` after an Apply; `tests/test_working_root.py::NoTrackedLoaderReadsTheIgnoredRoot` keeps `crates/` and `client/` from naming a session |
+| no candidate, log, operation or receipt becomes an input to the build | `test_the_promoted_path_still_passes_its_own_check_afterwards` runs `--check` after an Apply; `tests/test_working_root.py::NoTrackedLoaderReadsTheIgnoredRoot` keeps `crates/` and `web/` from naming a session |
 | the Workbench never edits `promotion.json` or the digest constant | `Session.artifact` refuses to address anything outside the session, with a mutant; every Apply output is asserted to be inside it |
 | `validate_candidate` returns a report, never a `Member` | the `compile_fail` doctest, with the receipt above |
 

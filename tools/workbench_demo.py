@@ -46,7 +46,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from workbench import capture as capture_reader  # noqa: E402
-from workbench import capture_harness  # noqa: E402
 from workbench import imageops  # noqa: E402
 from workbench_integrity import carried_tree  # noqa: E402
 
@@ -160,21 +159,10 @@ def summarize(packet: dict) -> None:
 
 
 def capture_section(base: str) -> str:
-    """Point at a photograph of the running game, and say which one."""
+    """Identify the retained capture fixture used by this selection proof."""
     rule("the capture the owner is pointing at")
-    try:
-        capture_harness.preflight(ROOT)
-    except capture_reader.CaptureUnavailable as unavailable:
-        print(f"  a fresh capture is unavailable: {unavailable}")
-        print("  pointing at the tracked capture fixture instead (cap-0001)")
-        return "cap-0001"
-    started = time.monotonic()
-    answer = post(base, "/api/capture", {})["capture"]
-    print(f"  took a fresh capture in {time.monotonic() - started:.1f}s")
-    for field in ("capture_id", "directory", "member", "frame_generation", "viewport", "targets"):
-        print(f"  {field:<17} {answer[field]}")
-    print(f"  square pitch      {answer['camera']['square_pitch_px']}px")
-    return answer["capture_id"]
+    print("  pointing at the recorded capture fixture (cap-0001); no fresh render claimed")
+    return "cap-0001"
 
 
 def digests_of(root: Path) -> dict:

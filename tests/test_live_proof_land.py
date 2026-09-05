@@ -1,6 +1,6 @@
 """Tests for the live proof's judgement of WHICH land it signed in to.
 
-The live proof needs PostgreSQL, TLS, credentials, and the pinned Godot binary,
+The live proof needs PostgreSQL and trusted loopback TLS,
 so it runs on demand. Two things it decides need none of that and must not go
 soft: which world it serves, and whether the client ended up standing in it.
 
@@ -19,14 +19,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import boundary_test_support  # noqa: F401  (puts tools/ on sys.path)
-import run_client_live_proof as live_proof
+import run_server_live_proof as live_proof
 from live_server_harness import REPOSITORY_ROOT, ProofError, World
 
 PROOF_DOCUMENT = "content/lands/identity-proof/world.json"
 
 
 def centre(x: int, y: int) -> str:
-    return f"shell = Observation centre {x},{y} · frame generation 2 · logical time 4"
+    return f"observer = Observation centre {x},{y} · frame generation 2 · logical time 4"
 
 
 def judge(stdout: str, world: World) -> str:

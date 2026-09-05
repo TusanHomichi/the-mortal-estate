@@ -1,32 +1,8 @@
-"""Acceptance criterion 9 — no full verification in the ordinary loop.
+"""The ordinary Workbench loop starts no processes.
 
-V0a could state this as "the package cannot start a process at all", and did.
-V0b cannot, because a capture is a real client run and a tool that pretended
-otherwise would be lying about its own cost — the exact failure spec open
-decision 7 names. So the claim is now sharper, and it is proven twice.
-
-**Two modules may start a program, and V1 added the second one.** A capture runs
-the client, because a photograph of the game can only come from the game drawing
-it. A candidate verdict runs the authoring compiler, because the meaning of an
-authored document lives there and there is exactly one of it. Both are deliberate
-acts on routes of their own; neither is on the ordinary path.
-
-**Structurally.** Every module of the package except those two is parsed and
-inspected: nothing imports a process-spawning facility, nothing calls one,
-nothing names a build or test command, and nothing imports anything outside the
-standard library. Each of the two is allowed exactly one command, read argument
-by argument, and nothing else.
-
-**Behaviourally.** The running server is driven through every ordinary route —
-state, projection, preview, selection, packet, comment, **and V1's staging and
-retraction** — with BOTH expensive modules' `subprocess` replaced by a tripwire.
-Nothing on the ordinary path touches either. A structural claim about imports is
-a claim about the file; this is a claim about what actually happened.
-
-Timing is asserted here only where it is a guarantee rather than a measurement:
-selection to written packet is on the reading path and must stay in
-milliseconds. Capture cost is measured and recorded in `docs/workbench-v0.md`,
-never asserted, because it is a real client run on real hardware.
+Only the compiler bridge may spawn a program. Structural import checks and a
+runtime subprocess tripwire protect selection, comments, staging, and retraction.
+Godot retirement removed fresh capture; existing capture selection stays cheap.
 """
 
 from __future__ import annotations
@@ -43,16 +19,15 @@ from pathlib import Path
 
 from workbench_test_support import TOOLS, StagedTree
 
-from workbench import bridge, capture_harness, serve
+from workbench import bridge, serve
 from workbench.projection import DEFAULT_PROJECTION_PATH
 
 PACKAGE = TOOLS / "workbench"
 
-#: The two modules that may start a program, and what each one starts.
+#: The compiler bridge is the only module allowed to start a program.
 #: Everything else is the ordinary path.
-HARNESS_MODULE = "capture_harness.py"
 BRIDGE_MODULE = "bridge.py"
-EXPENSIVE_MODULES = (BRIDGE_MODULE, HARNESS_MODULE)
+EXPENSIVE_MODULES = (BRIDGE_MODULE,)
 
 #: Anything that can start another program, directly or by proxy.
 FORBIDDEN_IMPORTS = {
@@ -153,7 +128,7 @@ def code_strings(node: ast.Module) -> set[str]:
 def imported_names(node: ast.Module) -> set[str]:
     """Every module a file imports, including the ones named after `from`.
 
-    `from workbench import capture_harness` imports a module, not a symbol, and
+    `from workbench import bridge` imports a module, not a symbol, and
     a reader that only recorded `workbench` would miss exactly the dependency
     this file exists to police.
     """
@@ -291,40 +266,6 @@ class TheExpensiveModulesAreNamedAndBounded(unittest.TestCase):
             self.assertNotIn(f'"{forbidden}"', source)
         self.assertEqual(bridge.COMPILER_COMMAND[-1], "--")
 
-    def test_the_harness_starts_the_pinned_client_and_nothing_else(self) -> None:
-        """The whole command is read off the module, argument by argument."""
-        command = capture_harness.harness_command(Path("/repository"), "/pinned/client")
-        self.assertEqual(command[0], capture_harness.XVFB)
-        self.assertEqual(command[command.index("/pinned/client")], "/pinned/client")
-        self.assertEqual(command[-1], capture_harness.HARNESS_SCRIPT)
-        self.assertEqual(command[command.index("--path") + 1], str(Path("/repository/client")))
-        for word in ("cargo", "pytest", "make", "sh", "bash", "-c"):
-            self.assertNotIn(word, command, f"the capture command names {word!r}")
-
-    def test_the_harness_is_reached_from_exactly_one_place(self) -> None:
-        importers = [
-            path.name
-            for path in modules()
-            if path.name != HARNESS_MODULE
-            and any(name.endswith("capture_harness") for name in imported_names(tree(path)))
-        ]
-        self.assertEqual(importers, ["serve.py"])
-        calls = [
-            node
-            for node in ast.walk(tree(PACKAGE / "serve.py"))
-            if isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Attribute)
-            and isinstance(node.func.value, ast.Name)
-            and node.func.value.id == "capture_harness"
-        ]
-        self.assertEqual([node.func.attr for node in calls], ["request"])
-
-    def test_the_harness_refuses_rather_than_falling_back(self) -> None:
-        """No fallback binary, no fallback display, no synthesised picture."""
-        source = (PACKAGE / HARNESS_MODULE).read_text(encoding="utf-8")
-        self.assertIn("CaptureUnavailable", source)
-        for word in ("except Exception", "pass  #", "or 'godot'", 'or "godot"'):
-            self.assertNotIn(word, source)
 
 
 class TheOrdinaryRoutesTouchNothing(StagedTree):
@@ -338,7 +279,7 @@ class TheOrdinaryRoutesTouchNothing(StagedTree):
             self.started.append(list(command))
             raise AssertionError("an ordinary route started a program")
 
-        for module in (capture_harness, bridge):
+        for module in (bridge,):
             original = module.subprocess.run
             module.subprocess.run = tripwire
             self.addCleanup(setattr, module.subprocess, "run", original)
@@ -370,6 +311,12 @@ class TheOrdinaryRoutesTouchNothing(StagedTree):
         )
         with urllib.request.urlopen(request, timeout=10) as response:
             return json.loads(response.read())
+
+    def test_retired_fresh_capture_route_is_refused(self) -> None:
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            self.post("/api/capture", {})
+        self.addCleanup(caught.exception.close)
+        self.assertEqual(caught.exception.code, 404)
 
     def test_no_ordinary_route_starts_a_program(self) -> None:
         self.get("/api/state")

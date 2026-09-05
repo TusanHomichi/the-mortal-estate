@@ -135,10 +135,10 @@ class Mutants(HostnameTestCase):
 
     def test_mutant_live_external_hostname_is_killed(self) -> None:
         self.repo.write(
-            "client/tests/test_endpoint_resolution.gd",
+            "web/tests/endpoint.test.ts",
             'const DEFAULT_HOST = "mutant-host.com"\n',
         )
-        self.repo.track("client/tests/test_endpoint_resolution.gd")
+        self.repo.track("web/tests/endpoint.test.ts")
         code, output = self.check()
         self.assertEqual(code, EXIT_VIOLATION, output)
         self.assertIn("non-reserved hostname", output)

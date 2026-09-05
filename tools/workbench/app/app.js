@@ -43,7 +43,7 @@ import { installApply } from "./apply.js";
 import { installGestures, record } from "./gestures.js";
 import { clearSelection } from "./identities.js";
 import { buildPalette } from "./logical.js";
-import { refreshSession, takeCapture } from "./session.js";
+import { refreshSession } from "./session.js";
 import { installStaging } from "./staging.js";
 import { state } from "./state.js";
 import { zoomCeiling, zoomFloor } from "./surface.js";
@@ -83,9 +83,7 @@ document.getElementById("reset").addEventListener("click", fit);
 document.getElementById("record").addEventListener("click", () => {
   record().catch(() => {});
 });
-document.getElementById("take-capture").addEventListener("click", () => {
-  takeCapture().catch(() => {});
-});
+
 
 /* ------------------------------------------------------------------- boot */
 

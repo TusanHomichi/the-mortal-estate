@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, rm } from "node:fs/promises";
+import { copyFile, mkdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { execFile, spawn } from "node:child_process";
@@ -52,7 +52,7 @@ const engineName = proofEngine.name;
 const captureRoot = captureBase;
 const sequenceFrames = path.join(captureRoot, ".wind-sequence-frames");
 const execFileAsync = promisify(execFile);
-// Two beats and slack for a landing, plus the synchronous build of the next
+// Two action intervals and slack for a landing, plus the synchronous build of the next
 // space when the landing is a portal: measured at up to ~9 s on headless
 // Chromium's software GL, under 2 s on Firefox's.
 const SPACE_BUILD_DEADLINE_MS = 20_000;
@@ -195,15 +195,18 @@ async function draftAndCommit(page, from, target, afterCommit = null) {
     canvas.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, button: 0 }));
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     canvas.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true }));
-    return { ...timing, locked: stage.dataset.walkState === "committed" && before === `${stage.dataset.caretakerPresented}|${stage.dataset.walkLandsAt}` };
+    return { ...timing, locked: stage.dataset.walkState === "committed" && before === `${stage.dataset.caretakerPresented}|${stage.dataset.walkLandsAt}`,
+      cursor: stage.dataset.walkCursor };
   }, point);
   assert.ok(Math.abs(committedWindow.end - committedWindow.start - 3) < 1e-6);
   assert.equal(committedWindow.locked, true);
-  // A pulse observer starts the instant the commitment is dispatched: on a
-  // slow rasteriser, waiting first can mean the strike has already landed.
+  assert.equal(committedWindow.cursor, "waiting");
+  assert.equal(await page.locator(".movement-status").count(), 0);
+  // A movement observer starts the instant the commitment is dispatched: on a
+  // slow rasteriser, waiting first can mean the movement has already finished.
   if (afterCommit !== null) await afterCommit();
   // The commitment is observed, not sampled, and on a timer: under a slow
-  // rasteriser the beat can strike between the double-click and the next
+  // rasteriser the movement can finish between the double-click and the next
   // animation frame, by which time the route has landed — on the target
   // cell, or through a portal into another space. Each of those is the
   // commitment succeeding; a strict re-read of "committed" was #31.
@@ -234,16 +237,16 @@ function parsePresented(value) {
   return { i, j };
 }
 
-// The walk between pulses (plan §6a): after the commit and before the strike
-// the figure is presented along the route with the route's gait; the
-// authoritative square stays put until the strike, then both agree.
-async function capturePulse(page, from, target, expectedGait) {
-  // Screenshots across the pulse, best effort at whatever rate the engine
+// During a commitment the figure follows the route while its local logical
+// square stays fixed. Both positions agree when the interval completes.
+async function captureMovement(page, from, target, expectedGait) {
+  // Screenshots across the movement interval, best effort at whatever rate the engine
   // manages; the assertions below read the presenter's own per-frame trace.
   await rm(sequenceFrames, { recursive: true, force: true });
   await mkdir(sequenceFrames, { recursive: true });
   for (let index = 0; index < 8; index += 1) {
-    await page.screenshot({ path: path.join(sequenceFrames, `pulse-frame-${String(index).padStart(2, "0")}.png`) });
+    await page.screenshot({ path: path.join(sequenceFrames, `movement-frame-${String(index).padStart(2, "0")}.png`) });
+    if (index === 0) await copyFile(path.join(sequenceFrames, "movement-frame-00.png"), path.join(captureRoot, "movement-commit.png"));
     const state = await page.locator("#feel-stage").evaluate((stage) => ({ ...stage.dataset }));
     if (state.walkState === "idle" && state.caretakerCell === `${target.i},${target.j}`) break;
     await page.waitForTimeout(250);
@@ -263,10 +266,11 @@ async function capturePulse(page, from, target, expectedGait) {
     return { walkState, gait, i, j };
   });
   const moving = trace.filter((frame) => frame.walkState === "committed");
+  assert.notEqual(await stageAttribute(page, "data-walk-cursor"), "waiting");
   const summary = trace.map((frame) => `${frame.walkState}/${frame.gait}@${frame.i.toFixed(2)},${frame.j.toFixed(2)}`).join(" ");
   assert.ok(moving.length >= 1, `no frame was presented while the route was committed: ${summary}`);
   for (const frame of moving) {
-    assert.equal(frame.gait, expectedGait, `gait during the pulse was ${frame.gait}, expected ${expectedGait}: ${summary}`);
+    assert.equal(frame.gait, expectedGait, `gait during movement was ${frame.gait}, expected ${expectedGait}: ${summary}`);
   }
   const distance = (point) => Math.hypot(point.i - from.i, point.j - from.j);
   const progress = moving.map(distance);
@@ -275,10 +279,10 @@ async function capturePulse(page, from, target, expectedGait) {
   assert.deepEqual({ i: landed.i, j: landed.j }, target, `the figure did not end on the target: ${summary}`);
   assert.equal(landed.gait, "idle", `the figure kept its gait after landing: ${summary}`);
   if (moving.length >= 2) {
-    assert.ok(progress[progress.length - 1] > progress[0], `the figure never left its square during the pulse: ${summary}`);
+    assert.ok(progress[progress.length - 1] > progress[0], `the figure never left its square during movement: ${summary}`);
   }
-  const output = path.join(captureRoot, "walk-pulse-sequence.webp");
-  await execFileAsync("ffmpeg", ["-loglevel", "error", "-y", "-framerate", "3", "-i", path.join(sequenceFrames, "pulse-frame-%02d.png"), "-an", "-c:v", "libwebp_anim", "-quality", "82", "-loop", "0", output]);
+  const output = path.join(captureRoot, "walk-movement-sequence.webp");
+  await execFileAsync("ffmpeg", ["-loglevel", "error", "-y", "-framerate", "3", "-i", path.join(sequenceFrames, "movement-frame-%02d.png"), "-an", "-c:v", "libwebp_anim", "-quality", "82", "-loop", "0", output]);
   await rm(sequenceFrames, { recursive: true, force: true });
   return moving.length;
 }
@@ -288,14 +292,14 @@ function paceFor(from, target) {
   return squares <= 1 ? "walk" : squares === 2 ? "run" : "sprint";
 }
 
-let pulseFramesObserved = 0;
+let movementFramesObserved = 0;
 
-async function walkWithinSpace(page, space, from, target, cameraFollows = true, observePulse = false) {
+async function walkWithinSpace(page, space, from, target, cameraFollows = true, observeMovement = false, expectedPace = paceFor(from, target)) {
   await draftAndCommit(
     page,
       from,
     target,
-    observePulse ? async () => { pulseFramesObserved = await capturePulse(page, from, target, paceFor(from, target)); } : null,
+    observeMovement ? async () => { movementFramesObserved = await captureMovement(page, from, target, expectedPace); } : null,
   );
   await page.waitForFunction(
     ({ expectedSpace, expectedCell }) => {
@@ -305,7 +309,7 @@ async function walkWithinSpace(page, space, from, target, cameraFollows = true, 
         stage.dataset.walkState === "idle";
     },
     { expectedSpace: space, expectedCell: `${target.i},${target.j}` },
-    { timeout: 8_000 }, // two beats and slack; the state and cell are still asserted
+    { timeout: 8_000 }, // two action intervals and slack; the state and cell are still asserted
   );
   // The last segment of a direct route completes along the larger axis when
   // the two deltas differ; equal deltas keep their diagonal heading.
@@ -366,7 +370,12 @@ try {
   page.on("pageerror", (error) => consoleErrors.push(`page: ${error.message}`));
 
   await page.goto(`${baseUrl}?preset=wind`, { waitUntil: "networkidle" });
-  await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
+  try {
+    await page.waitForFunction(() => document.body.dataset.sceneReady === "true");
+  } catch (error) {
+    const banner = await page.locator(".scene-banner").allTextContents();
+    throw new Error(`Scene did not become ready: ${JSON.stringify({ consoleErrors, banner })}`, { cause: error });
+  }
   await page.waitForFunction(
     () => document.querySelector("#feel-stage")?.dataset.walkState === "idle",
   );
@@ -400,8 +409,23 @@ try {
 
   const courtyardStaging = { i: 12, j: 8 };
   const doorApproach = { i: 11, j: 7 };
-  // The first route is photographed across its pulse: the gait is the route's pace.
-  await walkWithinSpace(page, "estate-grounds", start, courtyardStaging, true, true);
+  // Availability belongs to the cursor; no visual status/countdown panel remains.
+  // Exercise actual pointer targets in both browser engines.
+  const farTile = { i: start.i - 4, j: start.j };
+  const farPoint = await groundCellPoint(page, start, farTile);
+  await page.mouse.move(farPoint.x, farPoint.y);
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "refused");
+  assert.equal(await page.locator(".movement-status").count(), 0);
+  await page.screenshot({ path: path.join(captureRoot, "movement-refused.png") });
+  const readyPoint = await groundCellPoint(page, start, start);
+  await page.mouse.move(readyPoint.x, readyPoint.y);
+  assert.equal(await stageAttribute(page, "data-walk-cursor"), "ready");
+  await page.screenshot({ path: path.join(captureRoot, "movement-ready.png") });
+  // The direct diagonal from beside the courtyard table clips its corner.
+  // Its far-left side has a legal three-step detour that must be found.
+  const tableApproach = { i: 13, j: 10 };
+  await walkWithinSpace(page, "estate-grounds", start, tableApproach);
+  await walkWithinSpace(page, "estate-grounds", tableApproach, courtyardStaging, true, true, "sprint");
 
   await walkWithinSpace(page, "estate-grounds", courtyardStaging, doorApproach);
   await walkThroughPortal(
@@ -433,7 +457,7 @@ try {
   assert.deepEqual(consoleErrors, []);
   console.log(
     `PASS walk proof (${engineName}): ${captureRoot}; ${grassInstances} grass clumps; ` +
-      `pulse frames observed ${pulseFramesObserved}; ` +
+      `movement frames observed ${movementFramesObserved}; ` +
       `exterior draw calls ${measurement.calls}; ` +
       `30-frame rAF average ${measurement.averageRafMilliseconds.toFixed(3)} ms; ` +
       `render average ${measurement.averageRenderMilliseconds.toFixed(3)} ms`,

@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 """Provision a real server on a scratch database and hand a client the keys.
 
-Two proofs need exactly this: `run_client_live_proof.py`, which walks the
-shipped client through sign-in and play, and `run_fixture_land_capture.py`,
-which takes a gameplay capture over the authoring fixture's land. They differ
-only in which world they serve and which client script they drive, so the
-provisioning lives here once rather than twice.
+The live server proof and presentation-frame recorder share this provisioning.
+Both consume the authoritative wire through Python; rendering is separate.
 
 What it provisions, in order: a scratch PostgreSQL database, the schema, one
 enrolled account, one bootstrapped character, the real `tme-server` binary, and
@@ -43,7 +40,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
-GODOT_VERSION = "4.7.2.stable.official.ed1daf0bf"
 READY_TIMEOUT_SECONDS = 120.0
 PROXY_HOST = "localhost"
 
@@ -151,12 +147,6 @@ def run(command: list[str], *, env: dict[str, str] | None = None, stdin: str | N
     return completed.stdout
 
 
-def validate_godot(binary: Path) -> None:
-    output = run([str(binary), "--version"]).strip().splitlines()[-1].strip()
-    if output != GODOT_VERSION:
-        raise ProofError(f"Godot must be exactly {GODOT_VERSION}; this binary reports {output}")
-
-
 def build_server() -> Path:
     run(["cargo", "build", "--bin", "tme-server"], env={**os.environ})
     binary = REPOSITORY_ROOT / "target" / "debug" / "tme-server"
@@ -173,9 +163,16 @@ def create_certificates(directory: Path) -> tuple[Path, Path, Path]:
     leaf_request = directory / "leaf.csr"
     leaf_certificate = directory / "leaf.pem"
     extensions = directory / "leaf.ext"
-    extensions.write_text("subjectAltName=DNS:localhost,IP:127.0.0.1\n", encoding="utf-8")
+    extensions.write_text(
+        "subjectAltName=DNS:localhost,IP:127.0.0.1\n"
+        "basicConstraints=critical,CA:FALSE\n"
+        "keyUsage=critical,digitalSignature,keyEncipherment\n"
+        "extendedKeyUsage=serverAuth\n",
+        encoding="utf-8",
+    )
     run([
         "openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-sha256",
+        "-addext", "keyUsage=critical,keyCertSign,cRLSign",
         "-days", "1", "-subj", "/CN=The Mortal Estate proof authority",
         "-keyout", str(authority_key), "-out", str(authority_certificate),
     ])
@@ -450,56 +447,6 @@ class LiveServer:
             time.sleep(0.5)
         raise ProofError(f"the server never reported gameplay readiness: {last_error}")
 
-    # -- driving a client --------------------------------------------------
-
-    def client_environment(self, extra: dict[str, str] | None = None) -> dict[str, str]:
-        environment = {
-            **os.environ,
-            "TME_EX_HTTPS_BASE_URL": self.origin,
-            "TME_EX_WEBSOCKET_URL": f"wss://{PROXY_HOST}:{self.origin.rsplit(':', 1)[1]}/v3/socket",
-            "TME_EX_ORIGIN": self.origin,
-            "TME_EX_CA_PATH": str(self.authority),
-            "TME_EX_USERNAME": self.username,
-            "TME_EX_PASSWORD": self.password,
-            "TME_EX_CHARACTER_ID": self.character_id,
-        }
-        environment.update(extra or {})
-        return environment
-
-    def run_client(
-        self,
-        godot: Path,
-        script: str,
-        *,
-        extra_environment: dict[str, str] | None = None,
-        timeout: float = 300.0,
-        display: list[str] | None = None,
-        window: tuple[int, int] | None = None,
-    ) -> subprocess.CompletedProcess:
-        """Runs one client script against this server.
-
-        `display` prefixes the command with a virtual-display launcher, for a
-        run that must actually draw. Without it the client runs headless, which
-        is right for every proof that reads client state rather than pixels —
-        and is the reason a capture cannot: Godot's headless display driver
-        produces no viewport image at all.
-        """
-        command = list(display or [])
-        command += [str(godot), "--path", str(REPOSITORY_ROOT / "client")]
-        if not display:
-            command.append("--headless")
-        if window is not None:
-            command += ["--resolution", f"{window[0]}x{window[1]}"]
-        command += ["-s", script]
-        return subprocess.run(
-            command,
-            env=self.client_environment(extra_environment),
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=timeout,
-        )
-
     def log_tail(self, lines: int = 12) -> str:
         tail = self.server_log.read_text(encoding="utf-8", errors="replace").splitlines()[-lines:]
         return "\n".join(tail) if tail else "(the server wrote nothing)"
@@ -532,18 +479,5 @@ class LiveServer:
         shutil.rmtree(self.run_directory, ignore_errors=True)
 
 
-def resolve_godot(value: str) -> Path:
-    if not value:
-        raise ProofError("the pinned Godot binary must be named")
-    godot = Path(value).resolve()
-    validate_godot(godot)
-    return godot
-
-
 def read_admin_url(path: str) -> str:
     return Path(path).read_text(encoding="utf-8").strip()
-
-
-def emit_client_output(completed: subprocess.CompletedProcess) -> None:
-    sys.stdout.write(completed.stdout)
-    sys.stderr.write(completed.stderr)

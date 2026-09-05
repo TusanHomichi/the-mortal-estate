@@ -33,7 +33,7 @@ import {
 } from "three";
 import { CAMERA_OFFSET, projectedHeightCoverTiles } from "../camera";
 import { createFigureInstance, type DecodedFigure, type FigureInstance } from "./figureRig";
-import type { FeelSpace, PropPlacement, WallRun } from "../feelTypes";
+import type { FeelSpace, WallRun } from "../feelTypes";
 import { GRASS_CLUMP_HEIGHT, scatterGrassClumps } from "../grassClumps";
 import { buildGroundGeometry } from "../groundGeometry";
 import {
@@ -328,7 +328,7 @@ export class SpaceScene {
   private readonly interior: boolean;
 
   constructor(private readonly options: SpaceSceneOptions) {
-    const { name, space, textures, presets, anisotropy, caretakerCell } = options;
+    const { name, space, presets, caretakerCell } = options;
     this.group.name = `Space_${name}`;
     this.weatherEnabled = space.weather;
     this.interior = space.roofs.length === 0;

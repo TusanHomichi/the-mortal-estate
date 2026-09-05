@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-05
-revision: 4
+revision: 5
 status: Standing and authored ownership boundaries from Phase 7; path and protocol ownership corrections only. Phase 7 owner acceptance remains pending.
 public_safe: true
 summary: Fact ownership, implemented seams, authored life/death boundaries, the individual timing ruling, and the AI boundary.
@@ -70,7 +70,7 @@ presentation, and the Workbench.
 | Content | `content/`, validated by `crates/tme-rules/src/content` | the authored facts the rules consume |
 | Protocol | `crates/tme-protocol` | wire schema; the server converts rules projections and the clients consume it |
 | Server runtime | `crates/tme-server` | sessions, admission, wall-clock scheduling, durable authority, rules-to-wire conversion |
-| Client | `web/`, `client/` | input, presentation, accessibility, discardable local state |
+| Client | `web/` | input, presentation, accessibility, discardable local state |
 | Authoring | `crates/tme-authoring`, `content/lands/` | authored documents to proven runtime content |
 | Simulation | `crates/tme-sim` | fast deterministic gameplay proving over the same rules boundary |
 | Tools | `tools/` | boundary checks, the Workbench, proof harnesses |
@@ -166,8 +166,8 @@ stairs, pits, climbs, passages, and portals.
 **Never.** No caller re-derives walkability, cost, or sight from raw layers.
 Presentation must never imply a walkability it did not receive.
 
-**Proof.** `crates/tme-rules/tests/` navigation coverage; the client's reach grid
-is drawn only from authoritative squares (`client/tests/test_grid_world_view.gd`).
+**Proof.** `crates/tme-rules/tests/` navigation coverage. The browser must consume
+authoritative reach squares when its production wire integration is implemented.
 
 ## 1.6 Visibility is one observer policy
 
@@ -313,8 +313,8 @@ locations owned by inventory; death asks inventory to relocate them.
 from prose, from an event it happened to see, or from a missing actor. **No owner
 outside this one may invent a recovery policy.**
 
-**Proof.** `crates/tme-rules/tests/` death and resurrection coverage; the client
-carries life state as a projected fact only (`client/adapter/wire_codec.gd`).
+**Proof.** `crates/tme-rules/tests/` death and resurrection coverage. The client
+contract admits life state only as a projected fact.
 
 What this seam does **not** yet contain is the game: today a non-`Alive` actor
 cannot act at all — `crates/tme-rules/src/engine/timing.rs` rejects every intent
@@ -352,21 +352,20 @@ public surface. A contract version is a single constant in a single file.
 contract. No superseded contract shape retains a reader or an adapter — see the
 no-compatibility-adapters rule in [agent workflow](agent-workflow.md).
 
-**Proof.** the workspace suite; `client/tests/test_wire_codec.gd`
-(`test_protocol_constants_are_pinned`).
+**Proof.** the workspace suite and the shared protocol fixture corpus.
 
 ## 1.16 Strict wire codec discipline
 
 **Owner.** `crates/tme-protocol` is the wire-schema authority
 (`PROTOCOL_MAJOR` / `PROTOCOL_MINOR`, `CONTROL_API_VERSION`).
-`client/adapter/wire_codec.gd` and `client/adapter/strict_json.gd` are a
-**verified mirror**, never a second schema authority.
+A browser decoder must be a verified consumer, never a second schema authority.
+The retired Godot mirror is no longer proof of browser conformance.
 
 **Rule.** Decoding rejects unknown fields and variants, wrong types, missing
 required fields, invalid required-nullable distinctions, out-of-range or
 non-finite values, non-canonical UUIDs, and non-canonical decimal strings. Wide
 signed quantities cross the wire as canonical strings and never touch a float.
-Both sides are proven against **one shared fixture corpus**, `tests/fixtures/wire/`,
+Both sides must be proven against **one shared fixture corpus**, `tests/fixtures/wire/`,
 read rather than copied — two copies of a contract drift, and the drift shows up
 as a passing test on each side.
 
@@ -375,8 +374,8 @@ path exists before the external boundary activates.
 
 **Proof.** `crates/tme-protocol/src/client_fixture_tests.rs` and
 `crates/tme-protocol/tests/protocol_v1.rs` (the boundary corpus at 2^53−1, 2^53,
-2^53+1, and `i64::MAX`); `client/tests/test_wire_codec.gd` and
-`client/tests/test_strict_json.gd` assert the same inventory and verdicts.
+2^53+1, and `i64::MAX`). Browser decoder parity remains an integration gate;
+the Python wire observer does not claim exhaustive decoder conformance.
 Details in [client architecture](client-architecture.md).
 
 ## 1.17 The server owns wall-clock reality, and only that
@@ -399,7 +398,7 @@ not cross are owned by [server notes](server-notes.md).
 
 ## 1.18 The client owns nothing authoritative
 
-**Owner.** `client/`.
+**Owner.** `web/`.
 
 **Rule.** The client owns input, presentation, audiovisual pacing, accessibility,
 application lifecycle, strict wire consumption, and discardable local state. The
@@ -411,7 +410,7 @@ gameplay time, and keeps no gameplay ledger. Presentation may explain an
 authoritative event; it may not patch game truth.
 
 **Proof.** [Client architecture](client-architecture.md) holds the contract and
-its five proof layers; [client notes](client-notes.md) holds what is implemented.
+its proof surfaces and integration gaps; [browser client](browser-client.md) holds what is implemented.
 
 ## 1.19 Simulation exercises the same boundary; it is not a second game
 
@@ -470,7 +469,7 @@ the August 19 global-pulse ruling and the charter language derived from it.
 | Individual legality, scheduling, and chronological due work | `crates/tme-rules/src/engine/timing.rs` and `engine/deadlines.rs` |
 | Monotonic elapsed time and housekeeping requests | `crates/tme-server/src/scheduler.rs` |
 | Serialized durable application and publication | `crates/tme-server/src/facet/` |
-| Client cooldown presentation | [client notes](client-notes.md#individual-cooldowns-made-visible) |
+| Client cooldown presentation | [client architecture](client-architecture.md#authority) |
 
 The [cutover closeout](plans/2026-09-05-individual-action-cooldowns.md) records
 implementation and verification status. The ruling is settled; incomplete

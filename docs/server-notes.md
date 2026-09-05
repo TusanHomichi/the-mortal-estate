@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 7
-status: Individual deadline cutover implemented and verified under the September 5 owner direction; external-boundary activation and other recorded acceptance gates remain pending.
+revision: 17
+status: Standing server contract, individual deadlines, Python wire proof, and an open disconnected-logout finding.
 public_safe: true
-summary: One authoritative world with individual deadlines, precise persistence, credentials, immutable migrations, and PostgreSQL proof.
+summary: Server composition, individual deadlines, persistence, deployment reference, and external-boundary limits.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -16,8 +16,8 @@ routes:
 
 # Server Notes
 
-The client's counterpart to this document is [client notes](client-notes.md),
-which records how the client speaks the post-D4 wire and what it does with
+The client's counterpart is [client architecture](client-architecture.md),
+which specifies how the browser must consume the authoritative wire and use
 credentials under D7.
 
 ## The world instance, and what it is for
@@ -107,17 +107,30 @@ proof harness and the tree cannot disagree about which land is being served.
 Today one land declares one: [the identity proof's](../content/lands/identity-proof/README.md),
 whose world template is **the authoring compiler's emitted output** rather than a
 hand-authored corpus file (owner ruling R1, 2026-08-21). That is what makes an
-owner's Workbench edit able to reach play at all. `tools/run_client_live_proof.py`
-serves exactly that document, and judges *where* the client ended up: the
-observation centre the client presents must be the square the served seed seats
-the controlled actor on, so a proof that signed into some other land fails
-instead of reporting success.
+owner's Workbench edit able to reach the served world. `tools/run_server_live_proof.py`
+serves exactly that document and verifies the observed centre against its seed,
+then proves independent cooldowns, rejection during cooldown, reconnect, and
+logout over TLS. This is server evidence, not browser integration.
 
-The corpus remains non-canonical conformance data, not the served-world
-declaration for the identity proof. Diagnostic harnesses may serve fixtures:
-`tools/run_pulse_capture.py` explicitly loads the `first_land_structure` corpus
-world, and `tools/run_fixture_land_capture.py` loads the compiled authoring
-fixture. Neither grants those fixtures production content authority.
+Diagnostic harnesses may serve fixtures. `tools/run_presentation_adoption_recording.py`
+loads the compiled authoring fixture and records an authoritative frame through
+`tools/live_wire_client.py`. Neither the recording nor the fixture acquires
+production content authority.
+
+### Open logout finding (September 5 audit)
+
+Tracked as [issue #42](https://github.com/TusanHomichi/the-mortal-estate/issues/42).
+
+Closing the gameplay socket before HTTP logout returned 503 in two live scratch
+server runs, including one that waited for the WebSocket close handshake.
+Logging out with the socket still connected passed. The cause is unresolved;
+the wire observer uses normal session logout followed by transport cleanup.
+
+**Owner:** server session/grant teardown (`crates/tme-server/src/postgres/session_end.rs`).
+**Required proof:** reproduce disconnect-then-logout with retained server logs,
+fix the responsible transition, and prove both connected and disconnected logout
+return 204 and revoke the old cookie. Evidence is indexed in the
+[local audit receipt](plans/2026-09-05-code-and-context-audit.md).
 
 ## The line a scaling change may not cross
 

@@ -50,7 +50,7 @@ from workbench_test_support import (
 )
 
 from workbench import capture as capture_reader
-from workbench import capture_harness, serve
+from workbench import serve
 from workbench.identity import resolve as resolve_identities
 from workbench.packet import cells_for_gesture
 from workbench.projection import DEFAULT_PROJECTION_PATH
@@ -556,98 +556,6 @@ class NothingCanonicalMovesWhenSelectingOverACapture(unittest.TestCase):
             check=True,
         ).stdout
         self.assertEqual(after, before)
-
-
-def can_take_a_capture() -> bool:
-    try:
-        capture_harness.preflight(REPO_ROOT)
-    except Exception:  # noqa: BLE001 - any refusal means the same thing here
-        return False
-    return True
-
-
-@unittest.skipUnless(
-    can_take_a_capture(),
-    f"a capture needs {capture_harness.GODOT_VARIABLE} and {capture_harness.XVFB}; "
-    "the tracked capture fixtures prove everything else",
-)
-class AFreshCaptureMatchesTheTrackedOne(unittest.TestCase):
-    """The one thing tracked fixtures cannot prove: that they are still current.
-
-    Skipped honestly, naming what is missing, on a machine without the client
-    binary or a virtual display. It never passes by default.
-    """
-
-    def test_taking_a_capture_now_addresses_what_the_tracked_one_addresses(self) -> None:
-        projection = accepted_projection()
-        session = open_session(projection, "session-capture-currency")
-        directory = REPO_ROOT / session.relative
-        self.addCleanup(shutil.rmtree, directory, ignore_errors=True)
-        fresh = capture_harness.request(REPO_ROOT, session.directory)
-        tracked = fixture_route_capture()
-        self.assertEqual(fresh.viewport, tracked.viewport)
-        self.assertEqual(fresh.frame_generation, tracked.frame_generation)
-        self.assertEqual(fresh.camera, tracked.camera)
-        self.assertEqual(identities(fresh.targets), identities(tracked.targets))
-        self.assertEqual(fresh.raster_digest, tracked.raster_digest)
-
-    def test_the_capture_command_is_the_pinned_client_under_a_virtual_display(self) -> None:
-        command = capture_harness.harness_command(REPO_ROOT, os.environ[capture_harness.GODOT_VARIABLE])
-        self.assertEqual(command[0], capture_harness.XVFB)
-        self.assertIn(str(REPO_ROOT / "client"), command)
-
-
-class ThePreflightNamesWhatIsMissing(unittest.TestCase):
-    """A capture that cannot be taken must refuse before anything is launched.
-
-    Every one of these is a reason a *fresh checkout* cannot take a capture. The
-    class cache is the one this suite learned the hard way: `client/.gitignore`
-    ignores `.godot/`, so a clean clone has no `class_name` registry and the
-    capture script fails to parse on the first `GridWorldView` it names — which
-    arrived as an error inside a launched engine rather than as an honest
-    unavailable. Found by `tools/run_clean_clone_proof.py`.
-    """
-
-    def preflight_in(self, missing: str | None) -> str:
-        scratch = Path(tempfile.mkdtemp(prefix="tme-preflight-"))
-        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
-        for relative in (capture_harness.FRAME_FIXTURE, capture_harness.CLASS_CACHE):
-            if relative == missing:
-                continue
-            target = scratch / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text("present\n", encoding="utf-8")
-        with self.assertRaises(capture_harness.CaptureUnavailable) as raised:
-            capture_harness.preflight(scratch)
-        return str(raised.exception)
-
-    def test_a_missing_class_cache_is_an_honest_unavailable(self) -> None:
-        if not os.environ.get(capture_harness.GODOT_VARIABLE, "").strip():
-            self.skipTest(f"{capture_harness.GODOT_VARIABLE} is not set")
-        if shutil.which(capture_harness.XVFB) is None:
-            self.skipTest(f"{capture_harness.XVFB} is not installed")
-        reason = self.preflight_in(capture_harness.CLASS_CACHE)
-        self.assertIn("class cache is missing", reason)
-        self.assertIn("--import", reason)
-
-    def test_a_missing_frame_fixture_is_an_honest_unavailable(self) -> None:
-        reason = self.preflight_in(capture_harness.FRAME_FIXTURE)
-        self.assertIn("recorded frame fixture is missing", reason)
-
-    def test_an_unset_client_binary_is_an_honest_unavailable(self) -> None:
-        previous = os.environ.pop(capture_harness.GODOT_VARIABLE, None)
-        if previous is not None:
-            self.addCleanup(os.environ.__setitem__, capture_harness.GODOT_VARIABLE, previous)
-        reason = self.preflight_in(None)
-        self.assertIn(capture_harness.GODOT_VARIABLE, reason)
-
-    def test_the_class_cache_is_ignored_by_git_so_its_absence_is_normal(self) -> None:
-        completed = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "check-ignore", "-q", "--", capture_harness.CLASS_CACHE],
-            capture_output=True,
-            check=False,
-        )
-        self.assertEqual(completed.returncode, 0, "the class cache must stay build output")
 
 
 if __name__ == "__main__":

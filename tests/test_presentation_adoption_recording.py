@@ -153,15 +153,6 @@ class TheSemanticBarrier(unittest.TestCase):
         self.assertNotEqual(first, recording.normalized_projection(rerun))
 
 
-class TheDriverAndClientContract(unittest.TestCase):
-    def test_both_sides_name_the_same_script_and_sentinels(self) -> None:
-        client_path = REPOSITORY_ROOT / "client/tests/record_presentation_adoption_frame.gd"
-        source = client_path.read_text(encoding="utf-8")
-        self.assertEqual("res://tests/record_presentation_adoption_frame.gd", recording.CLIENT_SCRIPT)
-        self.assertIn(f'SUCCESS_SENTINEL: String = "{recording.CLIENT_SENTINEL}"', source)
-        self.assertTrue(client_path.is_file())
-
-
 class TheTrackedRecording(unittest.TestCase):
     def setUp(self) -> None:
         self.fixture = recording.load_fixture()
@@ -200,14 +191,10 @@ class TheTrackedRecording(unittest.TestCase):
             recording.sha256(REPOSITORY_ROOT / recording.FIXTURE_PATH),
             source["recording_fixture_sha256"],
         )
-        self.assertEqual(
-            recording.sha256(REPOSITORY_ROOT / "tools/run_presentation_adoption_recording.py"),
-            self.receipt["proof_sources"]["driver_sha256"],
-        )
-        self.assertEqual(
-            recording.sha256(REPOSITORY_ROOT / "client/tests/record_presentation_adoption_frame.gd"),
-            self.receipt["proof_sources"]["client_recorder_sha256"],
-        )
+        # These hashes identify the historical producer bytes. The runtime has
+        # been retired; this fixture is evidence, not a current-source receipt.
+        for digest in self.receipt["proof_sources"].values():
+            self.assertRegex(digest, r"^[0-9a-f]{64}$")
 
     def test_the_receipt_cannot_be_misread_as_dead_layer_evidence(self) -> None:
         self.assertEqual(

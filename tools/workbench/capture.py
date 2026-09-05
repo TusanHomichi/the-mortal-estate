@@ -2,15 +2,14 @@
 
 A capture is three files written together by the client's own presenter — the
 picture, an identity sidecar, and a per-pixel identity raster — and they are
-only meaningful as a set. This module requests one, reads all three, and turns
+only meaningful as a set. This module reads all three, and turns
 a gesture over the picture into the same cells and the same identities a
 gesture over the logical view would produce.
 
 **Nothing here runs anything.** Reading a capture and selecting over one are
-file reads and arithmetic. Taking a new capture is a real client run, and it
-lives alone in `capture_harness.py` so that the boundary between "the ordinary
-selection path" and "the expensive thing" is a module boundary a test can
-check, not a convention. `tests/test_workbench_loop.py` holds that line.
+file reads and arithmetic. The retired renderer launcher is absent; a future
+browser producer must satisfy the same identity-raster and digest contracts.
+`tests/test_workbench_loop.py` proves selection starts no programs.
 
 **Why the raster decides.** The sidecar's target list carries a rectangle per
 target, so a consumer could intersect rectangles instead. The raster is used

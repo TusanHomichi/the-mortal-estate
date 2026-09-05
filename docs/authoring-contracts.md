@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-04
-revision: 2
+last_updated: 2026-09-05
+revision: 3
 status: Working authoring standard ported at G1–G2; original owner-acceptance qualification retained. Audit links implemented instances without claiming all obligations are complete.
 public_safe: true
 summary: Contract-first geography and asset authoring, conformance, validator qualification, and owner taste gates.
@@ -211,7 +211,7 @@ reciprocity cannot be validated across a format border.
 classes are not free-form labels: a tracked terrain inventory maps every class
 to its content-registry terrain identity and names the gameplay semantics owned
 elsewhere — movement cost and burden, one-tile-at-a-time crossing constraints,
-and hazard-over-time behavior (per-pulse harm escalation for lingering on a
+and hazard-over-time behavior (scheduled harm escalation for lingering on a
 hazardous tile without the negating capability). The inventory validator blocks
 on: a blueprint class with no registry mapping, an orphan mapping, or a hazard
 or movement semantic asserted in a blueprint (P6: blueprints declare WHAT

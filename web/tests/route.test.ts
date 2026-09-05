@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FeelSpace, WallRun } from "../src/feelTypes";
-import { passabilityFrom } from "../src/walk/layoutPassability";
+import { canStep, passabilityFrom } from "../src/walk/layoutPassability";
 import { authorRoute } from "../src/walk/route";
 
 function field(walls: WallRun[] = []): FeelSpace {
@@ -22,8 +22,8 @@ function field(walls: WallRun[] = []): FeelSpace {
   };
 }
 
-describe("direct route authoring", () => {
-  it("a route is the direct line and never routes around a wall", () => {
+describe("shortest route authoring", () => {
+  it("keeps open-ground routes direct and finds legal detours around walls", () => {
     const open = passabilityFrom(field());
     expect(authorRoute(open, { i: 1, j: 1 }, { i: 4, j: 3 })).toEqual([
       { i: 1, j: 1 },
@@ -38,13 +38,24 @@ describe("direct route authoring", () => {
       cells: 1,
       door_interval: null,
     };
-    expect(
-      authorRoute(
-        passabilityFrom(field([blockingWall])),
-        { i: 1, j: 1 },
-        { i: 3, j: 3 },
-      ),
-    ).toBeNull();
+    const blocked = passabilityFrom(field([blockingWall]));
+    const detour = authorRoute(blocked, { i: 1, j: 1 }, { i: 3, j: 3 });
+    expect(detour).not.toBeNull();
+    expect(detour![detour!.length - 1]).toEqual({ i: 3, j: 3 });
+    expect(detour!.length - 1).toBeLessThanOrEqual(3);
+    expect(detour!.slice(1).every((cell, index) => canStep(blocked, detour![index]!, cell))).toBe(true);
+  });
+
+  it("routes around a table without cutting its blocked corners", () => {
+    const open = passabilityFrom(field());
+    const table = { ...open, blocked: new Set(["3,3"]) };
+    const from = { i: 3, j: 4 };
+    const to = { i: 2, j: 2 };
+    const route = authorRoute(table, from, to);
+    expect(route).toEqual([from, { i: 2, j: 4 }, { i: 2, j: 3 }, to]);
+    expect(route!.slice(1).every((cell, index) => canStep(table, route![index]!, cell))).toBe(true);
+    // The directly opposite tile needs four legal steps, outside one move.
+    expect(authorRoute(table, from, { i: 3, j: 2 })).toBeNull();
   });
 
   it("a target beyond three squares cannot be authored", () => {

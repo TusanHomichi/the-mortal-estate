@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 30
-status: Live navigation index including the September 5 timing ruling; detailed rulings remain in their sole owners.
+revision: 32
+status: Current lookup index; Three.js client and Godot retirement routed to their owners.
 public_safe: true
-summary: Short lookup index for settled architecture, workflow, presentation decisions, and previously diagnosed traps.
+summary: Lookup links for settled architecture, workflow, presentation decisions, and diagnosed traps.
 always: true
 ---
 
@@ -11,7 +11,7 @@ always: true
 
 Read the row, then its owner before changing the fact. This index prevents
 re-deriving closed decisions; it is not a second specification. A target listed
-here is not necessarily implemented: [client notes](client-notes.md#current-implementation)
+here is not necessarily implemented: [browser client](browser-client.md)
 owns that distinction for the clients.
 
 Exact gameplay mechanics, names, values, timings, penalties, and routes remain
@@ -25,13 +25,13 @@ experimental gameplay tuning.
 | --- | --- | --- |
 | Implementation stack | Fixed stack; widening needs a decision. | [AGENTS.md](../AGENTS.md#operating-rules) |
 | Gameplay authority | One reusable rules boundary. | [boundary map](boundary-map.md#the-boundaries) |
-| Client shape and baseline | Browser first; Godot retained and cold. | [client architecture](client-architecture.md#the-web-client) |
+| Client shape and baseline | Three.js browser; Godot retired September 5. | [client architecture](client-architecture.md#the-web-client) |
 | Browser and desktop proof | Two browser engines; Tauri targets need their own packaged-webview proof. | [client architecture](client-architecture.md#the-web-client) |
 | Live characters | Live rigs and modular equipment; material treatment remains candidate. | [presentation direction](presentation-direction.md#live-characters) |
-| Individual movement cooldown | Every committed preview move gets a full interval and locks competing movement. | [client notes](client-notes.md#the-web-feel-scenes-walk-experiment) |
+| Individual movement cooldown | Every committed preview move gets a full interval and locks competing movement. | [browser client](browser-client.md#movement-and-availability) |
 | World projection and standing geometry | Accepted camera and world-up construction. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) |
 | Tile and building assembly | Shared cell ruler, dedicated interiors, exterior roofs. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
-| Spaces and portals | Current browser experiment and its limits. | [client notes](client-notes.md#the-web-feel-scenes-walk-experiment) |
+| Spaces and portals | Current browser experiment and its limits. | [browser client](browser-client.md#movement-and-availability) |
 | Structure, cards, and character sources | Construction and source/output split. | [presentation direction](presentation-direction.md#structure-and-cards) |
 | Viewport and relative scale | Scale evidence; later display ruling also applies. | [presentation direction](presentation-direction.md#relative-scale-ruling) |
 | Interior camera | Space-owned focus indoors. | [presentation direction](presentation-direction.md#interior-camera) |
@@ -42,12 +42,12 @@ experimental gameplay tuning.
 | Proportional scaling | Ruled cell count and ultrawide treatment; assets remain open. | [presentation direction](presentation-direction.md#proportional-scaling) |
 | One world | D4: no player-selectable divergent histories. | [server notes](server-notes.md#the-world-instance-and-what-it-is-for) |
 | Individual authoritative deadlines | September 5 replaces the shared-pulse ruling. | [boundary map](boundary-map.md#21-authoritative-individual-deadlines-d5) |
-| Presenting cooldowns | Godot uses the observer’s precise deadline and frame-only readiness. | [client notes](client-notes.md#individual-cooldowns-made-visible) |
+| Presenting cooldowns | Authoritative readiness comes from the observer; browser integration remains open. | [client architecture](client-architecture.md#authority) |
 | Content contracts | Authored facts have one owner. | [boundary map](boundary-map.md#11-the-authoredruntime-contract-seam) |
 | Content validation | Rust owns gameplay-semantic validation. | [boundary map](boundary-map.md#13-rust-is-the-sole-gameplay-semantic-validator-and-it-fails-closed) |
 | Authoring and member counts | Compiler owns land semantics; members are content. | [authoring compiler](authoring-compiler.md#what-it-compiles) |
 | Served world | Content declaration and deployment bootstrap are separate. | [server notes](server-notes.md#which-world-the-one-process-serves) |
-| Wire corpus | One shared fixture corpus. | [client notes](client-notes.md#the-wire-fixture-corpus-is-read-not-copied) |
+| Wire corpus | One shared fixture corpus. | [client architecture](client-architecture.md#strict-protocol-consumption) |
 | Blocking checks | P9 mutant qualification. | [boundary checks](boundary-checks.md#qualification) |
 | Private denylist | Provisioning, worktrees, and fail-closed behavior. | [boundary checks](boundary-checks.md#the-private-terms-convention) |
 | Public source | Source publication is separate from product release. | [public boundary policy](public-boundary-policy.md#the-clean-public-successor-and-the-two-publication-cuts) |
@@ -65,8 +65,6 @@ experimental gameplay tuning.
 The linked owner carries the diagnosis and proof.
 
 - [Length gates making context checks unreachable](server-notes.md#the-defect-this-policy-was-written-against)
-- [Godot relative fixture paths reading the wrong directory](client-notes.md#the-wire-fixture-corpus-is-read-not-copied)
-- [Headless Godot producing no viewport image](client-notes.md#captureemitter-the-presenter-obligation-discharged)
 - [Gated PostgreSQL tests sharing a database](server-notes.md#one-fresh-migrated-database-per-gated-test)
 - [Ignored tests with no runner inventory](server-notes.md#the-inventory-fails-closed)
 - [Direct Rust binary launches bypassing cargo configuration](agent-workflow.md#prove-it-in-the-environment-the-product-configures)

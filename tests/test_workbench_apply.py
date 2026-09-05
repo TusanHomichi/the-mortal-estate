@@ -83,12 +83,12 @@ class CarriedSourceIntegrity(BoundaryTestCase):
 
     def test_ignored_output_and_nested_repositories_do_not_change_snapshot(self) -> None:
         self.repo.write(".gitignore", "/web/node_modules/\n/target/\n*.py[cod]\n")
-        self.repo.write("client/.gitignore", ".godot/\n")
+        self.repo.write("render/.gitignore", ".cache/\n")
         self.repo.write("source.py", "accepted\n")
-        self.repo.track(".gitignore", "client/.gitignore", "source.py")
+        self.repo.track(".gitignore", "render/.gitignore", "source.py")
         before = carried_tree(self.repo.path)
         for name in ("web/node_modules/pkg/index.js", "target/debug/build",
-                     "client/.godot/cache", "nested/cache.pyc"):
+                     "render/.cache/cache", "nested/cache.pyc"):
             self.repo.write(name, "disposable\n")
         nested = self.repo.path / "agents/nested"
         nested.mkdir(parents=True)

@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-03
 revision: 5
-status: Implemented 2026-09-03 (PR web/live-figure) to the approved spec — packet schema 4 with the figures group, the caretaker as a live rig decoded from verified bytes, the palette material, idle clip, two-way facing, no contact blob; proven in both engines. Client notes revision 20 is the implemented truth; this document is the record of the plan and its open list (§6); §6a, the walk between pulses, is implemented (schema 5, gait clips, `presentedWalkPosition`) and awaits the owner's feel judgment on the deployed preview.
+status: Dated implementation plan and open acceptance list; current browser behavior is owned by docs/browser-client.md.
 public_safe: true
 summary: The caretaker becomes a live rigged mesh in the feel client — rig, outfit parts, and clip library carried by the packet under the same digest discipline as every sheet, the painted grammar reproduced in the character's material, the card retired — with every claim labelled decided, proposed, or open.
 ---
@@ -28,7 +28,7 @@ evidence is evidence, not implementation: nothing crosses from the lab but
 the conclusions written here and the packet content the lab builds.
 
 **Owners of the facts this slice changes:** the packet contract and the
-client's implemented behaviour — [client notes](../client-notes.md); the
+client's implemented behaviour — [client notes](../browser-client.md); the
 client's standing contract — [client architecture](../client-architecture.md)
 (no change proposed); the visual target — presentation direction (already
 ruled). No gameplay fact moves: the caretaker's cell, facing, route, and

@@ -5,7 +5,7 @@
  * neither decides real walkability nor ticks gameplay time.
  */
 import { facingBetween, type FigureFacing } from "./facing";
-import { WALK_MOVE_SECONDS } from "./beat";
+import { WALK_MOVE_SECONDS } from "./movement";
 import { sameCell, type Cell, type LayoutPassability } from "./layoutPassability";
 import { authorRoute } from "./route";
 
@@ -14,7 +14,6 @@ export interface CommittedRoute {
   landsAt: number;
   /** When the commitment was made. */
   committedAt: number;
-
 }
 
 /** A presented (not authoritative) position: fractional between squares while walking. */
@@ -68,7 +67,10 @@ export function walkIntentKind(state: WalkIntentState): WalkIntentKind {
 
 export function walkPace(state: WalkIntentState): WalkPace | null {
   const route = state.draft ?? state.committed?.route ?? null;
-  if (route === null) return null;
+  return route === null ? null : paceOf(route);
+}
+
+function paceOf(route: readonly Cell[]): WalkPace {
   const squares = route.length - 1;
   if (squares === 1) return "walk";
   if (squares === 2) return "run";
@@ -139,16 +141,9 @@ export function doubleClick(
   return commitDraft(advanceWalk(state, now), now);
 }
 
-/** The authoritative square: what the game believes, never between squares. */
+/** The local experiment's logical square, never between squares. */
 export function presentedCaretakerPosition(state: WalkIntentState): Cell {
   return copyCell(state.caretakerCell);
-}
-
-function paceOf(route: readonly Cell[]): WalkPace {
-  const squares = route.length - 1;
-  if (squares <= 1) return "walk";
-  if (squares === 2) return "run";
-  return "sprint";
 }
 
 /**
@@ -159,7 +154,7 @@ function paceOf(route: readonly Cell[]): WalkPace {
 export function presentedWalkPosition(state: WalkIntentState, now: number): PresentedWalk {
   const committed = state.committed;
   if (committed === null) return { ...copyCell(state.caretakerCell), facing: null, gait: "idle" };
-  // At or past the strike the figure stands on the target even before the
+  // At or past completion the figure stands on the target even before the
   // state has been advanced to land it; the two agree the moment it is.
   if (now >= committed.landsAt) return { ...copyCell(routeEnd(committed.route)),
     facing: facingBetween(committed.route[committed.route.length - 2]!, routeEnd(committed.route)), gait: "idle" };

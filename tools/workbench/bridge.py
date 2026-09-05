@@ -9,14 +9,9 @@ standard names that class of duplication as the false-green failure it exists to
 kill. So the session, the log, the ordering, and the digests are this package's,
 and the document is the compiler's.
 
-**This is the second expensive module in the package, and the last.**
-`capture_harness` runs the client because a photograph of the game can only come
-from the game drawing it. This runs the compiler because a verdict on an
-authored document can only come from the thing that owns authored documents.
-Both are deliberate acts on routes of their own, both cost seconds rather than
-milliseconds, and neither is reachable from the ordinary selection path —
-pointing, resolving, reading a packet, and listing a session all still start
-nothing at all.
+**This is the package's only module that starts programs.** Authored-document
+verdicts come from the Rust compiler. Explicit edit operations pay that cost;
+pointing, resolving, reading packets, and listing sessions start nothing.
 
 **What it never does.** It never promotes. `validate-candidate` reads no
 promotion receipt and consults no reviewed digest; `replay` reads the accepted

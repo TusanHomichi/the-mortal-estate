@@ -1,14 +1,13 @@
 ---
-last_updated: 2026-09-04
-revision: 2
-status: Implemented at Phases 4W and 6W; owner acceptance remains at the recorded stop points. Audit documents explicit land selection and the verification owner.
+last_updated: 2026-09-05
+revision: 5
+status: Logical and recorded-capture selection retained; Godot fresh-capture runtime retired September 5. Browser capture integration remains open.
 public_safe: true
 summary: Workbench pointing, projection selection, packets, capture addressing, staleness, retention, and proof.
 routes:
   - tools/workbench/**
   - tools/workbench_demo.py
   - tools/workbench_prune.py
-  - tools/run_fixture_land_capture.py
   - tests/test_workbench_*.py
   - tests/test_capture_*.py
   - tests/fixtures/workbench/**
@@ -36,7 +35,8 @@ which lives in the planning tree rather than in this repository; §11.2's
 out-of-scope list binds here in full, and §11.3's acceptance criteria are the
 proof set below. This document records what was built, not what was decided.
 
-This document replaces `workbench-v0a.md`, which covered the logical half alone.
+Fresh capture is not currently implemented. The owner retired its Godot runtime;
+existing capture evidence remains loadable and selectable.
 
 ## What it does not do
 
@@ -59,9 +59,9 @@ limit of this slice.
   and nothing else — no overlay of the compiler's opinion on a photograph. The
   Workbench never approximates a gameplay frame; it shows a real one or it shows
   the projection, and it labels which.
-- **No claim that the current presenter is the game's look.** The client draws
-  the frame as a lattice of flat colours and says so on its own banner, inside
-  the picture. See [client notes](client-notes.md).
+- **Recorded captures are diagnostic evidence.** Their retired producer drew
+  flat-colour cells. They are not visual masters; [browser client](browser-client.md)
+  owns the current scene.
 
 ## Running it
 
@@ -85,17 +85,9 @@ Selecting never builds anything. The projection is a tracked artifact of the
 authoring compiler, and the Workbench reads it; if it is missing the server
 refuses to start and names the command above.
 
-Taking a capture runs the shipped client, and needs two things the checkout does
-not carry:
-
-| Requirement | Why |
-| --- | --- |
-| `TME_GODOT` naming the pinned client binary | a capture is a picture of what the shipped presenter draws |
-| `xvfb-run` on the path | the client's headless display driver produces no viewport image at all |
-
-Neither has a fallback. A capture taken by something other than the shipped
-presenter would not be a capture of the shipped presenter, and a blank picture
-with a confident sidecar is worse than a refusal.
+The capture view reads existing session captures. There is no renderer launcher,
+fresh-capture button, or `POST /api/capture` command. A browser producer must
+satisfy the capture contract below before fresh capture can return.
 
 To see the whole loop at once, including both views and the agent read path:
 
@@ -236,12 +228,10 @@ is an address, not a picture.
 
 ## The capture path
 
-The capture routes are the verification runner's **`capture` lane**
-(`--scope capture`): owner-invoked, deliberately outside every standing
-composition, and never selected automatically by a changed path. That is the
-charter's third loop — an exact gameplay preview on demand — and keeping it out
-of `full` is what stops a workspace build from becoming the price of looking at
-a frame. See [verification](verification.md#the-four-lanes).
+Recorded captures support selection and correspondence checks. Browser screenshots
+and wire observer recordings have separate proof routes in
+[verification](verification.md#on-demand-proofs); neither is an authoritative
+browser image/identity/sidecar capture yet.
 
 ### What a capture is
 
@@ -254,8 +244,7 @@ Three files, written together by the client's own presenter, meaningless apart:
 | `capture.sidecar.json` | frame generation, camera identity, viewport size, the digests of the other two files, and the full target list — identity, kind, coordinate, presentation layer, screen anchor, and screen hit shape |
 
 The raster is a binary Netpbm greyscale (`P5`, maxval 65535, most significant
-byte first) because both sides then need no library at all: the client fills
-rectangles into an `Image` in engine code, and the Workbench slices bytes with
+byte first) because both sides then need no library at all: a producer writes pixel identities, and the Workbench slices bytes with
 `struct`. The picture is a PNG, and the Workbench reads exactly one thing from it
 — the width and height in its header — which is ten lines of `struct` rather than
 an imaging dependency.
@@ -276,38 +265,14 @@ two views' answers comparable.
 Clicking an occupant's marker resolves to the square it stands on and records the
 occupant in `observed`. That is the case a nearest-anchor scheme gets wrong.
 
-### The two routes
+### Recorded correspondence evidence
 
-| | ordinary route | accuracy reference |
-| --- | --- | --- |
-| Command | `tools/workbench/capture_harness.py`, driven by the browser's *take a capture* button | `tools/run_fixture_land_capture.py` |
-| What runs | the client alone, replaying one recorded authoritative frame | scratch database, schema, account, real server, TLS front, the shipped `ClientRoot.tscn` through sign-in and admission |
-| Needs | the pinned client, a virtual display | all of the above plus a PostgreSQL superuser URL |
-| Cost | **3.9 s** | **23.5 s** (14.0 s provisioning, 9.5 s client) |
-
-The ordinary route is reproducible: re-running it over the same recorded frame
-produced a byte-identical picture, raster and sidecar on this machine. The
-raster and the sidecar are pure geometry and are reproducible anywhere; the
-picture's bytes depend on the renderer, so the tracked currency check compares
-the raster digest and the addresses rather than the PNG.
-
-The frame the ordinary route replays is a **real server frame**, recorded by the
-accuracy reference and tracked at
-`tests/fixtures/capture/fixture_land_frame.json`. Replaying a recorded frame is
-honest in a way synthesising one would not be: nothing invents a world, and a
-fixture that drifted from the compiled land is caught by
-`tests/test_capture_correspondence.py`.
-
-Both routes serve **the fixture land** — the same compiled authoring fixture the
-logical projection comes from. Criterion 2 is only meaningful over one land, and
-the standing live proof's corpus land is a different one.
-
-### What the two routes prove together
-
-The two tracked captures show one frame of one land at two framings: the live one
-inside the world shell, inset around the HUD, with 50-pixel squares; the ordinary
-one with the window to itself, at 68. Every pixel differs. No address does —
-`tests/test_capture_addressing.py::TheTwoCaptureRoutesResolveIdentically`.
+The two retained captures show the same authoritative fixture land under two
+framings. Their images differ while selected identities agree, proved by
+`tests/test_capture_addressing.py::TheTwoCaptureRoutesResolveIdentically` and
+`tests/test_capture_correspondence.py`. The input frame is
+`tests/fixtures/capture/fixture_land_frame.json`. This proves those recorded
+artifacts, not the currency of a renderer that no longer exists.
 
 ## The two plan-level rulings
 
@@ -353,61 +318,18 @@ sample per pixel it is neither.
 
 ### Decision 7 — drive the cheap route; keep the expensive one as the reference
 
-**Ruled: the ordinary capture is the client alone replaying a recorded frame; the
-real server route stays the accuracy reference, and both costs are published.**
-
-The spec's warning was that pretending the expensive lane is fast is the one
-option not available. It also assumed the expensive lane cost "minutes rather than
-seconds". Measured, on this machine, it costs **23.5 seconds** — the predecessor's
-credential- and display-gated integration lane was the expensive thing, and the
-successor's provisioning is not it. That is worth recording precisely because the
-spec's estimate is now wrong in the good direction.
-
-Even so, the split stands, for reasons that are not about the stopwatch:
-
-- The ordinary route needs no database, no superuser credential, no account, and
-  no network. It is **3.9 s** and it can run on any machine with the client and a
-  virtual display.
-- The accuracy reference photographs a frame the real server actually sent, inside
-  the real shell, and is the only thing that can catch the ordinary route drifting.
-  It is run when the frame is re-recorded, and its capture is tracked so that the
-  drift check runs in the standing suite without it.
-- Neither is on the ordinary selection path. Selecting over a capture that already
-  exists reads files: **0.33 ms** for a click.
-
-Both timings are stated in the interface as well as here: the browser's capture
-button says "runs the client · seconds, not milliseconds" before it is pressed,
-and reports the elapsed time after.
+The separation remains a capture-design obligation: replaying a recorded frame
+is distinct from observing the live server, and neither belongs on the ordinary
+selection path. Both old Godot producers are retired. The
+[dated capture evidence](plans/2026-08-20-workbench-capture-evidence.md) records
+their measured costs and correspondence; it supplies no current run command.
 
 ## The cost of every loop, measured
 
-Measured on the development machine on 2026-08-20, with software rendering
-(llvmpipe). Medians of repeated runs; the capture figures are wall-clock for the
-whole command.
-
-| Operation | Cost |
-| --- | --- |
-| Logical click → resolved identities | 0.33 ms |
-| Logical box over 16 cells → resolved identities | 0.40 ms |
-| Capture click → resolved identities, through the raster | 0.33 ms |
-| Capture box over 476×340 px (35 squares) | 5.3 ms |
-| Capture box over the whole 1024×768 frame | 22 ms |
-| Reading a capture: three files, three digests, header checks | 5.4 ms |
-| Selection → packet written to disk (logical) | 1.2 ms |
-| Selection → packet written to disk (capture) | 1.8 ms |
-| **Capture request → capture on screen (ordinary route)** | **3.9 s** |
-| **Capture request → capture on screen (accuracy reference)** | **23.5 s** |
-| Boundary checks (`tools/run_checks.py`) | 14 s |
-| The whole Python suite | 30 s |
-| The whole client suite | 16 s |
-
-Reproduce the two capture figures with:
-
-```bash
-TME_GODOT=<pinned client> python3 tools/workbench_demo.py     # prints the ordinary route's seconds
-tools/run_fixture_land_capture.py --admin-url-file <url file> \
-    --godot <pinned client> --output <directory>              # writes timings.json
-```
+Selection reads existing projection/capture files and starts no process.
+`tools/workbench_demo.py` exercises that path using the recorded fixture and
+reports its timings. Historical renderer measurements are in the linked receipt
+above. Fresh browser capture will need new measurements.
 
 ## The session directory
 
@@ -454,7 +376,7 @@ root and is the authority on any conflict; this table is how V0 meets it.
 | --- | --- |
 | Tracked builds, tests, and boundary proof never depend on the ignored root | No test reads `.workbench/`. Proofs use the tracked authoring fixture, the tracked synthetic fixture, and the tracked capture fixtures; the tests that write a real session write it, assert, and delete it |
 | Clean clones carry tracked synthetic fixtures for automated proof | `tests/fixtures/workbench/` — a complete synthetic land, session, packets, masks, and log, generated by `regenerate.py` and byte-checked. `tests/fixtures/capture/` — two real captures of one real frame, so the capture path proves out with no client binary and no display |
-| Missing private fixtures produce an honest unavailable result, never a false pass | A missing or malformed projection raises `ProjectionUnavailable` naming the command that produces it. A capture that cannot be taken raises `CaptureUnavailable` naming what is missing — the frame fixture, the client binary, `xvfb-run`, or **the engine's `class_name` cache, which `client/.gitignore` ignores and a fresh checkout therefore lacks** — and the one test that needs a fresh capture skips with that reason rather than passing. The class-cache case was found by `tools/run_clean_clone_proof.py`, arriving as a parse error inside a launched engine; it is now a preflight refusal naming `--import` as the repair |
+| Missing private fixtures produce an honest unavailable result, never a false pass | Missing/malformed projections and captures raise explicit errors. No test claims a fresh render; the retired capture command is refused rather than redirected to a fixture. |
 | Session files carry source hashes and cannot become runtime input | Every packet and manifest carries its bound digests. Nothing in the runtime, the compiler, or the content path reads a session; the manifest states `runtime_input: false` |
 | Retention and cleanup policy are explicit | Above; ruled in [the working-root policy](working-root-policy.md#the-retention-ruling), implemented by `tools/workbench_prune.py`, and restated in every session manifest |
 | Accepted outputs enter tracked content only through the promotion path | V0 produces no output that could be accepted. It cannot write tracked content at all |
@@ -483,13 +405,13 @@ Spec §11.3, all ten, with the phase that owns each.
 | --- | --- | --- |
 | **1. Pointing resolves exactly** | 4W | `tests/test_workbench_pointing.py` — 14 cases over the accepted fixture, one per gesture plus features; expected covered cells and full identity lists written out, read off the authored document by hand |
 | **2. Capture selections resolve to the same address space** | 6W | `tests/test_capture_addressing.py::ACaptureSelectionResolvesLikeALogicalOne` — click, occupant click, box, lasso and paint over a real capture, each compared against the equivalent logical selection; and `::TheTwoCaptureRoutesResolveIdentically`, which does it again between two captures of one frame at different scales. `tests/test_capture_correspondence.py` asserts the underlying claim: runtime cell (x, y) **is** master cell (x, y), cell by cell, with an offset mutant |
-| **3. The identity sidecar is real and matching** | 6W | `tests/test_capture_sidecar.py` — the sidecar's viewport equals the picture's own PNG header; the raster is the same resolution; the raster rebuilt from the target rectangles equals the raster byte for byte; every target's anchor pixel names that target; a marker owns its pixels over the square beneath. The presenter half — that the target list is the presenter's own semantic-target list, and that pointer resolution agrees with it — is `client/tests/test_grid_world_view.gd` |
+| **3. The identity sidecar is real and matching** | 6W | `tests/test_capture_sidecar.py` — the sidecar's viewport equals the picture's own PNG header; the raster is the same resolution; the raster rebuilt from the target rectangles equals the raster byte for byte; every target's anchor pixel names that target; a marker owns its pixels over the square beneath. Browser producer/pointer correspondence remains an integration obligation |
 | **4. Staleness fails closed, per digest** | 4W + 6W | `tests/test_workbench_staleness.py` — each of the five bound files mutated independently, killing the packet in `verify`, in `resolve.py`, and over HTTP; plus a deleted source, an edited mask, and a hand-edited packet. `tests/test_capture_addressing.py::ACapturePacketFailsClosedPerDigest` — all **eight** mutated independently, plus an edited cell list, an edited observed list, an edited gesture, an edited frame generation, and an edited camera |
 | **5. Ambiguity is data** | 4W | `tests/test_workbench_ambiguity.py` — all three clauses of the rule exercised separately, both directions, plus rank stability and a four-occupant selection |
 | **6. Agent parity holds** | 4W + 6W | `tests/test_workbench_parity.py` — the real HTTP server's answer compared against `resolve.py` run as a separate process, for every gesture; plus reading the tracked fixture cold. `tests/test_capture_addressing.py::AgentParityHoldsForCapturePackets` — the same, for capture packets, for every gesture |
 | **7. The loop is fast where it must be** | 4W + 6W | `tests/test_workbench_loop.py::test_selection_to_written_packet_stays_in_milliseconds` guarantees the selection path. The capture cost is **measured and recorded above**, from real runs, and reported in the interface — never asserted |
 | **8. Nothing canonical moves** | 4W + 6W | `tests/test_workbench_session.py::NothingCanonicalMoves` — a full four-gesture logical session in this repository with `git status` compared before and after. `tests/test_capture_addressing.py::NothingCanonicalMovesWhenSelectingOverACapture` — the same for a capture session |
-| **9. No full verification in the loop** | 4W + 6W | `tests/test_workbench_loop.py` — every selection-path module parsed: no process-spawning import, no such call, no build command, standard library only. `capture_harness` is the one exception and is proven to start exactly the pinned client under a virtual display, to be reached from one place, and never to be touched by an ordinary route — the last of those by driving the real server with its `subprocess` replaced by a tripwire |
+| **9. No full verification in the loop** | 4W + 6W | `tests/test_workbench_loop.py` parses selection modules and drives real routes with a process-spawning tripwire. Only `bridge.py` may invoke the authoring compiler; the retired fresh-capture route is refused. |
 | **10. The comment survives** | 4W | `tests/test_workbench_session.py::TheCommentSurvives` — a comment with newlines, quotes, trailing whitespace, non-ASCII and fake structured data, checked byte for byte through the packet, the log, and the agent consumer, with a proof that none of it reached a typed field |
 
 The compiler-side emitter has its own proofs in
@@ -515,15 +437,17 @@ equal to the compiler's own count, and layer attribution asserted per cell.
    visible, not the whole member. Pointing outside them is a refusal, not a
    guess. The logical view addresses the whole land and is the right surface for
    a region nobody is standing in.
-5. **The ordinary route replays one recorded frame.** It is a real frame, and
-   re-recording it is one documented command, but it is one frame. A capture of
-   somewhere else needs the accuracy reference, or a new recording.
+5. **Fresh authoritative browser capture is missing.** Tracked as
+   [issue #43](https://github.com/TusanHomichi/the-mortal-estate/issues/43). Owner: the browser
+   renderer integration. Required proof: live and replayed frames produce matching
+   image/identity/sidecar artifacts; pointer and raster identities agree; replay
+   corresponds to the observed authoritative frame. Existing fixtures cannot
+   discharge this proof.
 6. **`canvas_rect` is reported, not verified,** for logical selections. The screen
    rectangle is the client's own account of where the gesture happened; the cells
    are the address. For a capture selection the gesture geometry **is** verified,
    because the cells are derived from it.
 7. **Colour carries no authority in either view.** The logical view spreads hues
-   across the projection's terrain classes; the client spreads them across the
-   classes present in the current frame, so a class can change colour between
-   frames. Identity comes from the sidecar and the target list, never from a
-   pixel's colour.
+   across the projection's terrain classes. Recorded diagnostic captures also
+   use arbitrary colours. Identity comes from the sidecar and target list,
+   never from a pixel's colour.

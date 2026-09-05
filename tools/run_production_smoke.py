@@ -281,6 +281,8 @@ class AuthenticatedClient:
 class GameplaySocket:
     def __init__(self, public: PublicClient, ticket: str) -> None:
         self.public = public
+        self.latest_state: dict[str, Any] = {}
+        self.state_generation = 0
         self.raw = socket.create_connection(
             (public.connect_host, public.port), timeout=public.timeout
         )
@@ -351,6 +353,9 @@ class GameplaySocket:
                 raise SmokeError("server WebSocket payload was not an object")
             if value.get("kind") == "state_update":
                 self.world_revision = _required_decimal(value, "world_revision")
+            if value.get("kind") in ("state_update", "server_welcome"):
+                self.latest_state = value
+                self.state_generation += 1
             return value
 
     def command(
