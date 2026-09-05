@@ -185,7 +185,7 @@ fn move_gold_command(amount: &str) -> String {
 
 fn bootstrap_json() -> serde_json::Value {
     serde_json::json!({
-        "control_api_version": 3,
+        "control_api_version": CONTROL_API_VERSION,
         "account": {
             "account_id": COMMAND,
             "display_name": "Account"
@@ -555,8 +555,8 @@ fn observer_frame_validation_rejects_negative_gold() {
 }
 
 #[test]
-fn control_api_3_dtos_are_strict_and_predecessor_shapes_fail() {
-    assert_eq!(CONTROL_API_VERSION, 3);
+fn control_api_4_dtos_are_strict_and_predecessor_shapes_fail() {
+    assert_eq!(CONTROL_API_VERSION, 4);
     assert_eq!(PROTOCOL_MINOR, 8);
 
     let command = format!(

@@ -17,7 +17,7 @@ export class AuthoritativeRenderer {
   constructor(readonly canvas: HTMLCanvasElement, readonly width: number, readonly height: number) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true });
     this.renderer.setPixelRatio(1);
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.setClearColor(0x151d20);
     this.camera = new THREE.OrthographicCamera(0, width, height, 0, 0.1, 100);

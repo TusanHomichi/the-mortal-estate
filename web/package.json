@@ -10,8 +10,9 @@
     "typecheck": "tsc --noEmit",
     "pretest": "node proof/build-codec.mjs",
     "test": "vitest run",
-    "build": "vite build",
-    "dev": "vite"
+    "build": "vite build && node proof/build-play.mjs",
+    "dev": "vite",
+    "build:play": "node proof/build-play.mjs"
   },
   "dependencies": {
     "three": "0.185.1"

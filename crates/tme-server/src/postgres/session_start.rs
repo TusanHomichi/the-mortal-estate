@@ -162,7 +162,7 @@ impl PostgresState {
         } else {
             None
         };
-        let session_cookie = random_secret().map_err(|_| LoginError::Unavailable)?;
+        let session_token = random_secret().map_err(|_| LoginError::Unavailable)?;
         let csrf = random_csrf().map_err(|_| LoginError::Unavailable)?;
         let session_id =
             wire::SessionId::new(Uuid::now_v7()).map_err(|_| LoginError::Unavailable)?;
@@ -199,7 +199,7 @@ impl PostgresState {
         )
         .bind(session_id.as_uuid())
         .bind(account_id.as_uuid())
-        .bind(digest(session_cookie.expose()).as_slice())
+        .bind(digest(session_token.expose()).as_slice())
         .bind(digest(csrf.expose_for_validation()).as_slice())
         .bind(checked_i64(SESSION_IDLE.as_secs()).map_err(|_| LoginError::Unavailable)?)
         .bind(checked_i64(SESSION_ABSOLUTE.as_secs()).map_err(|_| LoginError::Unavailable)?)
@@ -230,20 +230,20 @@ impl PostgresState {
             .await
             .map_err(|_| LoginError::Unavailable)?;
         Ok(LoginSuccess {
-            session_cookie,
+            session_token,
             bootstrap,
         })
     }
 
     pub async fn session_bootstrap(
         &self,
-        session_cookie: &str,
+        session_token: &str,
     ) -> Result<wire::SessionBootstrapV1, SessionError> {
         let csrf = random_csrf().map_err(|_| SessionError::Unavailable)?;
         let mut tx = serializable(self.store.pool())
             .await
             .map_err(|_| SessionError::Unavailable)?;
-        let session = active_session(&mut tx, session_cookie, true)
+        let session = active_session(&mut tx, session_token, true)
             .await?
             .ok_or(SessionError::AuthenticationRequired)?;
         sqlx::query("UPDATE tme.sessions SET csrf_digest=$2 WHERE session_id=$1")

@@ -100,31 +100,39 @@ impl PostgresState {
         facets: &[(FacetHandle, crate::facet::PreparedFacetCheckpoint)],
     ) -> Result<(), SessionError> {
         for (_, checkpoint) in facets {
-            let row = sqlx::query(
-                "SELECT facet_revision,last_server_sequence FROM tme.facets \
+            Self::persist_prepared_checkpoint(tx, checkpoint).await?;
+        }
+        Ok(())
+    }
+
+    pub(super) async fn persist_prepared_checkpoint(
+        tx: &mut Transaction<'_, Postgres>,
+        checkpoint: &crate::facet::PreparedFacetCheckpoint,
+    ) -> Result<(), SessionError> {
+        let row = sqlx::query(
+            "SELECT facet_revision,last_server_sequence FROM tme.facets \
                  WHERE facet_id=$1 FOR UPDATE",
-            )
-            .bind(checkpoint.facet_id.as_uuid())
-            .fetch_one(&mut **tx)
-            .await
-            .map_err(|error| {
-                tracing::error!(sqlstate = ?error.as_database_error().and_then(|db| db.code()),
+        )
+        .bind(checkpoint.facet_id.as_uuid())
+        .fetch_one(&mut **tx)
+        .await
+        .map_err(|error| {
+            tracing::error!(sqlstate = ?error.as_database_error().and_then(|db| db.code()),
                     "character-exit checkpoint read failed");
-                unavailable(error)
-            })?;
-            if checked_u64(row.try_get("facet_revision").map_err(unavailable)?)
+            unavailable(error)
+        })?;
+        if checked_u64(row.try_get("facet_revision").map_err(unavailable)?).map_err(unavailable)?
+            != checkpoint.before_revision
+            || checked_u64(row.try_get("last_server_sequence").map_err(unavailable)?)
                 .map_err(unavailable)?
-                != checkpoint.before_revision
-                || checked_u64(row.try_get("last_server_sequence").map_err(unavailable)?)
-                    .map_err(unavailable)?
-                    != checkpoint.server_sequence
-            {
-                tracing::error!("character-exit checkpoint fence differs from durable world");
-                return Err(SessionError::Unavailable);
-            }
-            let updated = sqlx::query(
+                != checkpoint.before_sequence
+        {
+            tracing::error!("character-exit checkpoint fence differs from durable world");
+            return Err(SessionError::Unavailable);
+        }
+        let updated = sqlx::query(
                 "UPDATE tme.facets SET checkpoint_bytes=$2,checkpoint_sha256=$3, \
-                 facet_revision=$4,updated_at=statement_timestamp() WHERE facet_id=$1 \
+                 facet_revision=$4,last_server_sequence=$7,updated_at=statement_timestamp() WHERE facet_id=$1 \
                  AND facet_revision=$5 AND last_server_sequence=$6",
             )
             .bind(checkpoint.facet_id.as_uuid())
@@ -132,13 +140,13 @@ impl PostgresState {
             .bind(checkpoint.checkpoint.sha256().as_slice())
             .bind(checked_i64(checkpoint.after_revision).map_err(unavailable)?)
             .bind(checked_i64(checkpoint.before_revision).map_err(unavailable)?)
-            .bind(checked_i64(checkpoint.server_sequence).map_err(unavailable)?)
+            .bind(checked_i64(checkpoint.before_sequence).map_err(unavailable)?)
+            .bind(checked_i64(checkpoint.after_sequence).map_err(unavailable)?)
             .execute(&mut **tx)
             .await
             .map_err(unavailable)?;
-            if updated.rows_affected() != 1 {
-                return Err(SessionError::Unavailable);
-            }
+        if updated.rows_affected() != 1 {
+            return Err(SessionError::Unavailable);
         }
         Ok(())
     }
@@ -173,12 +181,12 @@ impl PostgresState {
 
     pub async fn select_character(
         &self,
-        session_cookie: &str,
+        session_token: &str,
         request: wire::CharacterSelectRequestV1,
     ) -> Result<wire::CharacterSelectionV1, SessionError> {
         let _transition = self.coordinator.transition().await;
         let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
-        let session = active_session(&mut tx, session_cookie, true)
+        let session = active_session(&mut tx, session_token, true)
             .await?
             .ok_or(SessionError::AuthenticationRequired)?;
         validate_csrf(session.csrf_digest, &request.csrf_token)?;
@@ -203,7 +211,7 @@ impl PostgresState {
             let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
             Self::revalidate_exit_session(
                 &mut tx,
-                session_cookie,
+                session_token,
                 &session,
                 &request.csrf_token,
                 true,
@@ -292,7 +300,7 @@ impl PostgresState {
 
     pub async fn issue_ticket(
         &self,
-        session_cookie: &str,
+        session_token: &str,
         request: wire::SocketTicketRequestV1,
         origin: &str,
         host: &str,
@@ -300,7 +308,7 @@ impl PostgresState {
         let _transition = self.coordinator.transition().await;
         let ticket = random_ticket().map_err(|_| SessionError::Unavailable)?;
         let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
-        let session = active_session(&mut tx, session_cookie, true)
+        let session = active_session(&mut tx, session_token, true)
             .await?
             .ok_or(SessionError::AuthenticationRequired)?;
         validate_csrf(session.csrf_digest, &request.csrf_token)?;

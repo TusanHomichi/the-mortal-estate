@@ -22,10 +22,9 @@ from typing import Any, BinaryIO
 
 
 PROTOCOL_MINOR = 8
-CONTROL_API_VERSION = 3
+CONTROL_API_VERSION = 4
 WEBSOCKET_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 WEBSOCKET_SUBPROTOCOL = "tme.v1"
-SESSION_COOKIE_NAME = "__Host-tme_session"
 CSRF_HEADER = "X-Tme-Csrf"
 MAX_FRAME_BYTES = 1024 * 1024
 
@@ -121,7 +120,7 @@ class PublicClient:
         path: str,
         *,
         body: dict[str, Any] | None = None,
-        cookie: str | None = None,
+        token: str | None = None,
         csrf: str | None = None,
         expected: tuple[int, ...] = (200,),
     ) -> tuple[dict[str, Any] | None, list[tuple[str, str]]]:
@@ -129,8 +128,8 @@ class PublicClient:
         headers = {"Accept": "application/json", "Origin": self.origin}
         if payload is not None:
             headers["Content-Type"] = "application/json"
-        if cookie is not None:
-            headers["Cookie"] = cookie
+        if token is not None:
+            headers["Authorization"] = "Bearer " + token
         if csrf is not None:
             headers[CSRF_HEADER] = csrf
         connection = RoutedHTTPSConnection(
@@ -164,41 +163,37 @@ class PublicClient:
         return value, response_headers
 
     def login(self, username: str, password: str) -> "AuthenticatedClient":
-        bootstrap, headers = self.request(
-            "POST", "/v3/login", body={"username": username, "password": password}
+        response, headers = self.request(
+            "POST", "/v4/login", body={"username": username, "password": password}
         )
-        if bootstrap is None:
-            raise SmokeError("login response was empty")
+        if response is None or set(response) != {"session_token", "bootstrap"}:
+            raise SmokeError("login response shape was refused")
+        if any(name.lower() == "set-cookie" for name, _ in headers):
+            raise SmokeError("login emitted a retired cookie")
+        bootstrap = response["bootstrap"]
         _validate_session_bootstrap(bootstrap)
-        set_cookie = next(
-            (value for name, value in headers if name.lower() == "set-cookie"), None
-        )
-        if set_cookie is None:
-            raise SmokeError("login response omitted the session cookie")
-        cookie = set_cookie.split(";", 1)[0]
-        if not cookie.startswith(f"{SESSION_COOKIE_NAME}="):
-            raise SmokeError("login response used the wrong session cookie")
+        token = _required_string(response, "session_token")
         csrf = bootstrap.get("csrf_token")
         if not isinstance(csrf, str) or not csrf:
             raise SmokeError("login response omitted the CSRF token")
-        return AuthenticatedClient(self, cookie, csrf, bootstrap)
+        return AuthenticatedClient(self, token, csrf, bootstrap)
 
 
 class AuthenticatedClient:
     def __init__(
         self,
         public: PublicClient,
-        cookie: str,
+        token: str,
         csrf: str,
         bootstrap: dict[str, Any],
     ) -> None:
         self.public = public
-        self.cookie = cookie
+        self.token = token
         self.csrf = csrf
         self.bootstrap = bootstrap
 
     def session(self) -> dict[str, Any]:
-        value, _ = self.public.request("GET", "/v3/session", cookie=self.cookie)
+        value, _ = self.public.request("POST", "/v4/session", body={}, token=self.token)
         if value is None:
             raise SmokeError("session response was empty")
         _validate_session_bootstrap(value)
@@ -223,8 +218,8 @@ class AuthenticatedClient:
         character_id = character.get("character_id")
         value, _ = self.public.request(
             "POST",
-            "/v3/characters/select",
-            cookie=self.cookie,
+            "/v4/characters/select",
+            token=self.token,
             body={"csrf_token": self.csrf, "character_id": character_id},
         )
         if value is None:
@@ -237,8 +232,8 @@ class AuthenticatedClient:
     def ticket(self) -> str:
         value, _ = self.public.request(
             "POST",
-            "/v3/socket-tickets",
-            cookie=self.cookie,
+            "/v4/socket-tickets",
+            token=self.token,
             body={"csrf_token": self.csrf},
         )
         ticket = None if value is None else value.get("ticket")
@@ -256,8 +251,8 @@ class AuthenticatedClient:
     def logout(self) -> None:
         self.public.request(
             "POST",
-            "/v3/logout",
-            cookie=self.cookie,
+            "/v4/logout",
+            token=self.token,
             csrf=self.csrf,
             body={"csrf_token": self.csrf},
             expected=(204,),
@@ -266,8 +261,8 @@ class AuthenticatedClient:
     def forgive(self, mark_id: str) -> dict[str, Any]:
         value, _ = self.public.request(
             "POST",
-            f"/v3/player-kill-marks/{mark_id}/forgive",
-            cookie=self.cookie,
+            f"/v4/player-kill-marks/{mark_id}/forgive",
+            token=self.token,
             csrf=self.csrf,
             body={"request_id": str(uuid.uuid4())},
         )
@@ -292,7 +287,7 @@ class GameplaySocket:
         key = base64.b64encode(secrets.token_bytes(16)).decode("ascii")
         authority = public.host if public.port == 443 else f"{public.host}:{public.port}"
         request = (
-            "GET /v3/socket HTTP/1.1\r\n"
+            "GET /v4/socket HTTP/1.1\r\n"
             f"Host: {authority}\r\n"
             f"Origin: {public.origin}\r\n"
             "Upgrade: websocket\r\n"

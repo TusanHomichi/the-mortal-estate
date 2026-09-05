@@ -156,7 +156,7 @@ impl std::fmt::Debug for OpaqueSecret {
 }
 
 pub struct LoginSuccess {
-    pub session_cookie: OpaqueSecret,
+    pub session_token: OpaqueSecret,
     pub bootstrap: wire::SessionBootstrapV1,
 }
 

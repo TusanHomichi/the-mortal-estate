@@ -271,7 +271,7 @@ verify_success_receipt_for_release() {
         (.admission | keys == ["closed_http_status","loopback_tls_smoke"]) and
         .admission.closed_http_status == 503 and .admission.loopback_tls_smoke == true and
         (.readiness | keys == ["control_api_version","gameplay_ready","protocol_minor"]) and
-        .readiness.gameplay_ready == true and .readiness.control_api_version == 3 and
+        .readiness.gameplay_ready == true and .readiness.control_api_version == 4 and
         .readiness.protocol_minor == 8 and
         (.authenticated_smoke | keys == ["profile","result","result_sha256"]) and
         .authenticated_smoke.profile == "admission" and
@@ -374,7 +374,7 @@ wait_private_readiness() {
         readiness=$(curl --fail --silent --show-error --max-time 5 \
             http://127.0.0.1:9090/internal/status 2>/dev/null || true)
         if printf '%s\n' "$readiness" | \
-            jq -e '.gameplay_ready == true and .control_api_version == 3 and .protocol_minor == 8' \
+            jq -e '.gameplay_ready == true and .control_api_version == 4 and .protocol_minor == 8' \
                 >/dev/null 2>&1
         then
             RELEASE_VERIFIED_GAMEPLAY_READY=$(printf '%s\n' "$readiness" | jq -r '.gameplay_ready')
@@ -625,7 +625,7 @@ commit_release_operation() {
     [ -n "$RELEASE_VERIFIED_MIGRATION_SHA256" ] || fail 'verified migration result is absent'
     [ "$RELEASE_VERIFIED_ADMISSION_STATUS" = 503 ] || fail 'verified admission result is absent'
     [ "$RELEASE_VERIFIED_GAMEPLAY_READY" = true ] || fail 'verified readiness result is absent'
-    [ "$RELEASE_VERIFIED_CONTROL_API_VERSION" = 3 ] || fail 'verified control API result is absent'
+    [ "$RELEASE_VERIFIED_CONTROL_API_VERSION" = 4 ] || fail 'verified control API result is absent'
     [ "$RELEASE_VERIFIED_PROTOCOL_MINOR" = 8 ] || fail 'verified protocol result is absent'
     [ "$RELEASE_VERIFIED_SMOKE" = admission ] || fail 'verified authenticated smoke result is absent'
     prepared=$(mktemp "$RELEASE_OPERATIONS_ROOT/.success.XXXXXX") || \

@@ -285,13 +285,19 @@ pub(super) async fn run_facet(
             } => {
                 let result = match prepared_transfer.as_mut() {
                     Some(prepared) if prepared.epoch == transfer_epoch && !prepared.committed => {
-                        engine = prepared
-                            .candidate
-                            .take()
-                            .expect("prepared transfer owns candidate");
-                        facet_revision = facet_revision.saturating_add(1);
-                        prepared.committed = true;
-                        Ok(())
+                        match next_publication(facet_revision, server_sequence) {
+                            Some((revision, sequence)) => {
+                                engine = prepared
+                                    .candidate
+                                    .take()
+                                    .expect("prepared transfer owns candidate");
+                                facet_revision = revision;
+                                server_sequence = sequence;
+                                prepared.committed = true;
+                                Ok(())
+                            }
+                            None => Err(FacetError::Transfer),
+                        }
                     }
                     _ => Err(FacetError::Transfer),
                 };
@@ -351,8 +357,8 @@ pub(super) async fn run_facet(
             } => {
                 let result = match prepared_transfer.as_ref() {
                     Some(prepared) if prepared.epoch == transfer_epoch && !prepared.committed => {
-                        match facet_revision.checked_add(1) {
-                            Some(after_revision) => prepared
+                        match next_publication(facet_revision, server_sequence) {
+                            Some((after_revision, after_sequence)) => prepared
                                 .candidate
                                 .as_ref()
                                 .expect("uncommitted transfer owns candidate")
@@ -361,7 +367,8 @@ pub(super) async fn run_facet(
                                     facet_id,
                                     before_revision: facet_revision,
                                     after_revision,
-                                    server_sequence,
+                                    before_sequence: server_sequence,
+                                    after_sequence,
                                     checkpoint,
                                 })
                                 .map_err(|_| FacetError::Transfer),
@@ -722,4 +729,8 @@ pub(super) async fn run_facet(
             return;
         }
     }
+}
+
+fn next_publication(revision: u64, sequence: u64) -> Option<(u64, u64)> {
+    revision.checked_add(1).zip(sequence.checked_add(1))
 }

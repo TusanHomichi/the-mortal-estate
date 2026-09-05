@@ -212,7 +212,7 @@ pub fn router(state: AppState) -> Router {
     Router::new()
         .route("/health/live", get(health_live))
         .route("/health/ready", get(health_ready))
-        .route("/v3/socket", get(socket))
+        .route("/v4/socket", get(socket))
         .merge(crate::control_api::router())
         .with_state(state)
 }
@@ -259,6 +259,9 @@ async fn socket(
 ) -> Response {
     if state.is_draining() {
         return StatusCode::SERVICE_UNAVAILABLE.into_response();
+    }
+    if headers.contains_key("cookie") || headers.contains_key("authorization") {
+        return StatusCode::FORBIDDEN.into_response();
     }
     let host = single_header(&headers, "host");
     let origin = single_header(&headers, "origin");

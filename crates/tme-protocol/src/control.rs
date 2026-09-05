@@ -2,6 +2,13 @@ use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct LoginResponseV1 {
+    pub session_token: SessionToken,
+    pub bootstrap: SessionBootstrapV1,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LoginRequestV1 {
     pub username: Username,
     pub password: Password,
@@ -139,3 +146,7 @@ pub enum ControlErrorCode {
 pub struct ControlErrorV1 {
     pub code: ControlErrorCode,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SessionBootstrapRequestV1 {}

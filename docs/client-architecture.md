@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 12
-status: Three.js browser runtime with a Rust WebAssembly codec and read-only authoritative capture; production control UI remains open.
+revision: 13
+status: Private authoritative browser controls and diagnostic capture use one Rust codec; presentation integration remains open.
 public_safe: true
-summary: Browser authority, shared Rust WebAssembly decoding, state domains, renderer identity, production integration targets, and proof limits.
+summary: Browser control authority, transient bearer credentials, shared Rust WebAssembly decoding, reconciliation, renderer identity and proof limits.
 routes:
   - web/**
   - crates/tme-protocol/**
@@ -19,7 +19,9 @@ hold whatever the client looks like.
 [presentation direction](presentation-direction.md) owns the visual target.
 The owner retired Godot on September 5. The browser is the sole client runtime;
 a read-only authoritative browser observer now supplies diagnostic Workbench
-capture. Production control/UI integration remains unimplemented.
+capture. A separate private play shell implements authoritative control and
+reconciliation through the same renderer seam; candidate artwork integration
+remains unfinished.
 Contracts below describe obligations, not claims of completed browser features.
 
 ## Authority
@@ -135,9 +137,9 @@ The browser integration must provide that adapter before UI surfaces send comman
   `Origin`. The client performs normal TLS hostname and certificate verification
   and sends that `Origin` on HTTP and WebSocket requests — **without** claiming
   that an `Origin` authenticates native software.
-- The session cookie is sent on control requests only,
+- The session bearer token is sent in `Authorization` on control requests only,
   never on WebSocket traffic. WebSocket admission uses a one-use socket ticket.
-- The cookie, CSRF tokens, and tickets are **memory-only**. Passwords never enter
+- The session token, CSRF tokens, and tickets are **memory-only**, isolated per tab. Passwords never enter
   logs, error text, screenshots, crash text, state summaries, or settings.
 - **Control work is serialised** because a successful session bootstrap rotates
   the CSRF token. Endpoint-specific placement is preserved rather than
@@ -147,6 +149,13 @@ The browser integration must provide that adapter before UI surfaces send comman
   outcome the adapter re-runs bootstrap, recovers current control state and a
   fresh token, issues a fresh ticket where one is needed, and then uses only that
   endpoint's own idempotency contract.
+
+Control API v4 returns a typed login response containing a session token and
+bootstrap. It sets no cookie. Session bootstrap is a strict empty-JSON POST: it
+rotates CSRF and lets native browser requests supply their real `Origin`. The
+server refuses retired routes/cookie authentication and credentials on socket
+upgrades. Browser fetch uses `credentials: omit`, no-store, no redirect, bounded
+responses and a timeout. Reload discards authentication; preferences are separate.
 
 The implemented endpoint and schema authorities are
 `crates/tme-server/src/control_api.rs` and `crates/tme-protocol/src/lib.rs`. This
@@ -293,6 +302,7 @@ Production packaging must exclude proof fixtures, test code, and private packets
 | Two-engine walk proof | Real Three.js movement, cursor, facing, portals and rendering | Candidate packet; no authoritative wire |
 | Native and WebAssembly protocol corpus | Current and refused wire formats through the same Rust codec | No production control UI |
 | `tools/run_server_live_proof.py` | Real TLS sign-in, admission, land, individual cooldowns, reconnect, logout | Python wire observer; no rendered browser claim |
+| Installed private browser UI proof | Two tabs, real HTTPS/WSS controls, offset deadlines, reconnect, movement, logout and 200% text | Owner-invoked against the private development deployment; normal CA verification in Chromium and Firefox |
 | PostgreSQL gated suite | Durable server, session, restart, and recovery invariants | Requires a scratch database administrator |
 | `tools/run_browser_capture_proof.py` | Native WSS, live/replay browser images, raster/pointer identity, source binding and Workbench HTTP selection in both engines | Diagnostic renderer; scratch TLS certificate errors permitted only in ephemeral proof profiles |
 
@@ -305,7 +315,7 @@ acceptance remains the owner's; it is not inferred from passing tests.
 
 Persist no credentials in project settings or local files. Passwords, CSRF
 values, and admission tickets remain transient; session handling must respect
-the server's cookie and token contracts. Any durable credential store requires
+the server's transient token contracts. Any durable credential store requires
 a separate owner decision and a platform secret facility. Keep preferences
 and bindings separate from authentication. There is no saved-login import path.
 

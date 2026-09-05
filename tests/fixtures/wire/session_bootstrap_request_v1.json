@@ -1,0 +1,1 @@
+{"schema_version":1,"decoder":"session_bootstrap_request_v1","cases":[{"case_id":"empty","expect":"accept","reason":"empty_contract","input_utf8":"{}"},{"case_id":"unknown","expect":"reject","reason":"unknown_contract","input_utf8":"{\"extra\":true}"},{"case_id":"positional_array","expect":"reject","reason":"control_root_requires_named_fields","input_utf8":"[]"}]}

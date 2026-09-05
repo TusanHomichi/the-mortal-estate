@@ -16,6 +16,9 @@ pub fn decode_document(decoder: &str, input: &[u8]) -> Result<Vec<u8>, ProtocolE
     match decoder {
         "decimal_u64" => encoded(decode_strict::<DecimalU64>(input)?),
         "decimal_i64" => encoded(decode_strict::<DecimalI64>(input)?),
+        "session_bootstrap_request_v1" => {
+            encoded(decode_control::<SessionBootstrapRequestV1>(input)?)
+        }
         "login_request_v1" => encoded(decode_login_request(input)?),
         "logout_request_v1" => encoded(decode_logout_request(input)?),
         "character_select_request_v1" => encoded(decode_character_select_request(input)?),
@@ -23,17 +26,14 @@ pub fn decode_document(decoder: &str, input: &[u8]) -> Result<Vec<u8>, ProtocolE
         "forgive_player_kill_mark_request_v1" => {
             encoded(decode_forgive_player_kill_mark_request(input)?)
         }
+        "login_response_v1" => {
+            let value = decode_control::<LoginResponseV1>(input)?;
+            validate_bootstrap(&value.bootstrap)?;
+            encoded(value)
+        }
         "session_bootstrap_v1" => {
             let value = decode_control::<SessionBootstrapV1>(input)?;
-            control_version(value.control_api_version)?;
-            let ids = value
-                .characters
-                .iter()
-                .map(|row| row.character_id)
-                .collect::<BTreeSet<_>>();
-            if ids.len() != value.characters.len() {
-                return Err(ProtocolError::new("bootstrap identities must be unique"));
-            }
+            validate_bootstrap(&value)?;
             encoded(value)
         }
         "character_selection_v1" => {
@@ -79,4 +79,17 @@ pub fn decode_document(decoder: &str, input: &[u8]) -> Result<Vec<u8>, ProtocolE
         }
         _ => Err(ProtocolError::new("unrecognized decoder")),
     }
+}
+
+fn validate_bootstrap(value: &SessionBootstrapV1) -> Result<(), ProtocolError> {
+    control_version(value.control_api_version)?;
+    let ids = value
+        .characters
+        .iter()
+        .map(|row| row.character_id)
+        .collect::<BTreeSet<_>>();
+    if ids.len() != value.characters.len() {
+        return Err(ProtocolError::new("bootstrap identities must be unique"));
+    }
+    Ok(())
 }

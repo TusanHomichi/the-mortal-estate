@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 3
-status: Local feel preview plus authoritative diagnostic browser capture; production gameplay integration and visual acceptance remain open.
+revision: 4
+status: Private authoritative play controls and diagnostic capture implemented; candidate presentation integration and visual acceptance remain open.
 public_safe: true
-summary: Local feel implementation, authoritative diagnostic capture, source map, operation, and two-engine proof.
+summary: Private authoritative browser play, local feel implementation, diagnostic capture, source map, operation and two-engine proof.
 routes:
   - web/**
 ---
@@ -13,7 +13,8 @@ routes:
 The browser is the active feel surface. It loads an external candidate packet
 into Three.js and runs local movement experiments. The feel scene does not authenticate or implement production gameplay legality.
 A separate read-only diagnostic observer consumes the authoritative wire for
-Workbench capture; it does not change the candidate preview.
+Workbench capture. The private play shell uses that renderer with server-owned
+movement and lifecycle control; it does not change the candidate preview.
 [Client architecture](client-architecture.md) owns the client contract;
 [presentation direction](presentation-direction.md) owns the visual target;
 [Server notes](server-notes.md) owns server implementation and the direct wire proof. Use the [checkpoint](plans/genesis-ledger.md#current-checkpoint-2026-09-05)
@@ -23,6 +24,7 @@ for deployment and work status.
 
 | Work | Start here | Proof |
 | --- | --- | --- |
+| Private authoritative play | `web/src/play/`, `web/play.html` | actual adapter tests, installed `web/proof/play-proof.mjs` |
 | Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
 | Startup and packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
 | Movement, pointing, cooldown | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
@@ -60,8 +62,8 @@ replay in Chromium and Firefox. It checks raster samples against raycasts,
 drives actual pointer events, and compares image/identity/recording bytes plus
 sidecar frame facts across replay. The proof page uses the scratch server's
 origin and native WSS. Certificate errors are allowed only in its disposable
-scratch profile; production certificate verification remains unproven in the
-browser. The Python control adapter verifies the scratch CA normally.
+scratch profile; this diagnostic proof makes no browser certificate-verification
+claim. The separate installed play proof below verifies its local authority. The Python control adapter verifies the scratch CA normally.
 
 The [Workbench capture operation](workbench-v0.md#the-capture-path) owns
 configuration, source binding, and atomic publication. Run the complete proof:
@@ -72,6 +74,41 @@ python3 tools/run_browser_capture_proof.py --admin-url-file <file> --output <ext
 
 This implements authoritative diagnostic capture, not production login,
 command reconciliation, candidate artwork integration, or a preview deployment.
+
+## Private authoritative play
+
+`web/src/play/control.ts` owns the serialized control lifecycle and all transient
+credentials. `main.ts` maps semantic actions and HUD facts onto the existing
+read-only diagnostic renderer. Four cardinal steps and Wait are supported;
+clicking an adjacent square sends the same one-step intent as its button or key.
+Only a validated server frame changes position or grants readiness. Recovery
+progress is cosmetic; reaching its end cannot enable action input.
+
+One immutable command remains pending until its correlated terminal result.
+Reconnect clears authority and obtains a fresh bootstrap, ticket and welcome;
+an ambiguous command replays only its original bytes. Old-epoch reconciliation
+cannot advance the new epoch cursor. Non-consuming rejection preserves the
+cursor for a fresh command id. Transport loss attempts one fresh reconnect;
+validation failures, server draining and unsuccessful recovery leave an explicit
+Reconnect action. Failed logout retains control credentials for another attempt;
+successful logout clears them and all presented authority.
+
+Text size and remappable semantic keys live in one versioned preferences record,
+with invalid shapes returning to defaults. No authentication enters browser
+storage. The shell supports buttons, keyboard, visible focus and enlarged text.
+This is a private diagnostic play surface, not accepted candidate artwork.
+
+`npm --prefix web run build` builds both the feel scene and private play bundle;
+`build:play` rebuilds the Rust codec and emits only the play application. The
+[development runbook](../deploy/development/README.md) owns installation and
+access. Run its `browser-proof --output <external-directory>` operation against
+the installed release. It drives two tabs in each real browser through login,
+selection, offset actions, cooldown reconnect, movement and logout, checks
+transient credentials and 200% text, and writes screenshots plus a sanitized
+receipt outside the checkout. It never substitutes control responses or sockets.
+Linux proof requires NSS `certutil`: Firefox trusts the CA in a disposable
+profile; Chromium adds only a uniquely named CA entry to its user NSS database
+and removes it on cleanup. Both retain normal hostname/certificate validation.
 
 ## Movement and availability
 

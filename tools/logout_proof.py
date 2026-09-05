@@ -30,7 +30,7 @@ def prove_disconnected_logout(server) -> None:
     for racing in (False, True):
         client = LiveWireClient(server).__enter__()
         client.session.ticket()  # A genuinely unused ticket must be revoked too.
-        cookie = client.session.cookie
+        token = client.session.token
         before = sql("SELECT facet_revision FROM tme.facets")
         locker = None
         logout_thread = None
@@ -78,9 +78,9 @@ def prove_disconnected_logout(server) -> None:
             logout()
         if failures:
             raise ProofError(f"disconnected logout failed (racing={racing}): {failures[0]}\n{server.log_tail()}")
-        client.public.request("GET", "/v3/session", cookie=cookie, expected=(401,))
+        client.public.request("POST", "/v4/session", body={}, token=token, expected=(401,))
         active = sql("SELECT count(*) FROM tme.socket_tickets t JOIN tme.sessions s USING (session_id) "
                      "WHERE s.revoked_at IS NOT NULL AND t.consumed_at IS NULL")
         if active != "0":
             raise ProofError("logout left unused tickets for a revoked session")
-        print(f"disconnected logout: HTTP 204, cookie revoked, unused tickets removed; racing={racing}")
+        print(f"disconnected logout: HTTP 204, token revoked, unused tickets removed; racing={racing}")

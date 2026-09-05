@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 1
+revision: 2
 status: Private development deployment and operational procedure; installed-host proof recorded separately.
 public_safe: true
-summary: Isolated user services, immutable releases, private access, operator credentials, lifecycle, backup, recovery and cleanup.
+summary: Isolated user services, matching server/browser releases, private access, installed UI proof and recovery.
 ---
 
 # Private development server
@@ -39,6 +39,12 @@ bootstrap bindings and proof receipts live under its private `config/` directory
 The process receives runtime/auth database secrets through systemd credentials.
 Neither identity uses the administrator's database role.
 
+The frontend serves the private sign-in and play shell. Each tab owns its login
+in memory; reload requires signing in again. Browser proof requires the locked
+web dependencies, both Playwright engines, and Linux NSS `certutil`. The proof
+uses actual UI requests with normal TLS validation and retains no credentials
+in its screenshots or receipt.
+
 The frontend's address is `https://localhost:<https-port>`. From another machine,
 forward that same port through SSH:
 
@@ -73,6 +79,7 @@ python3 deploy/development/manage.py restart
 python3 deploy/development/manage.py logs
 python3 deploy/development/manage.py renew-tls
 python3 deploy/development/manage.py proof --restart
+python3 deploy/development/manage.py browser-proof --output <external-proof-directory>
 ```
 
 `proof` uses the existing trusted-TLS wire adapter against the installed services:
@@ -90,7 +97,8 @@ baseline supplies independent scratch-database and browser evidence.
 
 ## Releases and rollback
 
-`stage` rebuilds the server from the staged carried source, copies carried content,
+`stage` rebuilds the server and private browser bundle (including the Rust codec)
+from the staged carried source, copies carried content,
 and writes an integrity manifest plus the built binary's `contract versions`
 output. The release directory is addressed by its Git source-tree identity;
 `base_commit` identifies its ancestry and does not mislabel uncommitted staged

@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-05
-revision: 1
-status: In progress; private development deployment followed by authoritative browser controls.
+revision: 2
+status: Private deployment and browser play implemented; PR #47 owns final baseline and delivery evidence.
 public_safe: true
 summary: Authorized two-slice execution, findings, and proof for a persistent private two-client play loop.
 ---
@@ -17,7 +17,7 @@ The owner accepted this sequence on September 5, starting from `510b6e4`:
    movement, reconciliation, reconnect, and logout against that deployment.
    Prove two independently controlled characters through the real browser UI.
 
-This Planning receipt owns execution and observed evidence. Server configuration
+This History receipt records execution and observed integration evidence. Server configuration
 and operational semantics belong to [server notes](../server-notes.md); browser
 control and credential contracts belong to [client architecture](../client-architecture.md).
 The runtime remains private. The presentation pause remains in force.
@@ -45,7 +45,9 @@ The runtime remains private. The presentation pause remains in force.
 | Finding | Owner and disposition |
 | --- | --- |
 | Existing production provisioning assumes a dedicated host and owns its default database/proxy configuration | Development operations use separate units, cluster, listeners and storage. No production bootstrap is run on this shared host. |
-| Login sets a persistent all-path cookie, conflicting with the browser's transient credentials and ticket-only socket contract | Browser-control slice must resolve the transport mechanism at the client/protocol boundary; do not conceal it with a proxy cookie strip or a second auth truth. |
+| Login sets a persistent all-path cookie, conflicting with the browser's transient credentials and ticket-only socket contract | Resolved by control API v4: explicit transient bearer token, strict POST bootstrap, ticket-only socket, retired routes/cookies refused, and every internal caller migrated. |
+
+| Prepared lifecycle mutation publishes a new revision under an existing server sequence, disconnecting the other strict browser on logout | Fixed at the server publication boundary: prepared checkpoints bind before/after sequences, durable writes and runtime commit advance together, and all prepared-mutation callers use the same persistence owner. Real two-tab logout and a prepared-publication regression prove it. |
 
 ## Evidence
 
@@ -69,6 +71,33 @@ responded with its authentication challenge.
 completed in 873.457 s with every selected step passing, using an independent
 scratch PostgreSQL cluster and the real private denylist. This includes the
 installed tests, native/WebAssembly corpus, PostgreSQL, trusted wire, both browser
-capture engines and clean-copy build/test proof. Git delivery is PR #46.
+capture engines and clean-copy build/test proof. PR #46 merged as `7907c56` after both required CI checks passed; #40 is closed.
 Machine inventory, generated inputs and detailed receipts remain local; GitHub
 owns delivered revisions and issue closure state.
+
+## Browser slice
+
+The private play shell consumes the diagnostic renderer through the existing
+frame/pointer seam. The connection adapter owns auth, one pending immutable
+command, epoch reconciliation and reconnect. Settings persist only text size and
+semantic key bindings. The candidate feel preview and presentation pause are
+unchanged. Browser and server bundle activation remains gated by equal storage
+and content contracts. Oversized persistence and certification test files were
+split by responsibility, preserving exact runner-selected test names.
+
+Observed focused proof: 278 shared codec and real-adapter tests passed. Normal
+TLS navigation to the installed host passed in both hardware-rendered engines.
+The installed two-tab UI proof passed in Chromium and Firefox with normal TLS
+verification and observed Intel hardware rendering. Both characters saw each
+other, received independently offset deadlines, reconnected during cooldown,
+moved through buttons/keys, and reconciled the other character's movement.
+Logout revoked its token without interrupting the other tab's continued play.
+Reload required sign-in, browser storage retained preferences only, and 200%
+text passed an overlap guard plus screenshot review. The shared diagnostic
+renderer now leaves CSS sizing to its containing surface.
+
+The installed restart-during-action and fenced restore proof passed again after
+the publication repair. Control document roots explicitly refuse positional
+arrays, including the new empty-object bootstrap request. Final full-baseline
+and required CI results belong to [PR #47](https://github.com/TusanHomichi/the-mortal-estate/pull/47),
+which also owns this slice's delivery state. Machine receipts remain external.

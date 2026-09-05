@@ -4,27 +4,25 @@ use axum::body::Bytes;
 use axum::extract::connect_info::ConnectInfo;
 use axum::extract::rejection::BytesRejection;
 use axum::extract::{DefaultBodyLimit, Path, State};
-use axum::http::header::{CONTENT_TYPE, COOKIE, SET_COOKIE};
-use axum::http::{HeaderMap, HeaderValue, StatusCode};
+use axum::http::header::{AUTHORIZATION, CONTENT_TYPE, COOKIE};
+use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post};
+use axum::routing::post;
 use axum::{Json, Router};
 use tme_protocol as wire;
 
 use crate::http::{AppState, single_header};
-use crate::postgres::{LoginError, SESSION_ABSOLUTE, SessionError};
-
-const SESSION_COOKIE_NAME: &str = "__Host-tme_session";
+use crate::postgres::{LoginError, SessionError};
 
 pub(crate) fn router() -> Router<AppState> {
     Router::new()
-        .route("/v3/login", post(login))
-        .route("/v3/session", get(session_bootstrap))
-        .route("/v3/logout", post(logout))
-        .route("/v3/characters/select", post(select_character))
-        .route("/v3/socket-tickets", post(issue_socket_ticket))
+        .route("/v4/login", post(login))
+        .route("/v4/session", post(session_bootstrap))
+        .route("/v4/logout", post(logout))
+        .route("/v4/characters/select", post(select_character))
+        .route("/v4/socket-tickets", post(issue_socket_ticket))
         .route(
-            "/v3/player-kill-marks/{mark_id}/forgive",
+            "/v4/player-kill-marks/{mark_id}/forgive",
             post(forgive_player_kill_mark),
         )
         .layer(DefaultBodyLimit::max(wire::MAX_CONTROL_INPUT_BYTES))
@@ -55,19 +53,15 @@ async fn login(
         );
     };
     match backend.login(context.source, request).await {
-        Ok(success) => {
-            let cookie = format!(
-                "{SESSION_COOKIE_NAME}={}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age={}",
-                success.session_cookie.expose(),
-                SESSION_ABSOLUTE.as_secs()
-            );
-            let mut response = (StatusCode::OK, Json(success.bootstrap)).into_response();
-            response.headers_mut().insert(
-                SET_COOKIE,
-                HeaderValue::from_str(&cookie).expect("generated cookie is a valid header"),
-            );
-            response
-        }
+        Ok(success) => (
+            StatusCode::OK,
+            Json(wire::LoginResponseV1 {
+                session_token: wire::SessionToken::new(success.session_token.expose())
+                    .expect("generated session token"),
+                bootstrap: success.bootstrap,
+            }),
+        )
+            .into_response(),
         Err(LoginError::InvalidCredentials) => control_error(
             StatusCode::UNAUTHORIZED,
             wire::ControlErrorCode::InvalidCredentials,
@@ -87,12 +81,20 @@ async fn session_bootstrap(
     State(state): State<AppState>,
     ConnectInfo(peer): ConnectInfo<SocketAddr>,
     headers: HeaderMap,
+    body: Result<Bytes, BytesRejection>,
 ) -> Response {
-    if let Err(failure) = control_context(&state, peer, &headers, false) {
+    if let Err(failure) = control_context(&state, peer, &headers, true) {
         return failure.into_response();
     }
-    let cookie = match session_cookie(&headers) {
-        Ok(cookie) => cookie,
+    let body = match control_body(body) {
+        Ok(body) => body,
+        Err(failure) => return failure.into_response(),
+    };
+    if wire::decode_document("session_bootstrap_request_v1", &body).is_err() {
+        return malformed(StatusCode::BAD_REQUEST);
+    }
+    let token = match session_token(&headers) {
+        Ok(token) => token,
         Err(failure) => return failure.into_response(),
     };
     let Some(backend) = &state.inner.backend else {
@@ -101,7 +103,7 @@ async fn session_bootstrap(
             wire::ControlErrorCode::Unavailable,
         );
     };
-    match backend.session_bootstrap(&cookie).await {
+    match backend.session_bootstrap(&token).await {
         Ok(bootstrap) => (StatusCode::OK, Json(bootstrap)).into_response(),
         Err(error) => session_error(error),
     }
@@ -116,8 +118,8 @@ async fn logout(
     if let Err(failure) = control_context(&state, peer, &headers, true) {
         return failure.into_response();
     }
-    let cookie = match session_cookie(&headers) {
-        Ok(cookie) => cookie,
+    let token = match session_token(&headers) {
+        Ok(token) => token,
         Err(failure) => return failure.into_response(),
     };
     let body = match control_body(body) {
@@ -134,17 +136,8 @@ async fn logout(
             wire::ControlErrorCode::Unavailable,
         );
     };
-    match backend.logout(&cookie, request).await {
-        Ok(()) => {
-            let mut response = StatusCode::NO_CONTENT.into_response();
-            response.headers_mut().insert(
-                SET_COOKIE,
-                HeaderValue::from_static(
-                    "__Host-tme_session=; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=0",
-                ),
-            );
-            response
-        }
+    match backend.logout(&token, request).await {
+        Ok(()) => StatusCode::NO_CONTENT.into_response(),
         Err(error) => session_error(error),
     }
 }
@@ -158,8 +151,8 @@ async fn select_character(
     if let Err(failure) = control_context(&state, peer, &headers, true) {
         return failure.into_response();
     }
-    let cookie = match session_cookie(&headers) {
-        Ok(cookie) => cookie,
+    let token = match session_token(&headers) {
+        Ok(token) => token,
         Err(failure) => return failure.into_response(),
     };
     let body = match control_body(body) {
@@ -176,7 +169,7 @@ async fn select_character(
             wire::ControlErrorCode::Unavailable,
         );
     };
-    match backend.select_character(&cookie, request).await {
+    match backend.select_character(&token, request).await {
         Ok(selection) => (StatusCode::OK, Json(selection)).into_response(),
         Err(error) => session_error(error),
     }
@@ -192,8 +185,8 @@ async fn issue_socket_ticket(
         Ok(context) => context,
         Err(failure) => return failure.into_response(),
     };
-    let cookie = match session_cookie(&headers) {
-        Ok(cookie) => cookie,
+    let token = match session_token(&headers) {
+        Ok(token) => token,
         Err(failure) => return failure.into_response(),
     };
     let body = match control_body(body) {
@@ -211,7 +204,7 @@ async fn issue_socket_ticket(
         );
     };
     match backend
-        .issue_ticket(&cookie, request, &context.origin, &context.host)
+        .issue_ticket(&token, request, &context.origin, &context.host)
         .await
     {
         Ok(ticket) => (StatusCode::OK, Json(ticket)).into_response(),
@@ -229,8 +222,8 @@ async fn forgive_player_kill_mark(
     if let Err(failure) = control_context(&state, peer, &headers, true) {
         return failure.into_response();
     }
-    let cookie = match session_cookie(&headers) {
-        Ok(cookie) => cookie,
+    let token = match session_token(&headers) {
+        Ok(token) => token,
         Err(failure) => return failure.into_response(),
     };
     let csrf_token = match single_header(&headers, "x-tme-csrf")
@@ -274,7 +267,7 @@ async fn forgive_player_kill_mark(
         );
     };
     match backend
-        .forgive_player_kill_mark(&cookie, &csrf_token, mark_id, request)
+        .forgive_player_kill_mark(&token, &csrf_token, mark_id, request)
         .await
     {
         Ok(result) => (StatusCode::OK, Json(result)).into_response(),
@@ -288,7 +281,7 @@ struct ControlContext {
     origin: String,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct ControlFailure {
     status: StatusCode,
     code: wire::ControlErrorCode,
@@ -352,23 +345,19 @@ fn control_context(
     })
 }
 
-fn session_cookie(headers: &HeaderMap) -> Result<String, ControlFailure> {
-    let header = single_header(headers, COOKIE.as_str()).ok_or(ControlFailure {
+fn session_token(headers: &HeaderMap) -> Result<String, ControlFailure> {
+    let refused = || ControlFailure {
         status: StatusCode::UNAUTHORIZED,
         code: wire::ControlErrorCode::AuthenticationRequired,
-    })?;
-    let values = header
-        .split(';')
-        .filter_map(|part| part.trim().split_once('='))
-        .filter_map(|(name, value)| (name == SESSION_COOKIE_NAME).then_some(value))
-        .collect::<Vec<_>>();
-    if values.len() != 1 || wire::AdmissionTicket::new(values[0]).is_err() {
-        return Err(ControlFailure {
-            status: StatusCode::UNAUTHORIZED,
-            code: wire::ControlErrorCode::AuthenticationRequired,
-        });
+    };
+    // Retired cookies cannot supply or accompany control authentication.
+    if headers.contains_key(COOKIE) {
+        return Err(refused());
     }
-    Ok(values[0].to_string())
+    let header = single_header(headers, AUTHORIZATION.as_str()).ok_or_else(refused)?;
+    let token = header.strip_prefix("Bearer ").ok_or_else(refused)?;
+    wire::SessionToken::new(token).map_err(|_| refused())?;
+    Ok(token.to_string())
 }
 
 fn forbidden() -> ControlFailure {
@@ -418,6 +407,7 @@ fn session_error(error: SessionError) -> Response {
 mod tests {
     use super::*;
     use crate::ServerConfig;
+    use axum::http::HeaderValue;
 
     fn state() -> AppState {
         AppState::disabled(
@@ -504,5 +494,25 @@ mod tests {
         assert!(
             control_context(&state, "198.51.100.9:4000".parse().unwrap(), &spoofed, true).is_err()
         );
+    }
+
+    #[test]
+    fn authentication_refuses_retired_cookies_and_ambiguous_headers() {
+        let token = "A".repeat(43);
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            COOKIE,
+            format!("__Host-tme_session={token}").parse().unwrap(),
+        );
+        assert!(session_token(&headers).is_err());
+        headers.insert(AUTHORIZATION, format!("Bearer {token}").parse().unwrap());
+        assert!(session_token(&headers).is_err());
+        headers.remove(COOKIE);
+        assert_eq!(session_token(&headers).unwrap(), token);
+        headers.append(AUTHORIZATION, format!("Bearer {token}").parse().unwrap());
+        assert!(session_token(&headers).is_err());
+        headers.clear();
+        headers.insert(AUTHORIZATION, "Bearer malformed".parse().unwrap());
+        assert!(session_token(&headers).is_err());
     }
 }

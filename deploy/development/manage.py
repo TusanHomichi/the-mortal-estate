@@ -34,6 +34,8 @@ def main():
     deploy.add_argument("release", type=Path)
     proof = commands.add_parser("proof")
     proof.add_argument("--restart", action="store_true", help="also restart the installed services during an action")
+    browser = commands.add_parser("browser-proof")
+    browser.add_argument("--output", type=Path, required=True)
     remove = commands.add_parser("uninstall")
     remove.add_argument("--purge-private-development-data", action="store_true")
     arguments = parser.parse_args()
@@ -76,6 +78,14 @@ def main():
         elif arguments.command == "proof":
             from proof import prove
             result = prove(site, restart=arguments.restart)
+        elif arguments.command == "browser-proof":
+            from common import REPO
+            health(site)
+            accounts = json.loads((site.config / "test-accounts.json").read_text())
+            result = run(["node", REPO / "web/proof/play-proof.mjs"], input=json.dumps({
+                "origin": site.origin, "authority": str(site.config / "tls/ca.pem"),
+                "accounts": accounts, "output": str(arguments.output.resolve()),
+            }), cwd=REPO, timeout=300)
         elif arguments.command == "uninstall":
             files = [site.units / (name + ".service") for name in UNITS]
             if any(path.exists() and str(site.root) not in path.read_text() for path in files):

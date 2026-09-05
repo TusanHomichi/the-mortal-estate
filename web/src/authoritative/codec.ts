@@ -6,6 +6,8 @@ type CodecExports = WebAssembly.Exports & {
   codec_output(): number;
   codec_output_length(): number;
   codec_protocol_minor(): number;
+  codec_control_version(): number;
+  codec_control_limit(): number;
 };
 
 export class WireCodec {
@@ -17,6 +19,9 @@ export class WireCodec {
   }
 
   get protocolMinor(): number { return this.exports.codec_protocol_minor(); }
+
+  get controlVersion(): number { return this.exports.codec_control_version(); }
+  get controlLimit(): number { return this.exports.codec_control_limit(); }
 
   decode<T>(name: string, raw: string | Uint8Array): T {
     const encoder = new TextEncoder();

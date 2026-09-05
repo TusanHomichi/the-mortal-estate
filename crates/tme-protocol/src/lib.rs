@@ -35,7 +35,7 @@ pub const MAX_FEEDBACK_TRANSACTION_COSTS: usize = 64;
 pub const MAX_FEEDBACK_TRANSACTION_REWARDS: usize = 64;
 pub const MAX_MERCHANT_PURCHASE_ITEMS: usize = 128;
 pub const MAX_OBSERVED_EVENTS: usize = 64;
-pub const CONTROL_API_VERSION: u16 = 3;
+pub const CONTROL_API_VERSION: u16 = 4;
 pub const MAX_CONTROL_INPUT_BYTES: usize = 16 * 1024;
 pub const MAX_CONTROL_JSON_NESTING: usize = 16;
 
@@ -591,6 +591,45 @@ impl Serialize for CsrfToken {
 }
 
 impl<'de> Deserialize<'de> for CsrfToken {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Self::new(String::deserialize(deserializer)?).map_err(serde::de::Error::custom)
+    }
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct SessionToken(String);
+
+impl SessionToken {
+    pub fn new(value: impl Into<String>) -> Result<Self, ProtocolError> {
+        let value = value.into();
+        AdmissionTicket::new(value.clone())?;
+        Ok(Self(value))
+    }
+
+    pub fn expose_for_validation(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Debug for SessionToken {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("SessionToken([REDACTED])")
+    }
+}
+
+impl Serialize for SessionToken {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&self.0)
+    }
+}
+
+impl<'de> Deserialize<'de> for SessionToken {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
