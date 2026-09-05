@@ -37,6 +37,8 @@ export const state = {
   projection: null,
   member: null,
   captures: [],
+  captureAvailable: false,
+  captureInProgress: false,
   captureId: null,
   captureImage: null,
   tool: "click",

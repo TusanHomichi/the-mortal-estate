@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 5
-status: Logical and recorded-capture selection retained; Godot fresh-capture runtime retired September 5. Browser capture integration remains open.
+revision: 6
+status: Logical, retained, and fresh authoritative browser capture selection; expensive capture is explicit and ordinary selection remains file reading.
 public_safe: true
-summary: Workbench pointing, projection selection, packets, capture addressing, staleness, retention, and proof.
+summary: Workbench pointing, explicit browser capture, authoritative recording and pixel addressing, source binding, staleness, and proof.
 routes:
   - tools/workbench/**
   - tools/workbench_demo.py
@@ -81,13 +81,30 @@ python3 tools/workbench/serve.py \
 `--port 0` picks a free port; `--root` points at another checkout; `--session`
 names the session directory instead of taking a fresh one.
 
+Gestures begin on the canvas. Releasing a toolbar button cannot replace the
+chosen address; the real browser proof exercises selection followed by Record.
+
 Selecting never builds anything. The projection is a tracked artifact of the
 authoring compiler, and the Workbench reads it; if it is missing the server
 refuses to start and names the command above.
 
-The capture view reads existing session captures. There is no renderer launcher,
-fresh-capture button, or `POST /api/capture` command. A browser producer must
-satisfy the capture contract below before fresh capture can return.
+The capture view reads existing session captures. Configure a live source to
+enable **Capture browser frame** and `POST /api/capture`:
+
+```bash
+python3 tools/workbench/serve.py \
+  --projection content/lands/identity-proof/generated/workbench_projection.json \
+  --capture-world content/lands/identity-proof/world.json \
+  --admin-url-file <scratch-database-admin-url-file>
+```
+
+`--capture-replay <browser-capture-directory>` selects a digest-verified recording
+inside the selected working root (relative paths resolve from that root),
+instead of a scratch live world. Exactly one producer source is configured at
+startup; HTTP cannot choose paths or credentials. Fresh capture uses the chosen
+checkout's own tools; `--root` inspection does not redirect a different checkout's live harness. Without configuration the
+button is disabled and the operation reports unavailable. Selection remains
+ordinary file reading.
 
 To see the whole loop at once, including both views and the agent read path:
 
@@ -228,20 +245,29 @@ is an address, not a picture.
 
 ## The capture path
 
-Recorded captures support selection and correspondence checks. Browser screenshots
-and wire observer recordings have separate proof routes in
-[verification](verification.md#on-demand-proofs); neither is an authoritative
-browser image/identity/sidecar capture yet.
+`capture_producer.py` owns the explicit expensive operation. It builds the
+carried Rust codec, runs the [browser diagnostic observer](browser-client.md#authoritative-diagnostic-capture)
+in both engines, and validates every result before one directory rename offers
+the batch. Live capture also replays its observed frames; recording replay needs
+no database. Failure offers no partial batch. Each batch records elapsed time
+and each engine's actual renderer and correspondence proof.
+
+The live source must use this projection's compiled world template. Every
+source digest is checked before and after capture and carried by the sidecar.
+Ordinary selection imports no producer and starts no process. A cached capture
+is rechecked against its bound file digests before use.
 
 ### What a capture is
 
-Three files, written together by the client's own presenter, meaningless apart:
+The presenter writes image, identity raster, and sidecar together. Fresh browser
+capture also carries the exact decoded authoritative recording:
 
 | File | What it holds |
 | --- | --- |
 | `capture.png` | what the presenter drew, straight off the viewport |
 | `capture.identity.pgm` | the **identity raster**: one 16-bit index per pixel naming which entry of the target list owns that pixel, or zero for none |
-| `capture.sidecar.json` | frame generation, camera identity, viewport size, the digests of the other two files, and the full target list — identity, kind, coordinate, presentation layer, screen anchor, and screen hit shape |
+| `capture.sidecar.json` | frame generation, camera identity, viewport size, image/raster digests, target list, authoritative envelope identity, and compiler source bindings |
+| `capture.frame.json` | the bounded accepted welcome/update recording consumed by the same Rust codec during replay; its digest is also bound by selection packets |
 
 The raster is a binary Netpbm greyscale (`P5`, maxval 65535, most significant
 byte first) because both sides then need no library at all: a producer writes pixel identities, and the Workbench slices bytes with
@@ -329,7 +355,8 @@ their measured costs and correspondence; it supplies no current run command.
 Selection reads existing projection/capture files and starts no process.
 `tools/workbench_demo.py` exercises that path using the recorded fixture and
 reports its timings. Historical renderer measurements are in the linked receipt
-above. Fresh browser capture will need new measurements.
+above. Each current browser batch writes its own elapsed time in `operation.json`;
+the [follow-up receipt](plans/2026-09-05-follow-up-closeout.md) records observed proof.
 
 ## The session directory
 
@@ -405,13 +432,13 @@ Spec §11.3, all ten, with the phase that owns each.
 | --- | --- | --- |
 | **1. Pointing resolves exactly** | 4W | `tests/test_workbench_pointing.py` — 14 cases over the accepted fixture, one per gesture plus features; expected covered cells and full identity lists written out, read off the authored document by hand |
 | **2. Capture selections resolve to the same address space** | 6W | `tests/test_capture_addressing.py::ACaptureSelectionResolvesLikeALogicalOne` — click, occupant click, box, lasso and paint over a real capture, each compared against the equivalent logical selection; and `::TheTwoCaptureRoutesResolveIdentically`, which does it again between two captures of one frame at different scales. `tests/test_capture_correspondence.py` asserts the underlying claim: runtime cell (x, y) **is** master cell (x, y), cell by cell, with an offset mutant |
-| **3. The identity sidecar is real and matching** | 6W | `tests/test_capture_sidecar.py` — the sidecar's viewport equals the picture's own PNG header; the raster is the same resolution; the raster rebuilt from the target rectangles equals the raster byte for byte; every target's anchor pixel names that target; a marker owns its pixels over the square beneath. Browser producer/pointer correspondence remains an integration obligation |
+| **3. The identity sidecar is real and matching** | 6W | `tests/test_capture_sidecar.py` — the sidecar's viewport equals the picture's own PNG header; the raster is the same resolution; the raster rebuilt from the target rectangles equals the raster byte for byte; every target's anchor pixel names that target; a marker owns its pixels over the square beneath. `tools/run_browser_capture_proof.py` adds fresh two-engine GPU/pointer and exact replay correspondence |
 | **4. Staleness fails closed, per digest** | 4W + 6W | `tests/test_workbench_staleness.py` — each of the five bound files mutated independently, killing the packet in `verify`, in `resolve.py`, and over HTTP; plus a deleted source, an edited mask, and a hand-edited packet. `tests/test_capture_addressing.py::ACapturePacketFailsClosedPerDigest` — all **eight** mutated independently, plus an edited cell list, an edited observed list, an edited gesture, an edited frame generation, and an edited camera |
 | **5. Ambiguity is data** | 4W | `tests/test_workbench_ambiguity.py` — all three clauses of the rule exercised separately, both directions, plus rank stability and a four-occupant selection |
 | **6. Agent parity holds** | 4W + 6W | `tests/test_workbench_parity.py` — the real HTTP server's answer compared against `resolve.py` run as a separate process, for every gesture; plus reading the tracked fixture cold. `tests/test_capture_addressing.py::AgentParityHoldsForCapturePackets` — the same, for capture packets, for every gesture |
 | **7. The loop is fast where it must be** | 4W + 6W | `tests/test_workbench_loop.py::test_selection_to_written_packet_stays_in_milliseconds` guarantees the selection path. The capture cost is **measured and recorded above**, from real runs, and reported in the interface — never asserted |
 | **8. Nothing canonical moves** | 4W + 6W | `tests/test_workbench_session.py::NothingCanonicalMoves` — a full four-gesture logical session in this repository with `git status` compared before and after. `tests/test_capture_addressing.py::NothingCanonicalMovesWhenSelectingOverACapture` — the same for a capture session |
-| **9. No full verification in the loop** | 4W + 6W | `tests/test_workbench_loop.py` parses selection modules and drives real routes with a process-spawning tripwire. Only `bridge.py` may invoke the authoring compiler; the retired fresh-capture route is refused. |
+| **9. No full verification in the loop** | 4W + 6W | `tests/test_workbench_loop.py` parses selection modules and drives real routes with a process-spawning tripwire. `bridge.py` and `capture_producer.py` are the explicit expensive owners; an unconfigured capture route is unavailable. |
 | **10. The comment survives** | 4W | `tests/test_workbench_session.py::TheCommentSurvives` — a comment with newlines, quotes, trailing whitespace, non-ASCII and fake structured data, checked byte for byte through the packet, the log, and the agent consumer, with a proof that none of it reached a typed field |
 
 The compiler-side emitter has its own proofs in
@@ -437,12 +464,10 @@ equal to the compiler's own count, and layer attribution asserted per cell.
    visible, not the whole member. Pointing outside them is a refusal, not a
    guess. The logical view addresses the whole land and is the right surface for
    a region nobody is standing in.
-5. **Fresh authoritative browser capture is missing.** Tracked as
-   [issue #43](https://github.com/TusanHomichi/the-mortal-estate/issues/43). Owner: the browser
-   renderer integration. Required proof: live and replayed frames produce matching
-   image/identity/sidecar artifacts; pointer and raster identities agree; replay
-   corresponds to the observed authoritative frame. Existing fixtures cannot
-   discharge this proof.
+5. **Fresh capture uses a diagnostic browser view.** It renders actual
+   authoritative rows and supports exact addressing. Candidate artwork and
+   production gameplay controls remain outside that view; capture proof does not
+   accept presentation or reopen paused plans.
 6. **`canvas_rect` is reported, not verified,** for logical selections. The screen
    rectangle is the client's own account of where the gesture happened; the cells
    are the address. For a capture selection the gesture geometry **is** verified,

@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 32
-status: Current lookup index; Three.js client and Godot retirement routed to their owners.
+revision: 33
+status: Current lookup index including the shared Rust WebAssembly codec and retained browser-first rulings.
 public_safe: true
-summary: Lookup links for settled architecture, workflow, presentation decisions, and diagnosed traps.
+summary: Lookup links for settled architecture, protocol consumption, workflow, presentation decisions, and diagnosed traps.
 always: true
 ---
 
@@ -47,7 +47,7 @@ experimental gameplay tuning.
 | Content validation | Rust owns gameplay-semantic validation. | [boundary map](boundary-map.md#13-rust-is-the-sole-gameplay-semantic-validator-and-it-fails-closed) |
 | Authoring and member counts | Compiler owns land semantics; members are content. | [authoring compiler](authoring-compiler.md#what-it-compiles) |
 | Served world | Content declaration and deployment bootstrap are separate. | [server notes](server-notes.md#which-world-the-one-process-serves) |
-| Wire corpus | One shared fixture corpus. | [client architecture](client-architecture.md#strict-protocol-consumption) |
+| Wire corpus | Native and browser WebAssembly consume one Rust decoder and shared corpus. | [client architecture](client-architecture.md#strict-protocol-consumption) |
 | Blocking checks | P9 mutant qualification. | [boundary checks](boundary-checks.md#qualification) |
 | Private denylist | Provisioning, worktrees, and fail-closed behavior. | [boundary checks](boundary-checks.md#the-private-terms-convention) |
 | Public source | Source publication is separate from product release. | [public boundary policy](public-boundary-policy.md#the-clean-public-successor-and-the-two-publication-cuts) |

@@ -21,6 +21,8 @@ import { fit, renderLegend } from "./view.js";
 
 export async function refreshSession(highlight) {
   const info = await readState();
+  state.captureAvailable = info.capture_available;
+  document.getElementById("take-capture").disabled = state.captureInProgress || !state.captureAvailable;
   state.captures = info.captures;
   state.selections = info.selections;
   state.staged = info.staged;

@@ -52,6 +52,8 @@ export function readState() {
   return request("/api/state");
 }
 
+export function takeCapture() { return post("/api/capture", {}); }
+
 export function readProjection() {
   return request("/api/projection");
 }

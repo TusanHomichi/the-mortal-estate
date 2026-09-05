@@ -80,6 +80,7 @@ export async function record() {
  * is written down in one place instead of falling out of import order.
  */
 export function installGestures() {
+  let gestureStarted = false;
   canvas.addEventListener("contextmenu", (event) => event.preventDefault());
 
   canvas.addEventListener("mousedown", (event) => {
@@ -88,6 +89,8 @@ export function installGestures() {
       state.panning = { x: event.clientX, y: event.clientY, origin: { ...state.origin } };
       return;
     }
+    if (event.button !== 0) return;
+    gestureStarted = true;
     const point = surfacePoint(event);
     if (state.tool === "box") {
       state.drag = { kind: "box", from: point, to: point };
@@ -139,8 +142,11 @@ export function installGestures() {
   window.addEventListener("mouseup", async (event) => {
     if (state.panning) {
       state.panning = null;
+      gestureStarted = false;
       return;
     }
+    if (!gestureStarted) return;
+    gestureStarted = false;
     if (capturing() ? !state.captureImage : !currentMember()) return;
     const drag = state.drag;
     state.drag = null;

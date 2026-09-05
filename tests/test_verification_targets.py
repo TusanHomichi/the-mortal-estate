@@ -136,6 +136,14 @@ class TheRustSchedulerGoesThroughCargo(unittest.TestCase):
         with self.assertRaises(rust_tests.RustTestError):
             rust_tests.parse_artifacts('{"reason":"build-finished","success":true}')
 
+    def test_the_native_harness_for_a_wasm_library_still_runs_through_cargo(self) -> None:
+        from verification import rust_tests
+        artifact = {"reason": "compiler-artifact", "profile": {"test": True},
+                    "executable": "/tmp/deps/tme_protocol-abc", "manifest_path": "/repo/crates/tme-protocol/Cargo.toml",
+                    "target": {"kind": ["rlib", "cdylib"], "name": "tme_protocol"}}
+        (parsed,) = rust_tests.parse_artifacts(json.dumps(artifact))
+        self.assertEqual(parsed.selector(), ("--lib",))
+
     def test_a_non_json_artifact_line_fails_closed(self) -> None:
         from verification import rust_tests
 

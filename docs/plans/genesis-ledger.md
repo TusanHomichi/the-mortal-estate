@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 16
-status: PR 41 merged; scene 06 source and Godot retirement verified for delivery. Private preview remains scene 06; recorded gates remain open.
+revision: 17
+status: Disconnected logout repair and authoritative diagnostic capture carried; preview remains scene 06. Follow-up receipt owns verification and delivery.
 public_safe: true
-summary: Concise resume checkpoint, current-owner pointers, dated genesis evidence, and open gates.
+summary: Current source checkpoint, follow-up implementation receipt, owner pointers, historical genesis evidence, and open gates.
 ---
 
 # The genesis ledger
@@ -37,9 +37,9 @@ owner's and are numbered by the phase they guard.
 - **Source:** scene 06 routing/cursor changes, the GPU proof launcher, and the
   Godot retirement are carried here. The [code/context audit](2026-09-05-code-and-context-audit.md)
   records cleanup and verification; delivery does not update the private preview.
-  Python wire proof retains server coverage. Follow-ups: disconnected logout
-  [#42](https://github.com/TusanHomichi/the-mortal-estate/issues/42) and browser
-  Workbench capture [#43](https://github.com/TusanHomichi/the-mortal-estate/issues/43).
+  The [follow-up slice](2026-09-05-follow-up-closeout.md) repairs disconnected
+  logout (#42) and restores authoritative diagnostic browser Workbench capture
+  (#43); that receipt owns verification and delivery state.
 - **Start browser work:** [browser client](../browser-client.md) maps source,
   current behavior, limitations, and proof. Production wire integration,
   proportional chrome, and distance-matched animation remain unfinished.

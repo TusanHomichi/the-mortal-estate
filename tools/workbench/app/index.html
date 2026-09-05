@@ -14,11 +14,9 @@
     looks like. It shows what the compiler knows.
   </p>
   <p class="banner capture" id="banner-capture" hidden>
-    <strong>CAPTURE VIEW</strong> — a real client frame, photographed by the
-    shipped presenter, with the identity of every pixel recorded beside it. It is
-    not a preview and not a second renderer: it is what the client drew. The
-    current presenter draws flat colours and no art, and says so on its own
-    banner inside the picture.
+    <strong>CAPTURE VIEW</strong> — a recorded browser frame with matching pixel
+    identities. Fresh captures show diagnostic squares and observed occupants;
+    their colours carry no gameplay meaning or artwork acceptance.
   </p>
   <p class="banner candidate" id="banner-candidate" hidden>
     <strong>CANDIDATE</strong> — an unattested document that exists only in this
@@ -41,6 +39,8 @@
       </span>
       <span class="group" id="members"></span>
       <span class="group" id="captures" hidden></span>
+      <button id="take-capture" disabled title="Configure a live world or browser recording when starting Workbench">Capture browser frame</button>
+      <output id="capture-status" aria-live="polite"></output>
       <span class="group" id="tools">
         <button data-tool="click" class="active">click</button>
         <button data-tool="box">box</button>

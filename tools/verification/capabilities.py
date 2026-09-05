@@ -108,6 +108,21 @@ def _probe_feel_assets(environ: Mapping[str, str]) -> tuple[bool, str]:
     return True, "external candidate-packet directory is available; browser proof validates its contents"
 
 
+def _probe_browsers(environ: Mapping[str, str]) -> tuple[bool, str]:
+    node = shutil.which("node", path=environ.get("PATH"))
+    if node is None:
+        return False, "Node is absent; install the browser toolchain first"
+    script = "import { chromium, firefox } from 'playwright'; import { existsSync } from 'node:fs'; process.exit([chromium, firefox].every(engine => existsSync(engine.executablePath())) ? 0 : 3);"
+    try:
+        result = subprocess.run([node, "--input-type=module", "-e", script], cwd=ROOT / "web", env=dict(environ),
+                                capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return False, "browser binaries could not be checked"
+    if result.returncode:
+        return False, "install web dependencies and Playwright Chromium/Firefox; the capture proof also requires a working WebGL2 display"
+    return True, "Playwright Chromium and Firefox are installed; the producer verifies actual WebGL2 renderers"
+
+
 FEEL_ASSETS = Capability("feel-assets", "an external candidate packet", _probe_feel_assets)
 NODE = Capability("node", "Node 22 or newer and npm", _probe_node)
 POSTGRES = Capability("postgres", "a PostgreSQL superuser URL and psql", _probe_postgres)
@@ -115,7 +130,8 @@ PRIVATE_TERMS_LIST = Capability(
     "private-terms", "the private banned-term denylist", _probe_private_terms
 )
 
-CAPABILITIES: tuple[Capability, ...] = (NODE, POSTGRES, PRIVATE_TERMS_LIST, FEEL_ASSETS)
+BROWSERS = Capability("browsers", "the two browser proof engines", _probe_browsers)
+CAPABILITIES: tuple[Capability, ...] = (NODE, POSTGRES, PRIVATE_TERMS_LIST, FEEL_ASSETS, BROWSERS)
 BY_NAME = {capability.name: capability for capability in CAPABILITIES}
 
 

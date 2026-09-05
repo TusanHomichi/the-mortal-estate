@@ -7,8 +7,8 @@ a gesture over the picture into the same cells and the same identities a
 gesture over the logical view would produce.
 
 **Nothing here runs anything.** Reading a capture and selecting over one are
-file reads and arithmetic. The retired renderer launcher is absent; a future
-browser producer must satisfy the same identity-raster and digest contracts.
+file reads and arithmetic. The explicit browser producer lives separately in
+`capture_producer.py`; selection never imports it.
 `tests/test_workbench_loop.py` proves selection starts no programs.
 
 **Why the raster decides.** The sidecar's target list carries a rectangle per
@@ -28,7 +28,7 @@ from pathlib import Path
 
 from .imageops.png import ImageUnreadable
 from .imageops.png import size as png_dimensions
-from .projection import Projection, WorkbenchError, digest_bytes
+from .projection import Projection, Source, WorkbenchError, digest_bytes, verify
 
 #: Where a session keeps its captures. One directory per capture, holding the
 #: three files exactly as the client wrote them.
@@ -202,11 +202,15 @@ class Capture:
 
     def source_records(self, root: Path) -> list[dict[str, str]]:
         base = self.directory.relative_to(root)
-        return [
+        records = [
             {"role": IMAGE_ROLE, "path": str(base / IMAGE_NAME), "sha256": self.image_digest},
             {"role": SIDECAR_ROLE, "path": str(base / SIDECAR_NAME), "sha256": self.sidecar_digest},
             {"role": RASTER_ROLE, "path": str(base / RASTER_NAME), "sha256": self.raster_digest},
         ]
+        if self.document.get("authority"):
+            records.append({"role": "capture_frame", "path": str(base / "capture.frame.json"),
+                            "sha256": self.document["authority"]["sha256"]})
+        return records
 
 
 def load(root: Path, directory: Path) -> Capture:
@@ -275,6 +279,40 @@ def load(root: Path, directory: Path) -> Capture:
                 "the sidecar's target list is not indexed from one in order"
             )
 
+    if document.get("producer") == "browser_authoritative_view":
+        try:
+            authority = document["authority"]
+            if authority["path"] != "capture.frame.json":
+                raise ValueError("unexpected authoritative recording path")
+            recording = (directory / "capture.frame.json").read_bytes()
+            if digest_bytes(recording) != authority["sha256"]:
+                raise ValueError("authoritative recording digest differs")
+            recorded = json.loads(recording)
+            envelopes = recorded["envelopes"]
+            if (recorded["schema_version"] != 1 or recorded["kind"] != "browser_observer_recording"
+                    or not envelopes or len(envelopes) != document["frame_generation"]):
+                raise ValueError("authoritative recording generation differs")
+            last = json.loads(envelopes[-1])
+            encoded = json.dumps(last, separators=(",", ":"), ensure_ascii=False).encode()
+            # The raw server document is re-encoded by Rust before the browser
+            # hashes it. JSON key order can differ, so hash the canonical object
+            # in the recording itself, emitted by the browser codec.
+            if digest_bytes(encoded) != authority["envelope_sha256"]:
+                raise ValueError("authoritative envelope digest differs")
+            frame = last["frame"]
+            if (last["server_sequence"] != authority["server_sequence"]
+                    or last["world_revision"] != authority["world_revision"]
+                    or frame["logical_time"] != document["scene"]["logical_time"]
+                    or frame["observation_center"]["realm"] != document["scene"]["realm"]
+                    or frame["observation_center"]["level"] != document["scene"]["level"]
+                    or frame["observation_center"]["position"] != document["scene"]["observation_center"]):
+                raise ValueError("capture scene differs from its authoritative frame")
+            if not authority["sources"]:
+                raise ValueError("capture has no source bindings")
+            verify(root, [Source.from_record(source) for source in authority["sources"]])
+        except (KeyError, ValueError, TypeError, OSError) as error:
+            raise CaptureUnavailable(f"invalid authoritative capture: {error}") from error
+
     return Capture(
         directory=directory,
         relative=str(directory.relative_to(root)),
@@ -294,6 +332,9 @@ def bind(projection: Projection, capture: Capture) -> str:
     is not a selection surface for this projection. Saying so here is what stops
     a capture selection from resolving into the wrong land's cells.
     """
+    authority = capture.document.get("authority")
+    if authority and authority["sources"] != [source.as_record() for source in projection.sources]:
+        raise CaptureUnavailable("capture source bindings differ from this compiled projection")
     if capture.realm != projection.realm_id:
         raise CaptureUnavailable(
             f"the capture was taken in realm {capture.realm!r} and this projection "
@@ -420,6 +461,7 @@ def select(projection: Projection, capture: Capture, gesture: str, geometry: dic
     pixels; a pixel is a target; a target stands on a square; a square is a cell
     of the compiled member. Nothing along that chain is estimated.
     """
+    verify(projection.root, [Source.from_record(record) for record in capture.source_records(projection.root)])
     member_name = bind(projection, capture)
     member = projection.member(member_name)
     indices = indices_for_gesture(capture.raster, gesture, geometry)

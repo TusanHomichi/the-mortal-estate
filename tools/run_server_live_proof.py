@@ -24,6 +24,7 @@ from live_server_harness import (  # noqa: E402
 
 from live_wire_client import LiveWireClient
 from run_production_smoke import SmokeError
+from logout_proof import prove_disconnected_logout
 
 SUCCESS_SENTINEL = "TME_SERVER_LIVE_PROOF_OK"
 
@@ -69,6 +70,7 @@ def proof(arguments: argparse.Namespace) -> int:
             check_cooldowns(report)
             cookie = client.session.cookie
         client.public.request("GET", "/v3/session", cookie=cookie, expected=(401,))
+        prove_disconnected_logout(server)
         print("sign-in, admission, cooldown rejection, reconnect, and logout passed")
     print(SUCCESS_SENTINEL)
     return 0

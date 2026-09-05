@@ -33,7 +33,7 @@ resumption is introduced by this audit.
 | Resume context mixed current facts, retired client details and old measurements | Added a browser implementation owner, shortened checkpoint/workflow context, moved measurements to dated evidence, and removed the Godot implementation document. Routing and links remain enforced. |
 | Session-root guard covered the retired client | Migrated runtime coverage to `web/` alongside `crates/`. |
 | Scratch TLS certificates failed Python strict verification | Added CA signing key usage and explicit server certificate constraints/usages. Live proof passes strict TLS without weakening the client. |
-| Disconnect followed by logout returned HTTP 503 | Open server finding in [server notes](../server-notes.md#open-logout-finding-september-5-audit), with required reproduction and regression proof. Connected logout passed; waiting for the close handshake did not resolve disconnected logout. |
+| Disconnect followed by logout returned HTTP 503 | Open server finding in [server notes](../server-notes.md#logout-and-disconnect-ordering), with required reproduction and regression proof. Connected logout passed; waiting for the close handshake did not resolve disconnected logout. |
 
 ## Coverage and remaining work
 

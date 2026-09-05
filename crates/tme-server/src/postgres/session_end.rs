@@ -12,6 +12,9 @@ impl PostgresState {
             .await?
             .ok_or(SessionError::AuthenticationRequired)?;
         validate_csrf(session.csrf_digest, &request.csrf_token)?;
+        // Authentication must not pin a snapshot across a queued world mutation.
+        // Prepare freezes the world; only then open the durable transaction.
+        tx.rollback().await.map_err(unavailable)?;
         let grants = {
             let live = self.live.lock().map_err(|_| SessionError::Unavailable)?;
             live.active_grants
@@ -25,6 +28,15 @@ impl PostgresState {
             None => None,
         };
         let durable = async {
+            let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
+            Self::revalidate_exit_session(
+                &mut tx,
+                session_cookie,
+                &session,
+                &request.csrf_token,
+                false,
+            )
+            .await?;
             if let Some(prepared) = &prepared_exit {
                 Self::persist_prepared_facets(&mut tx, &prepared.facets).await?;
             }
@@ -158,84 +170,29 @@ impl PostgresState {
             .filter(|grant| grant.session_id == session.session_id)
             .cloned()
             .collect::<Vec<_>>();
-        let mut prepared = Vec::<(FacetHandle, crate::facet::PreparedFacetCheckpoint)>::new();
-        let mut exit_epoch = None;
-        if let Some(character_id) = session.selected_character_id {
-            let epoch = self
-                .next_transfer_epoch
-                .fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
-                    value.checked_add(1)
-                })
-                .map_err(|_| "character-exit epoch overflow".to_string())?;
-            exit_epoch = Some(epoch);
-            let rules_character_id = CharacterId::new(character_id.to_string());
-            {
-                let handle = self.world.handle.clone();
-                if let Err(error) = handle
-                    .prepare_character_exit(epoch, rules_character_id.clone())
+        tx.rollback().await.map_err(|error| error.to_string())?;
+        let prepared = match session.selected_character_id {
+            Some(character_id) => Some(
+                self.prepare_character_exit_candidate(character_id)
                     .await
-                {
-                    for (prepared_handle, _) in &prepared {
-                        let _ = prepared_handle.rollback_transfer(epoch).await;
-                    }
-                    return Err(format!(
-                        "expired-session facet preparation failed: {error:?}"
-                    ));
-                }
-                match handle.prepared_checkpoint(epoch).await {
-                    Ok(checkpoint) => prepared.push((handle, checkpoint)),
-                    Err(error) => {
-                        let _ = handle.rollback_transfer(epoch).await;
-                        for (prepared_handle, _) in &prepared {
-                            let _ = prepared_handle.rollback_transfer(epoch).await;
-                        }
-                        return Err(format!(
-                            "expired-session checkpoint preparation failed: {error:?}"
-                        ));
-                    }
-                }
-            }
-            prepared.sort_by_key(|(_, checkpoint)| checkpoint.facet_id);
-        }
-
+                    .map_err(|error| format!("expired-session preparation failed: {error:?}"))?,
+            ),
+            None => None,
+        };
         let durable = async {
-            for (_, checkpoint) in &prepared {
-                let row = sqlx::query(
-                    "SELECT facet_revision,last_server_sequence FROM tme.facets \
-                     WHERE facet_id=$1 FOR UPDATE",
-                )
-                .bind(checkpoint.facet_id.as_uuid())
-                .fetch_one(&mut *tx)
-                .await
+            let mut tx = serializable(self.store.pool()).await?;
+            let still_expired: bool = sqlx::query_scalar(
+                "SELECT revoked_at IS NULL AND \
+                 (idle_expires_at<=statement_timestamp() OR absolute_expires_at<=statement_timestamp()) \
+                 FROM tme.sessions WHERE session_id=$1 FOR UPDATE",
+            ).bind(session.session_id.as_uuid()).fetch_one(&mut *tx).await
                 .map_err(|error| error.to_string())?;
-                if checked_u64(
-                    row.try_get("facet_revision")
-                        .map_err(|error| error.to_string())?,
-                )? != checkpoint.before_revision
-                    || checked_u64(
-                        row.try_get("last_server_sequence")
-                            .map_err(|error| error.to_string())?,
-                    )? != checkpoint.server_sequence
-                {
-                    return Err("expired-session facet revision changed".to_string());
-                }
-                let updated = sqlx::query(
-                    "UPDATE tme.facets SET checkpoint_bytes=$2,checkpoint_sha256=$3, \
-                     facet_revision=$4,updated_at=statement_timestamp() WHERE facet_id=$1 \
-                     AND facet_revision=$5 AND last_server_sequence=$6",
-                )
-                .bind(checkpoint.facet_id.as_uuid())
-                .bind(checkpoint.checkpoint.as_bytes())
-                .bind(checkpoint.checkpoint.sha256().as_slice())
-                .bind(checked_i64(checkpoint.after_revision)?)
-                .bind(checked_i64(checkpoint.before_revision)?)
-                .bind(checked_i64(checkpoint.server_sequence)?)
-                .execute(&mut *tx)
-                .await
-                .map_err(|error| error.to_string())?;
-                if updated.rows_affected() != 1 {
-                    return Err("expired-session facet update lost its fence".to_string());
-                }
+            if !still_expired {
+                return Err("expired session changed during world preparation".to_string());
+            }
+            if let Some(prepared) = &prepared {
+                Self::persist_prepared_facets(&mut tx, &prepared.facets).await
+                    .map_err(|error| format!("expired-session persistence failed: {error:?}"))?;
             }
             sqlx::query(
                 "UPDATE tme.sessions SET revoked_at=statement_timestamp() WHERE session_id=$1",
@@ -293,10 +250,8 @@ impl PostgresState {
         }
         .await;
         if let Err(error) = durable {
-            if let Some(epoch) = exit_epoch {
-                for (handle, _) in &prepared {
-                    let _ = handle.rollback_transfer(epoch).await;
-                }
+            if let Some(prepared) = &prepared {
+                Self::rollback_character_exit(prepared.epoch, &prepared.facets).await;
             }
             return Err(error);
         }
@@ -318,19 +273,10 @@ impl PostgresState {
                 );
             }
         }
-        if let Some(epoch) = exit_epoch {
-            for (handle, _) in &prepared {
-                handle
-                    .commit_transfer(epoch)
-                    .await
-                    .map_err(|error| format!("expired-session commit failed: {error:?}"))?;
-            }
-            for (handle, _) in &prepared {
-                handle
-                    .publish_transfer(epoch)
-                    .await
-                    .map_err(|error| format!("expired-session publish failed: {error:?}"))?;
-            }
+        if let Some(prepared) = &prepared {
+            self.publish_character_exit(prepared)
+                .await
+                .map_err(|error| format!("expired-session publication failed: {error:?}"))?;
         }
         for revocation in revocations {
             revocation
