@@ -65,6 +65,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_capture_sidecar",
     ),
     "harness": (
+        "tests.test_development_deploy",
         "tests.test_live_proof_land",
         "tests.test_live_wire_client",
         "tests.test_live_proof_cooldowns",

@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 18
-status: Standing server contract; disconnected logout and shared exit transaction ordering repaired.
+revision: 19
+status: Standing server contract with an isolated private development deployment and offline contract identity.
 public_safe: true
-summary: Server composition, deadline scheduling, atomic session teardown, persistence, and external-boundary limits.
+summary: Server authority, private development deployment, storage identity, deadlines, teardown and external-boundary limits.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -80,6 +80,25 @@ wire entirely, both rejection codes that could only mean "you named the wrong
 world" (`RejectionCode::WrongFacet`, `PathPreviewRejectionCode::WrongFacet`) are
 gone, and the wire fixture corpus carries the retired shapes as *reject* cases so
 they cannot come back unnoticed.
+
+## Private development deployment
+
+[The development runbook](../deploy/development/README.md) owns the isolated
+shared-host setup. Dedicated user services, a separate PostgreSQL cluster,
+loopback listeners and an explicit development bootstrap keep it separate from
+other projects and from the production reference. The declared land supplies
+content; generated account bindings and the reproducible second-character test
+seed remain operator inputs outside the checkout.
+
+`tme-server contract versions` reports the built binary's checkpoint version,
+embedded migration checksums and wire versions without connecting to a database.
+Development releases record that identity with their file digests. Activation
+requires matching storage contracts and served content; world/storage migrations
+cannot enter through an ordinary binary swap.
+
+The installed-service proof is explicit because it can restart the persistent
+private world. The [execution receipt](plans/2026-09-05-private-play-loop.md)
+records two-client timing, reconnect/restart and fenced-restore evidence.
 
 ## Which world the one process serves
 

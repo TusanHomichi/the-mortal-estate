@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-05
-revision: 17
-status: Disconnected logout repair and authoritative diagnostic capture carried; preview remains scene 06. Follow-up receipt owns verification and delivery.
+revision: 18
+status: Private persistent deployment carried; authoritative browser controls are next. Preview remains scene 06.
 public_safe: true
 summary: Current source checkpoint, follow-up implementation receipt, owner pointers, historical genesis evidence, and open gates.
 ---
@@ -40,6 +40,11 @@ owner's and are numbered by the phase they guard.
   The [follow-up slice](2026-09-05-follow-up-closeout.md) repairs disconnected
   logout (#42) and restores authoritative diagnostic browser Workbench capture
   (#43); that receipt owns verification and delivery state.
+- **Private play loop:** the owner dispatched an isolated persistent development
+  server (#40), followed by browser controls in a separate PR. The
+  [execution receipt](2026-09-05-private-play-loop.md) owns observed deployment
+  and verification evidence; [server notes](../server-notes.md#private-development-deployment)
+  routes its operational contract.
 - **Start browser work:** [browser client](../browser-client.md) maps source,
   current behavior, limitations, and proof. Production wire integration,
   proportional chrome, and distance-matched animation remain unfinished.

@@ -11,6 +11,33 @@
 
 use std::process::Command;
 
+#[test]
+fn the_built_binary_reports_its_embedded_storage_and_wire_contracts_offline() {
+    let output = Command::new(env!("CARGO_BIN_EXE_tme-server"))
+        .args(["contract", "versions"])
+        .env_remove("DATABASE_URL")
+        .env_remove("CREDENTIALS_DIRECTORY")
+        .output()
+        .expect("the server binary runs");
+    assert!(output.status.success());
+    let document: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        document["storage"]["checkpoint"],
+        tme_rules::FACET_CHECKPOINT_SCHEMA_VERSION
+    );
+    assert_eq!(document["wire"]["minor"], tme_protocol::PROTOCOL_MINOR);
+    assert_eq!(
+        document["wire"]["control"],
+        tme_protocol::CONTROL_API_VERSION
+    );
+    assert!(
+        !document["storage"]["migrations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+}
+
 fn serve_without(variable: &str) -> String {
     let mut command = Command::new(env!("CARGO_BIN_EXE_tme-server"));
     command
