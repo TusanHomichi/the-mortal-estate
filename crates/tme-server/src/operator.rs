@@ -16,6 +16,22 @@ use crate::store::{AuditEvent, audit, serializable};
 
 pub async fn run(arguments: &[String]) -> Result<bool, String> {
     match arguments {
+        [contract, versions] if contract == "contract" && versions == "versions" => {
+            println!("{}", serde_json::json!({
+                "storage": {
+                    "checkpoint": tme_rules::FACET_CHECKPOINT_SCHEMA_VERSION,
+                    "migrations": migrations::MIGRATOR.iter()
+                        .filter(|migration| !migration.migration_type.is_down_migration())
+                        .map(|migration| serde_json::json!({
+                            "version": migration.version,
+                            "checksum": migration.checksum.as_ref(),
+                        })).collect::<Vec<_>>(),
+                },
+                "wire": {"major": wire::PROTOCOL_MAJOR, "minor": wire::PROTOCOL_MINOR,
+                         "control": wire::CONTROL_API_VERSION},
+            }));
+            Ok(true)
+        }
         [command] if command == "migrate" => {
             let pool = operator_pool().await?;
             migrations::migrate(&pool).await?;
@@ -52,7 +68,7 @@ pub async fn run(arguments: &[String]) -> Result<bool, String> {
             Ok(true)
         }
         [] => Ok(false),
-        _ => Err("usage: tme-server [migrate | bootstrap verify <path> | account create --username <name> --display-name <name> --compromised-passwords <path> | account set-password --username <name> --compromised-passwords <path> | store verify | store restore-fence --confirm-restored-database]".to_string()),
+        _ => Err("usage: tme-server [contract versions | migrate | bootstrap verify <path> | account create --username <name> --display-name <name> --compromised-passwords <path> | account set-password --username <name> --compromised-passwords <path> | store verify | store restore-fence --confirm-restored-database]".to_string()),
     }
 }
 

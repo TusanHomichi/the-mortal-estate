@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "world_document": "content/lands/identity-proof/world.json",
+  "ports": {"postgres": 55434, "server": 18741, "operations": 18742, "https": 18743}
+}
