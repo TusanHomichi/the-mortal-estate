@@ -360,6 +360,11 @@ pub(super) fn decode_strict<T: DeserializeOwned>(input: &[u8]) -> Result<T, Prot
 }
 
 pub(super) fn decode_control<T: DeserializeOwned>(input: &[u8]) -> Result<T, ProtocolError> {
+    // Serde can deserialize a struct from a positional array. Control documents
+    // are named-field JSON objects; that alternate representation is forbidden.
+    if input.iter().find(|byte| !byte.is_ascii_whitespace()) != Some(&b'{') {
+        return Err(ProtocolError::new("control document must be a JSON object"));
+    }
     decode_strict_with_limits(input, MAX_CONTROL_INPUT_BYTES, MAX_CONTROL_JSON_NESTING)
 }
 
