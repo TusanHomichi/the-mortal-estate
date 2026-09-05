@@ -60,6 +60,15 @@ normal hostname/certificate validation.
 
 Portable deployment tests cover host isolation, conflicting unit refusal,
 source-root refusal, release tampering (including extra files and symlinks),
-and backup mutation/storage drift. Full baseline and Git delivery are pending.
+and backup mutation/storage drift. Release activation, deliberate rollback and
+reactivation passed private readiness. The shared host retained its pre-existing
+listeners and active host nginx/PostgreSQL; the protected feel preview still
+responded with its authentication challenge.
+
+`python3 tools/run_verification.py --scope full --keep-going --report-disk`
+completed in 873.457 s with every selected step passing, using an independent
+scratch PostgreSQL cluster and the real private denylist. This includes the
+installed tests, native/WebAssembly corpus, PostgreSQL, trusted wire, both browser
+capture engines and clean-copy build/test proof. Git delivery is PR #46.
 Machine inventory, generated inputs and detailed receipts remain local; GitHub
 owns delivered revisions and issue closure state.
