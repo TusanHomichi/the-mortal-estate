@@ -1,8 +1,8 @@
 """The ordinary Workbench loop starts no processes.
 
-Only the compiler bridge may spawn a program. Structural import checks and a
+Only the compiler bridge and explicit browser producer may spawn programs. Structural import checks and a
 runtime subprocess tripwire protect selection, comments, staging, and retraction.
-Godot retirement removed fresh capture; existing capture selection stays cheap.
+Existing capture selection stays a file-reading operation.
 """
 
 from __future__ import annotations
@@ -24,10 +24,10 @@ from workbench.projection import DEFAULT_PROJECTION_PATH
 
 PACKAGE = TOOLS / "workbench"
 
-#: The compiler bridge is the only module allowed to start a program.
+#: The compiler bridge and explicit browser producer own expensive operations.
 #: Everything else is the ordinary path.
 BRIDGE_MODULE = "bridge.py"
-EXPENSIVE_MODULES = (BRIDGE_MODULE,)
+EXPENSIVE_MODULES = (BRIDGE_MODULE, "capture_producer.py")
 
 #: Anything that can start another program, directly or by proxy.
 FORBIDDEN_IMPORTS = {
@@ -196,7 +196,7 @@ class TheSelectionPathStartsNothing(unittest.TestCase):
             with self.subTest(module=path.name):
                 for name in imported_names(tree(path)):
                     root = name.split(".")[0]
-                    if root in ("workbench", ""):
+                    if root in ("workbench", "") or (path.name == "capture_producer.py" and root in ("live_server_harness", "live_wire_client", "run_production_smoke")):
                         continue
                     self.assertIn(
                         root,
@@ -312,11 +312,11 @@ class TheOrdinaryRoutesTouchNothing(StagedTree):
         with urllib.request.urlopen(request, timeout=10) as response:
             return json.loads(response.read())
 
-    def test_retired_fresh_capture_route_is_refused(self) -> None:
+    def test_unconfigured_fresh_capture_is_unavailable(self) -> None:
         with self.assertRaises(urllib.error.HTTPError) as caught:
             self.post("/api/capture", {})
         self.addCleanup(caught.exception.close)
-        self.assertEqual(caught.exception.code, 404)
+        self.assertEqual(caught.exception.code, 503)
 
     def test_no_ordinary_route_starts_a_program(self) -> None:
         self.get("/api/state")
@@ -384,7 +384,8 @@ class TheBrowserSideStartsNothingEither(unittest.TestCase):
         self.assertIn("LOGICAL VIEW", markup)
         self.assertIn("not a gameplay preview", markup)
         self.assertIn("CAPTURE VIEW", markup)
-        self.assertIn("real client frame", markup)
+        self.assertIn("recorded browser frame", markup)
+        self.assertIn("diagnostic squares and observed occupants", markup)
 
     def test_the_page_asks_the_server_what_a_gesture_means(self) -> None:
         """Agent parity is a law: one resolver, and it is not in the browser.

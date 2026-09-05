@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 3
-status: Standing verification usage for Rust, browser, Python wire observation, and retained capture correspondence.
+revision: 4
+status: Standing verification usage including native/WebAssembly protocol proof and gated authoritative browser capture.
 public_safe: true
-summary: Verification commands, lane selection, capabilities, exit codes, and on-demand proof; the runner owns the step table.
+summary: Lane usage, capabilities, shared native/browser codec proof, gated capture, exit codes, and local evidence.
 routes:
   - tools/run_verification.py
   - tools/verification/**
@@ -11,6 +11,8 @@ routes:
   - tools/run_clean_clone_proof.py
   - tools/run_server_live_proof.py
   - tools/live_wire_client.py
+  - tools/logout_proof.py
+  - tools/run_browser_capture_proof.py
   - tools/run_presentation_adoption_recording.py
   - tests/test_verification_*.py
   - tests/test_ci_workflow.py
@@ -83,6 +85,7 @@ private denylist. It is a stated limit, not a skip.
 
 | Capability | Supplied by |
 | --- | --- |
+| `browsers` | installed Playwright Chromium and Firefox; the actual capture still probes and requires working WebGL2 renderers |
 | `node` | a `node` on `PATH` whose major version is 22 or later, plus `npm` — asked, never assumed. Absent, the `web` lane is `UNAVAILABLE` |
 | `postgres` | `TME_PG_ADMIN_URL_FILE`, naming a readable file holding a superuser URL used only to create and drop scratch databases, plus `psql` |
 | `private-terms` | the private file resolved by `tools/boundary_common.py` (this checkout first, then its main checkout for a linked worktree). Absent, the banned-terms check **degrades** onto the tracked synthetic fixture: the mechanism still runs and still must pass, and the run says the real denylist was not proven |
@@ -124,8 +127,12 @@ HTTPS/WebSocket. It needs a running deployment and is not part of any lane.
 
 ## Browser evidence
 
-The standing `web` lane proves install, typecheck, unit tests, and build. It
-does not claim a real-tab capture or visual acceptance. Candidate-packet
+The standing `web` lane proves install, typecheck, unit tests, and build. Its
+tests rebuild the Rust WebAssembly codec and consume the shared wire corpus.
+The gated browser capture proof additionally exercises both real browser
+engines through native WSS, exact replay, GPU/raycast correspondence, and the
+Workbench HTTP operation. It requires PostgreSQL and both installed browsers;
+missing capabilities are unavailable. Neither lane grants visual acceptance. Candidate-packet
 walk and screenshot commands, and their external inputs, are documented in
 [browser client](browser-client.md#operation-and-proof).
 

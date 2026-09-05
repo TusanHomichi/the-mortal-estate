@@ -16,8 +16,8 @@ produces it.
 
 **Authoring operations run the compiler only when asked.** Selection over the
 logical projection or an existing capture reads files and starts no program.
-Fresh rendered capture belongs to the browser integration; this server does
-not carry a renderer launcher.
+Only the explicit capture route invokes the browser producer; no ordinary
+selection, image read, comment, or staging operation invokes it.
 """
 
 from __future__ import annotations
@@ -29,6 +29,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from ipaddress import ip_address
 from pathlib import Path
+import os
 from urllib.parse import parse_qs
 
 if __package__ in (None, ""):
@@ -38,6 +39,7 @@ from workbench import VERSION  # noqa: E402
 from workbench import apply as apply_module  # noqa: E402
 from workbench import bridge  # noqa: E402
 from workbench import capture as capture_reader  # noqa: E402
+from workbench import capture_producer  # noqa: E402
 from workbench import imageops  # noqa: E402
 from workbench import operations as operation_log  # noqa: E402
 from workbench import replay as replay_module  # noqa: E402
@@ -55,6 +57,7 @@ from workbench.packet import (  # noqa: E402
 from workbench.projection import (  # noqa: E402
     DEFAULT_PROJECTION_PATH,
     ProjectionUnavailable,
+    Source,
     StaleSelection,
     WorkbenchError,
     load,
@@ -105,11 +108,13 @@ _SERVED_ASSET_VERBS = ("edit_region",)
 class Workbench:
     """Everything one running Workbench holds. No mutable world state."""
 
-    def __init__(self, root: Path, projection_path: str, session_id: str | None) -> None:
+    def __init__(self, root: Path, projection_path: str, session_id: str | None,
+                 capture_configuration: dict | None = None) -> None:
         self.root = Path(root).resolve()
         self.projection = load(self.root, projection_path)
         self.session = open_session(self.projection, session_id)
         self.captures: dict[str, capture_reader.Capture] = {}
+        self.capture_configuration = capture_configuration
         # The candidate the last preview produced, if there is one. Derived
         # state, replaced whole by the next preview and never persisted here:
         # the LOG is what a session keeps, and the candidate is a function of it.
@@ -132,18 +137,31 @@ class Workbench:
         directory = self.session.directory / capture_reader.CAPTURES_DIR
         if not directory.is_dir():
             return
-        for child in sorted(directory.glob("cap-*")):
+        for child in sorted([*directory.glob("cap-*"), *directory.glob("batch-*/*/live"), *directory.glob("batch-*/*/replay")]):
+            identifier = "-".join(child.relative_to(directory).parts)
             try:
                 taken = capture_reader.load(self.root, child)
                 capture_reader.bind(self.projection, taken)
             except WorkbenchError as error:
-                self.broken_captures[child.name] = str(error)
+                self.broken_captures[identifier] = str(error)
                 continue
-            self.captures[child.name] = taken
+            self.captures[identifier] = taken
+
+    def capture_id(self, taken: capture_reader.Capture) -> str:
+        return "-".join(taken.directory.relative_to(self.session.directory / capture_reader.CAPTURES_DIR).parts)
+
+    def take_capture(self) -> list[dict]:
+        if self.capture_configuration is None:
+            raise capture_reader.CaptureUnavailable("start Workbench with --capture-world or --capture-replay to configure browser capture")
+        paths = capture_producer.produce(self.projection, self.session.directory / capture_reader.CAPTURES_DIR,
+                                         **self.capture_configuration)
+        self.check()
+        self._reload_captures()
+        return [self.capture_summary(taken) for taken in self.captures.values() if taken.directory in paths]
 
     def capture(self, identifier: str) -> capture_reader.Capture:
         try:
-            return self.captures[identifier]
+            taken = self.captures[identifier]
         except KeyError:
             raise WorkbenchError(
                 f"this session holds no capture {identifier!r}"
@@ -153,10 +171,12 @@ class Workbench:
                     else ""
                 )
             ) from None
+        verify(self.root, [Source.from_record(record) for record in taken.source_records(self.root)])
+        return taken
 
     def capture_summary(self, taken: capture_reader.Capture) -> dict:
         return {
-            "capture_id": Path(taken.directory).name,
+            "capture_id": self.capture_id(taken),
             "directory": taken.relative,
             "image": taken.relative_path(self.root, capture_reader.IMAGE_NAME),
             "member": taken.level,
@@ -190,6 +210,7 @@ class Workbench:
                 for identifier in sorted(self.captures)
             ],
             "broken_captures": dict(sorted(self.broken_captures.items())),
+            "capture_available": self.capture_configuration is not None,
         }
 
 
@@ -289,6 +310,10 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, self._resolve_capture_gesture(body))
             elif path == "/api/capture/selection":
                 self._json(HTTPStatus.CREATED, self._record_capture(body))
+            elif path == "/api/capture":
+                if body:
+                    raise WorkbenchError("capture uses only the producer configured at startup")
+                self._json(HTTPStatus.CREATED, {"captures": self.workbench.take_capture()})
             elif path == "/api/stage":
                 self._json(HTTPStatus.CREATED, self._stage(body))
             elif path == "/api/retract":
@@ -365,7 +390,7 @@ class Handler(BaseHTTPRequestHandler):
         return {
             "member": member.member,
             "gesture": selection["gesture"],
-            "capture_id": Path(taken.directory).name,
+            "capture_id": self.workbench.capture_id(taken),
             "observed": selection["observed"],
             **resolve(member, selection["cells"]),
         }
@@ -537,9 +562,10 @@ class Handler(BaseHTTPRequestHandler):
         return {"packet": packet, "session_directory": session.relative}
 
 
-def serve(root: Path, projection_path: str, host: str, port: int, session_id: str | None) -> int:
+def serve(root: Path, projection_path: str, host: str, port: int, session_id: str | None,
+          capture_configuration: dict | None = None) -> int:
     try:
-        workbench = Workbench(root, projection_path, session_id)
+        workbench = Workbench(root, projection_path, session_id, capture_configuration)
     except ProjectionUnavailable as error:
         print(f"UNSERVABLE: {error}", file=sys.stderr)
         return EXIT_UNSERVABLE
@@ -574,6 +600,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--host", default=DEFAULT_HOST, help="loopback address to bind")
     parser.add_argument("--port", type=int, default=8730, help="0 picks a free port")
     parser.add_argument("--session", default=None, help="session id (default: a new one)")
+    capture_source = parser.add_mutually_exclusive_group()
+    capture_source.add_argument("--capture-world", help="served-world document for scratch authoritative browser capture")
+    capture_source.add_argument("--capture-replay", type=Path, help="existing browser capture directory to replay")
+    parser.add_argument("--admin-url-file", default=os.environ.get("TME_PG_ADMIN_URL_FILE"))
     arguments = parser.parse_args(argv)
     root = Path(arguments.root) if arguments.root else Path(__file__).resolve().parents[2]
     try:
@@ -583,7 +613,11 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError:
         print("UNSERVABLE: --host must be a loopback address literal", file=sys.stderr)
         return EXIT_UNSERVABLE
-    return serve(root, arguments.projection, arguments.host, arguments.port, arguments.session)
+    configuration = None
+    if arguments.capture_world or arguments.capture_replay:
+        configuration = {"world_document": arguments.capture_world, "replay_directory": arguments.capture_replay,
+                         "admin_url_file": arguments.admin_url_file}
+    return serve(root, arguments.projection, arguments.host, arguments.port, arguments.session, configuration)
 
 
 if __name__ == "__main__":

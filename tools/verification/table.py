@@ -270,6 +270,14 @@ _STATIC: tuple[Step, ...] = (
         timeout=1800.0,
     ),
     Step(
+        key="gated.browser_capture",
+        owner="gated",
+        label="browser: authoritative Workbench capture, native WSS, replay and pointer correspondence",
+        argv=("python3", "tools/run_browser_capture_proof.py", "--admin-url-file", "$TME_PG_ADMIN_URL_FILE"),
+        requires=("postgres", "node", "browsers"),
+        timeout=1800.0,
+    ),
+    Step(
         key="capture.browser",
         owner="capture",
         label="browser: two-engine movement and scene capture",

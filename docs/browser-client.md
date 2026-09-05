@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 2
-status: Local browser feel implementation; private scene 06 deployed. Godot retired; production browser integration and visual acceptance remain open.
+revision: 3
+status: Local feel preview plus authoritative diagnostic browser capture; production gameplay integration and visual acceptance remain open.
 public_safe: true
-summary: Browser source map, local movement and cursor behavior, packet rendering contracts, operation, and two-engine proof.
+summary: Local feel implementation, authoritative diagnostic capture, source map, operation, and two-engine proof.
 routes:
   - web/**
 ---
@@ -11,8 +11,9 @@ routes:
 # Browser client
 
 The browser is the active feel surface. It loads an external candidate packet
-into Three.js and runs local movement experiments. It does not authenticate,
-consume the authoritative wire, or implement production gameplay legality.
+into Three.js and runs local movement experiments. The feel scene does not authenticate or implement production gameplay legality.
+A separate read-only diagnostic observer consumes the authoritative wire for
+Workbench capture; it does not change the candidate preview.
 [Client architecture](client-architecture.md) owns the client contract;
 [presentation direction](presentation-direction.md) owns the visual target;
 [Server notes](server-notes.md) owns server implementation and the direct wire proof. Use the [checkpoint](plans/genesis-ledger.md#current-checkpoint-2026-09-05)
@@ -22,6 +23,7 @@ for deployment and work status.
 
 | Work | Start here | Proof |
 | --- | --- | --- |
+| Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
 | Startup and packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
 | Movement, pointing, cooldown | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
 | Scene assembly and lighting | `web/src/space/SpaceScene.ts`, `palette.ts`, `cardLighting.ts` | geometry, palette, lighting tests and real-tab captures |
@@ -31,6 +33,45 @@ for deployment and work status.
 
 Paths in a row share the first path's directory unless written in full.
 The standing TypeScript check rejects unused imports, locals, and parameters.
+
+## Authoritative diagnostic capture
+
+`crates/tme-protocol/src/codec.rs` owns decoding and semantic validation.
+Its instance-local WebAssembly byte interface is built from carried source by
+`web/proof/build-codec.mjs`; the toolchain declares the WebAssembly target.
+The browser test command rebuilds it before running the shared corpus. No
+ignored binary or copied TypeScript schema supplies protocol authority.
+
+`observer.ts` owns the read-only native WSS connection and strict frame
+replacement. It receives a one-use ticket from the local harness, sends the
+current hello, accepts a welcome before updates, and rejects regressed or
+conflicting state. Counters remain decimal strings. Disconnect clears authority;
+replay starts a fresh recording generation. Recording is bounded to 256 accepted
+frames and refuses overflow. No cookie or password enters the page.
+
+`targets.ts` maps actual observer rows to diagnostic squares and occupant
+markers. `renderer.ts` uses Three.js meshes for color, a GPU identity pass, and
+raycast targets. Terrain hues and cell shading are diagnostic; they confer no
+art acceptance or gameplay meaning. Capture copies its frame, image, identity
+pixels, camera, and target list synchronously before asynchronous hashing.
+
+`web/proof/authoritative-capture.mjs` exercises live welcome/update and exact
+replay in Chromium and Firefox. It checks raster samples against raycasts,
+drives actual pointer events, and compares image/identity/recording bytes plus
+sidecar frame facts across replay. The proof page uses the scratch server's
+origin and native WSS. Certificate errors are allowed only in its disposable
+scratch profile; production certificate verification remains unproven in the
+browser. The Python control adapter verifies the scratch CA normally.
+
+The [Workbench capture operation](workbench-v0.md#the-capture-path) owns
+configuration, source binding, and atomic publication. Run the complete proof:
+
+```bash
+python3 tools/run_browser_capture_proof.py --admin-url-file <file> --output <external-directory>
+```
+
+This implements authoritative diagnostic capture, not production login,
+command reconciliation, candidate artwork integration, or a preview deployment.
 
 ## Movement and availability
 

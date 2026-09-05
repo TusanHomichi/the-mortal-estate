@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 17
-status: Standing server contract, individual deadlines, Python wire proof, and an open disconnected-logout finding.
+revision: 18
+status: Standing server contract; disconnected logout and shared exit transaction ordering repaired.
 public_safe: true
-summary: Server composition, individual deadlines, persistence, deployment reference, and external-boundary limits.
+summary: Server composition, deadline scheduling, atomic session teardown, persistence, and external-boundary limits.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -117,20 +117,29 @@ loads the compiled authoring fixture and records an authoritative frame through
 `tools/live_wire_client.py`. Neither the recording nor the fixture acquires
 production content authority.
 
-### Open logout finding (September 5 audit)
+### Logout and disconnect ordering
 
 Tracked as [issue #42](https://github.com/TusanHomichi/the-mortal-estate/issues/42).
 
-Closing the gameplay socket before HTTP logout returned 503 in two live scratch
-server runs, including one that waited for the WebSocket close handshake.
-Logging out with the socket still connected passed. The cause is unresolved;
-the wire observer uses normal session logout followed by transport cleanup.
+The defect was a serializable snapshot opened during authentication, before a
+queued disconnect committed its presence checkpoint. Reading the prepared
+checkpoint's newer row then failed with PostgreSQL SQLSTATE `40001`.
 
-**Owner:** server session/grant teardown (`crates/tme-server/src/postgres/session_end.rs`).
-**Required proof:** reproduce disconnect-then-logout with retained server logs,
-fix the responsible transition, and prove both connected and disconnected logout
-return 204 and revoke the old cookie. Evidence is indexed in the
-[local audit receipt](plans/2026-09-05-code-and-context-audit.md).
+Logout now authenticates in a short transaction, prepares the serialized world,
+and opens its durable transaction only after preparation has frozen that world.
+It rechecks the active session, selected character, and CSRF token in the
+transaction that writes revocation, unused-ticket deletion, epoch fencing, and
+the world checkpoint. Preparation is rolled back on any pre-commit failure;
+publication still follows the durable commit. There is no retry path.
+Character replacement and session expiry use the same preparation-before-snapshot
+ordering; expiry also shares the character-exit persistence/publication helpers.
+
+`tools/logout_proof.py`, called by the gated server live proof, verifies a
+completed disconnect and forces the failing overlap using a PostgreSQL session
+row lock. The waiter and durable revision establish the ordering. Both return
+204, revoke the old cookie, and remove an unused ticket; connected logout remains
+covered by the same live proof. The [follow-up receipt](plans/2026-09-05-follow-up-closeout.md)
+records before/after evidence.
 
 ## The line a scaling change may not cross
 

@@ -122,6 +122,8 @@ def parse_artifacts(raw: str) -> tuple[TestTarget, ...]:
         if not isinstance(target, dict) or not isinstance(manifest, str):
             raise RustTestError(f"cargo artifact line {number} lacks target identity")
         kinds = [kind for kind in target.get("kind", []) if kind in _SELECTOR]
+        if not kinds and set(target.get("kind", [])) <= {"rlib", "cdylib"} and target.get("kind"):
+            kinds = ["lib"]
         name = target.get("name")
         if not kinds or not isinstance(name, str):
             raise RustTestError(

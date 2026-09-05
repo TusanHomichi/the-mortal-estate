@@ -1,6 +1,27 @@
 use super::*;
 
 impl PostgresState {
+    /// Recheck authorization in the snapshot that will commit the prepared world.
+    pub(super) async fn revalidate_exit_session(
+        tx: &mut Transaction<'_, Postgres>,
+        cookie: &str,
+        expected: &SessionRow,
+        csrf: &wire::CsrfToken,
+        refresh: bool,
+    ) -> Result<(), SessionError> {
+        let current = active_session(tx, cookie, refresh)
+            .await?
+            .ok_or(SessionError::AuthenticationRequired)?;
+        validate_csrf(current.csrf_digest, csrf)?;
+        if current.session_id != expected.session_id
+            || current.account_id != expected.account_id
+            || current.selected_character_id != expected.selected_character_id
+        {
+            return Err(SessionError::Unavailable);
+        }
+        Ok(())
+    }
+
     /// Builds the candidate engine carrying every consequence this returning
     /// killer owes, and hands back the checkpoint plus the per-kill
     /// `linked_karma_added` the rules produced. Nothing is durable yet; the
@@ -86,7 +107,11 @@ impl PostgresState {
             .bind(checkpoint.facet_id.as_uuid())
             .fetch_one(&mut **tx)
             .await
-            .map_err(unavailable)?;
+            .map_err(|error| {
+                tracing::error!(sqlstate = ?error.as_database_error().and_then(|db| db.code()),
+                    "character-exit checkpoint read failed");
+                unavailable(error)
+            })?;
             if checked_u64(row.try_get("facet_revision").map_err(unavailable)?)
                 .map_err(unavailable)?
                 != checkpoint.before_revision
@@ -94,6 +119,7 @@ impl PostgresState {
                     .map_err(unavailable)?
                     != checkpoint.server_sequence
             {
+                tracing::error!("character-exit checkpoint fence differs from durable world");
                 return Err(SessionError::Unavailable);
             }
             let updated = sqlx::query(
@@ -168,11 +194,24 @@ impl PostgresState {
                 .ok()
                 .and_then(|live| live.active_grants.get(&replaced).cloned())
         });
+        tx.rollback().await.map_err(unavailable)?;
         let prepared_exit = match replacing_character {
             Some(replaced) => Some(self.prepare_character_exit_candidate(replaced).await?),
             None => None,
         };
         let durable = async {
+            let mut tx = serializable(self.store.pool()).await.map_err(unavailable)?;
+            Self::revalidate_exit_session(
+                &mut tx,
+                session_cookie,
+                &session,
+                &request.csrf_token,
+                true,
+            )
+            .await?;
+            character_for_account(&mut tx, request.character_id, session.account_id)
+                .await?
+                .ok_or(SessionError::CharacterNotOwned)?;
             if let (Some(replaced), Some(prepared)) = (replacing_character, &prepared_exit) {
                 Self::persist_prepared_facets(&mut tx, &prepared.facets).await?;
                 sqlx::query(

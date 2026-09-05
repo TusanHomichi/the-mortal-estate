@@ -13,7 +13,7 @@ list, it is the target list.
 
 These retained fixtures prove correspondence within their recorded files. A
 fresh browser producer must separately prove that its identity targets match
-its own hit testing; that integration is still open in docs/workbench-v0.md.
+its own hit testing; tools/run_browser_capture_proof.py exercises that surface.
 """
 
 from __future__ import annotations
@@ -23,6 +23,9 @@ import unittest
 
 from workbench_test_support import (
     FIXTURE_ROUTE,
+    BOUND_FILES,
+    CAPTURE_FILES,
+    StagedTree,
     LIVE_ROUTE,
     REPO_ROOT,
     fixture_route_capture,
@@ -31,7 +34,7 @@ from workbench_test_support import (
 )
 
 from workbench import capture as capture_reader
-from workbench.projection import WorkbenchError
+from workbench.projection import WorkbenchError, StaleSelection, digest_bytes
 
 
 def rebuild_raster(taken) -> bytes:
@@ -230,6 +233,65 @@ class ABrokenCaptureIsRefusedRatherThanRead(unittest.TestCase):
     def test_something_that_is_not_a_png_is_refused(self) -> None:
         with self.assertRaises(WorkbenchError):
             capture_reader.png_size(b"not a picture at all, not even close to one")
+
+
+class BrowserAuthorityBinding(StagedTree):
+    """Digest mutations over synthetic metadata; actual rendering has live proof."""
+    staged_files = BOUND_FILES + CAPTURE_FILES
+
+    def setUp(self):
+        super().setUp()
+        self.projection = self.staged_projection()
+        self.directory = self.staged / FIXTURE_ROUTE
+        self.sidecar_path = self.directory / "capture.sidecar.json"
+        self.sidecar = json.loads(self.sidecar_path.read_bytes())
+        frame = recorded_frame()["frame"]
+        envelope = {"kind": "server_welcome", "server_sequence": "5", "world_revision": "7", "frame": frame}
+        encoded = json.dumps(envelope, separators=(",", ":"), ensure_ascii=False)
+        recording = json.dumps({"schema_version": 1, "kind": "browser_observer_recording", "envelopes": [encoded]}).encode()
+        (self.directory / "capture.frame.json").write_bytes(recording)
+        self.sidecar.update(producer="browser_authoritative_view", frame_generation=1,
+            scene={"realm": frame["observation_center"]["realm"], "level": frame["observation_center"]["level"],
+                   "logical_time": frame["logical_time"], "observation_center": frame["observation_center"]["position"]},
+            authority={"path": "capture.frame.json", "sha256": digest_bytes(recording), "envelope_sha256": digest_bytes(encoded.encode()),
+                       "server_sequence": "5", "world_revision": "7", "sources": self.projection.source_records()})
+        self.write_sidecar()
+
+    def write_sidecar(self):
+        self.sidecar_path.write_text(json.dumps(self.sidecar))
+
+    def test_the_recording_is_a_separately_bound_capture_source(self):
+        taken = capture_reader.load(self.staged, self.directory)
+        capture_reader.bind(self.projection, taken)
+        self.assertEqual(taken.source_records(self.staged)[-1]["role"], "capture_frame")
+
+    def test_changed_recording_and_absent_authority_are_refused(self):
+        recording = self.directory / "capture.frame.json"
+        recording.write_bytes(recording.read_bytes() + b"\n")
+        with self.assertRaisesRegex(WorkbenchError, "recording digest"):
+            capture_reader.load(self.staged, self.directory)
+        del self.sidecar["authority"]
+        self.write_sidecar()
+        with self.assertRaises(WorkbenchError):
+            capture_reader.load(self.staged, self.directory)
+
+    def test_frame_generation_and_scene_cannot_disagree_with_the_recording(self):
+        for mutate in (lambda: self.sidecar.update(frame_generation=2),
+                       lambda: self.sidecar["scene"].update(logical_time="0")):
+            original = json.loads(json.dumps(self.sidecar))
+            mutate(); self.write_sidecar()
+            with self.assertRaises(WorkbenchError):
+                capture_reader.load(self.staged, self.directory)
+            self.sidecar = original
+
+    def test_changed_compiler_source_and_cached_capture_fail_closed(self):
+        taken = capture_reader.load(self.staged, self.directory)
+        self.corrupt(BOUND_FILES[0])
+        with self.assertRaises(StaleSelection):
+            capture_reader.load(self.staged, self.directory)
+        self.sidecar_path.write_bytes(self.sidecar_path.read_bytes() + b"\n")
+        with self.assertRaises(StaleSelection):
+            capture_reader.select(self.projection, taken, "click", {"point": taken.targets[0]["anchor"]})
 
 
 if __name__ == "__main__":

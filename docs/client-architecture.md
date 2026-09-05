@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-05
-revision: 11
-status: Three.js is the sole client runtime; owner retired Godot on September 5. Server integration contracts remain targets until implemented in the browser.
+revision: 12
+status: Three.js browser runtime with a Rust WebAssembly codec and read-only authoritative capture; production control UI remains open.
 public_safe: true
-summary: Browser client authority, state and protocol contracts, credentials, input/accessibility, desktop targets, and proof boundaries.
+summary: Browser authority, shared Rust WebAssembly decoding, state domains, renderer identity, production integration targets, and proof limits.
 routes:
   - web/**
   - crates/tme-protocol/**
@@ -18,7 +18,8 @@ hold whatever the client looks like.
 [Browser client](browser-client.md) owns current implementation and operation;
 [presentation direction](presentation-direction.md) owns the visual target.
 The owner retired Godot on September 5. The browser is the sole client runtime;
-its authoritative server integration and production UI are still unimplemented.
+a read-only authoritative browser observer now supplies diagnostic Workbench
+capture. Production control/UI integration remains unimplemented.
 Contracts below describe obligations, not claims of completed browser features.
 
 ## Authority
@@ -64,11 +65,12 @@ Its baseline:
 - **No other runtime dependency without a decision** that owns it, with the
   same licensing, maintenance, and proof obligations. A rendering-backend change (WebGPU) is a contract change, not a
   drift.
-- The wire codec's intended route is **no mirror at all**: `crates/tme-protocol`
+- The wire codec uses **no mirror at all**: `crates/tme-protocol`
   compiled to WebAssembly and called from TypeScript, so the schema authority
-  is consumed rather than re-implemented. Until that lands, the web client
-  carries no wire consumption, and any interim TypeScript codec is a verified
-  mirror proven against `tests/fixtures/wire/` when that implementation is introduced.
+  is consumed rather than re-implemented. This is implemented for the diagnostic
+  observer through `web/src/authoritative/codec.ts`. Both native and WebAssembly
+  decoders execute the complete shared corpus in `tests/fixtures/wire/`. The
+  page sees decoded objects only after strict Rust validation.
 - The accepted layout and display-scaling target is owned by
   [presentation direction](presentation-direction.md#proportional-scaling);
   [browser client](browser-client.md) separates that target
@@ -157,8 +159,8 @@ subprotocol `tme.v1`. It obtains a one-use ticket, opens WSS with the configured
 `Origin` and that exact subprotocol, sends `client_hello`, and accepts
 `server_welcome` only after exact version validation.
 
-The browser codec must consume the Rust schema authority or prove a strict
-mirror against the shared corpus:
+The browser codec consumes the Rust schema authority through WebAssembly,
+with both targets proven against the shared corpus:
 
 1. Before any dictionary access, raw input is rejected for byte or nesting-depth
    overflow, invalid UTF-8, duplicate keys, and malformed JSON.
@@ -172,7 +174,7 @@ never pass through a float.** The shared conformance corpus covers the boundary
 values where a double silently loses precision — 2^53−1, 2^53, 2^53+1, and
 `i64::MAX` — plus negative and out-of-range spellings at the applicable type
 boundary. `tests/fixtures/wire/` remains one shared positive/negative corpus.
-Rust consumes it today; the browser codec must consume it directly when added.
+The native and browser WebAssembly decoder tests consume that corpus directly.
 
 **No fallback parser, ignored-field mode, alias, or previous-version path exists**
 before the external boundary activates. Retired envelope shapes are carried in the
@@ -239,9 +241,12 @@ Four architectural rules bind any implementation:
    It never owns readiness, never anticipates acceptance, and never lets
    a bounded animation change which square a thing is on.
 
-Authoritative browser capture must add matching color, identity raster, and
-sidecar output for [Workbench addressing](workbench-v0.md#what-a-capture-is).
-The current candidate-packet screenshot proof does not meet that integration obligation.
+The diagnostic authoritative renderer supplies matching color, identity raster,
+and sidecar output for [Workbench addressing](workbench-v0.md#what-a-capture-is).
+Its neutral target owner uses observer rows; the same meshes supply the image,
+GPU identity pass, and raycast pointer targets. It draws no candidate artwork
+and implements no gameplay controls. The candidate-packet feel scene remains
+a separate local experiment awaiting production authoritative integration.
 
 ## Input and the accessibility floor
 
@@ -286,10 +291,10 @@ Production packaging must exclude proof fixtures, test code, and private packets
 | --- | --- | --- |
 | `web` verification lane | Typecheck, browser unit tests, build | Synthetic inputs; no live server |
 | Two-engine walk proof | Real Three.js movement, cursor, facing, portals and rendering | Candidate packet; no authoritative wire |
-| Rust protocol corpus | Current and refused wire formats | Browser codec is still to be implemented |
+| Native and WebAssembly protocol corpus | Current and refused wire formats through the same Rust codec | No production control UI |
 | `tools/run_server_live_proof.py` | Real TLS sign-in, admission, land, individual cooldowns, reconnect, logout | Python wire observer; no rendered browser claim |
 | PostgreSQL gated suite | Durable server, session, restart, and recovery invariants | Requires a scratch database administrator |
-| Recorded Workbench captures | Digest/raster/selection correspondence | Historical images; no fresh renderer claim |
+| `tools/run_browser_capture_proof.py` | Native WSS, live/replay browser images, raster/pointer identity, source binding and Workbench HTTP selection in both engines | Diagnostic renderer; scratch TLS certificate errors permitted only in ephemeral proof profiles |
 
 Production browser integration needs end-to-end tests through shipped UI and
 transport wiring. A server wire proof cannot stand in for that. Tauri targets

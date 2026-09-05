@@ -38,7 +38,7 @@
  *   gestures.js    a gesture, from the mouse button to the written packet
  */
 
-import { readProjection, readState, refuse } from "./api.js";
+import { readProjection, readState, refuse, takeCapture } from "./api.js";
 import { installApply } from "./apply.js";
 import { installGestures, record } from "./gestures.js";
 import { clearSelection } from "./identities.js";
@@ -84,6 +84,28 @@ document.getElementById("record").addEventListener("click", () => {
   record().catch(() => {});
 });
 
+
+document.getElementById("take-capture").addEventListener("click", async () => {
+  if (state.captureInProgress) return;
+  state.captureInProgress = true;
+  const button = document.getElementById("take-capture");
+  const status = document.getElementById("capture-status");
+  const began = performance.now();
+  button.disabled = true;
+  button.textContent = "Capturing both browsers…";
+  status.textContent = "";
+  try {
+    const result = await takeCapture();
+    await refreshSession(null);
+    await setView("capture");
+    status.textContent = `${result.captures.length} captures in ${((performance.now() - began) / 1000).toFixed(1)} s`;
+  } catch (error) { refuse({ error: "capture", detail: String(error) }); }
+  finally {
+    state.captureInProgress = false;
+    button.textContent = "Capture browser frame";
+    button.disabled = !state.captureAvailable;
+  }
+});
 
 /* ------------------------------------------------------------------- boot */
 

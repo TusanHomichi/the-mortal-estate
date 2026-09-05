@@ -611,3 +611,8 @@ mod actions;
 pub use actions::*;
 mod envelopes;
 pub use envelopes::*;
+
+mod codec;
+pub use codec::decode_document;
+#[cfg(target_arch = "wasm32")]
+mod wasm;
