@@ -48,4 +48,3 @@ export function makeSoleTexture(kind: "draft" | "committed"): CanvasTexture {
   texture.needsUpdate = true;
   return texture;
 }
-
