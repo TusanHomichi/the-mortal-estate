@@ -7,6 +7,7 @@ pub mod boundary;
 pub mod catalog;
 pub mod characters;
 pub mod combat;
+pub mod creation;
 pub mod creatures;
 pub mod items;
 pub mod npcs;
@@ -55,6 +56,7 @@ pub use combat::{
     CombatHitRulesDef, CombatJumpkickRulesDef, CombatKickRulesDef, CombatPracticeRulesDef,
     CombatRulesDef, CombatTuningStatusDef, CombatWoundRulesDef,
 };
+pub use creation::CharacterCreationProfileDef;
 pub use creatures::{
     ActorDefinitionDef, EcologyKindDef, EcologySiteDef, EcologySiteSourceDef, LairDefinitionDef,
     LootChoiceMemberDef, LootEntryDef, LootTableDef, LootTableFamilyDef,

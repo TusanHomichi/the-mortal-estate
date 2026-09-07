@@ -1,3 +1,4 @@
+import type { CameraView } from "./camera";
 import { decodeStructures } from "./space/structures";
 import type { FigureFacing } from "./walk/facing";
 import {
@@ -37,7 +38,7 @@ interface FogOverlay {
 }
 
 interface FeelDevHook {
-  wallRunPlasterOpacity(runIndex: number): number | null;
+  surfaceFades(): { name: string; id: number; opacity: number }[];
 }
 
 declare global {
@@ -47,6 +48,7 @@ declare global {
 }
 
 export interface FeelViewOptions {
+  cameraView?: CameraView;
   /** Comparison zoom steps from the ruled frame; 0 is the ruled frame. */
   zoomStep: number;
 }
@@ -91,13 +93,17 @@ export async function startFeelScene(
   presets: readonly Preset[],
   view: FeelViewOptions = { zoomStep: 0 },
 ): Promise<FeelSceneHandle> {
+  if (view.cameraView !== undefined && view.cameraView !== "front-high" && Object.values(packet.manifest.spaces).some(space =>
+    !space.weather || space.wall_runs.length > 0 || space.roofs.length > 0 || space.props.some(p => p.facing === "view"))) {
+    throw new Error("alternate camera comparisons require geometry-based exterior spaces without camera-painted cards");
+  }
+  stage.dataset.cameraView = view.cameraView ?? "front-high";
   const canvas = document.createElement("canvas");
   canvas.setAttribute("aria-hidden", "true");
   const context = canvas.getContext("webgl2", {
     alpha: false,
     antialias: true,
     depth: true,
-    stencil: false,
   });
   if (context === null) throw new Error("WebGL2 is unavailable in this browser");
   stage.prepend(canvas);
@@ -139,6 +145,7 @@ export async function startFeelScene(
     window.innerHeight,
     initialCell,
     view.zoomStep,
+    view.cameraView,
   );
   const clock = new Clock();
   let activeSpace: SpaceScene | null = null;
@@ -186,7 +193,7 @@ export async function startFeelScene(
       presetLabel.textContent = describeView(
         nextSpace.weatherEnabled ? presets.join(" · ") : "INTERIOR",
         view.zoomStep,
-      );
+      ) + (view.cameraView && view.cameraView !== "front-high" ? ` · ${view.cameraView.toUpperCase()} COMPARISON` : "");
     }
     if (nextSpace.weatherEnabled && presets.includes("fog")) {
       activeFog = makeFogOverlay();
@@ -200,7 +207,7 @@ export async function startFeelScene(
       space,
       caretaker: nextSpace.caretaker,
       initialCell: targetCell,
-      updateWallFade: (cell, now) => nextSpace.updateWallFade(cell, now),
+      onHoverCell: cell => nextSpace.focusGrid(cell),
       onCellChanged: (previous, next) => nextSpace.focusLighting(previous, next),
       onPortalLanding: swapSpace,
       cameraFollowsCaretaker: cameraFollowsCaretaker(space),
@@ -211,8 +218,7 @@ export async function startFeelScene(
 
   const devHook: FeelDevHook | null = import.meta.env["DEV"]
     ? {
-        wallRunPlasterOpacity: (runIndex) =>
-          activeSpace?.wallRunPlasterOpacity(runIndex) ?? null,
+        surfaceFades: () => activeSpace?.surfaceFades() ?? [],
       }
     : null;
   if (devHook !== null) window.__tmeFeel = devHook;
@@ -222,6 +228,7 @@ export async function startFeelScene(
     const elapsed = clock.getElapsedTime();
     activeSpace?.update(elapsed);
     activePresenter?.update(performance.now() / 1000);
+    stage.dataset.walkFadedSurfaces = String(activeSpace?.updateOcclusion(elapsed) ?? 0);
     renderer.setRenderTarget(null);
     renderer.clear();
     const renderStartedAt = performance.now();
@@ -263,6 +270,7 @@ export async function startFeelScene(
       delete stage.dataset.renderCalls;
       delete stage.dataset.renderMilliseconds;
       delete stage.dataset.grassInstances;
+      delete stage.dataset.walkFadedSurfaces;
       renderer.dispose();
     },
   };

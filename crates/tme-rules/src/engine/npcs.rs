@@ -3,6 +3,9 @@ use crate::model::{ActionCost, ActorKind, CharacterId};
 
 use super::{Engine, StepError};
 
+#[cfg(test)]
+mod tests;
+
 impl Engine {
     pub(super) fn clear_npc_followers_of_character(
         &mut self,
@@ -55,7 +58,13 @@ impl Engine {
             .as_mut()
             .ok_or_else(|| StepError::new("NPC follow state disappeared"))?
             .following_character_id = target.clone();
-        if target.is_some() || self.world.actors[npc_index].ai.is_some() {
+        if target.is_some()
+            || self.world.actors[npc_index].ai.is_some()
+            || self.world.actors[npc_index]
+                .npc
+                .as_ref()
+                .is_some_and(|npc| !npc.patrol.is_empty())
+        {
             self.make_npc_ready_now(npc_index)?;
         } else {
             self.make_npc_dormant(npc_index)?;
@@ -83,6 +92,7 @@ impl Engine {
             return Err(StepError::new("ready NPC is not a living NPC"));
         }
         let has_ai = actor.ai.is_some();
+        let has_patrol = actor.npc.as_ref().is_some_and(|npc| !npc.patrol.is_empty());
         let following_character_id = actor
             .npc
             .as_ref()
@@ -97,23 +107,82 @@ impl Engine {
         {
             let npc_actor_id = self.world.actors[npc_index].id.clone();
             self.set_npc_follow_target(&npc_actor_id, None, events)?;
-            if has_ai {
+            if has_ai && (!has_patrol || self.has_automatic_combat_priority(npc_index)?) {
                 return self
                     .apply_automatic_actor_action(npc_index, events)
                     .map(Some);
             }
-            return Ok(None);
+            return self.apply_npc_patrol_action(npc_index, events);
         }
 
         if has_ai
-            && (following_character_id.is_none()
+            && ((following_character_id.is_none() && !has_patrol)
                 || self.has_automatic_combat_priority(npc_index)?)
         {
             return self
                 .apply_automatic_actor_action(npc_index, events)
                 .map(Some);
         }
-        self.apply_npc_follow_action(npc_index, events)
+        if following_character_id.is_some() {
+            self.apply_npc_follow_action(npc_index, events)
+        } else {
+            self.apply_npc_patrol_action(npc_index, events)
+        }
+    }
+
+    fn apply_npc_patrol_action(
+        &mut self,
+        npc_index: usize,
+        events: &mut Vec<Event>,
+    ) -> Result<Option<ActionCost>, StepError> {
+        let actor = &self.world.actors[npc_index];
+        let npc = actor
+            .npc
+            .as_ref()
+            .ok_or_else(|| StepError::new("NPC patrol state missing"))?;
+        if npc.patrol.is_empty() || actor.location.site() != actor.home_location.site() {
+            self.make_npc_dormant(npc_index)?;
+            return Ok(None);
+        }
+        let cost = ActionCost::from_positive_units(npc.follow_cadence_units)
+            .ok_or_else(|| StepError::new("NPC cadence must be positive"))?;
+        // Attend to someone approaching the provider. This grants no service range:
+        // the same-square rules still decide every transaction.
+        if self.world.actors.iter().any(|visitor| {
+            visitor.kind == ActorKind::Player
+                && visitor.is_alive()
+                && visitor.location.site() == actor.location.site()
+                && visitor
+                    .location
+                    .position
+                    .x
+                    .abs_diff(actor.location.position.x)
+                    + visitor
+                        .location
+                        .position
+                        .y
+                        .abs_diff(actor.location.position.y)
+                    <= 1
+        }) {
+            return Ok(Some(cost));
+        }
+        let mut next = npc.patrol_next;
+        if next >= npc.patrol.len() {
+            return Err(StepError::new("NPC patrol cursor out of bounds"));
+        }
+        if actor.location.position == npc.patrol[next] {
+            next = (next + 1) % npc.patrol.len();
+        }
+        let target = npc.patrol[next];
+        self.world.actors[npc_index]
+            .npc
+            .as_mut()
+            .expect("validated NPC")
+            .patrol_next = next;
+        if let Some(direction) = self.step_toward(npc_index, target) {
+            self.try_actor_move(npc_index, direction, events)?;
+        }
+        Ok(Some(cost))
     }
 
     pub(super) fn apply_npc_follow_action(

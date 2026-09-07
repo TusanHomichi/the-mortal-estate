@@ -9,7 +9,7 @@ describe("orthographic pointer unprojection", () => {
       getBoundingClientRect: () => ({ left: 0, top: 0, width: 1280, height: 800 }),
     };
     expect(cellUnderPointer(camera, canvas, 640, 400, { i: 30, j: 22 })).toEqual({
-      i: 12,
+      i: 13,
       j: 10,
     });
   });

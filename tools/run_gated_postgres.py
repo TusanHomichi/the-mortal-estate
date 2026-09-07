@@ -91,6 +91,11 @@ GATED_TESTS: tuple[GatedTest, ...] = (
         "absent_killer_karma_is_deferred_and_applied_exactly_once",
     ),
     GatedTest(
+        "character_creation",
+        ("--test", "postgres_persistence"),
+        "character_creation_is_atomic_idempotent_and_survives_restart",
+    ),
+    GatedTest(
         "replayed_kill_assessment",
         ("--test", "postgres_persistence"),
         "replayed_player_kill_assessment_agrees_and_a_contradicting_one_is_refused",

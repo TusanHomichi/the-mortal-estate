@@ -19,7 +19,7 @@ def health(site, timeout=30):
     deadline = time.monotonic() + timeout
     while True:
         try:
-            with urllib.request.urlopen(site.origin + "/health/ready", context=context, timeout=3) as response:
+            with urllib.request.urlopen(site.local_origin + "/health/ready", context=context, timeout=3) as response:
                 public = json.load(response)
             with urllib.request.urlopen(f"http://127.0.0.1:{site.ports['operations']}/internal/status", timeout=3) as response:
                 status = json.load(response)

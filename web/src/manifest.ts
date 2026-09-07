@@ -410,10 +410,11 @@ function parseSpace(
   const cells = value.cells.map((candidate) => {
     if (
       !isRecord(candidate) ||
-      !hasExactKeys(candidate, ["i", "j", "material"]) ||
+      !hasExactKeys(candidate, ["i", "j", "material", "walkable"]) ||
       !isInteger(candidate.i) ||
       !isInteger(candidate.j) ||
-      typeof candidate.material !== "string"
+      typeof candidate.material !== "string" ||
+      typeof candidate.walkable !== "boolean"
     ) {
       throw new Error("a candidate feel cell is invalid");
     }
@@ -427,11 +428,16 @@ function parseSpace(
     ) {
       throw new Error("the candidate feel material plan has an invalid or duplicate cell");
     }
-    if (!Object.hasOwn(assets.terrain, candidate.material)) {
+    // A void is an authored floor opening, with no swatch or standing surface.
+    // Its address remains explicit so omissions cannot hide missing map cells.
+    if (candidate.material === "void" && candidate.walkable) {
+      throw new Error("a candidate feel floor opening cannot be walkable");
+    }
+    if (candidate.material !== "void" && !Object.hasOwn(assets.terrain, candidate.material)) {
       throw new Error("a candidate feel cell names an unknown material");
     }
     seen.add(key);
-    return { i: candidate.i, j: candidate.j, material: candidate.material };
+    return { i: candidate.i, j: candidate.j, material: candidate.material, walkable: candidate.walkable };
   });
   const cellKeys = new Set(cells.map(cellKey));
 
@@ -584,13 +590,13 @@ function validateSpaces(spaces: Record<string, FeelSpace>, start: PortalTarget):
 }
 
 export function parseFeelManifest(value: unknown): FeelManifest {
-  if (isRecord(value) && [1, 2, 3, 4, 5].includes(value.schema_version as number)) {
+  if (isRecord(value) && [1, 2, 3, 4, 5, 6].includes(value.schema_version as number)) {
     throw new Error(`candidate feel manifest schema ${value.schema_version} is retired and refused`);
   }
   if (!isRecord(value) || !hasExactKeys(value, ["schema_version", "assets", "figures", "caretaker", "start", "spaces"])) {
     throw new Error("the candidate feel manifest has unknown or missing top-level fields");
   }
-  if (value.schema_version !== 6 || !isRecord(value.assets)) {
+  if (value.schema_version !== 7 || !isRecord(value.assets)) {
     throw new Error("the candidate feel manifest schema version or assets are invalid");
   }
   if (!hasExactKeys(value.assets, ASSET_GROUPS)) {
@@ -602,6 +608,9 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     props: parseAssetGroup(value.assets.props, "props"),
     roofs: parseAssetGroup(value.assets.roofs, "roofs"),
   };
+  if (Object.hasOwn(assets.terrain, "void")) {
+    throw new Error("void is a floor opening, not a terrain asset");
+  }
   requireAssets(assets, "terrain", REQUIRED_TERRAIN);
   requireAssets(assets, "walls", REQUIRED_WALLS);
   requireAssets(assets, "props", REQUIRED_PROPS);
@@ -635,7 +644,7 @@ export function parseFeelManifest(value: unknown): FeelManifest {
     }),
   );
   validateSpaces(spaces, start);
-  return { schema_version: 6, assets, figures, caretaker, start, spaces };
+  return { schema_version: 7, assets, figures, caretaker, start, spaces };
 }
 
 function bytesToHex(bytes: Uint8Array): string {

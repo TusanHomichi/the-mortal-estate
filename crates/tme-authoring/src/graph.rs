@@ -9,7 +9,7 @@
 //! graph. That is a fact about the land, not a missing check: every transition
 //! the land declares is still resolved, and there are none.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use crate::Result;
 use crate::compile::Member;
@@ -34,6 +34,7 @@ fn opposite(direction: &str) -> Option<&'static str> {
     match direction {
         "down" => Some("up"),
         "up" => Some("down"),
+        "passage" => Some("passage"),
         _ => None,
     }
 }
@@ -78,7 +79,7 @@ pub fn link(members: &BTreeMap<String, Member>) -> Result<Connectivity> {
                     transition.id, paired.id
                 ));
             }
-            if !member.is_passable(transition.access) || !target.is_passable(paired.access) {
+            if !member.is_passable(transition.access) || !target.is_passable(paired.landing) {
                 return Err(format!(
                     "transition {} connects through a blocked endpoint",
                     transition.id
@@ -89,10 +90,30 @@ pub fn link(members: &BTreeMap<String, Member>) -> Result<Connectivity> {
                 from_member: member_id.clone(),
                 from: transition.access,
                 to_member: transition.target_member.clone(),
-                to: paired.access,
+                to: paired.landing,
                 direction: transition.direction.clone(),
             });
         }
+    }
+    let roots = members
+        .iter()
+        .filter(|(_, member)| member.arrival().is_some())
+        .map(|(id, _)| id.clone())
+        .collect::<Vec<_>>();
+    let [root] = roots.as_slice() else {
+        return Err("land connectivity requires exactly one arrival member".into());
+    };
+    let mut reached = BTreeSet::from([root.clone()]);
+    let mut queue = VecDeque::from([root.clone()]);
+    while let Some(member) = queue.pop_front() {
+        for edge in edges.iter().filter(|edge| edge.from_member == member) {
+            if reached.insert(edge.to_member.clone()) {
+                queue.push_back(edge.to_member.clone());
+            }
+        }
+    }
+    if reached.len() != members.len() {
+        return Err("land connectivity contains a member unreachable from arrival".into());
     }
     edges.sort_by(|left, right| left.id.cmp(&right.id));
     Ok(Connectivity { edges })

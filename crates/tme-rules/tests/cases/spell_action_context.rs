@@ -263,7 +263,8 @@ fn learn_spell_validate_accepts_local_teacher_and_rejects_away_room() {
     assert_eq!(local_status.blocked_reason, None);
 
     let mut away_engine = learn_spell_context_engine(|parts| {
-        parts.service_instances_mut()[0]["location"]["level"] = serde_json::json!("hall");
+        parts.service_instances_mut()[0]["placement"]["location"]["level"] =
+            serde_json::json!("hall");
     });
     away_engine
         .apply_actor_intent(

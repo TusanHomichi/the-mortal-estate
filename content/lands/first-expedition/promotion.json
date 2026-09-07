@@ -1,0 +1,78 @@
+{
+  "attested_by": "peter",
+  "attested_on": "2026-09-07",
+  "authority": {
+    "content_canon": false,
+    "coordinates": true,
+    "gameplay_tuning": false,
+    "member_transition_endpoints": true,
+    "presentation_art": false,
+    "runtime_loads_authoring_source": true,
+    "structures_and_landmarks": true,
+    "terrain_and_passability": true
+  },
+  "companions": [
+    {
+      "path": "content/lands/first-expedition/lodge.tmj",
+      "sha256": "788e4a84c7d763a8fb144b5f94877da9fbdf93a15fe074a175eebadb5c2b6071"
+    },
+    {
+      "path": "content/lands/first-expedition/bank.tmj",
+      "sha256": "bd5004f952a05abefe8ef0797e395799728dd97b5642fa379155c263824920da"
+    },
+    {
+      "path": "content/lands/first-expedition/outfitter.tmj",
+      "sha256": "bfd8e769e5320c834838f4553f4bd62e8477e8fac79cc5ad1207a1bf11b5e6a0"
+    },
+    {
+      "path": "content/lands/first-expedition/market.tmj",
+      "sha256": "a3e71a80278cb264c821b1c3a744aa33e8c7f9c9227cb98afbbfb0a3d35729bc"
+    },
+    {
+      "path": "content/lands/first-expedition/bakery.tmj",
+      "sha256": "adde958777f7c74422e1361030ed550a1d9581a9fa57e5aa2b89319af20e167a"
+    },
+    {
+      "path": "content/lands/first-expedition/herbalist.tmj",
+      "sha256": "49a61f8a9ac1869ede643b3945d81862d20b9aa772c3b2ea852b8fa8e054615e"
+    },
+    {
+      "path": "content/lands/first-expedition/forge.tmj",
+      "sha256": "60b67973dcd876e4444bda8a9fdffcb6cf225bedc2c6388d0ef1742f643e24c3"
+    },
+    {
+      "path": "content/lands/first-expedition/chandler.tmj",
+      "sha256": "88c8858c209a245b8e51424c240d9cbeb85133c27bba175ddde5c2eecdd0c596"
+    },
+    {
+      "path": "content/lands/first-expedition/temple.tmj",
+      "sha256": "8686a54d75006240be5c8d5099df961e4424bc833b42536bdca0b63bda2be183"
+    },
+    {
+      "path": "content/lands/first-expedition/trainers.tmj",
+      "sha256": "351093432a7fd43520f873297f3c29d7ec45661fbea2f256ddf951ec2824f654"
+    },
+    {
+      "path": "content/lands/first-expedition/d1_entry.tmj",
+      "sha256": "020c3dada5b04116620fed668f9b07f651f72262ffd001d667fbad323f7b2314"
+    }
+  ],
+  "kind": "authored_land_promotion",
+  "master": {
+    "byte_identical_to_reviewed_master": false,
+    "path": "content/lands/first-expedition/arrival.tmj",
+    "sha256": "7e37e586161c2b8d6c9f46f3eb154d5697e0acc12a42ca6bd26217cf07c419e9"
+  },
+  "research_boundary": {
+    "review_refs": [
+      "docs/plans/2026-09-05-first-land-surface.md",
+      "content/lands/first-expedition/README.md"
+    ]
+  },
+  "reviewed_encoding": {
+    "geography_sha256": "2ce205b35536006932437c855827575d26f61a26813ade0bc885160db95534d4",
+    "review_manifest_sha256": "d132d434d60e20d15b2962834bfde80e6bd04d8cf8d01da615674c297dee8d73"
+  },
+  "schema_version": 1,
+  "status": "owner_accepted_first_expedition_geography"
+}

@@ -88,10 +88,7 @@ impl Engine {
         }
         let (trainer, teaching) = authored_trainers
             .into_iter()
-            .find(|(service, _)| {
-                service.position().level == player.location.level
-                    && service.position().position == player.location.position
-            })
+            .find(|(service, _)| service.position() == &player.location)
             .ok_or(ActionBlockedReasonV1::ServiceNotHere)?;
         let training = self
             .referenced_training_capability(trainer, teaching)

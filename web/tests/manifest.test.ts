@@ -29,7 +29,7 @@ function figureRow(): Record<string, unknown> {
 
 function validManifest(): Record<string, unknown> {
   return {
-    schema_version: 6,
+    schema_version: 7,
     assets: {
       terrain: requiredRows(REQUIRED_TERRAIN),
       walls: requiredRows(REQUIRED_WALLS),
@@ -45,7 +45,7 @@ function validManifest(): Record<string, unknown> {
         cells: Array.from({ length: 9 }, (_, index) => ({
           i: index % 3,
           j: Math.floor(index / 3),
-          material: "grass",
+          material: "grass", walkable: true,
         })),
         wall_runs: [
           { axis: "x", start: [-0.5, 0.5], cells: 3, door_interval: [1.15, 1.85] },
@@ -63,11 +63,37 @@ function validManifest(): Record<string, unknown> {
 }
 
 describe("candidate feel manifest", () => {
-  it("parses the exact schema-6 spaces packet", () => {
+  it("keeps floor openings explicit, unwalkable and unavailable as landings", () => {
+    const value = validManifest();
+    const room = (value.spaces as Record<string, { cells: { material: string; walkable: boolean }[] }>).room!;
+    room.cells[0] = { ...room.cells[0]!, material: "void", walkable: false };
+    expect(parseFeelManifest(value).spaces.room!.cells[0]!.material).toBe("void");
+    room.cells[0]!.walkable = true;
+    expect(() => parseFeelManifest(value)).toThrow("floor opening cannot be walkable");
+    room.cells[0]!.walkable = false;
+    value.start = { space: "room", cell: [0, 0] };
+    expect(() => parseFeelManifest(value)).toThrow("not walkable");
+    value.start = { space: "room", cell: [1, 1] };
+    (value.assets as { terrain: Record<string, unknown> }).terrain.void = row;
+    expect(() => parseFeelManifest(value)).toThrow("not a terrain asset");
+  });
+  it("parses the exact schema-7 spaces packet", () => {
     const parsed = parseFeelManifest(validManifest());
-    expect(parsed.schema_version).toBe(6);
+    expect(parsed.schema_version).toBe(7);
     expect(parsed.start).toEqual({ space: "room", cell: [1, 1] });
     expect(parsed.spaces.room?.light_sources.lantern_glass).toBeNull();
+  });
+
+  it("refuses retired schema 6 and missing or nonboolean ground verdicts", () => {
+    const old = validManifest();
+    old.schema_version = 6;
+    expect(() => parseFeelManifest(old)).toThrow(/retired/);
+    for (const verdict of [undefined, null, 0, "false"]) {
+      const value = validManifest();
+      const spaces = value.spaces as Record<string, { cells: Record<string, unknown>[] }>;
+      spaces.room!.cells[0]!.walkable = verdict;
+      expect(() => parseFeelManifest(value)).toThrow(/cell is invalid/);
+    }
   });
 
   it("accepts a listed additional prop kind with mirror", () => {

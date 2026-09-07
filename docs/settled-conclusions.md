@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 33
-status: Current lookup index including the shared Rust WebAssembly codec and retained browser-first rulings.
+last_updated: 2026-09-07
+revision: 47
+status: Current lookup index including restored authoritative path controls and the horseshoe town direction.
 public_safe: true
-summary: Lookup links for settled architecture, protocol consumption, workflow, presentation decisions, and diagnosed traps.
+summary: Lookup links for path controls, settlement arrangement, resident activity, lighting, coastal water and proof.
 always: true
 ---
 
@@ -15,7 +15,8 @@ here is not necessarily implemented: [browser client](browser-client.md)
 owns that distinction for the clients.
 
 Exact gameplay mechanics, names, values, timings, penalties, and routes remain
-subject to [D2](boundary-map.md#what-an-authored-seam-does-and-does-not-settle).
+subject to the [historical gameplay baseline](gameplay-baseline.md), which
+supersedes D2's blanket reset.
 Presentation rows route to recorded owner direction; they do not settle
 experimental gameplay tuning.
 
@@ -26,11 +27,24 @@ experimental gameplay tuning.
 | Implementation stack | Fixed stack; widening needs a decision. | [AGENTS.md](../AGENTS.md#operating-rules) |
 | Gameplay authority | One reusable rules boundary. | [boundary map](boundary-map.md#the-boundaries) |
 | Client shape and baseline | Three.js browser; Godot retired September 5. | [client architecture](client-architecture.md#the-web-client) |
-| Browser and desktop proof | Two browser engines; Tauri targets need their own packaged-webview proof. | [client architecture](client-architecture.md#the-web-client) |
+| Browser and desktop proof | Shared browser matrix; Tauri targets also require packaged-webview proof. | [client architecture](client-architecture.md#the-web-client) |
+| Town residents | Authored patrols and actor-bound services; temple interaction request. | [resident contract](town-resident-contract.md) |
+| Living-town arrangement | Horseshoe toward the dock, temple at its head; central feature undecided and layout study pending. | [surface brief](plans/2026-09-05-first-land-surface.md#horseshoe-town-arrangement) |
+| Continuous visual review | Inspect every visible area; fix bounded defects or record screenshot-backed follow-ups. | [presentation direction](presentation-direction.md#continuous-visual-review) |
+| Preview entry point | Whole current playable build privately; future account creation and invited play require later activation. | [server notes](server-notes.md#private-development-deployment) |
 | Live characters | Live rigs and modular equipment; material treatment remains candidate. | [presentation direction](presentation-direction.md#live-characters) |
+| Inhabiting a square | Contextual idle variety for players and NPCs; standing visual direction, not yet implemented. | [presentation direction](presentation-direction.md#settling-into-an-occupied-square) |
+| NPC daily activity | Looking around and small room-specific chores; fitted prop contact, interruptible attention and authoritative travel; not yet implemented. | [presentation direction](presentation-direction.md#npc-attention-and-room-activities) |
+| Interior lighting | Visible fixtures explain temple illumination; restrained indirect fill and a lower stair lantern. | [presentation direction](presentation-direction.md#room-lighting-from-visible-sources) |
+| Coastal water | Visible bottom and quieter shallows with depth/exposure transitions; follow-up remains open. | [presentation direction](presentation-direction.md#coastal-water-by-depth-and-exposure) |
 | Individual movement cooldown | Every committed preview move gets a full interval and locks competing movement. | [browser client](browser-client.md#movement-and-availability) |
-| World projection and standing geometry | Accepted camera and world-up construction. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) |
-| Tile and building assembly | Shared cell ruler, dedicated interiors, exterior roofs. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
+| Playable path controls | Footprint draft, endpoint confirmation and server assessment; cancellation clears only uncommitted input. | [browser client](browser-client.md#authoritative-play-controls) |
+| World projection and standing geometry | Revised camera ruling and world-up construction. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) |
+| Tile and building assembly | Shared cell ruler, visible-grid experiment, dedicated interiors and exterior roofs. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
+| Architectural feel | Warm stylized direction; arrival house and street dispatched for native review. | [presentation direction](presentation-direction.md#warm-architectural-direction) |
+| Stylization and character target | Restrained charm; first adventurer guide preferred after comparison. | [presentation direction](presentation-direction.md#stylization-and-restrained-charm) |
+| Asset sourcing | Retained kits first, then suitable CC0 and provider candidates; native style fit governs selection. | [presentation direction](presentation-direction.md#asset-sourcing-order) |
+| Town building identity | Exteriors communicate purpose; the surface brief owns the temple's role. | [presentation direction](presentation-direction.md#building-purpose-from-the-street) |
 | Spaces and portals | Current browser experiment and its limits. | [browser client](browser-client.md#movement-and-availability) |
 | Structure, cards, and character sources | Construction and source/output split. | [presentation direction](presentation-direction.md#structure-and-cards) |
 | Viewport and relative scale | Scale evidence; later display ruling also applies. | [presentation direction](presentation-direction.md#relative-scale-ruling) |
@@ -51,6 +65,8 @@ experimental gameplay tuning.
 | Blocking checks | P9 mutant qualification. | [boundary checks](boundary-checks.md#qualification) |
 | Private denylist | Provisioning, worktrees, and fail-closed behavior. | [boundary checks](boundary-checks.md#the-private-terms-convention) |
 | Public source | Source publication is separate from product release. | [public boundary policy](public-boundary-policy.md#the-clean-public-successor-and-the-two-publication-cuts) |
+| Historical gameplay baseline | Exact reconstruction with evidence and explicit deviations; research restored privately. | [gameplay baseline](gameplay-baseline.md) |
+| First-land map template | Owner-approved geography exception; scope and provenance have one owner. | [public boundary policy](public-boundary-policy.md#first-land-map-template) |
 | Two enforcement points | Repository scan and content-load validation. | [boundary checks](boundary-checks.md#the-second-enforcement-point-the-content-validator) |
 | Internal migrations | Atomic cutover; no compatibility adapters. | [agent workflow](agent-workflow.md#no-compatibility-adapters) |
 | Proof method | Exercise and identify the real path. | [agent workflow](agent-workflow.md#verification) |

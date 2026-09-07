@@ -18,7 +18,7 @@ fn learn_spell_runtime_engine(mutate: impl FnOnce(&mut ContentParts)) -> Engine 
             ]
         }
     });
-    parts.service_instances_mut()[0]["location"]["level"] = serde_json::json!("start");
+    parts.service_instances_mut()[0]["placement"]["location"]["level"] = serde_json::json!("start");
     for actor in parts
         .actors_mut()
         .as_array_mut()

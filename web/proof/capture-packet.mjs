@@ -4,7 +4,7 @@
 // errors required. Usage:
 //   TME_FEEL_ASSETS=<packet> node web/proof/capture-packet.mjs --out <dir> \
 //       [--query preset=night] [--query "preset=night&zoom=-1"] [--width 1280] [--height 800]
-// Every query is shot in every proof engine (Chromium and Firefox), each frame
+// Every query is shot in every proof engine (the shared engine roster), each frame
 // named `<query>-<engine>.png`; TME_PROOF_BROWSER=<engine> narrows to one.
 import { mkdir } from "node:fs/promises";
 import path from "node:path";

@@ -98,6 +98,7 @@
         "realm": "identity_proof"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -145,15 +146,18 @@
   "service_instances": [
     {
       "id": "keeper_rite",
-      "location": {
-        "level": "settlement",
-        "position": {
-          "x": 11,
-          "y": 13
-        },
-        "realm": "identity_proof"
-      },
-      "service_definition_id": "threshold_keeper"
+      "service_definition_id": "threshold_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "settlement",
+          "position": {
+            "x": 11,
+            "y": 13
+          },
+          "realm": "identity_proof"
+        }
+      }
     }
   ]
 }

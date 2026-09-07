@@ -17,8 +17,8 @@ readiness scheduled: Dummy cost=1 ready_at=9000ms
 
 player ready: Delver at 6000ms
 Delver intent at 6000ms: train sword_trainer 40
-Delver spent 7 gold
-Delver trained sword with sword_trainer: learning rate 1 -> 2, offered 40 gold, spent 7, retained 33
+Delver spent 40 gold
+Delver trained sword with sword_trainer: learning rate 1 -> 2, offered 40 gold, spent 7, returned to ground 33
 Delver gained 3 experience points (total: 303)
 readiness scheduled: Delver cost=1 ready_at=9000ms
 time 9000ms

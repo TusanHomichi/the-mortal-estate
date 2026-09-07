@@ -335,6 +335,7 @@ pub(super) fn service_capability(
 pub(super) fn service(value: &rules::ServiceViewV1) -> Result<wire::Service, wire::ProtocolError> {
     Ok(wire::Service {
         service_id: label(&value.service_id)?,
+        actor_id: value.actor_id.as_ref().map(actor_id).transpose()?,
         name: label(&value.name)?,
         position: position(&value.position)?,
         capabilities: value

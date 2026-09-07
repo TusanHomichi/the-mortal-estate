@@ -1,6 +1,7 @@
 import { Box3, Group, Mesh } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { StructurePlacement, VerifiedAssetPacket } from "../feelTypes";
+import { validateStructureAtmosphere } from "./structureAtmosphere";
 import { disposeFigureSources } from "./figureRig";
 
 export function parseStructures(value: unknown, extents: { i: number; j: number }): StructurePlacement[] {
@@ -51,15 +52,19 @@ export function assertEmbeddedStructure(bytes: ArrayBuffer): void {
 /** Decoded once; instances share immutable source geometry and materials. */
 export async function decodeStructures(packet: VerifiedAssetPacket): Promise<Map<string, Group>> {
   const decoded = new Map<string, Group>();
+  const byHash = new Map<string, Group>();
   try {
     for (const [space, plan] of Object.entries(packet.manifest.spaces)) {
       for (const [index, placement] of plan.structures.entries()) {
         const key = `structures/${space}/${index}`;
+        const cached = byHash.get(placement.sha256);
+        if (cached) { decoded.set(key, cached); continue; }
         const bytes = packet.assets.get(key)?.bytes;
         if (!bytes) throw new Error(`${key} was not verified`);
         assertEmbeddedStructure(bytes);
         const gltf = await new GLTFLoader().parseAsync(bytes, "");
         decoded.set(key, gltf.scene);
+        byHash.set(placement.sha256, gltf.scene);
         let meshes = 0;
         gltf.scene.traverse((o) => {
           if (!(o instanceof Mesh)) return;
@@ -68,6 +73,7 @@ export async function decodeStructures(packet: VerifiedAssetPacket): Promise<Map
           o.castShadow = true;
           o.receiveShadow = true;
         });
+        validateStructureAtmosphere(gltf.scene);
         if (!meshes) throw new Error(`${key} carries no meshes`);
         const box = new Box3().setFromObject(gltf.scene);
         if (![...box.min.toArray(), ...box.max.toArray()].every(Number.isFinite)) throw new Error(`${key} has invalid bounds`);
@@ -83,14 +89,14 @@ export async function decodeStructures(packet: VerifiedAssetPacket): Promise<Map
   }
 }
 
-export function addStructures(parent: Group, name: string, placements: readonly StructurePlacement[], decoded: ReadonlyMap<string, Group>): void {
+export function addStructures(parent: Group, name: string, placements: readonly StructurePlacement[], decoded: ReadonlyMap<string, Group>, heightAt: (i: number, j: number) => number): void {
   placements.forEach((placement, index) => {
     const source = decoded.get(`structures/${name}/${index}`);
     if (!source) throw new Error(`structure ${name}/${index} was not decoded`);
     const root = new Group();
     root.name = `Structure_${index}`;
     root.add(source.clone(true));
-    root.position.set(placement.cell_anchor[0], 0, placement.cell_anchor[1]);
+    root.position.set(placement.cell_anchor[0], heightAt(...placement.cell_anchor), placement.cell_anchor[1]);
     root.rotation.y = placement.yaw * Math.PI / 180;
     parent.add(root);
   });

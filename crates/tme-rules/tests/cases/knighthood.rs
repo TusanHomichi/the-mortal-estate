@@ -282,7 +282,8 @@ fn promotion_requires_current_fighter_class_and_exact_configured_target() {
 #[test]
 fn promotion_requires_the_service_room_and_exact_coordinate() {
     let mut wrong_position = fixture_value();
-    wrong_position.service_instances_mut()[0]["location"]["position"] = json!({"x": 1, "y": 2});
+    wrong_position.service_instances_mut()[0]["placement"]["location"]["position"] =
+        json!({"x": 1, "y": 2});
     let mut engine = engine_from_value(wrong_position);
     assert!(
         engine

@@ -409,7 +409,7 @@ fn internal_boundary_requires_the_marker_and_exact_pairing() {
     assert!(
         parse(&wrong_pair)
             .expect_err("mismatched pair must fail")
-            .contains("must select exactly clean_original_fixture or internal_parity_fixture")
+            .contains("must select exactly clean_original_fixture or clean_authored_content")
     );
 }
 

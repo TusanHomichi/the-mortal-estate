@@ -216,6 +216,8 @@ pub enum ServiceCapability {
 #[serde(deny_unknown_fields)]
 pub struct Service {
     pub service_id: WireLabel,
+    #[serde(deserialize_with = "deserialize_required_nullable")]
+    pub actor_id: Option<ActorId>,
     pub name: WireLabel,
     pub position: Position,
     pub capabilities: Vec<ServiceCapability>,

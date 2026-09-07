@@ -1,0 +1,5026 @@
+{
+  "schema_version": 3,
+  "kind": "world_template",
+  "id": "first_expedition",
+  "visual_manifest_digest": "7e37e586161c2b8d6c9f46f3eb154d5697e0acc12a42ca6bd26217cf07c419e9",
+  "realms": {
+    "first_expedition": {
+      "name": "First Land",
+      "levels": {
+        "arrival": {
+          "law_zone": "none",
+          "scene_role": "overworld",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 12,
+          "staged_viewport": null,
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 27,
+          "height": 36,
+          "cells": [
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass",
+                "expedition_bridge"
+              ],
+              [
+                "expedition_grass",
+                "expedition_bridge"
+              ],
+              [
+                "expedition_grass",
+                "expedition_bridge"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_forest",
+                "expedition_path"
+              ],
+              [
+                "expedition_forest",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ]
+            ],
+            [
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_prop_occupancy"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_forest"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_town_ground",
+                "expedition_footprint"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_forest",
+                "expedition_path"
+              ],
+              [
+                "expedition_forest",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass",
+                "expedition_path"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_bridge"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_bridge"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_grass"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_rock"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_bridge"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_rock"
+              ],
+              [
+                "expedition_water"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ]
+            ],
+            [
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ],
+              [
+                "expedition_water"
+              ]
+            ]
+          ]
+        },
+        "bakery": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 3,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 3,
+          "height": 3,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "bank": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 5,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 5,
+          "height": 4,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "chandler": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 4,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 4,
+          "height": 3,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "d1_entry": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 7,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [
+            "expedition_wall",
+            "expedition_closed_door",
+            "expedition_deferred"
+          ],
+          "static_props": [],
+          "width": 7,
+          "height": 7,
+          "cells": [
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_deferred"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_deferred"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_deferred"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_closed_door"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_wall"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor",
+                "expedition_path"
+              ]
+            ],
+            [
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_wall"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_deferred"
+              ],
+              [
+                "expedition_closed_door"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "forge": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 4,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 4,
+          "height": 3,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "herbalist": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 4,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 4,
+          "height": 3,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "lodge": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 7,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 7,
+          "height": 4,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "market": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 4,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 4,
+          "height": 2,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "outfitter": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 4,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 4,
+          "height": 4,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "temple": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 7,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 7,
+          "height": 8,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_void"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_void"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_void"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        },
+        "trainers": {
+          "law_zone": "none",
+          "scene_role": "interior",
+          "presentation_mode": "overworld_town",
+          "world_zoom": {
+            "screen_cell_pitch": [
+              156,
+              104
+            ]
+          },
+          "maximum_clear_sightline": 8,
+          "staged_viewport": {
+            "frame_size": [
+              1920,
+              1080
+            ],
+            "fit_whole_level": true
+          },
+          "wall_terrain_ids": [],
+          "static_props": [],
+          "width": 8,
+          "height": 5,
+          "cells": [
+            [
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_furniture"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ],
+            [
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ],
+              [
+                "expedition_floor"
+              ]
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "arrivals": {
+    "dock_arrival": {
+      "realm": "first_expedition",
+      "level": "arrival",
+      "position": {
+        "x": 9,
+        "y": 31
+      }
+    }
+  },
+  "topology": {
+    "route/arrival_to_bakery": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 4,
+          "y": 12
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "bakery",
+          "position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_bank": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 10,
+          "y": 16
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "bank",
+          "position": {
+            "x": 2,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_chandler": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 20,
+          "y": 27
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "chandler",
+          "position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_forge": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 20,
+          "y": 12
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "forge",
+          "position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_herbalist": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 15,
+          "y": 12
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "herbalist",
+          "position": {
+            "x": 0,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_lodge": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 10,
+          "y": 26
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "lodge",
+          "position": {
+            "x": 6,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_market": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 10,
+          "y": 20
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "market",
+          "position": {
+            "x": 0,
+            "y": 1
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_outfitter": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 5,
+          "y": 20
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "outfitter",
+          "position": {
+            "x": 3,
+            "y": 2
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_temple": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 6,
+          "y": 7
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "temple",
+          "position": {
+            "x": 3,
+            "y": 6
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/arrival_to_trainers": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 17,
+          "y": 6
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "trainers",
+          "position": {
+            "x": 3,
+            "y": 3
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/bakery_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "bakery",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 4,
+            "y": 13
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/bank_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "bank",
+        "position": {
+          "x": 2,
+          "y": 3
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 10,
+            "y": 17
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/chandler_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "chandler",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 20,
+            "y": 28
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/d1_entry_to_temple": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "d1_entry",
+        "position": {
+          "x": 6,
+          "y": 4
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "temple",
+          "position": {
+            "x": 0,
+            "y": 5
+          }
+        }
+      },
+      "kind": {
+        "kind": "stairs",
+        "direction": "up"
+      },
+      "hidden": false
+    },
+    "route/forge_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "forge",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 20,
+            "y": 13
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/herbalist_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "herbalist",
+        "position": {
+          "x": 1,
+          "y": 2
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 15,
+            "y": 13
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/lodge_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "lodge",
+        "position": {
+          "x": 6,
+          "y": 3
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 10,
+            "y": 27
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/market_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "market",
+        "position": {
+          "x": 2,
+          "y": 1
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 10,
+            "y": 21
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/outfitter_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "outfitter",
+        "position": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 5,
+            "y": 21
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/temple_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "temple",
+        "position": {
+          "x": 3,
+          "y": 7
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 6,
+            "y": 8
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    },
+    "route/temple_to_d1_entry": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "temple",
+        "position": {
+          "x": 0,
+          "y": 4
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "d1_entry",
+          "position": {
+            "x": 5,
+            "y": 4
+          }
+        }
+      },
+      "kind": {
+        "kind": "stairs",
+        "direction": "down"
+      },
+      "hidden": false
+    },
+    "route/trainers_to_arrival": {
+      "at": {
+        "realm": "first_expedition",
+        "level": "trainers",
+        "position": {
+          "x": 3,
+          "y": 4
+        }
+      },
+      "target": {
+        "kind": "position",
+        "location": {
+          "realm": "first_expedition",
+          "level": "arrival",
+          "position": {
+            "x": 17,
+            "y": 7
+          }
+        }
+      },
+      "kind": {
+        "kind": "passage"
+      },
+      "hidden": false
+    }
+  }
+}

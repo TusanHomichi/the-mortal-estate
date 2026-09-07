@@ -151,7 +151,15 @@ fn training_spends_only_absorbable_gold_awards_xp_and_preserves_position() {
     assert_eq!(sword.practice_points, 5);
     assert_eq!(sword.learning_rate, 2);
     assert_eq!(character.progression.experience, 303);
-    assert_eq!(engine.world().actors[0].carried.gold.sack, 493);
+    assert_eq!(engine.world().actors[0].carried.gold.sack, 460);
+    let change = engine.world().ground_gold.values().collect::<Vec<_>>();
+    assert_eq!(change.len(), 1);
+    assert_eq!(change[0].amount, 33);
+    assert_eq!(change[0].location, engine.world().actors[0].location);
+    assert_eq!(
+        engine.world().actors[0].carried.gold.sack + change[0].amount + 7,
+        500
+    );
     assert!(
         !events
             .iter()
@@ -278,6 +286,30 @@ fn critique_is_focusless_read_only_rank_zero_aware_and_independent() {
         } if service_id == "trainer" && track_id == "mace"
     )));
 
+    let projection = engine
+        .observer_projection(&tme_rules::ActorId::from("player"), events.as_ref())
+        .unwrap();
+    assert!(projection.events.iter().any(|row| matches!(row,
+        tme_rules::view::ObservedEventV1::Feedback { cue:
+        tme_rules::view::ObserverFeedbackCueV1::SkillCritique { service_id, track_id, level: 0, critique_rank: None, .. }
+        } if service_id == "trainer" && track_id == "mace")));
+
+    let mut other_events = events.as_ref().to_vec();
+    for event in &mut other_events {
+        if let Event::SkillCritiqued { actor_id, .. } = event {
+            *actor_id = tme_rules::ActorId::from("another_player");
+        }
+    }
+    let private = engine
+        .observer_projection(&tme_rules::ActorId::from("player"), &other_events)
+        .unwrap();
+    assert!(!private.events.iter().any(|row| matches!(
+        row,
+        tme_rules::view::ObservedEventV1::Feedback {
+            cue: tme_rules::view::ObserverFeedbackCueV1::SkillCritique { .. }
+        }
+    )));
+
     let no_critique = engine_with(|parts| {
         parts.selected_mut("service_definitions", 0)["capabilities"]
             .as_array_mut()
@@ -344,7 +376,8 @@ fn exact_service_coordinate_focus_and_validation_order_failures_are_typed() {
             [["stone_wall"], ["flagstone"], ["flagstone"]],
             [["stone_wall"], ["flagstone"], ["stone_wall"]]
         ]);
-        parts.service_instances_mut()[0]["location"]["position"] = json!({"x": 2, "y": 1});
+        parts.service_instances_mut()[0]["placement"]["location"]["position"] =
+            json!({"x": 2, "y": 1});
     });
     assert_eq!(
         not_here

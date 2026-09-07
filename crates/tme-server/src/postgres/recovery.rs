@@ -177,7 +177,7 @@ pub(super) async fn verify_character_assertions(
         })
         .collect::<Result<BTreeSet<_>, sqlx::Error>>()
         .map_err(|error| error.to_string())?;
-    if configured != durable {
+    if !configured.is_subset(&durable) {
         return Err("durable character directory differs from bootstrap assertions".to_string());
     }
     Ok(())

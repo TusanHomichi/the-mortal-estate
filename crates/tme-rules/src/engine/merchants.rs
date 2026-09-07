@@ -28,9 +28,7 @@ impl Engine {
         let service = self.service_by_id(service_id).ok_or_else(|| {
             TransactionPlanError::new(ActionBlockedReasonV1::NoService, "service was not found")
         })?;
-        if service.position().level != actor.location.level
-            || service.position().position != actor.location.position
-        {
+        if service.position() != &actor.location {
             return Err(TransactionPlanError::new(
                 ActionBlockedReasonV1::ServiceNotHere,
                 "service is not at the actor coordinate",
@@ -62,9 +60,7 @@ impl Engine {
                 format!("service {service_id:?} was not found"),
             )
         })?;
-        if service.position().level != actor.location.level
-            || service.position().position != actor.location.position
-        {
+        if service.position() != &actor.location {
             return Err(TransactionPlanError::new(
                 ActionBlockedReasonV1::ServiceNotHere,
                 format!("service {service_id:?} is not at the actor coordinate"),

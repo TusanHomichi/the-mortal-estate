@@ -42,7 +42,25 @@ impl Engine {
             .iter()
             .find(|instance| instance.id == service_id)?;
         let definition = self.service_definition_by_id(&instance.definition_id)?;
-        Some(ResolvedService::new(instance, definition))
+        Some(ResolvedService::new(
+            instance,
+            definition,
+            self.service_position(instance)?,
+        ))
+    }
+
+    fn service_position<'a>(
+        &'a self,
+        instance: &'a crate::model::ServiceInstanceState,
+    ) -> Option<&'a crate::model::WorldPosition> {
+        match &instance.placement {
+            crate::model::ServicePlacement::Fixed { location } => Some(location),
+            crate::model::ServicePlacement::Actor { actor_id } => self
+                .world
+                .actor(actor_id)
+                .filter(|actor| actor.is_alive())
+                .map(|actor| &actor.location),
+        }
     }
 
     pub(super) fn services_at_actor(&self, actor_index: usize) -> Vec<ResolvedService<'_>> {
@@ -52,14 +70,8 @@ impl Engine {
         self.world
             .service_instances
             .iter()
-            .filter(|instance| {
-                instance.position.level == actor.location.level
-                    && instance.position.position == actor.location.position
-            })
-            .filter_map(|instance| {
-                self.service_definition_by_id(&instance.definition_id)
-                    .map(|definition| ResolvedService::new(instance, definition))
-            })
+            .filter_map(|instance| self.service_by_id(&instance.id))
+            .filter(|service| service.position() == &actor.location)
             .collect()
     }
 
@@ -141,10 +153,7 @@ impl Engine {
         self.world
             .service_instances
             .iter()
-            .filter_map(|instance| {
-                self.service_definition_by_id(&instance.definition_id)
-                    .map(|definition| ResolvedService::new(instance, definition))
-            })
+            .filter_map(|instance| self.service_by_id(&instance.id))
             .flat_map(|service| {
                 service.capabilities().iter().filter_map(move |capability| {
                     let ServiceCapability::SpellTeaching(teaching) = capability else {

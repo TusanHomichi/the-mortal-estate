@@ -4,8 +4,8 @@ import { buildGroundGeometry } from "../src/groundGeometry";
 describe("batched ground geometry", () => {
   it("carries each cell origin on all four of that cell's vertices", () => {
     const geometry = buildGroundGeometry([
-      { i: 2, j: 3, material: "grass" },
-      { i: 8, j: 5, material: "grass" },
+      { i: 2, j: 3, material: "grass", walkable: true },
+      { i: 8, j: 5, material: "grass", walkable: true },
     ]);
     expect(geometry.positions).toHaveLength(24);
     expect(geometry.uvs).toHaveLength(16);

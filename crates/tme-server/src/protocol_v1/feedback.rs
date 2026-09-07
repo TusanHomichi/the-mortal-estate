@@ -395,6 +395,21 @@ pub(super) fn feedback_cue(
     value: &rules::ObserverFeedbackCueV1,
 ) -> Result<wire::FeedbackCue, wire::ProtocolError> {
     Ok(match value {
+        rules::ObserverFeedbackCueV1::SkillCritique {
+            service_id,
+            track_id,
+            track_display,
+            level,
+            critique_rank,
+            level_title,
+        } => wire::FeedbackCue::SkillCritique {
+            service_id: label(service_id)?,
+            track_id: label(track_id)?,
+            track_display: track_display.as_deref().map(label).transpose()?,
+            level: *level,
+            critique_rank: *critique_rank,
+            level_title: level_title.as_deref().map(label).transpose()?,
+        },
         rules::ObserverFeedbackCueV1::PhysicalCombat {
             source,
             target,

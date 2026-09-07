@@ -41,6 +41,7 @@ struct Receipt {
     companions: Vec<AttestedFile>,
     authority: Authority,
     research_boundary: ResearchBoundary,
+    reviewed_encoding: Option<EncodingReceipt>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -50,6 +51,13 @@ struct AttestedFile {
     sha256: String,
     #[serde(default)]
     byte_identical_to_reviewed_master: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EncodingReceipt {
+    review_manifest_sha256: String,
+    geography_sha256: String,
 }
 
 /// What the attestation covers, and — just as load-bearing — what it does not.
@@ -168,6 +176,15 @@ pub fn load(root: &Path, contract: &'static LandContract) -> Result<Land> {
         members.insert(member.id.to_owned(), compiled);
     }
     let graph = graph::link(&members)?;
+    if let Some(review) = contract.reviewed_encoding {
+        let digest = crate::geography::digest(&members, &graph)?;
+        if digest != review.geography_sha256 {
+            return Err(format!(
+                "land {} differs from its accepted geography: {digest}",
+                contract.id
+            ));
+        }
+    }
     Ok(Land {
         contract,
         members,
@@ -189,7 +206,6 @@ fn validate_promotion(
         || receipt.status != contract.receipt_status
         || receipt.attested_by != contract.receipt_attested_by
         || receipt.attested_on != contract.receipt_attested_on
-        || !receipt.master.byte_identical_to_reviewed_master
         || receipt.master.path != contract.master().document
         || receipt.master.sha256 != contract.master_digest
         || receipt.research_boundary.review_refs.is_empty()
@@ -198,6 +214,20 @@ fn validate_promotion(
             "the {} promotion receipt differs from the attested contract",
             contract.id
         ));
+    }
+
+    match (contract.reviewed_encoding, &receipt.reviewed_encoding) {
+        (None, None) if receipt.master.byte_identical_to_reviewed_master => {}
+        (Some(expected), Some(actual))
+            if !receipt.master.byte_identical_to_reviewed_master
+                && actual.review_manifest_sha256 == expected.review_manifest_sha256
+                && actual.geography_sha256 == expected.geography_sha256 => {}
+        _ => {
+            return Err(format!(
+                "the {} promotion review basis differs from the attested contract",
+                contract.id
+            ));
+        }
     }
 
     if ReceiptAuthority::from(receipt.authority) != contract.authority {

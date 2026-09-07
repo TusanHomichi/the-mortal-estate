@@ -159,7 +159,7 @@ Mira regenerated 1 Mp (8/40, Active, time 51000ms)
 player ready: Mira at 51000ms
 Mira intent at 51000ms: train waystation_counter 7
 Mira spent 7 gold
-Mira trained wizard_magic with waystation_counter: learning rate 1 -> 2, offered 7 gold, spent 7, retained 0
+Mira trained wizard_magic with waystation_counter: learning rate 1 -> 2, offered 7 gold, spent 7, returned to ground 0
 Mira gained 3 experience points (total: 10)
 readiness scheduled: Mira cost=1 ready_at=54000ms
 time 54000ms

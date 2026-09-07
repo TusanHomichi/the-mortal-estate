@@ -173,6 +173,8 @@ pub enum SessionError {
     CsrfRejected,
     CharacterNotOwned,
     CharacterNotSelected,
+    CharacterCreationRefused,
+    CharacterCreationConflict,
     GameplayMarkLocked,
     ForgivenessUnavailable,
     Unavailable,
@@ -195,6 +197,7 @@ struct CharacterRow {
 
 mod admission;
 mod bootstrap_view;
+mod creation;
 mod forgiveness;
 mod recovery;
 mod selection;

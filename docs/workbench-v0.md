@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 6
-status: Logical, retained, and fresh authoritative browser capture selection; expensive capture is explicit and ordinary selection remains file reading.
+last_updated: 2026-09-06
+revision: 7
+status: Explicit authoritative capture covers the shared browser roster; ordinary selection remains file reading.
 public_safe: true
-summary: Workbench pointing, explicit browser capture, authoritative recording and pixel addressing, source binding, staleness, and proof.
+summary: Workbench pointing, atomic browser-roster capture, authoritative pixel addressing, source binding and staleness.
 routes:
   - tools/workbench/**
   - tools/workbench_demo.py
@@ -247,7 +247,7 @@ is an address, not a picture.
 
 `capture_producer.py` owns the explicit expensive operation. It builds the
 carried Rust codec, runs the [browser diagnostic observer](browser-client.md#authoritative-diagnostic-capture)
-in both engines, and validates every result before one directory rename offers
+across the shared browser roster, and validates every result before one directory rename offers
 the batch. Live capture also replays its observed frames; recording replay needs
 no database. Failure offers no partial batch. Each batch records elapsed time
 and each engine's actual renderer and correspondence proof.
@@ -432,7 +432,7 @@ Spec §11.3, all ten, with the phase that owns each.
 | --- | --- | --- |
 | **1. Pointing resolves exactly** | 4W | `tests/test_workbench_pointing.py` — 14 cases over the accepted fixture, one per gesture plus features; expected covered cells and full identity lists written out, read off the authored document by hand |
 | **2. Capture selections resolve to the same address space** | 6W | `tests/test_capture_addressing.py::ACaptureSelectionResolvesLikeALogicalOne` — click, occupant click, box, lasso and paint over a real capture, each compared against the equivalent logical selection; and `::TheTwoCaptureRoutesResolveIdentically`, which does it again between two captures of one frame at different scales. `tests/test_capture_correspondence.py` asserts the underlying claim: runtime cell (x, y) **is** master cell (x, y), cell by cell, with an offset mutant |
-| **3. The identity sidecar is real and matching** | 6W | `tests/test_capture_sidecar.py` — the sidecar's viewport equals the picture's own PNG header; the raster is the same resolution; the raster rebuilt from the target rectangles equals the raster byte for byte; every target's anchor pixel names that target; a marker owns its pixels over the square beneath. `tools/run_browser_capture_proof.py` adds fresh two-engine GPU/pointer and exact replay correspondence |
+| **3. The identity sidecar is real and matching** | 6W | `tests/test_capture_sidecar.py` — the sidecar's viewport equals the picture's own PNG header; the raster is the same resolution; the raster rebuilt from the target rectangles equals the raster byte for byte; every target's anchor pixel names that target; a marker owns its pixels over the square beneath. `tools/run_browser_capture_proof.py` adds fresh full-roster GPU/pointer and exact replay correspondence |
 | **4. Staleness fails closed, per digest** | 4W + 6W | `tests/test_workbench_staleness.py` — each of the five bound files mutated independently, killing the packet in `verify`, in `resolve.py`, and over HTTP; plus a deleted source, an edited mask, and a hand-edited packet. `tests/test_capture_addressing.py::ACapturePacketFailsClosedPerDigest` — all **eight** mutated independently, plus an edited cell list, an edited observed list, an edited gesture, an edited frame generation, and an edited camera |
 | **5. Ambiguity is data** | 4W | `tests/test_workbench_ambiguity.py` — all three clauses of the rule exercised separately, both directions, plus rank stability and a four-occupant selection |
 | **6. Agent parity holds** | 4W + 6W | `tests/test_workbench_parity.py` — the real HTTP server's answer compared against `resolve.py` run as a separate process, for every gesture; plus reading the tracked fixture cold. `tests/test_capture_addressing.py::AgentParityHoldsForCapturePackets` — the same, for capture packets, for every gesture |

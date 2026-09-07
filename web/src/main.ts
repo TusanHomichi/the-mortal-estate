@@ -1,3 +1,4 @@
+import { cameraViewFromUrl } from "./camera";
 import "./style.css";
 import { startFeelScene } from "./feelScene";
 import { fetchVerifiedAssetPacket } from "./manifest";
@@ -26,7 +27,7 @@ function showRefusal(reason: string): void {
 async function main(): Promise<void> {
   try {
     const packet = await fetchVerifiedAssetPacket();
-    await startFeelScene(stage!, packet, presets, { zoomStep });
+    await startFeelScene(stage!, packet, presets, { zoomStep, cameraView: cameraViewFromUrl(pageUrl) });
     banner!.hidden = true;
     stage!.dataset.sceneState = "ready";
     document.body.dataset.sceneReady = "true";

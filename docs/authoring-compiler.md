@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 3
-status: Compiler and land contracts; fixture accepted at G4X and identity-proof geography at S1. Audit clarifies diagnostic serving and remaining report obligations.
+last_updated: 2026-09-06
+revision: 4
+status: Three declared lands; first-expedition geography accepted with verified encoding, threshold passages and explicit landings.
 public_safe: true
-summary: Land declarations, compiler commands, promotion, deterministic output, Workbench operations, and proven rejection classes.
+summary: Land declarations, geographic acceptance, deterministic compilation, transition layouts, Workbench and rejection proof.
 routes:
   - crates/tme-authoring/**
   - content/lands/**
@@ -137,6 +137,35 @@ every accepted geography edit costs a source change and a rebuild. That is
 correct while accepted edits are rare, and it will be felt once the Workbench
 makes truth edits cheap. Revisit the SHAPE of the second anchor when there is
 real usage evidence; do not revisit its existence.
+
+### Encoding an accepted visual review
+
+The first-expedition approval covers a visual packet whose geometry requires
+compiler encoding. Its receipt explicitly denies byte identity with that review.
+The land contract additionally pins the review manifest and a canonical compiled
+geography digest; the receipt must match both. The canonical record includes each
+member's dimensions, terrain stacks, passability, structures, landmarks, arrival
+and all directed endpoints. Its independent comparison against the reviewed
+packet is recorded in the [land provenance](../content/lands/first-expedition/README.md).
+The normal master-byte anchor and per-file checks still apply. This grants no
+artwork, tuning or canon authority, and cannot be selected by rewriting a receipt
+for a land whose contract requires byte-identical review.
+
+### Passage and landing semantics
+
+Transitions declare their encoding in the member contract. `AdjacentMarker`
+places a marked feature beside the shared access/return square. `Threshold`
+places the marker on the departure square and requires explicit local
+`landing_cell_x` and `landing_cell_y` properties. Every marker, departure and
+landing must be in bounds and passable. A landing may be offset by more than one
+square where the accepted room layout calls for it. The compiler already proves
+all those floor squares belong to the member's reachable component.
+
+The graph links a departure to the paired transition's landing, preserves
+complementary up/down stairs, and projects paired `passage` directions as normal
+runtime passages. Every member must be reachable from the sole arrival member.
+The graph never infers a landing from visual assets or substitutes stairs for a
+room entrance. Workbench projections expose the compiled landing explicitly.
 
 ## The candidate path
 

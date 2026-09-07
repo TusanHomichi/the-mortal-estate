@@ -6,10 +6,10 @@ function space(weather = true): FeelSpace {
   return {
     grid_extents: { i: 4, j: 1 },
     cells: [
-      { i: 0, j: 0, material: "grass" },
-      { i: 1, j: 0, material: "grass" },
-      { i: 2, j: 0, material: "grass" },
-      { i: 3, j: 0, material: "stone" },
+      { i: 0, j: 0, material: "grass", walkable: true },
+      { i: 1, j: 0, material: "grass", walkable: true },
+      { i: 2, j: 0, material: "grass", walkable: true },
+      { i: 3, j: 0, material: "stone", walkable: true },
     ],
     wall_runs: [],
     roofs: [],

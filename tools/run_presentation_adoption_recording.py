@@ -174,13 +174,16 @@ def arrange_seed(
     if len(service_rows) != 1:
         raise ProofError(f"source seed must carry service {service_change['service_id']!r} exactly once")
     service = service_rows[0]
-    service_before = copy.deepcopy(service["location"])
-    service["location"] = _replacement_location(service_before, service_change["location"])
+    if service["placement"]["kind"] != "fixed":
+        raise ProofError("recording fixture requires a fixed service placement")
+    placement = service["placement"]
+    service_before = copy.deepcopy(placement["location"])
+    placement["location"] = _replacement_location(service_before, service_change["location"])
     deltas.append(
         {
-            "path": f"service_instances/{service_change['service_id']}/location",
+            "path": f"service_instances/{service_change['service_id']}/placement/location",
             "before": service_before,
-            "after": copy.deepcopy(service["location"]),
+            "after": copy.deepcopy(placement["location"]),
         }
     )
     return effective, deltas

@@ -92,7 +92,7 @@ document.getElementById("take-capture").addEventListener("click", async () => {
   const status = document.getElementById("capture-status");
   const began = performance.now();
   button.disabled = true;
-  button.textContent = "Capturing both browsers…";
+  button.textContent = "Capturing browsers…";
   status.textContent = "";
   try {
     const result = await takeCapture();

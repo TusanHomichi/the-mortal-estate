@@ -20,6 +20,9 @@ tactics, social interdependence, long character development, mutable
 environments, and a persistent world whose living settlements are built over
 lives and places that came before.
 
+The [gameplay baseline](docs/gameplay-baseline.md) owns historical gameplay
+fidelity, the modern implementation boundary and explicit world changes.
+
 ## Status
 
 Public clean-source repository, pre-release, under active construction. This
@@ -28,7 +31,7 @@ development record and frozen private predecessor remain private and are not
 part of this repository. Publishing this source did not release a game, client,
 service, public API, or content snapshot. Where the work stands, phase by phase,
 is the
-[genesis ledger](docs/plans/genesis-ledger.md#current-checkpoint-2026-09-05).
+[genesis ledger](docs/plans/genesis-ledger.md#current-checkpoint).
 For what the browser implements now, read
 [browser client](docs/browser-client.md);
 [presentation direction](docs/presentation-direction.md) owns the accepted target.

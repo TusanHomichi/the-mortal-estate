@@ -41,6 +41,7 @@ mod compile;
 pub mod contract;
 mod emit;
 mod export;
+mod geography;
 mod graph;
 #[cfg(test)]
 mod mutants;

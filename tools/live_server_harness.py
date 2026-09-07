@@ -364,7 +364,7 @@ class LiveServer:
         operations_port = reserve_port()
         tls_port = reserve_port()
         self.authority, certificate, key = create_certificates(self.run_directory)
-        self._proxy = TlsProxy(tls_port, public_port, certificate, key)
+        self._proxy = self.start_proxy(tls_port, public_port, certificate, key)
         self.origin = f"https://{PROXY_HOST}:{tls_port}"
         print(f"origin: {self.origin}")
 
@@ -400,6 +400,10 @@ class LiveServer:
                 self.status.get("protocol_minor"),
             )
         )
+
+    def start_proxy(self, listen_port: int, upstream_port: int, certificate: Path, key: Path):
+        """The client harness owns its front end; authority provisioning is shared."""
+        return TlsProxy(listen_port, upstream_port, certificate, key)
 
     def _write_bootstrap_manifest(self) -> Path:
         manifest = {

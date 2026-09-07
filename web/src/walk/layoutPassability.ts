@@ -1,7 +1,8 @@
 /**
  * Presentation-only passability for the browser feel scene's walk experiment.
  *
- * This guesses walkability from one candidate space's layout. It is local,
+ * This combines explicit candidate ground verdicts with local wall and prop
+ * occupancy. Static meshes have no implicit collision. It is local,
  * non-authoritative, and must never be used by the real client, which may
  * present only walkability received from authority
  * (docs/boundary-map.md#15-fail-closed-terrain-composition).
@@ -37,13 +38,13 @@ export function sameCell(left: Cell, right: Cell): boolean {
 
 export function passabilityFrom(space: FeelSpace): LayoutPassability {
   const cells = new Set(space.cells.map((cell) => cellKey(cell)));
-  const blocked = new Set<string>();
+  const blocked = new Set(space.cells.filter((cell) => !cell.walkable).map(cellKey));
   const { wallTiles, doorTiles } = wallAndDoorTiles(space.wall_runs, cells);
   const portalTiles = new Set(
     space.portals.map((portal) => cellKey({ i: portal.cell[0], j: portal.cell[1] })),
   );
   const roofTiles = new Set<string>();
-  for (const roof of [...space.roofs, ...space.structures]) {
+  for (const roof of space.roofs) {
     for (let j = roof.footprint.j0; j <= roof.footprint.j1; j += 1) {
       for (let i = roof.footprint.i0; i <= roof.footprint.i1; i += 1) {
         const key = cellKey({ i, j });

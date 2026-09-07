@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 13
-status: Private authoritative browser controls and diagnostic capture use one Rust codec; presentation integration remains open.
+last_updated: 2026-09-06
+revision: 14
+status: Three-engine browser matrix including WebKit; packaged desktop and presentation integration proof remain open.
 public_safe: true
-summary: Browser control authority, transient bearer credentials, shared Rust WebAssembly decoding, reconciliation, renderer identity and proof limits.
+summary: Browser control authority, shared codec, three-engine proof, renderer evidence and packaged desktop obligations.
 routes:
   - web/**
   - crates/tme-protocol/**
@@ -84,16 +84,15 @@ Its baseline:
   `tools/run_verification.py`, gated on the `node` capability, running
   install, typecheck, unit tests, and build; `UNAVAILABLE` without Node.
 
-**Every real-tab proof runs in two engines (owner ruling, 2026-09-03).** The
-owner reviews the preview in Firefox; the proofs and captures ran in headless
-Chromium. A picture judged in one browser is judged in both: the walk proof
-and the capture tool run in Chromium and in Firefox through Playwright, each
-engine with its own server, tab, and captures. Firefox requires a display for
-WebGL; [browser client](browser-client.md#renderer-capability) owns
-the hardware/software launcher and its capabilities. A run that cannot supply
-an engine or its requested renderer is incomplete, never a pass on the other. The desktop webviews join
-that list as targets are claimed. Narrowing a run to one engine is a look,
-not a proof.
+**The browser matrix includes WebKit (owner ruling, 2026-09-06).** The
+September 3 Chromium/Firefox requirement expands to Chromium, Firefox and
+Playwright WebKit. The executable roster is `web/proof/engines.json`, shared by
+browser launchers, capability checks and authoritative capture producers. Every
+complete real-tab proof covers that roster; a missing engine or unproven requested
+renderer makes it incomplete. Narrowing a run is an inspection. The
+[browser client](browser-client.md#renderer-capability) owns platform launch and
+GPU-evidence details. Playwright WebKit adds engine compatibility coverage; it
+does not establish Safari-version or packaged Tauri support.
 
 **The desktop client is the web client (owner ruling, 2026-09-03).** The
 browser client is the one client; the desktop build is that client in a
@@ -299,12 +298,12 @@ Production packaging must exclude proof fixtures, test code, and private packets
 | Surface | What it proves | Limit |
 | --- | --- | --- |
 | `web` verification lane | Typecheck, browser unit tests, build | Synthetic inputs; no live server |
-| Two-engine walk proof | Real Three.js movement, cursor, facing, portals and rendering | Candidate packet; no authoritative wire |
+| Full-roster walk proof | Real Three.js movement, cursor, facing, portals and rendering | Candidate packet; no authoritative wire |
 | Native and WebAssembly protocol corpus | Current and refused wire formats through the same Rust codec | No production control UI |
 | `tools/run_server_live_proof.py` | Real TLS sign-in, admission, land, individual cooldowns, reconnect, logout | Python wire observer; no rendered browser claim |
-| Installed private browser UI proof | Two tabs, real HTTPS/WSS controls, offset deadlines, reconnect, movement, logout and 200% text | Owner-invoked against the private development deployment; normal CA verification in Chromium and Firefox |
+| Installed private browser UI proof | Two tabs, real HTTPS/WSS controls, offset deadlines, reconnect, movement, logout and 200% text | Owner-invoked against the private development deployment; normal CA verification across the browser roster |
 | PostgreSQL gated suite | Durable server, session, restart, and recovery invariants | Requires a scratch database administrator |
-| `tools/run_browser_capture_proof.py` | Native WSS, live/replay browser images, raster/pointer identity, source binding and Workbench HTTP selection in both engines | Diagnostic renderer; scratch TLS certificate errors permitted only in ephemeral proof profiles |
+| `tools/run_browser_capture_proof.py` | Native WSS, live/replay browser images, raster/pointer identity, source binding and Workbench HTTP selection across the browser roster | Diagnostic renderer; scratch TLS certificate errors permitted only in ephemeral proof profiles |
 
 Production browser integration needs end-to-end tests through shipped UI and
 transport wiring. A server wire proof cannot stand in for that. Tauri targets

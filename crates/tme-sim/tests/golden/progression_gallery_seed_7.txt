@@ -75,8 +75,8 @@ time 27000ms
 
 player ready: Delver at 27000ms
 Delver intent at 27000ms: train gallery_trainer 20
-Delver spent 14 gold
-Delver trained sword with gallery_trainer: learning rate 1 -> 3, offered 20 gold, spent 14, retained 6
+Delver spent 20 gold
+Delver trained sword with gallery_trainer: learning rate 1 -> 3, offered 20 gold, spent 14, returned to ground 6
 Delver gained 6 experience points (total: 2806)
 readiness scheduled: Delver cost=1 ready_at=30000ms
 time 30000ms

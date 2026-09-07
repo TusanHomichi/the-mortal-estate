@@ -32,4 +32,5 @@ __pycache__/
 # Browser-client dependencies and Vite build output. Both are reproducible
 # from web/package-lock.json and neither is runtime input or source.
 /web/node_modules/
+/node_modules/
 /web/dist/

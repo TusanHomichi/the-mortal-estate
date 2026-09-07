@@ -510,6 +510,8 @@ fn turn_undead_commits_each_contact_immediately_before_that_targets_effect() {
             target.social.behavior = SocialBehavior::Civilian;
             target.social.owner_relation = SocialOwnerRelation::None;
             target.npc = Some(NpcState {
+                patrol: Vec::new(),
+                patrol_next: 0,
                 follow_cadence_units: 1,
                 interactions: Vec::new(),
                 following_character_id: None,

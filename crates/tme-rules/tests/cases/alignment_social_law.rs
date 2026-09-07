@@ -338,6 +338,8 @@ fn hostile_spell_contacts_lawful_npc_before_resistance_and_debug_surfaces_are_au
             owner_relation: SocialOwnerRelation::None,
         };
         npc.npc = Some(NpcState {
+            patrol: Vec::new(),
+            patrol_next: 0,
             follow_cadence_units: 1,
             interactions: Vec::new(),
             following_character_id: None,
@@ -427,6 +429,8 @@ fn late_hostile_spell_failure_restores_social_spell_timing_and_rng_state() {
             owner_relation: SocialOwnerRelation::None,
         };
         target.npc = Some(NpcState {
+            patrol: Vec::new(),
+            patrol_next: 0,
             follow_cadence_units: 1,
             interactions: Vec::new(),
             following_character_id: None,

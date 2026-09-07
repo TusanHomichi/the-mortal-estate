@@ -25,6 +25,7 @@ impl Engine {
                     .collect::<Result<Vec<_>, StepError>>()?;
                 Ok(ServiceViewV1 {
                     service_id: service.id().to_string(),
+                    actor_id: service.actor_id().cloned(),
                     name: service.name().to_string(),
                     position: service.position().clone(),
                     capabilities,
@@ -389,10 +390,7 @@ impl Engine {
                             .world
                             .corpses
                             .values()
-                            .filter(|corpse| {
-                                corpse.location.level == service.position().level
-                                    && corpse.location.position == service.position().position
-                            })
+                            .filter(|corpse| &corpse.location == service.position())
                             .map(|corpse| (corpse.sequence, corpse.id.clone()))
                             .collect::<Vec<_>>();
                         local.sort();

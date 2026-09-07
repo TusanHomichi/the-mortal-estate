@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 20
-status: Standing server contract with private deployment and transient control API v4 authentication.
+last_updated: 2026-09-07
+revision: 22
+status: Standing server contract with durable creation, transient authentication and matching private preview releases.
 public_safe: true
-summary: Server authority, transient browser-compatible authentication, private development deployment, storage identity and teardown.
+summary: Durable creation, server authority, transient authentication, private preview deployment, storage identity and teardown.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -90,6 +90,22 @@ expiry, admission consequences and forgiveness use one prepared-checkpoint
 persistence function; no path may publish changed state under an existing
 sequence. The private two-tab proof caught the former logout violation.
 
+## Character creation admission
+
+Authenticated creation offers and requests use the strict control API codec and
+normal Origin, Bearer and CSRF checks. The [class contract](class-training-contract.md#character-creation)
+owns creation profiles and rules validation. The server assigns an identity and
+a free account slot, then commits the character directory, world checkpoint and
+account-scoped request receipt in one transaction before runtime publication.
+HTTP cancellation does not cancel an admitted creation operation. An identical
+retry returns its original character; another draft under that request ID is a
+conflict. Creation does not select or admit a socket for the character.
+
+On restart, operator-supplied seeded character assertions must still match the
+durable roster. Additional created characters are permitted. The complete roster
+must agree with the recovered world's character actors; the seed is no longer
+mistaken for an exhaustive permanent roster.
+
 ## Transient control authentication
 
 Control API v4 returns an explicit redacted-debug session token with the login
@@ -113,9 +129,18 @@ seed remain operator inputs outside the checkout.
 
 `tme-server contract versions` reports the built binary's checkpoint version,
 embedded migration checksums and wire versions without connecting to a database.
-Development releases record that identity with their file digests. Activation
+Development releases record that identity with their file digests. The development
+runbook also owns private preview origins and receipt-bound candidate artwork,
+shipped with the matching browser and server. Activation
 requires matching storage contracts and served content; world/storage migrations
 cannot enter through an ordinary binary swap.
+
+The owner intends the preview to become an account-creation and play entry point
+when inviting people. This is recorded product direction, not current outside
+admission or authorization to open enrollment. The private preview serves the
+whole current playable build, including exterior travel and interior transitions.
+Public enrollment and external product-boundary activation remain a later owner
+decision with their own implementation and proof.
 
 The installed-service proof is explicit because it can restart the persistent
 private world. The [execution receipt](plans/2026-09-05-private-play-loop.md)

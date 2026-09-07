@@ -6,7 +6,8 @@
 
 use super::{
     LandContract, LandmarkContract, LevelPresentation, MemberContract, PropertyValue,
-    ReceiptAuthority, StructureContract, TileClass, TileRole, TransitionContract, base, class,
+    ReceiptAuthority, StructureContract, TileClass, TileRole, TransitionContract, TransitionLayout,
+    base, class,
 };
 use tme_rules::{LawZoneDef, PresentationModeDef, SceneRoleDef, StagedViewportDef, WorldZoomDef};
 
@@ -55,6 +56,7 @@ const WORLD_ZOOM: WorldZoomDef = WorldZoomDef {
 };
 
 pub static LAND: LandContract = LandContract {
+    reviewed_encoding: None,
     id: "authoring_fixture",
     realm_id: "testland",
     realm_name: "Testland",
@@ -102,6 +104,7 @@ pub static LAND: LandContract = LandContract {
                 },
             ],
             transitions: &[TransitionContract {
+                layout: TransitionLayout::AdjacentMarker,
                 id: "fixture_descent",
                 target_member: "interior",
                 paired_transition: "fixture_ascent",
@@ -131,6 +134,7 @@ pub static LAND: LandContract = LandContract {
             structures: &[],
             landmarks: &[],
             transitions: &[TransitionContract {
+                layout: TransitionLayout::AdjacentMarker,
                 id: "fixture_ascent",
                 target_member: "surface",
                 paired_transition: "fixture_descent",

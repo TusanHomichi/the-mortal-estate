@@ -75,6 +75,16 @@ seed-7 gallery and make no source-parity claim:
 The final carried-gold target of 64 and bank balance of 15 follow only from
 those clean proof inputs and the existing transaction owners.
 
+## Creation variant
+
+The native browser proof may create an additional character from the immutable
+fixture profile at `creation_arrival`, the existing player start square. This
+reuses the synthetic Wizard sheet and loadout, restores initial HP/MP to 40/40,
+and gives attributes an invented minimum of 8, maximum of 18 and 18-point pool.
+The source item's character binding is instantiated for the new identity.
+These choices test allocation, ownership, persistence and the UI; they are not
+historical starting values. The original scripted actor is unchanged.
+
 ## Mechanic Precedents
 
 These tracked evaluations establish the current mechanics being composed; they

@@ -8,7 +8,7 @@ function room(): FeelSpace {
     cells: Array.from({ length: 45 }, (_, index) => ({
       i: index % 9,
       j: Math.floor(index / 9),
-      material: "floor_planks",
+      material: "floor_planks", walkable: true,
     })),
     wall_runs: [
       { axis: "x", start: [0.5, 0.5], cells: 8, door_interval: null },
@@ -27,8 +27,8 @@ function room(): FeelSpace {
 }
 
 describe("interior near-wall selection", () => {
-  it("derives the south and east runs from absent camera-side floor", () => {
-    expect(nearWallRunIndices(room())).toEqual(new Set([2, 3]));
+  it("derives the south runs from absent camera-side floor", () => {
+    expect(nearWallRunIndices(room())).toEqual(new Set([2]));
   });
 
   it("never cuts down exterior walls", () => {

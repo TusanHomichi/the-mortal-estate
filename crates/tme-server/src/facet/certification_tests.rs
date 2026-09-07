@@ -536,7 +536,7 @@ async fn assert_common_ready(
 
 async fn run_determinism_oracle(fixture: DeterminismFixture) -> [u8; 32] {
     assert_eq!(wire::PROTOCOL_MAJOR, 1);
-    assert_eq!(wire::PROTOCOL_MINOR, 8);
+    assert_eq!(wire::PROTOCOL_MINOR, 10);
     let initial = fixture.engine.export_checkpoint().unwrap();
     let mut direct = fixture.engine.clone();
     let facet_engine = fixture.engine.clone();
@@ -755,7 +755,7 @@ async fn fixed_enqueue_sim_and_facet_paths_are_byte_exact_and_repeatable() {
         .collect::<String>();
     assert_eq!(first, second, "semantic trace SHA-256 must repeat exactly");
     assert_eq!(
-        semantic_sha256, "7f8eaf2b76d5bf20771d7b476a4055f694e1ab3b006d1529f15187cf5d25efcb",
+        semantic_sha256, "121f9c1be217a331362e8a97b91689538fdb7c4494b1185abfccfe55d978a580",
         "semantic trace SHA-256 is an approval-visible determinism contract"
     );
 }

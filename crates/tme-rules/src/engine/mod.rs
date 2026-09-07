@@ -21,6 +21,7 @@ mod ai;
 mod armor;
 mod character_transfer;
 mod combat;
+mod creation;
 
 mod checkpoint;
 pub use checkpoint::{

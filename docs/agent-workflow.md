@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 9
-status: Standing workflow; selective context loading and single-agent/delegated closeout clarified. Historical disk measurements moved to a linked receipt.
+last_updated: 2026-09-06
+revision: 11
+status: Standing workflow; historical gameplay specifications start from recovered evidence under the owner-directed baseline.
 public_safe: true
-summary: Scope, selective context loading, ownership, implementation, verification method, CI, and closeout.
+summary: Scope, context loading, specification sourcing, ownership, implementation, verification, CI, and closeout.
 always: true
 ---
 
@@ -110,13 +110,17 @@ charter rulings are located through the [boundary map](boundary-map.md) and
 in this tree. If a needed ruling is not carried, ask the owner to supply that
 decision; a private archive is not an implicit prerequisite for starting work.
 
-**2. The reopened list.** Check [boundary-map.md](boundary-map.md) Part 2 and the
-charter's open-decisions list. If this system's values sit on either, the spec is
-**authoring them fresh**. It may not import a value — not from the predecessor,
-not from another game, not from an agent's recollection, and not from a number
-that happens to already be in this tree because a port carried it. Ruling D2
-reopened every exact mechanic, name, timing, penalty, and route; a spec that
-quietly reuses one has broken a ruling, not saved time.
+**2. The selected baseline and reopened list.** Check [boundary-map.md](boundary-map.md) Part 2 and the
+charter's open-decisions list. The [gameplay baseline](gameplay-baseline.md) supersedes D2's blanket
+fresh-design requirement. For historical gameplay, recover the previous evidence
+and design dispositions first, identify the source version and separate observed
+facts from provisional values. Match the selected behavior through original
+implementation. Missing evidence remains unknown; it does not authorize a
+replacement mechanic. New mechanics outside the baseline need owner design.
+
+Apply later owner rulings before treating a fact as still reopened. The
+[first-land map-template exception](public-boundary-policy.md#first-land-map-template)
+owns the permitted geographic source and derivation scope.
 
 **3. The owner of every fact it changes.** Before designing a mechanic, name the
 seam that will own each fact the system mutates, from
@@ -131,8 +135,10 @@ stronger than any prose, including prose in this repository. Read them before
 writing. A spec that contradicts a green test is proposing a deliberate break, and
 must say so in those words, name the tests, and migrate them in the same slice.
 
-**5. Original design work, with the owner.** Then design. Owner conversation
-originates the mechanic; it is not an adjustment pass over something inherited.
+**5. Author the specification.** Within the historical baseline, write the
+evidence-backed contract and explicit deviations. Recovered original design work
+is reviewed for retention, replacement or conflict rather than discarded. Outside
+that baseline, owner conversation originates new mechanics.
 Where nothing settles a question, present the options and their consequences and
 let the owner rule — then record the ruling in the document that owns the fact.
 
@@ -143,16 +149,19 @@ can see them, not flattened into confident prose.
 
 **Evidence.** What may be cited as the basis of a design claim: owner rulings, the
 charter, this repository's own contracts and tests, original design work, and
-observed play. External reference material is never the basis of a spec. It may
+observed play. Outside the
+[authorized reconstruction scope](public-boundary-policy.md#historical-gameplay-reconstruction),
+external reference material is never the basis of a spec. It may
 inform a human-authored conclusion, and it never appears as authority in a
 document — the full rule, including quarantine and provenance, is
 [public-boundary-policy.md](public-boundary-policy.md).
 
 ### What this replaced, and why
 
-The retired workflow required private-corpus research before any gameplay spec.
-The authoring steps above replace that dependency: owner conversation can
-originate design; external reference payload cannot enter the tree. Follow the
+The old blanket requirement to research every kind of specification remains
+retired. Historical gameplay now explicitly requires evidence recovery under the
+selected baseline; unrelated engineering work does not. Authored contracts carry
+the resulting rules so implementation and proof need no private archive. Follow the
 [public boundary](public-boundary-policy.md#the-quarantine-flow).
 
 ## Implementer autonomy

@@ -168,24 +168,30 @@
     {
       "id": "crossroads_counter",
       "service_definition_id": "crossroads_counter",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     },
     {
       "id": "trail_vendor",
       "service_definition_id": "trail_vendor",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     }

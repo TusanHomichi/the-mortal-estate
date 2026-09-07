@@ -89,11 +89,13 @@ fn storage_engine() -> Engine {
         seed.service_instances.push(ServiceInstanceSeedDef {
             id: definition_id.clone(),
             service_definition_id: definition_id,
-            location: crate::model::WorldPosition::new(
-                "realm_0",
-                "room_0",
-                crate::model::Coord { x: 1, y: 1 },
-            ),
+            placement: crate::model::ServicePlacement::Fixed {
+                location: crate::model::WorldPosition::new(
+                    "realm_0",
+                    "room_0",
+                    crate::model::Coord { x: 1, y: 1 },
+                ),
+            },
         });
     }
     crate::engine::setup::test_engine_from_parts(catalog, profile, template, seed)

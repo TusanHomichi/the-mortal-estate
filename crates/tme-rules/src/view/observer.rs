@@ -341,6 +341,14 @@ pub enum ObserverTransactionRewardV1 {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ObserverFeedbackCueV1 {
+    SkillCritique {
+        service_id: String,
+        track_id: String,
+        track_display: Option<String>,
+        level: u8,
+        critique_rank: Option<u8>,
+        level_title: Option<String>,
+    },
     PhysicalCombat {
         source: Option<ObserverFeedbackActorV1>,
         target: ObserverFeedbackActorV1,

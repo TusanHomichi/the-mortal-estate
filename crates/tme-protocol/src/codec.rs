@@ -22,6 +22,27 @@ pub fn decode_document(decoder: &str, input: &[u8]) -> Result<Vec<u8>, ProtocolE
         "login_request_v1" => encoded(decode_login_request(input)?),
         "logout_request_v1" => encoded(decode_logout_request(input)?),
         "character_select_request_v1" => encoded(decode_character_select_request(input)?),
+        "character_create_request_v1" => encoded(decode_character_create_request(input)?),
+        "character_creation_options_v1" => {
+            let value = decode_control::<CharacterCreationOptionsV1>(input)?;
+            control_version(value.control_api_version)?;
+            let ids = value
+                .options
+                .iter()
+                .map(|option| option.profile_id.as_str())
+                .collect::<BTreeSet<_>>();
+            if ids.len() != value.options.len() {
+                return Err(ProtocolError::new(
+                    "creation profile identities must be unique",
+                ));
+            }
+            encoded(value)
+        }
+        "character_created_v1" => {
+            let value = decode_control::<CharacterCreatedV1>(input)?;
+            control_version(value.control_api_version)?;
+            encoded(value)
+        }
         "socket_ticket_request_v1" => encoded(decode_socket_ticket_request(input)?),
         "forgive_player_kill_mark_request_v1" => {
             encoded(decode_forgive_player_kill_mark_request(input)?)

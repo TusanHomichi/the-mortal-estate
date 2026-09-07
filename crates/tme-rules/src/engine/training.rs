@@ -1,5 +1,8 @@
 //! Service-addressed permanent skill training and read-only critique.
 
+#[cfg(test)]
+mod tests;
+
 use std::collections::BTreeSet;
 
 use crate::engine::StepError;
@@ -88,9 +91,7 @@ impl Engine {
         let actor = self.world.actors.get(actor_index).ok_or_else(|| {
             TrainingContractError::new(ActionBlockedReasonV1::NoSuchTarget, "unknown actor")
         })?;
-        if service.position().level != actor.location.level
-            || service.position().position != actor.location.position
-        {
+        if service.position() != &actor.location {
             return Err(TrainingContractError::new(
                 ActionBlockedReasonV1::ServiceNotHere,
                 format!("trainer service {service_id:?} is not at the actor coordinate"),
@@ -119,9 +120,7 @@ impl Engine {
         let actor = self.world.actors.get(actor_index).ok_or_else(|| {
             TrainingContractError::new(ActionBlockedReasonV1::NoSuchTarget, "unknown actor")
         })?;
-        if service.position().level != actor.location.level
-            || service.position().position != actor.location.position
-        {
+        if service.position() != &actor.location {
             return Err(TrainingContractError::new(
                 ActionBlockedReasonV1::ServiceNotHere,
                 format!("trainer service {service_id:?} is not at the actor coordinate"),
@@ -541,9 +540,27 @@ impl Engine {
             requirements: vec![TransactionRequirement::MinimumCarriedGold {
                 amount: offered_gold,
             }],
-            costs: vec![TransactionCost::CarriedGold { amount: spent_gold }],
+            costs: vec![TransactionCost::CarriedGold {
+                amount: offered_gold,
+            }],
             rewards: Vec::new(),
         };
+        let mut rewards = vec![
+            PlannedReward::LearningRate {
+                track_id: track_id.clone(),
+                before: previous_learning_rate,
+                after: new_learning_rate,
+            },
+            PlannedReward::Experience {
+                amount: training_xp,
+            },
+        ];
+        if unspent_gold > 0 {
+            rewards.push(PlannedReward::ReturnedGold {
+                amount: unspent_gold,
+                location: actor.location.clone(),
+            });
+        }
         let transaction = self
             .plan_transaction(
                 actor_index,
@@ -554,16 +571,7 @@ impl Engine {
                 },
                 &shared,
                 None,
-                vec![
-                    PlannedReward::LearningRate {
-                        track_id: track_id.clone(),
-                        before: previous_learning_rate,
-                        after: new_learning_rate,
-                    },
-                    PlannedReward::Experience {
-                        amount: training_xp,
-                    },
-                ],
+                rewards,
             )
             .map_err(|error| TrainingContractError::new(error.reason(), error.message()))?;
         Ok(TrainingPlan {

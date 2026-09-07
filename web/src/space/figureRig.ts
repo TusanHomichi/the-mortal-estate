@@ -22,7 +22,7 @@ import type { FigureRow, VerifiedAssetPacket } from "../feelTypes";
 /**
  * The live figure (owner ruling, 2026-09-03): a rigged glTF, its outfit parts
  * on the same skeleton, a clip library, and a material that reproduces the
- * treated cards' grammar — the figure's own palette as a nearest-colour lookup
+ * treated cards' grammar — grading through the figure's two nearest palette colours
  * after lighting, with a rim darkening. Decoded once per packet from verified
  * bytes only; instanced per space with a cloned skeleton.
  */
@@ -76,7 +76,7 @@ const PALETTE_ANCHOR = "#include <opaque_fragment>";
 
 /**
  * Patches a physical material so its lit colour snaps, in gamma space, to the
- * nearest of the figure's palette after a rim darkening. The anchor is three's
+ * two nearest palette colours after a rim darkening. The anchor is three's
  * own; if an upgrade moves it the patch refuses loudly rather than shipping an
  * unpainted figure.
  */
@@ -103,12 +103,22 @@ export function applyFigurePalette(
         vec3 w = vec3(0.6, 1.0, 0.4);
         float best = 1e9;
         vec3 pick = g;
+        vec3 runner = g;
+        float runnerDistance = 1e9;
         for (int i = 0; i < ${count}; i++) {
           vec3 d = (figurePalette[i] - g) * w;
           float dist = dot(d, d);
-          if (dist < best) { best = dist; pick = figurePalette[i]; }
+          if (dist < best) {
+            runnerDistance = best; runner = pick;
+            best = dist; pick = figurePalette[i];
+          } else if (dist < runnerDistance) {
+            runnerDistance = dist; runner = figurePalette[i];
+          }
         }
-        outgoingLight = pow(clamp(pick, 0.0, 1.0), vec3(2.2));
+        // Continuous interpolation between the nearest colours avoids hard
+        // palette boundaries turning detailed normal/albedo maps into speckles.
+        float blend = best / max(best + runnerDistance, 0.000001);
+        outgoingLight = pow(clamp(mix(pick, runner, blend), 0.0, 1.0), vec3(2.2));
       }
       ${PALETTE_ANCHOR}`,
     );
@@ -193,8 +203,12 @@ export function assertSameSkeleton(rig: Object3D, part: Object3D, what: string):
 
 /** Skinned meshes own a skeleton whose bone texture lives on the GPU; release each one. */
 function disposeSkeletons(root: Object3D): void {
+  const disposed = new Set<SkinnedMesh["skeleton"]>();
   root.traverse((object: Object3D) => {
-    if (object instanceof SkinnedMesh) object.skeleton.dispose();
+    if (object instanceof SkinnedMesh && !disposed.has(object.skeleton)) {
+      disposed.add(object.skeleton);
+      object.skeleton.dispose();
+    }
   });
 }
 
@@ -233,19 +247,34 @@ async function decodeFiguresInto(
     for (const file of figureFiles(figure)) table.set(file, URL.createObjectURL(new Blob([bytesOf(file)])));
     try {
       const manager = new LoadingManager();
-      manager.setURLModifier((url) => resolveFigureUrl(url, table));
+      // GLTFLoader can swallow a texture failure and return a material without
+      // that map. Preserve dependency failures across its successful callback.
+      const dependencyFailures: string[] = [];
+      manager.setURLModifier((url) => {
+        try { return resolveFigureUrl(url, table); }
+        catch (error) { dependencyFailures.push(String(error)); throw error; }
+      });
+      manager.onError = () => { dependencyFailures.push("a verified figure dependency could not be loaded"); };
+      const assertDependencies = (): void => {
+        if (dependencyFailures.length > 0) {
+          throw new Error(`figure ${name} has failed dependencies: ${dependencyFailures.join("; ")}`);
+        }
+      };
       const loader = new GLTFLoader(manager);
       const rig = await parseGltf(loader, bytesOf(figure.rig.file), `figure ${name} rig`);
       parsed.push(rig.scene);
+      assertDependencies();
       assertPaintableMaterials(rig.scene, `figure ${name} rig`);
       const parts: Group[] = [];
       for (const part of figure.parts) {
         const scene = (await parseGltf(loader, bytesOf(part.file), `figure ${name} part ${part.file}`)).scene;
         parsed.push(scene);
+        assertDependencies();
         assertPaintableMaterials(scene, `figure ${name} part ${part.file}`);
         parts.push(scene);
       }
       const clips = (await parseGltf(loader, bytesOf(figure.clips.file), `figure ${name} clips`)).animations;
+      assertDependencies();
       const named = { idle: figure.idle, ...figure.gait };
       const required = Object.values(named).map((clipName) => {
         const clip = clips.find((candidate) => candidate.name === clipName);
@@ -278,15 +307,17 @@ export function disposeDecodedFigures(figures: ReadonlyMap<string, DecodedFigure
 /** Releases parsed glTF scenes: skeletons, geometry, materials, and their textures. */
 export function disposeFigureSources(sources: readonly Object3D[]): void {
   const materials = new Set<Material>();
-  for (const source of sources) {
+  const geometries = new Set<Mesh["geometry"]>();
+  for (const source of new Set(sources)) {
     disposeSkeletons(source);
     source.traverse((object: Object3D) => {
       if (!(object instanceof Mesh)) return;
-      object.geometry.dispose();
+      geometries.add(object.geometry);
       const owned = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of owned) materials.add(material);
     });
   }
+  for (const geometry of geometries) geometry.dispose();
   for (const material of materials) {
     for (const value of Object.values(material)) {
       if (value instanceof Texture) value.dispose();
@@ -299,7 +330,7 @@ export function disposeFigureSources(sources: readonly Object3D[]): void {
 const GAIT_FADE_SECONDS = 0.15;
 
 /** Instances a decoded figure at a cell: cloned skeletons, patched materials, the idle clip playing. */
-export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: FigureFacing): FigureInstance {
+export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: FigureFacing, heightAt: (i: number, j: number) => number): FigureInstance {
   const root = new Group();
   root.name = `Figure_${figure.name}`;
   const mixers: AnimationMixer[] = [];
@@ -346,7 +377,7 @@ export function createFigureInstance(figure: DecodedFigure, cell: Cell, facing: 
     facing,
     gait: "idle",
     place(i, j) {
-      root.position.set(i, 0, j);
+      root.position.set(i, heightAt(i, j), j);
     },
     setFacing(direction) {
       root.rotation.y = facingYaw(direction);

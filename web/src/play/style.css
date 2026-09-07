@@ -18,5 +18,18 @@ progress { width: 100%; accent-color: #c4b48b; }
 .legend { color: #b8c4bb; font-size: .85rem; } #position,#feedback { overflow-wrap: anywhere; }
 #occupants { padding-left: 1.2rem; } details { border-top: 1px solid #55635c; padding-top: 1rem; } summary { cursor: pointer; margin-bottom: 1rem; }
 #bindings { display: grid; grid-template-columns: repeat(auto-fit,minmax(12rem,1fr)); gap: 1rem; }
+#gameplay { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap: 1rem; margin-block: 1rem; }
+#gameplay section,#gameplay details { min-width: 0; overflow-wrap: anywhere; }
+#gameplay button { margin-top: .6rem; }
 [hidden] { display: none !important; }
 @media (max-width: 70rem) { .world-grid { grid-template-columns: 1fr; } .controls { max-width: 30rem; } }
+
+.resident-dialog { position: fixed; inset: auto 1rem 1rem auto; width: min(22rem, 85vw); max-height: 70vh; overflow: auto; margin: 0; padding: 1.1rem; color: #eedec5; background: #302a24; border: 1px solid #8d7759; border-radius: .65rem; box-shadow: 0 .6rem 2rem #0008; z-index: 20; }
+.resident-dialog h2 { margin: 0 0 .75rem; }
+.resident-dialog div { display: grid; gap: .5rem; margin-bottom: .8rem; }
+.resident-dialog p { margin: .25rem 0; }
+.resident-dialog small { color: #cdbb9f; }
+
+#login-controls { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1rem; }
+
+.movement-announcement { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }

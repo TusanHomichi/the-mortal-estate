@@ -70,8 +70,8 @@ pub use services::{
     ItemServiceOperationKind, LockerCapability, MerchantCapability, PlayerSalesPolicy,
     ResolvedService, RestorationCapability, RestorationOperation, RestorationOutcome,
     RestorationStatusKind, ServiceCapability, ServiceDefinition, ServiceInstanceState,
-    ServiceTransactionCapability, SkillCritiqueCapability, SkillTrainingCapability, SpellTeaching,
-    SpellTeachingCapability, TrainingOffer,
+    ServicePlacement, ServiceTransactionCapability, SkillCritiqueCapability,
+    SkillTrainingCapability, SpellTeaching, SpellTeachingCapability, TrainingOffer,
 };
 pub use social::{
     AccountMarkAssessment, AccountMarkAssessmentReason, AlignmentConsequenceReason,

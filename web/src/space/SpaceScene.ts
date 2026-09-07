@@ -1,9 +1,14 @@
+import { createSurfaceOcclusion, type OccludingSurface } from "./surfaceOcclusion";
+import { textureHitTest } from "./surfaceAlpha";
+import { createTacticalGrid } from "./tacticalGrid";
+import { createStructureAtmosphere } from "./structureAtmosphere";
+import { resolveInteriorLighting } from "./structureLighting";
+import { addGrassCover, type GrassCover } from "./grassCover";
 import { addStructures } from "./structures";
 import type { FigureFacing } from "../walk/facing";
 import {
   AdditiveBlending,
   AmbientLight,
-  BufferAttribute,
   BufferGeometry,
   ClampToEdgeWrapping,
   Color,
@@ -14,6 +19,7 @@ import {
   Group,
   InstancedBufferAttribute,
   InstancedMesh,
+  Light,
   LinearFilter,
   Matrix4,
   Mesh,
@@ -24,24 +30,23 @@ import {
   PointLight,
   RedFormat,
   ShaderMaterial,
-  ShadowMaterial,
   UnsignedByteType,
   Vector2,
   Vector3,
   type Material,
   type OrthographicCamera,
 } from "three";
-import { CAMERA_OFFSET, projectedHeightCoverTiles } from "../camera";
+import { CAMERA_OFFSET } from "../camera";
 import { createFigureInstance, type DecodedFigure, type FigureInstance } from "./figureRig";
-import type { FeelSpace, WallRun } from "../feelTypes";
+import type { FeelSpace } from "../feelTypes";
 import { GRASS_CLUMP_HEIGHT, scatterGrassClumps } from "../grassClumps";
-import { buildGroundGeometry } from "../groundGeometry";
+import { createTerrainSurface, type TerrainSurface } from "../terrainSurface";
+import { addGround } from "./ground";
 import {
   buildHearthGeometry,
   HEARTH_PROFILE,
   hearthFireAnchor,
   hearthLightPosition,
-  type HearthMaterial,
 } from "../hearthGeometry";
 import { windPresetSettings, type Preset, type WindPresetSettings } from "../presets";
 import {
@@ -52,8 +57,6 @@ import {
   type RoofMaterial,
 } from "../roofGeometry";
 import {
-  groundFragmentShader,
-  groundVertexShader,
   hearthEmberFragmentShader,
   hearthEmberVertexShader,
   hearthFireFragmentShader,
@@ -63,12 +66,11 @@ import {
   windVertexShader,
 } from "../shaders";
 import { buildWindWeight } from "../windWeight";
-import { buildWallProfile, WALL_PROFILE, type WallMaterial } from "../wallGeometry";
+import { buildWallProfile, type WallMaterial } from "../wallGeometry";
 import type { Cell } from "../walk/layoutPassability";
-import { occludingRuns } from "../walk/wallOcclusion";
 import { nearWallRunIndices } from "./interiorWalls";
 import { applyCardLighting } from "./cardLighting";
-import { paletteFor, type ScenePalette } from "./palette";
+import { keyLightOffset, paletteFor, type ScenePalette } from "./palette";
 import { propCardTransform } from "./propCards";
 import {
   configureTexture,
@@ -76,16 +78,6 @@ import {
   requiredTexture,
   type DecodedTexture,
 } from "./textures";
-
-interface WallRunPresentation {
-  run: WallRun;
-  materials: Record<WallMaterial, MeshStandardMaterial>;
-  fadeableMeshes: Mesh[];
-  fadeAmount: number;
-  fadeStartedAt: number;
-  fadeStartedFrom: number;
-  fadeTarget: number;
-}
 
 interface RainSystem {
   update(elapsed: number): void;
@@ -118,11 +110,6 @@ const WARM_LIGHT = new Color("#ffb457");
 const RAIN_COUNT = 1080;
 /** A frame gap beyond this is a pause, not a slow frame. */
 const PAUSE_GAP_SECONDS = 2;
-const WALL_FADE_DURATION_SECONDS = 0.35;
-const WALL_FADED_PLASTER_OPACITY = 0.34;
-const WALL_FADED_TIMBER_OPACITY = 0.48;
-const WALL_FADED_RENDER_ORDER = 10;
-const WALL_COVER_TILES = projectedHeightCoverTiles(WALL_PROFILE.capTop);
 export const HEARTH_LIGHT_INTENSITY_MULTIPLIER = 8;
 export const HEARTH_LIGHT_DISTANCE = 7.5;
 
@@ -193,42 +180,6 @@ function wallMaterials(
     cap_front: build("cap_front"),
     cap_top: build("cap_top"),
   };
-}
-
-function easeOutCubic(progress: number): number {
-  return 1 - (1 - progress) ** 3;
-}
-
-function fadeAmountAt(run: WallRunPresentation, now: number): number {
-  if (run.fadeAmount === run.fadeTarget) return run.fadeTarget;
-  const progress = Math.min(
-    1,
-    Math.max(0, (now - run.fadeStartedAt) / WALL_FADE_DURATION_SECONDS),
-  );
-  return run.fadeStartedFrom +
-    (run.fadeTarget - run.fadeStartedFrom) * easeOutCubic(progress);
-}
-
-function applyWallFade(run: WallRunPresentation, amount: number): void {
-  const faded = amount > 0;
-  for (const [name, material] of Object.entries(run.materials) as [
-    WallMaterial,
-    MeshStandardMaterial,
-  ][]) {
-    if (name === "plinth") continue;
-    const fadedOpacity = name === "plaster"
-      ? WALL_FADED_PLASTER_OPACITY
-      : WALL_FADED_TIMBER_OPACITY;
-    material.opacity = 1 + (fadedOpacity - 1) * amount;
-    if (material.transparent !== faded) {
-      material.transparent = faded;
-      material.needsUpdate = true;
-    }
-    material.depthWrite = !faded;
-  }
-  for (const mesh of run.fadeableMeshes) {
-    mesh.renderOrder = faded ? WALL_FADED_RENDER_ORDER : 0;
-  }
 }
 
 function addContactShadow(group: Group, x: number, z: number, height: number): Mesh {
@@ -316,23 +267,29 @@ export class SpaceScene {
   private readonly windMaterials: ShaderMaterial[] = [];
   private readonly windSettings: WindPresetSettings;
   private readonly windUniforms: SharedWindUniforms;
-  private readonly wallRuns: WallRunPresentation[] = [];
+  private readonly wallRuns: Record<WallMaterial, MeshStandardMaterial>[] = [];
+  private readonly occludingSurfaces: OccludingSurface[] = [];
+  private readonly occlusion: ReturnType<typeof createSurfaceOcclusion>;
   private readonly hearths: HearthPresentation[] = [];
-  private readonly keyLight: DirectionalLight;
+  private readonly keyLight: DirectionalLight | null;
   private readonly keyTarget: Object3D;
   /** World direction toward the key light; constant while it tracks focus. */
   private readonly keyDirection: Vector3;
   private readonly lantern: PointLight | null;
   private readonly lanternBase: number;
   private readonly rain: RainSystem | null;
-  private readonly interior: boolean;
+  private readonly surface: TerrainSurface;
+  private readonly structureAtmosphere: ReturnType<typeof createStructureAtmosphere>;
+  private readonly tacticalGrid: ReturnType<typeof createTacticalGrid>;
+  private grassCover: GrassCover | null = null;
 
   constructor(private readonly options: SpaceSceneOptions) {
     const { name, space, presets, caretakerCell } = options;
     this.group.name = `Space_${name}`;
     this.weatherEnabled = space.weather;
-    this.interior = space.roofs.length === 0;
-    this.palette = paletteFor(presets, space.weather);
+    const lighting = resolveInteriorLighting(space.structures.map((_, index) =>
+      options.structures.get(`structures/${name}/${index}`)).filter((root): root is Group => root !== undefined));
+    this.palette = paletteFor(presets, space.weather, lighting);
     this.windSettings = windPresetSettings(presets, space.weather);
     this.windUniforms = {
       elapsed: { value: 0 },
@@ -341,10 +298,17 @@ export class SpaceScene {
       gustPeriod: { value: this.windSettings.gustPeriod },
     };
     this.background = this.palette.background;
-    this.addGround();
+    this.surface = createTerrainSurface(space);
+    addGround(this.group, options, this.palette, this.windUniforms.elapsed, this.surface);
+    this.tacticalGrid = createTacticalGrid(space, this.surface);
+    this.group.add(this.tacticalGrid.mesh);
     this.addWalls();
     this.addRoofs();
-    addStructures(this.group, name, space.structures, options.structures);
+    addStructures(this.group, name, space.structures, options.structures, this.surface.heightAt);
+    this.structureAtmosphere = createStructureAtmosphere(this.group, presets, options.camera, lighting);
+    this.group.traverse(object => {
+      if (object instanceof Mesh && object.userData.sharedStructure) this.occludingSurfaces.push({ mesh: object });
+    });
     this.addFixtures();
     const lights = this.addLights(caretakerCell);
     this.keyLight = lights.key;
@@ -354,85 +318,18 @@ export class SpaceScene {
     this.lanternBase = lights.lanternBase;
     this.addProps();
     this.caretaker = this.addCaretaker();
+    this.occlusion = createSurfaceOcclusion(this.occludingSurfaces, this.caretaker.root, options.camera);
     this.grassInstanceCount = this.addGrass();
     this.rain = space.weather && presets.includes("rain")
       ? addRain(this.group, options.camera, space.grid_extents)
       : null;
   }
 
-  private addGround(): void {
-    const { space, textures, presets, anisotropy } = this.options;
-    const rainy = space.weather && presets.includes("rain");
-    const ambient = this.palette.ambient.clone().multiplyScalar(this.palette.ambientIntensity);
-    const key = this.palette.key.clone().multiplyScalar(this.palette.keyIntensity * 0.44);
-    const cellsByMaterial = new Map<string, typeof space.cells>();
-    for (const cell of space.cells) {
-      const cells = cellsByMaterial.get(cell.material) ?? [];
-      cells.push(cell);
-      cellsByMaterial.set(cell.material, cells);
-    }
-    for (const [materialName, cells] of cellsByMaterial) {
-      const swatch = requiredTexture(textures, `terrain/${materialName}`).texture;
-      configureTexture(swatch, anisotropy);
-      const material = new ShaderMaterial({
-        name: `ground-${materialName}`,
-        uniforms: {
-          swatch: { value: swatch },
-          swatchPeriod: { value: 3 },
-          jointWidth: { value: 0.028 },
-          wetness: { value: rainy ? 1 : 0 },
-          timeTint: {
-            value: space.weather && presets.includes("dusk")
-              ? new Color(0.94, 0.94, 0.94)
-              : materialName === "grass"
-                ? new Color(0.6, 0.72, 0.9)
-                : new Color(0.74, 0.82, 0.96),
-          },
-          ambientColour: { value: ambient },
-          keyColour: { value: key },
-          keyDirection: { value: new Vector3(-0.52, 0.79, -0.33).normalize() },
-        },
-        vertexShader: groundVertexShader,
-        fragmentShader: groundFragmentShader,
-      });
-      const data = buildGroundGeometry(cells);
-      const geometry = new BufferGeometry();
-      geometry.setAttribute("position", new BufferAttribute(new Float32Array(data.positions), 3));
-      geometry.setAttribute("uv", new BufferAttribute(new Float32Array(data.uvs), 2));
-      geometry.setAttribute("cellOrigin", new BufferAttribute(new Float32Array(data.cellOrigins), 2));
-      geometry.setIndex(data.indices);
-      geometry.computeVertexNormals();
-      geometry.computeBoundingSphere();
-      const mesh = new Mesh(geometry, material);
-      mesh.name = `Ground_${materialName}`;
-      this.group.add(mesh);
-    }
-
-    const extents = space.grid_extents;
-    const shadowPlane = new Mesh(
-      new PlaneGeometry(extents.i, extents.j),
-      new ShadowMaterial({ color: 0x02050b, opacity: 0.34 }),
-    );
-    shadowPlane.name = "GroundShadowReceiver";
-    shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.set((extents.i - 1) / 2, -0.003, (extents.j - 1) / 2);
-    shadowPlane.receiveShadow = true;
-    this.group.add(shadowPlane);
-  }
-
   private addWalls(): void {
     const { space, textures, anisotropy } = this.options;
     const nearRuns = nearWallRunIndices(space);
-    space.wall_runs.forEach((run, runIndex) => {
-      this.wallRuns.push({
-        run,
-        materials: wallMaterials(textures, anisotropy, runIndex),
-        fadeableMeshes: [],
-        fadeAmount: 0,
-        fadeStartedAt: 0,
-        fadeStartedFrom: 0,
-        fadeTarget: 0,
-      });
+    space.wall_runs.forEach((_run, runIndex) => {
+      this.wallRuns.push(wallMaterials(textures, anisotropy, runIndex));
     });
     for (const part of buildWallProfile(space.wall_runs)) {
       if (nearRuns.has(part.runIndex) && part.material !== "plinth" && part.material !== "sill") {
@@ -440,11 +337,12 @@ export class SpaceScene {
       }
       const run = this.wallRuns[part.runIndex];
       if (run === undefined) throw new Error(`wall part ${part.label} names absent run ${part.runIndex}`);
-      const mesh = new Mesh(geometryFromData(part.geometry), run.materials[part.material]);
+      const mesh = new Mesh(geometryFromData(part.geometry), run[part.material]);
       mesh.name = `WallRun_${part.runIndex}_${part.label}`;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      if (part.material !== "plinth") run.fadeableMeshes.push(mesh);
+      this.occludingSurfaces.push({ mesh, acceptsHit: part.material === "door"
+        ? textureHitTest(requiredTexture(textures, "walls/door")) : undefined });
       this.group.add(mesh);
     }
   }
@@ -455,12 +353,12 @@ export class SpaceScene {
       string,
       { material: RoofMaterial; textureKey: string; geometries: ReturnType<typeof buildRoofGeometry>[number]["geometry"][] }
     >();
-    for (const roof of space.roofs) {
+    for (const [roofIndex, roof] of space.roofs.entries()) {
       for (const part of buildRoofGeometry(roof)) {
         const textureKey = part.material === "plaster" || part.material === "post"
           ? `walls/${part.material}`
           : `roofs/${roof.material}_${part.material.replace("shingle_", "")}`;
-        const key = `${part.material}:${textureKey}`;
+        const key = `${roofIndex}:${part.material}:${textureKey}`;
         const batch = batches.get(key) ?? {
           material: part.material,
           textureKey,
@@ -494,7 +392,8 @@ export class SpaceScene {
         geometryFromData(mergeGeometryData(batch.geometries)),
         material,
       );
-      mesh.name = `RoofBatch_${batch.material}`;
+      mesh.name = `RoofBatch_${key}`;
+      this.occludingSurfaces.push({ mesh });
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       this.group.add(mesh);
@@ -505,20 +404,12 @@ export class SpaceScene {
     const { space, textures, anisotropy } = this.options;
     if (space.fixtures.length === 0) return;
 
-    const partsByMaterial = new Map<
-      HearthMaterial,
-      ReturnType<typeof buildHearthGeometry>[number]["geometry"][]
-    >();
-    for (const part of buildHearthGeometry(space.fixtures)) {
-      const geometries = partsByMaterial.get(part.material) ?? [];
-      geometries.push(part.geometry);
-      partsByMaterial.set(part.material, geometries);
-    }
     const fieldstone = requiredTexture(textures, "walls/fieldstone").texture;
     const timber = requiredTexture(textures, "walls/post").texture;
     configureTexture(fieldstone, anisotropy);
     configureTexture(timber, anisotropy);
-    for (const [materialName, geometries] of partsByMaterial) {
+    for (const part of buildHearthGeometry(space.fixtures)) {
+      const materialName = part.material;
       const material = new MeshStandardMaterial({
         name: `hearth-${materialName}`,
         map: materialName === "post" ? timber : fieldstone,
@@ -528,8 +419,9 @@ export class SpaceScene {
         roughness: materialName === "post" ? 0.86 : 0.94,
         metalness: 0,
       });
-      const mesh = new Mesh(geometryFromData(mergeGeometryData(geometries)), material);
-      mesh.name = `HearthBatch_${materialName}`;
+      const mesh = new Mesh(geometryFromData(part.geometry), material);
+      mesh.name = `Hearth_${part.fixtureIndex}_${part.label}`;
+      this.occludingSurfaces.push({ mesh });
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       this.group.add(mesh);
@@ -624,7 +516,7 @@ export class SpaceScene {
   }
 
   private addLights(focusCell: Cell): {
-    key: DirectionalLight;
+    key: DirectionalLight | null;
     target: Object3D;
     direction: Vector3;
     lantern: PointLight | null;
@@ -632,31 +524,36 @@ export class SpaceScene {
   } {
     const { space, presets } = this.options;
     this.group.add(new AmbientLight(this.palette.ambient, this.palette.ambientIntensity));
-    const key = new DirectionalLight(this.palette.key, this.palette.keyIntensity);
-    key.name = space.weather && presets.includes("dusk") ? "WarmHorizonKey" : "CoolMoonlight";
-    const keyOffset = space.weather && presets.includes("dusk")
-      ? new Vector3(-10.5, 6, 6.5)
-      : new Vector3(3.5, 12, -10.5);
-    key.target.position.set(focusCell.i, 0, focusCell.j);
-    key.position.copy(key.target.position).add(keyOffset);
-    key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.left = -10;
-    key.shadow.camera.right = 10;
-    key.shadow.camera.top = 10;
-    key.shadow.camera.bottom = -10;
-    key.shadow.camera.near = 0.1;
-    key.shadow.camera.far = 40;
-    key.shadow.bias = -0.00025;
-    this.group.add(key, key.target);
+    const key = this.palette.keyIntensity > 0 ? new DirectionalLight(this.palette.key, this.palette.keyIntensity) : null;
+    const target = new Object3D();
+    const keyOffset = keyLightOffset(presets, space.weather);
+    if (key) {
+      key.target = target;
+      key.name = space.weather && presets.includes("dusk") ? "WarmHorizonKey" : "CoolMoonlight";
+      key.target.position.set(focusCell.i, 0, focusCell.j);
+      key.position.copy(key.target.position).add(keyOffset);
+      key.castShadow = true;
+      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.camera.left = -10;
+      key.shadow.camera.right = 10;
+      key.shadow.camera.top = 10;
+      key.shadow.camera.bottom = -10;
+      key.shadow.camera.near = 0.1;
+      key.shadow.camera.far = 40;
+      key.shadow.bias = -0.00025;
+      key.shadow.normalBias = 0.025;
+      this.group.add(key, key.target);
+    }
 
+    const lanternBase = this.palette.lanternIntensity * (this.surface.coastal ? .35 : 1);
     let lantern: PointLight | null = null;
     if (space.light_sources.lantern_glass !== null) {
-      lantern = new PointLight(WARM_LIGHT, this.palette.lanternIntensity, 6, 2);
+      lantern = new PointLight(WARM_LIGHT, lanternBase, 6, 2);
       lantern.name = "LanternGlow";
       lantern.position.fromArray(space.light_sources.lantern_glass);
       lantern.castShadow = true;
       lantern.shadow.mapSize.set(512, 512);
+      lantern.shadow.normalBias = 0.025;
       this.group.add(lantern);
     }
     space.light_sources.candles.forEach((position, index) => {
@@ -667,10 +564,10 @@ export class SpaceScene {
     });
     return {
       key,
-      target: key.target,
+      target,
       direction: keyOffset.clone().normalize(),
       lantern,
-      lanternBase: this.palette.lanternIntensity,
+      lanternBase,
     };
   }
 
@@ -678,7 +575,7 @@ export class SpaceScene {
     const { figures, caretakerFigure, caretakerCell, caretakerFacing } = this.options;
     const figure = figures.get(caretakerFigure);
     if (figure === undefined) throw new Error(`the packet's caretaker figure ${caretakerFigure} was not decoded`);
-    const instance = createFigureInstance(figure, caretakerCell, caretakerFacing);
+    const instance = createFigureInstance(figure, caretakerCell, caretakerFacing, this.surface.heightAt);
     this.group.add(instance.root);
     return instance;
   }
@@ -718,6 +615,7 @@ export class SpaceScene {
       }
       const mesh = new Mesh(geometry, material);
       mesh.name = `Prop_${prop.kind}`;
+      this.occludingSurfaces.push({ mesh, acceptsHit: textureHitTest(source) });
       const transform = propCardTransform(prop);
       mesh.scale.x = transform.scaleX;
       mesh.position.set(transform.position.x, transform.position.y, transform.position.z);
@@ -791,6 +689,10 @@ export class SpaceScene {
   }
 
   private addGrass(): number {
+    if (this.surface.coastal) {
+      this.grassCover = addGrassCover(this.group, this.options.space, this.surface, this.windUniforms);
+      return this.grassCover.count;
+    }
     const clumps = scatterGrassClumps(this.options.space);
     if (clumps.length === 0) return 0;
     const source = requiredTexture(this.options.textures, "props/grass_clump");
@@ -823,7 +725,12 @@ export class SpaceScene {
     return clumps.length;
   }
 
+  focusGrid(cell: Cell | null): void {
+    this.tacticalGrid.focus(cell);
+  }
+
   focusLighting(previous: Cell, next: Cell): void {
+    if (!this.keyLight) return;
     const deltaI = next.i - previous.i;
     const deltaJ = next.j - previous.j;
     this.keyLight.position.x += deltaI;
@@ -834,30 +741,12 @@ export class SpaceScene {
     this.keyTarget.updateMatrixWorld(true);
   }
 
-  updateWallFade(playerCell: Cell, now: number): number {
-    if (this.interior) return 0;
-    const selected = new Set(
-      occludingRuns(this.options.space.wall_runs, playerCell, WALL_COVER_TILES),
-    );
-    let fadedRuns = 0;
-    for (const run of this.wallRuns) {
-      const target = selected.has(run.run) ? 1 : 0;
-      if (target === 1) fadedRuns += 1;
-      if (target !== run.fadeTarget) {
-        const current = fadeAmountAt(run, now);
-        run.fadeAmount = current;
-        run.fadeStartedFrom = current;
-        run.fadeStartedAt = now;
-        run.fadeTarget = target;
-      }
-      run.fadeAmount = fadeAmountAt(run, now);
-      applyWallFade(run, run.fadeAmount);
-    }
-    return fadedRuns;
+  updateOcclusion(now: number): number {
+    return this.occlusion.update(now);
   }
 
-  wallRunPlasterOpacity(runIndex: number): number | null {
-    return this.wallRuns[runIndex]?.materials.plaster.opacity ?? null;
+  surfaceFades(): ReturnType<typeof this.occlusion.snapshot> {
+    return this.occlusion.snapshot();
   }
 
   private lastElapsed = 0;
@@ -887,21 +776,27 @@ export class SpaceScene {
       hearth.emberMaterial.uniforms.elapsed!.value = elapsed;
       hearth.light.intensity = hearth.lightBase * fireFlicker;
     }
+    this.structureAtmosphere.update(elapsed);
     this.rain?.update(elapsed);
+    this.grassCover?.update(elapsed, this.caretaker.root.position);
   }
 
   dispose(): void {
+    this.occlusion.dispose();
+    this.structureAtmosphere.dispose();
     this.caretaker.dispose();
+    this.grassCover?.dispose();
     const geometries = new Set<BufferGeometry>();
     const materials = new Set<Material>();
     this.group.traverse((object) => {
+      if (object instanceof Light) object.dispose();
       if (!(object instanceof Mesh) || object.userData.sharedStructure) return;
       geometries.add(object.geometry);
       if (Array.isArray(object.material)) object.material.forEach((material) => materials.add(material));
       else materials.add(object.material);
     });
     for (const run of this.wallRuns) {
-      Object.values(run.materials).forEach((material) => materials.add(material));
+      Object.values(run).forEach((material) => materials.add(material));
     }
     geometries.forEach((geometry) => geometry.dispose());
     materials.forEach(disposeMaterial);

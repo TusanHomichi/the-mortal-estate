@@ -94,12 +94,15 @@
     {
       "id": "knight_promoter",
       "service_definition_id": "knight_promoter",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     }

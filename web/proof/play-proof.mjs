@@ -3,14 +3,14 @@
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { launchProofBrowser, PROOF_ENGINES } from "./serve.mjs";
+import { launchProofBrowser, PROOF_ENGINES, ENGINE_NAMES } from "./serve.mjs";
 let input = "";
 for await (const chunk of process.stdin) input += chunk;
 const config = JSON.parse(input); input = "";
 const reports = [];
 // A headed Firefox background tab can suspend animation-frame polling.
 const wait = (page, predicate, argument) => page.waitForFunction(predicate, argument, { polling: 50, timeout: 30_000 });
-for (const name of ["chromium", "firefox"]) {
+for (const name of ENGINE_NAMES) {
   const engine = PROOF_ENGINES[name];
   const launched = await launchProofBrowser({ name, engine, executablePath: engine.executablePath(), trustedAuthority: config.authority, multipleWindows: true });
   try {

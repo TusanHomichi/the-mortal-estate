@@ -3,6 +3,17 @@ use super::*;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum FeedbackCue {
+    SkillCritique {
+        service_id: WireLabel,
+        track_id: WireLabel,
+        #[serde(deserialize_with = "deserialize_required_nullable")]
+        track_display: Option<WireLabel>,
+        level: u8,
+        #[serde(deserialize_with = "deserialize_required_nullable")]
+        critique_rank: Option<u8>,
+        #[serde(deserialize_with = "deserialize_required_nullable")]
+        level_title: Option<WireLabel>,
+    },
     PhysicalCombat {
         #[serde(deserialize_with = "deserialize_required_nullable")]
         source: Option<FeedbackActor>,

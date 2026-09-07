@@ -1,10 +1,19 @@
 import { OrthographicCamera, Vector3 } from "three";
 
-/** Nine ground-cell diamonds tall at the ruled 30-degree camera elevation. */
-export const CAMERA_VERTICAL_SIZE_1280X800 = 9 * Math.SQRT2 * Math.sin(Math.PI / 6);
+/** Nine ground-cell rows tall at the accepted 45-degree elevation. */
+export const CAMERA_VERTICAL_SIZE_1280X800 = 9 * Math.sin(Math.PI / 4);
 export const CAMERA_TARGET_HEIGHT = 1.22;
-export const CAMERA_OFFSET = new Vector3(8, 6.531973, 8);
-const CAMERA_REFERENCE_VIEWPORT_HEIGHT = 800;
+export const CAMERA_OFFSET = new Vector3(0, 8, 8);
+const DIMETRIC_OFFSET = new Vector3(8, 6.531973, 8);
+export type CameraView = "dimetric" | "front" | "front-high";
+const cameraViews = new WeakMap<OrthographicCamera, CameraView>();
+/** Owner comparison: same elevation and scale, upright world, zero yaw. */
+const FRONT_OFFSET = new Vector3(0, DIMETRIC_OFFSET.y, Math.hypot(DIMETRIC_OFFSET.x, DIMETRIC_OFFSET.z));
+export function cameraViewFromUrl(url: URL): CameraView {
+  const value=url.searchParams.get("view") ?? "front-high";
+  if(value!=="dimetric"&&value!=="front"&&value!=="front-high") throw new Error(`unknown camera comparison ${value}`);
+  return value;
+}
 
 /**
  * A comparison zoom for the owner's viewport ruling: each step multiplies the
@@ -56,6 +65,7 @@ export function createFeelCamera(
   height: number,
   initialFocus: FeelCameraFocus,
   zoomStep = 0,
+  view: CameraView = "front-high",
 ): OrthographicCamera {
   const aspect = width / height;
   const halfHeight = cameraVerticalSize(zoomStep) / 2;
@@ -68,13 +78,14 @@ export function createFeelCamera(
     100,
   );
   camera.updateProjectionMatrix();
+  cameraViews.set(camera, view);
   focusFeelCamera(camera, initialFocus);
   return camera;
 }
 
 export function focusFeelCamera(camera: OrthographicCamera, cell: FeelCameraFocus): void {
   const target = new Vector3(cell.i, CAMERA_TARGET_HEIGHT, cell.j);
-  camera.position.copy(target).add(CAMERA_OFFSET);
+  camera.position.copy(target).add(cameraViews.get(camera) === "dimetric" ? DIMETRIC_OFFSET : cameraViews.get(camera) === "front" ? FRONT_OFFSET : CAMERA_OFFSET);
   camera.lookAt(target);
   camera.updateMatrixWorld(true);
 }
@@ -94,7 +105,7 @@ export function resizeFeelCamera(
   camera.updateProjectionMatrix();
 }
 
-export function projectedCellDiamondWidth(camera: OrthographicCamera, viewportWidth: number): number {
+export function projectedCellWidth(camera: OrthographicCamera, viewportWidth: number): number {
   const corners = [
     new Vector3(-0.5, 0, -0.5),
     new Vector3(0.5, 0, -0.5),
@@ -105,31 +116,7 @@ export function projectedCellDiamondWidth(camera: OrthographicCamera, viewportWi
   return Math.max(...screenX) - Math.min(...screenX);
 }
 
-/**
- * How many ground tiles the projected height of a world-up object covers in
- * the camera's away-from-camera direction. Both ground axes have the same
- * projection under the ruled 45-degree yaw; using the smaller measured depth
- * keeps the calculation correct if that symmetry changes by rounding.
- */
+/** Projected world-up height expressed in ground rows away from the camera. */
 export function projectedHeightCoverTiles(height: number): number {
-  const cameraDistance = CAMERA_OFFSET.length();
-  const horizontalDistance = Math.hypot(CAMERA_OFFSET.x, CAMERA_OFFSET.z);
-  const pixelsPerCameraUnit =
-    CAMERA_REFERENCE_VIEWPORT_HEIGHT / CAMERA_VERTICAL_SIZE_1280X800;
-  const heightPixelsPerWorldUnit =
-    (horizontalDistance / cameraDistance) * pixelsPerCameraUnit;
-  const depthPixelsAlongI =
-    Math.abs(
-      (CAMERA_OFFSET.x * CAMERA_OFFSET.y) /
-        (cameraDistance * horizontalDistance),
-    ) * pixelsPerCameraUnit;
-  const depthPixelsAlongJ =
-    Math.abs(
-      (CAMERA_OFFSET.z * CAMERA_OFFSET.y) /
-        (cameraDistance * horizontalDistance),
-    ) * pixelsPerCameraUnit;
-  return (
-    height * heightPixelsPerWorldUnit /
-    Math.min(depthPixelsAlongI, depthPixelsAlongJ)
-  );
+  return height * Math.hypot(CAMERA_OFFSET.x, CAMERA_OFFSET.z) / CAMERA_OFFSET.y;
 }

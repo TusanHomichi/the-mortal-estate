@@ -110,24 +110,30 @@
     {
       "id": "west_counter",
       "service_definition_id": "west_counter",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     },
     {
       "id": "east_counter",
       "service_definition_id": "east_counter",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     }

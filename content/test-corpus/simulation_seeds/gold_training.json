@@ -106,12 +106,15 @@
     {
       "id": "sword_trainer",
       "service_definition_id": "sword_trainer",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     }

@@ -88,7 +88,7 @@ async fn postgres_bootstrap_command_and_restart_are_durable() {
         .await
         .unwrap();
     assert_eq!(ticket.protocol_major, 1);
-    assert_eq!(ticket.supported_minors, vec![8]);
+    assert_eq!(ticket.supported_minors, vec![wire::PROTOCOL_MINOR]);
     let (outbound, _outbound_receive) = mpsc::channel(8);
     let (terminal, _terminal_receive) = watch::channel(None);
     let (grant, welcome) = first
@@ -197,7 +197,7 @@ async fn postgres_bootstrap_command_and_restart_are_durable() {
         .await
         .unwrap();
     assert_eq!(restarted_ticket.protocol_major, 1);
-    assert_eq!(restarted_ticket.supported_minors, vec![8]);
+    assert_eq!(restarted_ticket.supported_minors, vec![wire::PROTOCOL_MINOR]);
     let (outbound, _outbound_receive) = mpsc::channel(8);
     let (terminal, _terminal_receive) = watch::channel(None);
     let (restarted_grant, restarted_welcome) = third

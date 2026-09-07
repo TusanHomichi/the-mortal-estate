@@ -8,7 +8,7 @@ import {
 
 const layout: FeelSpace = {
   grid_extents: { i: 5, j: 5 },
-  cells: Array.from({ length: 25 }, (_, index) => ({ i: index % 5, j: Math.floor(index / 5), material: "ground" })),
+  cells: Array.from({ length: 25 }, (_, index) => ({ i: index % 5, j: Math.floor(index / 5), material: "ground", walkable: true })),
   wall_runs: [], roofs: [], props: [], fixtures: [], structures: [],
   light_sources: { lantern_glass: null, candles: [] }, weather: false, portals: [],
 };

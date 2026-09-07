@@ -279,6 +279,53 @@ pub(super) async fn run_facet(
                 }
                 let _ = marked.send(());
             }
+            FacetRequest::CreationProfiles { reply } => {
+                let _ = reply.send(engine.definition().creation_profiles().to_vec());
+            }
+            FacetRequest::PrepareCharacterCreation {
+                transfer_epoch,
+                character_id,
+                draft,
+                reply,
+            } => {
+                let result = if prepared_transfer.is_some() {
+                    Err(FacetError::Transfer)
+                } else {
+                    let attributes = tme_rules::CharacterAttributes {
+                        strength: draft.attributes.strength,
+                        dexterity: draft.attributes.dexterity,
+                        constitution: draft.attributes.constitution,
+                        intelligence: draft.attributes.intelligence,
+                        wisdom: draft.attributes.wisdom,
+                        charisma: draft.attributes.charisma,
+                    };
+                    match engine.prepare_character_creation(
+                        draft.profile_id.as_str(),
+                        character_id.clone(),
+                        draft.display_name.as_str(),
+                        attributes,
+                    ) {
+                        Ok(candidate) => {
+                            let actor_id = candidate
+                                .world()
+                                .actors
+                                .iter()
+                                .find(|actor| actor.character_id.as_ref() == Some(&character_id))
+                                .expect("rules created the requested character")
+                                .id
+                                .clone();
+                            prepared_transfer = Some(PreparedTransfer {
+                                epoch: transfer_epoch,
+                                candidate: Some(candidate),
+                                committed: false,
+                            });
+                            Ok(actor_id)
+                        }
+                        Err(_) => Err(FacetError::InvalidActor),
+                    }
+                };
+                let _ = reply.send(result);
+            }
             FacetRequest::CommitTransfer {
                 transfer_epoch,
                 reply,

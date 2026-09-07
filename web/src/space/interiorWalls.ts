@@ -3,14 +3,14 @@ import { gridCellKey } from "./layoutTiles";
 
 /**
  * Finds wall runs whose camera-facing side has no floor. With the ruled camera
- * at +x/+z, those are the room edges that should stop at the sill.
+ * at +z, those are the room edges that should stop at the sill.
  */
 export function nearWallRunIndices(space: FeelSpace): Set<number> {
   if (space.roofs.length > 0) return new Set();
   const cells = new Set(space.cells.map(gridCellKey));
   const near = new Set<number>();
   space.wall_runs.forEach((run, runIndex) => {
-    if (!runHasFloorOnCameraSide(run, cells)) near.add(runIndex);
+    if (run.axis === "x" && !runHasFloorOnCameraSide(run, cells)) near.add(runIndex);
   });
   return near;
 }

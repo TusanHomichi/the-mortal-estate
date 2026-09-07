@@ -6,7 +6,7 @@ use serde::Deserialize;
 
 use super::*;
 
-const DECODERS: [&str; 17] = [
+const DECODERS: [&str; 20] = [
     "decimal_u64",
     "decimal_i64",
     "login_request_v1",
@@ -14,6 +14,9 @@ const DECODERS: [&str; 17] = [
     "session_bootstrap_request_v1",
     "logout_request_v1",
     "character_select_request_v1",
+    "character_create_request_v1",
+    "character_creation_options_v1",
+    "character_created_v1",
     "socket_ticket_request_v1",
     "forgive_player_kill_mark_request_v1",
     "session_bootstrap_v1",

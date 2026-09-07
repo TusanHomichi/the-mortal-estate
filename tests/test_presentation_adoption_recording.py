@@ -86,7 +86,7 @@ class TheTrackedArrangement(unittest.TestCase):
             [
                 "actors/threshold_keeper/location",
                 "ecology_sites/ruin_mouth_lair/member_locations/great_bear",
-                "service_instances/keeper_rite/location",
+                "service_instances/keeper_rite/placement/location",
             ],
         )
         restored = copy.deepcopy(effective)
@@ -96,7 +96,7 @@ class TheTrackedArrangement(unittest.TestCase):
         next(row for row in restored["ecology_sites"] if row["id"] == "ruin_mouth_lair")[
             "member_locations"
         ]["great_bear"] = deltas[1]["before"]
-        next(row for row in restored["service_instances"] if row["id"] == "keeper_rite")[
+        next(row for row in restored["service_instances"] if row["id"] == "keeper_rite")["placement"][
             "location"
         ] = deltas[2]["before"]
         self.assertEqual(restored, self.source)
@@ -188,7 +188,7 @@ class TheTrackedRecording(unittest.TestCase):
             self.receipt["observed"]["normalized_projection_sha256"],
         )
         self.assertEqual(
-            recording.sha256(REPOSITORY_ROOT / recording.FIXTURE_PATH),
+            recording.sha256(self.frame_path.with_name("identity-proof-recording-source.json")),
             source["recording_fixture_sha256"],
         )
         # These hashes identify the historical producer bytes. The runtime has

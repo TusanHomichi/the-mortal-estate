@@ -20,6 +20,8 @@ pub(crate) fn router() -> Router<AppState> {
         .route("/v4/session", post(session_bootstrap))
         .route("/v4/logout", post(logout))
         .route("/v4/characters/select", post(select_character))
+        .route("/v4/characters/creation", post(character_creation_options))
+        .route("/v4/characters/create", post(create_character))
         .route("/v4/socket-tickets", post(issue_socket_ticket))
         .route(
             "/v4/player-kill-marks/{mark_id}/forgive",
@@ -170,6 +172,72 @@ async fn select_character(
         );
     };
     match backend.select_character(&token, request).await {
+        Ok(selection) => (StatusCode::OK, Json(selection)).into_response(),
+        Err(error) => session_error(error),
+    }
+}
+
+async fn create_character(
+    State(state): State<AppState>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
+    headers: HeaderMap,
+    body: Result<Bytes, BytesRejection>,
+) -> Response {
+    if let Err(failure) = control_context(&state, peer, &headers, true) {
+        return failure.into_response();
+    }
+    let token = match session_token(&headers) {
+        Ok(token) => token,
+        Err(failure) => return failure.into_response(),
+    };
+    let body = match control_body(body) {
+        Ok(body) => body,
+        Err(failure) => return failure.into_response(),
+    };
+    let request = match wire::decode_character_create_request(&body) {
+        Ok(request) => request,
+        Err(_) => return malformed(StatusCode::BAD_REQUEST),
+    };
+    let Some(backend) = &state.inner.backend else {
+        return control_error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            wire::ControlErrorCode::Unavailable,
+        );
+    };
+    match backend.create_character(&token, request).await {
+        Ok(selection) => (StatusCode::OK, Json(selection)).into_response(),
+        Err(error) => session_error(error),
+    }
+}
+
+async fn character_creation_options(
+    State(state): State<AppState>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
+    headers: HeaderMap,
+    body: Result<Bytes, BytesRejection>,
+) -> Response {
+    if let Err(failure) = control_context(&state, peer, &headers, true) {
+        return failure.into_response();
+    }
+    let token = match session_token(&headers) {
+        Ok(token) => token,
+        Err(failure) => return failure.into_response(),
+    };
+    let body = match control_body(body) {
+        Ok(body) => body,
+        Err(failure) => return failure.into_response(),
+    };
+    let _request = match wire::decode_document("session_bootstrap_request_v1", &body) {
+        Ok(request) => request,
+        Err(_) => return malformed(StatusCode::BAD_REQUEST),
+    };
+    let Some(backend) = &state.inner.backend else {
+        return control_error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            wire::ControlErrorCode::Unavailable,
+        );
+    };
+    match backend.character_creation_options(&token).await {
         Ok(selection) => (StatusCode::OK, Json(selection)).into_response(),
         Err(error) => session_error(error),
     }
@@ -387,6 +455,14 @@ fn session_error(error: SessionError) -> Response {
         SessionError::CharacterNotSelected => control_error(
             StatusCode::CONFLICT,
             wire::ControlErrorCode::CharacterNotSelected,
+        ),
+        SessionError::CharacterCreationRefused => control_error(
+            StatusCode::UNPROCESSABLE_ENTITY,
+            wire::ControlErrorCode::CharacterCreationRefused,
+        ),
+        SessionError::CharacterCreationConflict => control_error(
+            StatusCode::CONFLICT,
+            wire::ControlErrorCode::CharacterCreationConflict,
         ),
         SessionError::GameplayMarkLocked => control_error(
             StatusCode::LOCKED,

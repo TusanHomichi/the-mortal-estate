@@ -9,7 +9,7 @@ function field(walls: WallRun[] = []): FeelSpace {
     cells: Array.from({ length: 49 }, (_, index) => ({
       i: index % 7,
       j: Math.floor(index / 7),
-      material: "ground",
+      material: "ground", walkable: true,
     })),
     wall_runs: walls,
     roofs: [],

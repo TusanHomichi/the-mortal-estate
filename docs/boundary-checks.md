@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 3
-status: Initial four checks accepted at G3; current checks and their qualifications are listed below. Audit corrects lane-selection and acceptance wording.
+last_updated: 2026-09-06
+revision: 4
+status: Boundary checks retain fail-closed private-term requirements; clean authored gameplay uses the existing clean-content scan.
 public_safe: true
-summary: Public-boundary checks, private-terms resolution, scan scope, fail-closed behavior, and mutant qualification.
+summary: Public-boundary checks, clean authored provenance, private-term resolution, scan scope and mutant qualification.
 routes:
   - tools/check_*.py
   - tools/boundary_common.py
@@ -103,7 +103,7 @@ worse than no check, because it reports green while defending nothing — the
 false-green class `authoring-contracts.md` §1 exists to kill.
 
 In `tools/run_checks.py`, a fail-closed result outranks a violation in the
-summary: if any check could not run, you cannot trust the rest of the run.
+summary: Public-boundary checks, clean authored provenance, private-term resolution, scan scope and mutant qualification.
 
 ## The private-terms convention
 
@@ -384,3 +384,15 @@ set, the binary sniff, the list-file parser, and the ignore probe.
 5. Add it to `CHECKS` in `tools/run_checks.py`. That is the registry, and the
    verification runner reads it — there is no second place to add it, and
    forgetting this step is the only way to write a check that never runs.
+
+
+### Authored gameplay catalog provenance
+
+`clean_authored_content` identifies authorized authored runtime content, including
+geographic derivation and evidenced gameplay facts under the
+[public-boundary ruling](public-boundary-policy.md#historical-gameplay-reconstruction).
+It requires `clean_content: true`, non-empty review references and notes, and the
+same mandatory raw-document term scan as `clean_original_fixture`. Neither
+status grants historical-fidelity acceptance. The production loader asks the
+rules boundary for its validated policy; it does not maintain a separate status
+allowlist. Internal parity fixtures remain excluded from production loading.
