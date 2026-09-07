@@ -58,6 +58,10 @@ class Installation:
 
     @property
     def origin(self):
+        return self.settings["public_origin"]
+
+    @property
+    def local_origin(self):
         return f"https://localhost:{self.ports['https']}"
 
     def pg(self, name, *arguments, input=None, database="tme", timeout=120):

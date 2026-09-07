@@ -23,6 +23,7 @@ fn here() -> WorldPosition {
 
 fn cue_name(cue: &ObserverFeedbackCueV1) -> &'static str {
     match cue {
+        ObserverFeedbackCueV1::SkillCritique { .. } => "skill_critique",
         ObserverFeedbackCueV1::PhysicalCombat { .. } => "physical_combat",
         ObserverFeedbackCueV1::WeaponFumbled { .. } => "weapon_fumbled",
         ObserverFeedbackCueV1::SpellLifecycle { .. } => "spell_lifecycle",

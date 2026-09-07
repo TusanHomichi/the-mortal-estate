@@ -231,3 +231,19 @@ fn a_transition_through_a_blocked_endpoint_is_rejected() {
     transition(&mut members, "surface", "fixture_descent").access = Point { x: 0, y: 0 };
     link_rejection(&members, "blocked endpoint");
 }
+
+#[test]
+fn a_blocked_return_landing_is_rejected_even_when_departure_is_open() {
+    let mut members = compiled();
+    transition(&mut members, "surface", "fixture_descent").landing = Point { x: 0, y: 0 };
+    link_rejection(&members, "blocked endpoint");
+}
+
+#[test]
+fn an_orphan_member_is_rejected() {
+    let mut members = compiled();
+    let mut orphan = members["interior"].clone();
+    orphan.transitions.clear();
+    members.insert("orphan".into(), orphan);
+    link_rejection(&members, "unreachable from arrival");
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "status": "candidate",
+  "geography_review_manifest_sha256": "d132d434d60e20d15b2962834bfde80e6bd04d8cf8d01da615674c297dee8d73",
+  "asset_manifest_sha256": "dc549664e4a439a556fe350e5ecbab8f701c0e776ed67839655f10e96f4bb707",
+  "guide_sha256": "d6b277a0e12452e2df3593884712e88170bbb3f7a87ef83fcbbc4f29ccd1b91a",
+  "actor_figures": {
+    "tomas": "tomas",
+    "balm_seller": "maude"
+  }
+}

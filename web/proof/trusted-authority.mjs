@@ -1,5 +1,7 @@
 // Add only the proof authority; restore the user's Chromium trust after launch
-// lifetime. Firefox uses a disposable profile. No certificate-error bypass.
+// lifetime. Firefox uses a disposable profile. Linux WebKit uses the system
+// certificate store; its uniquely named temporary anchor is removed on stop.
+// No certificate-error bypass.
 import { execFileSync } from "node:child_process";
 import { access, mkdir, mkdtemp, rm } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
@@ -8,6 +10,7 @@ import path from "node:path";
 
 export async function trustAuthority(name, authority) {
   if (process.platform !== "linux") throw new Error("Trusted local browser proof currently requires Linux NSS tooling");
+  if (name === "webkit") return trustSystemAuthority(authority);
   let profile;
   let database;
   if (name === "firefox") {
@@ -30,5 +33,23 @@ export async function trustAuthority(name, authority) {
     execFileSync("certutil", ["-A", "-d", `sql:${database}`, "-n", nickname, "-t", "C,,", "-i", authority], { stdio: "pipe" });
     added = true;
     return { profile, stop };
+  } catch (error) { await stop(); throw error; }
+}
+
+/** WebKitGTK's TLS backend does not read Chromium's NSS database. */
+export async function trustSystemAuthority(authority, run = execFileSync) {
+  const anchor = `/usr/local/share/ca-certificates/tme-proof-${randomUUID()}.crt`;
+  let installed = false;
+  const stop = async () => {
+    if (!installed) return;
+    run("sudo", ["-n", "rm", "-f", "--", anchor], { stdio: "pipe" });
+    run("sudo", ["-n", "update-ca-certificates"], { stdio: "pipe" });
+    installed = false;
+  };
+  try {
+    run("sudo", ["-n", "install", "-m", "644", authority, anchor], { stdio: "pipe" });
+    installed = true;
+    run("sudo", ["-n", "update-ca-certificates"], { stdio: "pipe" });
+    return { stop };
   } catch (error) { await stop(); throw error; }
 }

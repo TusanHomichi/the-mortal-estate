@@ -31,11 +31,15 @@ pub(crate) fn validate_research_boundary(
     label: &str,
     errors: &mut Vec<String>,
 ) -> Option<ContentBoundaryPolicy> {
-    let clean = clean_content && boundary.status == "clean_original_fixture";
+    let clean = clean_content
+        && matches!(
+            boundary.status.as_str(),
+            "clean_original_fixture" | "clean_authored_content"
+        );
     let marked = !clean_content && boundary.status == "internal_parity_fixture";
     if !clean && !marked {
         errors.push(format!(
-            "{label}.clean_content and {label}.research_boundary.status must select exactly clean_original_fixture or internal_parity_fixture"
+            "{label}.clean_content and {label}.research_boundary.status must select exactly clean_original_fixture or clean_authored_content with clean_content=true, or internal_parity_fixture with clean_content=false"
         ));
     }
     if boundary.review_refs.is_empty() {

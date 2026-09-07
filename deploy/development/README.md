@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 2
-status: Private development deployment and operational procedure; installed-host proof recorded separately.
+last_updated: 2026-09-07
+revision: 4
+status: Private development and current-game preview deployment; installed-host proof recorded separately.
 public_safe: true
-summary: Isolated user services, matching server/browser releases, private access, installed UI proof and recovery.
+summary: Isolated services, matching server/browser/artwork releases, private preview origins, installed UI proof and recovery.
 ---
 
 # Private development server
@@ -41,7 +41,7 @@ Neither identity uses the administrator's database role.
 
 The frontend serves the private sign-in and play shell. Each tab owns its login
 in memory; reload requires signing in again. Browser proof requires the locked
-web dependencies, both Playwright engines, and Linux NSS `certutil`. The proof
+web dependencies, all three Playwright engines, and Linux NSS `certutil`. The proof
 uses actual UI requests with normal TLS validation and retains no credentials
 in its screenshots or receipt.
 
@@ -66,9 +66,44 @@ policy. Application credentials are separate from these operator-owned inputs.
 
 The declared served-world document supplies catalog, profile, compiled geography,
 seed and RNG selection. The development seed retains the declared cast and adds
-one copied controlled character in the adjacent square. The real Rust bootstrap
+one controlled test character on the declared spawn square with empty inventory.
+It never guesses adjacent passability or duplicates equipment instance ownership. The real Rust bootstrap
 validator judges the composed result before service startup. This derivative
 belongs only to private development and promotes no authored master.
+
+## Private preview origin and current game artwork
+
+Configuration schema 2 requires `public_origin` and `presentation_assets` in
+addition to the world and ports. Schema 1 is refused. For a local diagnostic
+installation use the example's localhost origin and null assets. For an
+owner-authorized remote preview, use its canonical HTTPS origin, the first
+expedition world document, and the absolute external candidate-packet directory.
+The packet must match the browser's study receipt. Staging copies only the
+manifest and its verified asset references into the immutable browser release;
+private source files and unrelated packet files are excluded. The browser is built in fixed `first-expedition` presentation mode. Both the root
+and direct index entry render the world without a query parameter. The actual server supplies every area,
+resident, service and transition; the preview is not a local movement scene.
+
+The operator's existing TLS reverse proxy forwards the public host and WebSocket
+upgrade to the loopback frontend. The sign-in page and its client/artwork assets are reachable at that origin.
+Gameplay requires a provisioned game account; there is no public account signup.
+Do not layer HTTP Basic authentication on the game origin's routes: credential-free
+codec fetches and WebSocket admission deliberately refuse that ambient credential.
+Versioned API routes use game authentication and single-use WebSocket tickets.
+The frontend redirects legacy username/password query URLs to a clean entry
+without consuming them. Configure the public proxy's access log to omit query
+strings and referrers; do not use the default full-request combined format for
+game routes. Never expose `/internal/` or the operations listener. The server validates the
+configured public origin and host. Host-specific proxy configuration and access
+credentials remain outside this repository.
+
+A release updates the matching server, codec, browser, content and artwork
+atomically through `stage` and `activate`. Deployment is explicit after proof;
+it does not serve a moving checkout. An isolated temporary Git index may carry
+the reviewed working tree for staging without changing the user's index or refs.
+Retain its source-tree identity in the release receipt. Changing the selected
+land requires a separately bootstrapped private installation or an owner-approved
+retirement and replacement; ordinary activation never resets a saved world.
 
 ## Lifecycle and proof
 
@@ -139,6 +174,12 @@ world. A modified dump or incompatible storage contract is refused.
 Actual restore replaces this development database. It takes a safety backup and
 stops gameplay first, fences and verifies the restored store, then proves the
 services ready. On failure it restores the safety backup before reopening.
+
+The current restore-drill assertion still expects two characters; it must be
+updated before claiming installed restore-drill coverage for a world with newly
+created characters. The [town execution record](../../docs/plans/2026-09-06-town-buildout.md#temple-patterns-of-daily-use)
+tracks that concrete verification follow-up. This limitation does not change the
+dump format or authorize resetting a world.
 
 Take a backup before manual experiments whose state matters. Activation and
 restore take one automatically. There is no automatic retention deletion or

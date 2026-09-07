@@ -4,7 +4,7 @@
   "source": {
     "world_document": "content/lands/identity-proof/world.json",
     "simulation_seed": "content/lands/identity-proof/simulation_seed.json",
-    "simulation_seed_sha256": "ac3952813d5a06759891932c562c4182a8bcefe3ee9c4776eabf47eab4c76fd6"
+    "simulation_seed_sha256": "ed4f392c1a992d3c51e042842334d94d83b0f136dd46808bbd539523eebfd8ab"
   },
   "arrangements": {
     "actors": [

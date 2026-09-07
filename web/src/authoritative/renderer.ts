@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import type { Snapshot } from "./state";
 import { frameTargets, type Target } from "./targets";
+import { PathOverlay } from "../play/pathOverlay";
+import type { WalkPresentation } from "../play/pathControls";
 
 const colors: Record<string, number> = { tile: 0x43534c, actor: 0xe6bd75, corpse: 0xb77c82, ground_item: 0x85b6c5, gold_pile: 0xe7d570 };
 
@@ -9,6 +11,8 @@ export class AuthoritativeRenderer {
   readonly renderer: THREE.WebGLRenderer;
   readonly camera: THREE.OrthographicCamera;
   private scene = new THREE.Scene();
+  private overlayScene = new THREE.Scene();
+  private overlay = new PathOverlay();
   private readonly raycaster = new THREE.Raycaster();
   targets: Target[] = [];
   cameraIdentity: ReturnType<typeof frameTargets>["camera"] | null = null;
@@ -22,9 +26,11 @@ export class AuthoritativeRenderer {
     this.renderer.setClearColor(0x151d20);
     this.camera = new THREE.OrthographicCamera(0, width, height, 0, 0.1, 100);
     this.camera.position.z = 10;
+    this.overlayScene.add(this.overlay.group);
   }
 
   clear(): void {
+    this.overlay.clear();
     for (const object of this.scene.children) {
       const mesh = object as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
       mesh.geometry.dispose(); mesh.material.dispose();
@@ -63,6 +69,22 @@ export class AuthoritativeRenderer {
     return this.raycaster.intersectObjects(this.scene.children, false)[0]?.object.userData.target ?? null;
   }
 
+  presentWalk(walk: WalkPresentation): void {
+    const tile = this.targets.find(target => target.kind === "tile");
+    if (!tile) return;
+    const cellWidth = tile.hit_shape.width, cellHeight = tile.hit_shape.height;
+    const pitchX = cellWidth, pitchY = cellHeight;
+    this.overlay.present(walk,()=>0);
+    this.overlay.group.rotation.x = Math.PI/2;
+    this.overlay.group.scale.set(pitchX,1,pitchY);
+    this.overlay.group.position.set(tile.hit_shape.x+cellWidth/2-tile.coordinate.x*pitchX,
+      this.height-tile.hit_shape.y-cellHeight/2+tile.coordinate.y*pitchY,2);
+    this.renderer.render(this.scene,this.camera);
+    this.renderer.autoClear = false;
+    this.renderer.render(this.overlayScene,this.camera);
+    this.renderer.autoClear = true;
+  }
+
   identityRaster(): Uint8Array<ArrayBuffer> {
     if (!this.snapshot) throw new Error("no authoritative frame is presented");
     const saved = this.scene.children.map(object => (object as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>).material.color.clone());
@@ -94,5 +116,5 @@ export class AuthoritativeRenderer {
     }
   }
 
-  dispose(): void { this.clear(); this.renderer.dispose(); }
+  dispose(): void { this.clear(); this.overlay.dispose(); this.renderer.dispose(); }
 }

@@ -580,7 +580,7 @@ pub(super) fn render(event: &Event) -> Vec<String> {
             new_learning_rate,
             ..
         } => vec![format!(
-            "{actor} trained {track_id} with {service_id}: learning rate {previous_learning_rate} -> {new_learning_rate}, offered {offered_gold} gold, spent {spent_gold}, retained {unspent_gold}"
+            "{actor} trained {track_id} with {service_id}: learning rate {previous_learning_rate} -> {new_learning_rate}, offered {offered_gold} gold, spent {spent_gold}, returned to ground {unspent_gold}"
         )],
 
         _ => unreachable!("event family is selected by the exhaustive dispatcher"),

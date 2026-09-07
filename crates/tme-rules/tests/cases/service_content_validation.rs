@@ -80,7 +80,7 @@ fn add_second_service_definition(
     let mut instance = parts.service_instances_mut()[0].clone();
     instance["id"] = json!(instance_id);
     instance["service_definition_id"] = json!(definition_id);
-    instance["location"]["position"] = position;
+    instance["placement"]["location"]["position"] = position;
     parts
         .service_instances_mut()
         .as_array_mut()
@@ -152,7 +152,7 @@ fn split_service_definition_and_instance_shapes_are_strict() {
     assert_contains(&seed_error(&instance_policy), "unknown field `name`");
 
     let mut missing_position = trainer_parts();
-    missing_position.service_instances_mut()[0]["location"]
+    missing_position.service_instances_mut()[0]["placement"]["location"]
         .as_object_mut()
         .expect("service location")
         .remove("position");

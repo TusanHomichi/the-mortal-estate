@@ -1,0 +1,279 @@
+{
+  "height": 3,
+  "infinite": false,
+  "layers": [
+    {
+      "data": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "height": 3,
+      "id": 1,
+      "name": "base_terrain",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "height": 3,
+      "id": 2,
+      "name": "routes",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "height": 3,
+      "id": 3,
+      "name": "structure_footprints",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "height": 3,
+      "id": 4,
+      "name": "landmark_marks",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "data": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "height": 3,
+      "id": 5,
+      "name": "passability",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 4,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 6,
+      "name": "structures",
+      "objects": [],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 7,
+      "name": "transitions",
+      "objects": [
+        {
+          "class": "member_transition",
+          "height": 16,
+          "id": 100,
+          "name": "herbalist_to_arrival",
+          "properties": [
+            {
+              "name": "target_member",
+              "type": "string",
+              "value": "arrival"
+            },
+            {
+              "name": "paired_transition",
+              "type": "string",
+              "value": "arrival_to_herbalist"
+            },
+            {
+              "name": "direction",
+              "type": "string",
+              "value": "passage"
+            },
+            {
+              "name": "access_cell_x",
+              "type": "int",
+              "value": 1
+            },
+            {
+              "name": "access_cell_y",
+              "type": "int",
+              "value": 2
+            },
+            {
+              "name": "landing_cell_x",
+              "type": "int",
+              "value": 0
+            },
+            {
+              "name": "landing_cell_y",
+              "type": "int",
+              "value": 2
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 16,
+          "y": 32
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 8,
+      "name": "landmarks",
+      "objects": [],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "orientation": "orthogonal",
+  "properties": [
+    {
+      "name": "member_role",
+      "type": "string",
+      "value": "herbalist"
+    },
+    {
+      "name": "artifact_status",
+      "type": "string",
+      "value": "tracked_authored_land"
+    },
+    {
+      "name": "authoring_origin",
+      "type": "string",
+      "value": "accepted_geography_encoding"
+    },
+    {
+      "name": "content_authority",
+      "type": "string",
+      "value": "authored_geography"
+    },
+    {
+      "name": "envelope_locked",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "runtime_consumable",
+      "type": "bool",
+      "value": true
+    }
+  ],
+  "tileheight": 16,
+  "tilesets": [
+    {
+      "columns": 5,
+      "firstgid": 1,
+      "name": "expedition-classes",
+      "tilecount": 5,
+      "tileheight": 16,
+      "tiles": [
+        {
+          "class": "expedition_floor",
+          "id": 0
+        },
+        {
+          "class": "expedition_furniture",
+          "id": 1
+        },
+        {
+          "class": "expedition_void",
+          "id": 2
+        },
+        {
+          "class": "expedition_blocked",
+          "id": 3
+        },
+        {
+          "class": "expedition_walkable",
+          "id": 4
+        }
+      ],
+      "tilewidth": 16
+    }
+  ],
+  "tilewidth": 16,
+  "type": "map",
+  "width": 4
+}

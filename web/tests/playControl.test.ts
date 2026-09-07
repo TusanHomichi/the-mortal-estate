@@ -46,6 +46,60 @@ async function connected() {
   return { control, sockets, requests, login, result };
 }
 describe("actual serialized browser connection adapter", () => {
+  it("previews through the Rust wire codec without consuming the command cursor or changing authority", async () => {
+    const { control, sockets } = await connected();
+    const before=control.view.snapshot, sequence=control.view.nextSequence;
+    const pending=control.previewPath(["north","east"]);
+    const request=JSON.parse(sockets[0]!.sent.at(-1)!);
+    expect(request.kind).toBe("path_preview");expect(request.client_sequence).toBeUndefined();
+    expect(control.view.pending).toBe(false);
+    const reply=fixture("server_envelope","accept_path_preview_result");
+    reply.preview_id=request.preview_id;reply.control_epoch=request.control_epoch;
+    reply.world_revision=request.observed_world_revision;
+    sockets[0]!.receive(reply);
+    const preview=await pending;
+    expect(preview?.requested_path).toEqual(["north","east"]);
+    expect(control.view.snapshot).toBe(before);expect(control.view.nextSequence).toBe(sequence);
+    expect(control.view.phase).toBe("playing");
+  });
+  it("cancels in-flight previews on command or reconnect, and ignores late responses", async () => {
+    const { control, sockets }=await connected();
+    const pending=control.previewPath(["north","east"]);
+    expect(control.command({kind:"wait"})).toBe(true);expect(await pending).toBeNull();
+    const reply=fixture("server_envelope","accept_path_preview_result");
+    sockets[0]!.receive(reply);expect(control.view.phase).toBe("playing");
+    // The pending command continues to be the sole sequenced action.
+    expect(control.view.nextSequence).toBe("1");expect(control.view.pending).toBe(true);
+    const next=await connected();const preview=next.control.previewPath(["north","east"]);
+    await next.control.reconnect();expect(await preview).toBeNull();
+  });
+  it("rejects a preview for a different control epoch",async()=>{
+    const {control,sockets}=await connected();const pending=control.previewPath(["north","east"]);
+    const request=JSON.parse(sockets[0]!.sent.at(-1)!);
+    const reply=fixture("server_envelope","accept_path_preview_result");reply.preview_id=request.preview_id;
+    sockets[0]!.receive(reply);expect(await pending).toBeNull();
+  });
+  it("dispatches the current offered intent and refuses stale-frame, disabled and disconnected choices", async () => {
+    const { control, sockets, result } = await connected();
+    const snapshot = control.view.snapshot!;
+    const action = snapshot.envelope.frame.action_options.find(row => row.intent?.kind === "move_item")!;
+    expect(control.offeredAction(snapshot.generation - 1, "character", action.id)).toBe(false);
+    expect(control.offeredAction(snapshot.generation, "absent", action.id)).toBe(false);
+    expect(control.offeredAction(snapshot.generation, "character", action.id)).toBe(true);
+    const sent = JSON.parse(sockets[0]!.sent[1]!);
+    expect(sent.intent).toEqual(action.intent);
+    expect(control.offeredAction(snapshot.generation, "character", action.id)).toBe(false);
+    sockets[0]!.receive(result(sent.command_id, { kind: "accepted" }));
+    const update = fixture("server_envelope", "accept_state_update");
+    update.server_sequence = (BigInt(snapshot.envelope.server_sequence) + 1n).toString();
+    update.world_revision = snapshot.envelope.world_revision;
+    update.frame.action_options.find((row: { id: string }) => row.id === action.id).enabled = false;
+    sockets[0]!.receive(update);
+    expect(control.offeredAction(snapshot.generation, "character", action.id)).toBe(false);
+    expect(control.offeredAction(control.view.snapshot!.generation, "character", action.id)).toBe(false);
+    control.dispose();
+    expect(control.offeredAction(snapshot.generation, "character", action.id)).toBe(false);
+  });
   it("uses explicit transient control auth, a strict POST bootstrap, and ticket-only sockets", async () => {
     const { control, sockets, requests, login } = await connected();
     await control.reconnect();

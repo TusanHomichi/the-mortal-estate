@@ -17,15 +17,18 @@ operating rules; detailed workflow and verification usage have linked owners.
 - **One fact, one owner.** Read the relevant [boundary](docs/boundary-map.md)
   before changing behaviour. Record consequential decisions in their owner;
   other documents point there.
-- **Owner rulings bind.** D2 reopens inherited mechanics, names, values,
-  timings, penalties, and routes; surviving code is not design acceptance.
+- **Owner rulings bind.** The owner-directed historical gameplay
+  baseline supersedes D2's blanket reset; surviving code is evidence, not proof
+  of exact correspondence.
   D5 owns authoritative timing. Read the [rulings](docs/boundary-map.md#what-an-authored-seam-does-and-does-not-settle)
   before designing either.
 - **Atomic internal cutovers.** The external product boundary is not active.
   Follow the [no-compatibility policy](docs/agent-workflow.md#no-compatibility-adapters):
   migrate every caller and proof together; prove retired shapes refused.
-- **Keep private payloads out.** No quarantine directory or external reference
-  payload belongs in this checkout. Follow the [public-boundary policy](docs/public-boundary-policy.md)
+- **Keep raw references out.** No quarantine directory or raw external reference
+  payload belongs in this checkout. Authorized derived geography follows the
+  [first-land map-template ruling](docs/public-boundary-policy.md#first-land-map-template).
+  Follow the [public-boundary policy](docs/public-boundary-policy.md)
   and the [working-root policy](docs/working-root-policy.md). The private
   denylist is owner-provisioned out of band; its absence must never become a
   false pass ([verification](docs/verification.md#capabilities)).
@@ -64,6 +67,9 @@ when the task needs their evidence. Keep machine setup and session logs local.
 
 | Start here | When |
 | --- | --- |
+| [docs/gameplay-baseline.md](docs/gameplay-baseline.md) | historical gameplay, recovered decisions, fidelity and explicit deviations |
+| [docs/town-resident-contract.md](docs/town-resident-contract.md) | resident circuits, service providers and temple interactions |
+| [docs/class-training-contract.md](docs/class-training-contract.md) | classes, promotion, skill focus and teaching services |
 | [docs/boundary-map.md](docs/boundary-map.md) | before changing behaviour — who owns the fact you are about to move |
 | [docs/agent-workflow.md](docs/agent-workflow.md) | scoping, design, verification lessons, and closeout |
 | [docs/verification.md](docs/verification.md) | choosing and running proof |

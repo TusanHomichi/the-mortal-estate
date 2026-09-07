@@ -12,7 +12,7 @@ summary: The ruled design packet for the charter's first identity proof — its 
 # The identity proof — design packet
 
 For the current pause and the separately authorized browser feel work, start
-with the [genesis checkpoint](genesis-ledger.md#current-checkpoint-2026-09-05).
+with the [genesis checkpoint](genesis-ledger.md#current-checkpoint).
 The implementation audit and file-line evidence below describe this packet's
 original baseline; they are not a current code index or permission to resume.
 

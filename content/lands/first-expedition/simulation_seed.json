@@ -1,0 +1,1298 @@
+{
+  "actors": [
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/player",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 100
+        },
+        "items": [
+          {
+            "item_instance_id": "weathered_staff",
+            "position": "right_hand"
+          },
+          {
+            "item_instance_id": "wizard_spell_book",
+            "position": "sack_item_1"
+          }
+        ]
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 13,
+          "constitution": 17,
+          "dexterity": 14,
+          "intelligence": 17,
+          "strength": 14,
+          "wisdom": 15
+        },
+        "identity": {
+          "base_class_id": "wizard",
+          "current_class_id": "wizard",
+          "display_class": "Wizard",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 40,
+          "max_hp": 40,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 40,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "staff"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "hand"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "wizard_magic"
+          }
+        ]
+      },
+      "character_id": "character:first_expedition:operator",
+      "id": "player",
+      "location": {
+        "level": "arrival",
+        "position": {
+          "x": 9,
+          "y": 31
+        },
+        "realm": "first_expedition"
+      },
+      "npc": null
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/lodge_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "lodge_keeper",
+      "location": {
+        "level": "lodge",
+        "position": {
+          "x": 6,
+          "y": 1
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Your locker is yours. The recovery table is for things their owners may come looking for.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/banker",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "banker",
+      "location": {
+        "level": "bank",
+        "position": {
+          "x": 1,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Keep your reserve here. Take only what you need.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/sheriff",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "sheriff",
+      "location": {
+        "level": "bank",
+        "position": {
+          "x": 3,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Keep your weapons quiet inside town.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/outfitter_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "outfitter_keeper",
+      "location": {
+        "level": "outfitter",
+        "position": {
+          "x": 2,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take a look at the goods. There is work enough outside these walls.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/provisioner",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "provisioner",
+      "location": {
+        "level": "market",
+        "position": {
+          "x": 0,
+          "y": 1
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take a look at the goods. There is work enough outside these walls.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/bakery_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "bakery_keeper",
+      "location": {
+        "level": "bakery",
+        "position": {
+          "x": 0,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take a look at the goods. There is work enough outside these walls.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/herbalist_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "herbalist_keeper",
+      "location": {
+        "level": "herbalist",
+        "position": {
+          "x": 0,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take a look at the goods. There is work enough outside these walls.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/forge_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "forge_keeper",
+      "location": {
+        "level": "forge",
+        "position": {
+          "x": 0,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take a look at the goods. There is work enough outside these walls.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/chandler_keeper",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "chandler_keeper",
+      "location": {
+        "level": "chandler",
+        "position": {
+          "x": 0,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take a look at the goods. There is work enough outside these walls.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/tomas",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "tomas",
+      "location": {
+        "level": "temple",
+        "position": {
+          "x": 3,
+          "y": 3
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 3,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Bring the fallen here. The temple keeps a place for them.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": [
+          {
+            "x": 3,
+            "y": 3
+          },
+          {
+            "x": 3,
+            "y": 4
+          },
+          {
+            "x": 3,
+            "y": 5
+          },
+          {
+            "x": 4,
+            "y": 5
+          },
+          {
+            "x": 4,
+            "y": 4
+          },
+          {
+            "x": 4,
+            "y": 3
+          }
+        ]
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/balm_seller",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "balm_seller",
+      "location": {
+        "level": "temple",
+        "position": {
+          "x": 5,
+          "y": 1
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Take balm before you take the stairs.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/trainer_1",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "trainer_1",
+      "location": {
+        "level": "trainers",
+        "position": {
+          "x": 1,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Bring the weapon you intend to practise with.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/trainer_3",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "trainer_3",
+      "location": {
+        "level": "trainers",
+        "position": {
+          "x": 3,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "An empty hand is enough to begin.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/trainer_5",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "trainer_5",
+      "location": {
+        "level": "trainers",
+        "position": {
+          "x": 5,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Guild study covers our craft and our own magic.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/trainer_7",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 0
+        },
+        "items": []
+      },
+      "id": "trainer_7",
+      "location": {
+        "level": "trainers",
+        "position": {
+          "x": 7,
+          "y": 2
+        },
+        "realm": "first_expedition"
+      },
+      "npc": {
+        "follow_cadence_units": 100,
+        "interactions": [
+          {
+            "outcome": {
+              "kind": "speak"
+            },
+            "response": "Bring your bound book for magic instruction.",
+            "transaction": {
+              "costs": [],
+              "id": "greeting",
+              "label": "Speak",
+              "requirements": [],
+              "rewards": []
+            }
+          }
+        ],
+        "patrol": []
+      }
+    },
+    {
+      "active_effects": [],
+      "actor_definition_id": "actor/first_expedition/cellar_scavenger",
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 20
+        },
+        "items": [
+          {
+            "item_instance_id": "found_charm",
+            "position": "sack_item_1"
+          }
+        ]
+      },
+      "id": "cellar_scavenger",
+      "location": {
+        "level": "d1_entry",
+        "position": {
+          "x": 4,
+          "y": 6
+        },
+        "realm": "first_expedition"
+      },
+      "npc": null
+    }
+  ],
+  "ecology_sites": [],
+  "ground_items": [],
+  "id": "first_expedition",
+  "item_instances": {
+    "found_charm": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "trade_charm"
+    },
+    "stock/bakery_keeper/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/bakery_keeper/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/bakery_keeper/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/bakery_keeper/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/balm_seller/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/balm_seller/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/balm_seller/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/balm_seller/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/chandler_keeper/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/chandler_keeper/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/chandler_keeper/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/chandler_keeper/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/forge_keeper/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/forge_keeper/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/forge_keeper/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/forge_keeper/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/herbalist_keeper/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/herbalist_keeper/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/herbalist_keeper/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/herbalist_keeper/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/outfitter_keeper/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/outfitter_keeper/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/outfitter_keeper/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/outfitter_keeper/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "bright_staff"
+    },
+    "stock/provisioner/0": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/1": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/2": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "weathered_staff": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "weathered_staff"
+    },
+    "wizard_spell_book": {
+      "binding": {
+        "character_id": "character:first_expedition:operator",
+        "state": "bound"
+      },
+      "definition_id": "wizard_spell_book"
+    }
+  },
+  "kind": "simulation_seed",
+  "merchant_inventories": [
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "outfitter_keeper",
+      "stock": [
+        {
+          "item_instance_id": "stock/outfitter_keeper/0",
+          "price_gold": 12
+        },
+        {
+          "item_instance_id": "stock/outfitter_keeper/1",
+          "price_gold": 12
+        },
+        {
+          "item_instance_id": "stock/outfitter_keeper/2",
+          "price_gold": 12
+        },
+        {
+          "item_instance_id": "stock/outfitter_keeper/3",
+          "price_gold": 12
+        }
+      ]
+    },
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "provisioner",
+      "stock": [
+        {
+          "item_instance_id": "stock/provisioner/0",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/provisioner/1",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/provisioner/2",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/provisioner/3",
+          "price_gold": 5
+        }
+      ]
+    },
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "bakery_keeper",
+      "stock": [
+        {
+          "item_instance_id": "stock/bakery_keeper/0",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/bakery_keeper/1",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/bakery_keeper/2",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/bakery_keeper/3",
+          "price_gold": 5
+        }
+      ]
+    },
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "herbalist_keeper",
+      "stock": [
+        {
+          "item_instance_id": "stock/herbalist_keeper/0",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/herbalist_keeper/1",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/herbalist_keeper/2",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/herbalist_keeper/3",
+          "price_gold": 5
+        }
+      ]
+    },
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "forge_keeper",
+      "stock": [
+        {
+          "item_instance_id": "stock/forge_keeper/0",
+          "price_gold": 12
+        },
+        {
+          "item_instance_id": "stock/forge_keeper/1",
+          "price_gold": 12
+        },
+        {
+          "item_instance_id": "stock/forge_keeper/2",
+          "price_gold": 12
+        },
+        {
+          "item_instance_id": "stock/forge_keeper/3",
+          "price_gold": 12
+        }
+      ]
+    },
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "chandler_keeper",
+      "stock": [
+        {
+          "item_instance_id": "stock/chandler_keeper/0",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/chandler_keeper/1",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/chandler_keeper/2",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/chandler_keeper/3",
+          "price_gold": 5
+        }
+      ]
+    },
+    {
+      "capability_id": "trail_wares",
+      "service_instance_id": "balm_seller",
+      "stock": [
+        {
+          "item_instance_id": "stock/balm_seller/0",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/balm_seller/1",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/balm_seller/2",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/balm_seller/3",
+          "price_gold": 5
+        }
+      ]
+    }
+  ],
+  "schema_version": 3,
+  "service_instances": [
+    {
+      "id": "lodge_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "lodge",
+          "position": {
+            "x": 6,
+            "y": 1
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "lodge_keeper"
+    },
+    {
+      "id": "banker",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "bank",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "banker"
+    },
+    {
+      "id": "outfitter_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "outfitter",
+          "position": {
+            "x": 2,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "outfitter_keeper"
+    },
+    {
+      "id": "provisioner",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "market",
+          "position": {
+            "x": 0,
+            "y": 1
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "provisioner"
+    },
+    {
+      "id": "bakery_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "bakery",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "bakery_keeper"
+    },
+    {
+      "id": "herbalist_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "herbalist",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "herbalist_keeper"
+    },
+    {
+      "id": "forge_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "forge",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "forge_keeper"
+    },
+    {
+      "id": "chandler_keeper",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "chandler",
+          "position": {
+            "x": 0,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "chandler_keeper"
+    },
+    {
+      "id": "tomas",
+      "placement": {
+        "actor_id": "tomas",
+        "kind": "actor"
+      },
+      "service_definition_id": "tomas"
+    },
+    {
+      "id": "balm_seller",
+      "placement": {
+        "actor_id": "balm_seller",
+        "kind": "actor"
+      },
+      "service_definition_id": "balm_seller"
+    },
+    {
+      "id": "trainer_1",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "trainers",
+          "position": {
+            "x": 1,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "trainer_1"
+    },
+    {
+      "id": "trainer_3",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "trainers",
+          "position": {
+            "x": 3,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "trainer_3"
+    },
+    {
+      "id": "trainer_5",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "trainers",
+          "position": {
+            "x": 5,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "trainer_5"
+    },
+    {
+      "id": "trainer_7",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "trainers",
+          "position": {
+            "x": 7,
+            "y": 2
+          },
+          "realm": "first_expedition"
+        }
+      },
+      "service_definition_id": "trainer_7"
+    }
+  ]
+}

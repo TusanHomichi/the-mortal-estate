@@ -4,6 +4,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +44,39 @@ class PrivateDeployment(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_settings(changed)
 
+    def test_origin_and_retired_configuration_are_refused(self):
+        settings = json.loads((ROOT / "deploy/development/config.example.json").read_text())
+        for origin in ("http://localhost:18743", "https://user@host", "https://host/", "https://host?q=1", "https://host;bad"):
+            changed = copy.deepcopy(settings)
+            changed["public_origin"] = origin
+            with self.assertRaises(ValueError):
+                validate_settings(changed)
+        settings["schema_version"] = 1
+        with self.assertRaises(ValueError):
+            validate_settings(settings)
+
+    def test_artwork_copy_is_bound_and_allowlisted(self):
+        from artwork import copy_artwork
+        packet = self.root / "packet"
+        packet.mkdir()
+        (packet / "room.glb").write_bytes(b"synthetic geometry")
+        (packet / "private-notes.txt").write_text("must not be copied")
+        manifest = packet / "feel-manifest.json"
+        manifest.write_text(json.dumps({"assets": [{"file": "room.glb", "sha256": digest(packet / "room.glb")}]}))
+        source = self.root / "source"
+        receipt = source / "web/src/play/studyReceipt.json"
+        document(receipt, {"asset_manifest_sha256": digest(manifest)})
+        with patch("artwork.REPO", source):
+            copy_artwork(packet, self.root / "copied")
+            self.assertEqual({p.name for p in (self.root / "copied").iterdir()}, {"feel-manifest.json", "room.glb"})
+            (packet / "room.glb").write_bytes(b"changed")
+            with self.assertRaises(ValueError):
+                copy_artwork(packet, self.root / "refused")
+            self.assertFalse((self.root / "refused").exists())
+            manifest.write_text("{}")
+            with self.assertRaises(ValueError):
+                copy_artwork(packet, self.root / "wrong-manifest")
+
     def test_state_cannot_be_installed_inside_source(self):
         with self.assertRaises(ValueError):
             Installation(ROOT / ".workbench/deployment")
@@ -55,7 +89,17 @@ class PrivateDeployment(unittest.TestCase):
         self.assertEqual(seed["actors"][:-1], source["actors"])
         self.assertEqual(len(actors), 2)
         self.assertNotEqual(actors[0], actors[1])
+        self.assertEqual(seed["actors"][-1]["location"], source["actors"][0]["location"])
+        self.assertEqual(seed["actors"][-1]["carried"]["items"], [])
         self.assertNotEqual(seed["actors"][0]["character_id"], seed["actors"][-1]["character_id"])
+
+    def test_equipped_expedition_seed_retains_unique_item_ownership(self):
+        source = json.loads((ROOT / "content/lands/first-expedition/simulation_seed.json").read_text())
+        seed, _ = development_seed(source)
+        self.assertEqual(seed["actors"][:-1], source["actors"])
+        owners = [entry["item_instance_id"] for actor in seed["actors"] for entry in actor["carried"]["items"]]
+        self.assertEqual(len(owners), len(set(owners)))
+        self.assertEqual(seed["actors"][-1]["location"], source["actors"][0]["location"])
 
     def test_units_and_frontend_are_isolated_and_bounded(self):
         install_units(self.site)
@@ -72,6 +116,7 @@ class PrivateDeployment(unittest.TestCase):
         self.assertIn("listen 127.0.0.1:", nginx)
         self.assertIn("location /internal/ { return 404; }", nginx)
         self.assertNotIn("0.0.0.0", nginx)
+        self.assertIn("absolute_redirect off;", nginx)
         (units[0]).write_text("owned by another project")
         with self.assertRaises(RuntimeError):
             install_units(self.site)

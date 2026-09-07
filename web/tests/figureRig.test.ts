@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AnimationClip, Bone, BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Object3D, Skeleton, SkinnedMesh, Texture, VectorKeyframeTrack } from "three";
-import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, assertSameSkeleton, createFigureInstance, disposeDecodedFigures, disposeFigureSources, resolveFigureUrl } from "../src/space/figureRig";
+import { applyFigurePalette, assertClipBinds, assertPaintableMaterials, assertSameSkeleton, createFigureInstance, decodeFigures, disposeDecodedFigures, disposeFigureSources, resolveFigureUrl } from "../src/space/figureRig";
+import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import type { VerifiedAssetPacket } from "../src/feelTypes";
 import type { DecodedFigure } from "../src/space/figureRig";
 
 describe("figure files resolve only against verified bytes", () => {
@@ -57,7 +59,7 @@ describe("disposing decoded figures", () => {
     texture.dispose = () => { disposed.texture += 1; };
     const figure: DecodedFigure = { name: "f", rig, parts: [part], clips: [], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "x", gait: { walk: "x", run: "x", sprint: "x" } };
     disposeDecodedFigures(new Map([["f", figure]]));
-    expect(disposed).toEqual({ geometry: 2, material: 1, texture: 1 });
+    expect(disposed).toEqual({ geometry: 1, material: 1, texture: 1 });
   });
 });
 
@@ -123,7 +125,7 @@ describe("an instance releases its cloned skeletons", () => {
     Skeleton.prototype.dispose = function (this: Skeleton) { disposed.push(this); };
     try {
       const clip = new AnimationClip("Idle", 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 0, 0])]);
-      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Idle", run: "Idle", sprint: "Idle" } }, { i: 0, j: 0 }, { i: 1, j: 0 });
+      const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [clip], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Idle", run: "Idle", sprint: "Idle" } }, { i: 0, j: 0 }, { i: 1, j: 0 }, () => 0);
       instance.dispose();
       expect(disposed).toHaveLength(1);
       expect(disposed[0]).not.toBe(skinned.skeleton); // the clone's, not the source's
@@ -186,7 +188,7 @@ describe("a figure changes gait by clip", () => {
     const jog = new AnimationClip("Jog", 1, [new VectorKeyframeTrack("Hips.position", [0, 1], [0, 0, 0, 0, 1, 0])]);
     const instance = createFigureInstance({ name: "f", rig, parts: [], clips: [idle, jog],
       palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle",
-      gait: { walk: "Jog", run: "Jog", sprint: "Jog" } }, { i: 0, j: 0 }, { i: 1, j: 0 });
+      gait: { walk: "Jog", run: "Jog", sprint: "Jog" } }, { i: 0, j: 0 }, { i: 1, j: 0 }, () => 0);
     instance.setGait("run");
     instance.update(0.4);
     expect(instance.root.getObjectByName("Hips")!.position.y).toBeCloseTo(0.4);
@@ -211,7 +213,14 @@ describe("a figure changes gait by clip", () => {
       { name: "f", rig, parts: [], clips: [clip("Idle"), clip("Walk"), clip("Jog"), clip("Sprint")], palette: [[0, 0, 0], [1, 1, 1]], rim: 0, idle: "Idle", gait: { walk: "Walk", run: "Jog", sprint: "Sprint" } },
       { i: 0, j: 0 },
       { i: 1, j: 0 },
+      (i, j) => i * .1 + j * .2,
     );
+    const meshes: Mesh[] = [];
+    instance.root.traverse(object => { if (object instanceof Mesh) meshes.push(object); });
+    expect(meshes).toHaveLength(1);
+    expect((meshes[0]!.material as MeshStandardMaterial).stencilWrite).toBe(false);
+    instance.place(2, 3);
+    expect(instance.root.position.toArray()).toEqual([2, .8, 3]);
     expect(instance.gait).toBe("idle");
     expect(instance.clip).toBe("Idle");
     instance.setGait("run");
@@ -222,5 +231,40 @@ describe("a figure changes gait by clip", () => {
     expect(instance.clip).toBe("Idle");
     instance.update(0.2);
     instance.dispose();
+  });
+});
+
+
+describe("figure dependency failures survive a loader success", () => {
+  it.each(["unlisted", "decode"])("refuses a swallowed %s texture failure and disposes the parsed rig", async (failure) => {
+    const geometry = new BoxGeometry();
+    const disposed = vi.spyOn(geometry, "dispose");
+    const rig = new Group();
+    rig.add(new Mesh(geometry, new MeshStandardMaterial()));
+    const parse = vi.spyOn(GLTFLoader.prototype, "parse").mockImplementation(function (this: GLTFLoader, _data, _path, loaded) {
+      if (failure === "unlisted") {
+        // Three catches this texture error and resolves the rest of the glTF.
+        try { this.manager.resolveURL("undeclared.png"); } catch { /* swallowed by loader */ }
+      } else {
+        this.manager.itemError("verified-but-corrupt.png");
+      }
+      loaded({ scene: rig } as GLTF);
+    });
+    const file = (name: string) => ({ file: name, sha256: "0".repeat(64) });
+    const packet = {
+      manifest: { figures: { test: {
+        rig: file("rig.gltf"), sidecars: [], clips: file("clips.glb"), parts: [],
+        palette: [[0, 0, 0], [255, 255, 255]], rim: 0, idle: "idle",
+        gait: { walk: "walk", run: "run", sprint: "sprint" },
+      } } },
+      assets: new Map(["rig.gltf", "clips.glb"].map(name => [
+        `figures/test/${name}`, { bytes: new ArrayBuffer(0) },
+      ])),
+    } as unknown as VerifiedAssetPacket;
+    try {
+      await expect(decodeFigures(packet)).rejects.toThrow(/figure test has failed dependencies/);
+      expect(disposed).toHaveBeenCalledOnce();
+      expect(parse).toHaveBeenCalledOnce();
+    } finally { vi.restoreAllMocks(); }
   });
 });

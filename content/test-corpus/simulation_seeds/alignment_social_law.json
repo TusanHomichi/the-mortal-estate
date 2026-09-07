@@ -92,6 +92,7 @@
         }
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 1,
         "interactions": [
           {
@@ -131,6 +132,7 @@
         }
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 1,
         "interactions": [
           {

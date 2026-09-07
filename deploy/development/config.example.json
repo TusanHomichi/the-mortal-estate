@@ -1,5 +1,12 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "world_document": "content/lands/identity-proof/world.json",
-  "ports": {"postgres": 55434, "server": 18741, "operations": 18742, "https": 18743}
+  "ports": {
+    "postgres": 55434,
+    "server": 18741,
+    "operations": 18742,
+    "https": 18743
+  },
+  "public_origin": "https://localhost:18743",
+  "presentation_assets": null
 }

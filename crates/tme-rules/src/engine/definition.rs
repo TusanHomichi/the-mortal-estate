@@ -32,6 +32,7 @@ pub struct CatalogItem {
 }
 #[derive(Debug, Clone)]
 pub struct GameCatalog {
+    pub(in crate::engine) creation_profiles: Vec<crate::content::CharacterCreationProfileDef>,
     pub(in crate::engine) boundary_policy: ContentBoundaryPolicy,
     pub(in crate::engine) profile_key: CatalogProfileKey,
     pub(in crate::engine) rules: WorldRules,

@@ -57,6 +57,8 @@ http {{
     server {{
         listen 127.0.0.1:{ports['https']} ssl;
         server_name localhost;
+        absolute_redirect off;
+        if ($args ~* "(^|&)(username|password)=") {{ return 303 /; }}
         ssl_certificate {site.config}/tls/current/server.pem;
         ssl_certificate_key {site.config}/tls/current/server.key;
         ssl_protocols TLSv1.2 TLSv1.3;

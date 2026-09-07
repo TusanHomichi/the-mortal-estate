@@ -385,7 +385,8 @@ fn typed_discovery_is_deterministic_read_only_and_reuses_flat_actions() {
 #[test]
 fn discovery_is_exact_coordinate_only_and_preserves_authored_provider_order() {
     let mut other_coordinate = content_parts("magic_profession_gallery");
-    other_coordinate.service_instances_mut()[0]["location"]["position"]["x"] = json!(2);
+    other_coordinate.service_instances_mut()[0]["placement"]["location"]["position"]["x"] =
+        json!(2);
     let engine = engine_from_parts(other_coordinate);
     assert!(
         engine
@@ -398,7 +399,7 @@ fn discovery_is_exact_coordinate_only_and_preserves_authored_provider_order() {
     let mut other_room = content_parts("magic_profession_gallery");
     let room = other_room.template_levels_source_mut()["room_0"].clone();
     other_room.template_levels_source_mut()["other"] = room;
-    other_room.service_instances_mut()[0]["location"]["level"] = json!("other");
+    other_room.service_instances_mut()[0]["placement"]["location"]["level"] = json!("other");
     let engine = engine_from_parts(other_room);
     assert!(
         engine

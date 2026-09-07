@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 19
-status: Private persistent deployment and authoritative browser controls carried; preview remains scene 06.
+last_updated: 2026-09-07
+revision: 48
+status: Preview renderer/login and path-control repairs deployed and verified; horseshoe town study remains next.
 public_safe: true
-summary: Current private play checkpoint, execution receipt, owner pointers, historical genesis evidence and open gates.
+summary: Current preview input restoration, horseshoe town study, temple iteration, resident services and remaining visual gates.
 ---
 
 # The genesis ledger
@@ -26,14 +26,106 @@ boundary map; 8 tooling and the verification lane split; 9 Workbench V1;
 10 the first identity proof; 11 the first external public release. Gates are the
 owner's and are numbered by the phase they guard.
 
-## Current checkpoint (2026-09-05)
+## Current checkpoint
 
+Updated 2026-09-07.
+
+The latest bounded [temple art iteration](2026-09-06-town-buildout.md#temple-patterns-of-daily-use)
+adds patterns of daily use and gentler fixture shadows toward the selected guide. The
+[coastal-water follow-up](2026-09-07-coastal-water.md) records the requested
+shallow-water research and next experiment. Authored geography,
+resident services and the fixed camera retain their existing owners.
+
+The subsequent [preview repair](2026-09-06-town-buildout.md#preview-renderer-default-repair)
+fixes renderer entry selection and credential leakage during login startup;
+final deployed proof passed in all three browsers. The newly directed
+[town layout study](2026-09-06-town-buildout.md#horseshoe-layout-study) is next.
+The subsequently reported [path-control regression](2026-09-07-path-controls.md)
+is repaired and deployed, with the exterior/temple input proof passing in all
+three browsers. That geography work remains next.
+
+- **First expedition:** the owner approved the town and bounded entrance
+  geography and directed implementation to continue. The
+  [execution record](2026-09-06-first-expedition.md) owns the authored twelve-area
+  world, five creation profiles, town services, temple descent, encounter and
+  loot, instruction, storage and durable reconnect. The private visual study
+  presents server authority using the verified external candidate artwork.
+  Numerical approximations remain explicit under the
+  [baseline ruling](../gameplay-baseline.md#first-expedition-provisional-values).
+  The [class contract](../class-training-contract.md) owns recovered relationships
+  and unresolved historical numbers. Final native and persistence results are
+  recorded in the execution record. Chromium, Firefox and WebKit each passed
+  the complete authored loop, including training and lodge storage across
+  reconnects.
+
+- **Character and style iteration:** the owner amended the
+  [visual direction](../presentation-direction.md#stylization-and-restrained-charm)
+  and selected the first of two generated adventurers. The
+  [character study](2026-09-06-character-study.md) records the original Blender
+  trial, subsequent owner-authorized Meshy generation and rigging, and the
+  cleaned character's private-study integration. The model remains a visual
+  candidate with modular equipment and final deformation work open. Asset
+  selection follows the [sourcing order](../presentation-direction.md#asset-sourcing-order).
+
+- **Design continuity:** the owner identified missing class and mechanics context.
+  The [initial recovery audit](2026-09-06-design-continuity-audit.md) records
+  surviving implementations and the trainer-layout planning error. The owner has now selected the
+  [historical gameplay baseline](../gameplay-baseline.md) and dispatched private
+  research restoration and audit. The surface brief records the dead town, four
+  initial dungeon levels and three deeper levels for later content.
+  The [restoration audit](2026-09-06-research-restoration-audit.md) records the
+  verified archive, independent map/creation-data checks, recovered decision
+  dispositions and the distinction between observable gameplay and historical
+  implementation details.
+- **First-land design:** the owner amended the geographic sourcing boundary.
+  The [map-template ruling](../public-boundary-policy.md#first-land-map-template)
+  owns its scope and provenance requirements. The
+  [surface brief](2026-09-05-first-land-surface.md) owns the subsequent surface,
+  settlement and dock-arrival decisions, the verified template identity and the
+  first proposed study and compiled arrival candidate. Local walking review
+  covers the revised dock approach and rebuilt town after owner feedback on
+  building occlusion. A subsequent local material study adds bank relief,
+  recessed openings, mowing zones, interactive grass and a tree-volume
+  comparison. A further local study adds licensed town props and procedural
+  water, and compares straight-on cameras at two elevations. The owner then
+  selected the camera through the [projection ruling](../presentation-direction.md#projection-and-surface-ruling)
+  and requested a lived-in housing pass, followed by material refinement and
+  a visible-grid experiment. The owner then selected the
+  [warm architectural direction](../presentation-direction.md#warm-architectural-direction)
+  and dispatched the arrival house and its immediate street as the first
+  implementation. Finished geography and presentation
+  artwork masters remain unaccepted; the first-expedition geography acceptance
+  is recorded in the surface brief.
+  Entrance recovery is tracked there for
+  the subsequent dungeon pass.
+- **Temple refinement:** the owner selected the revised September 7 guide and
+  directed implementation. The [town record](2026-09-06-town-buildout.md#september-7-temple-iteration)
+  owns the 7×8 layout, distinct live residents, native material and framing pass,
+  and verification. The [resident contract](../town-resident-contract.md) owns
+  Tomas's authoritative circuit and actor-bound services. Right-click buying uses
+  current server-projected offers. Artwork-master acceptance remains open.
+- **Town buildout:** the [execution plan](2026-09-06-town-buildout.md) carries
+  private lore reconciliation and the expanded candidate: ten enterable service
+  interiors, the lodge locker room, central bank and sheriff, trainer spaces and
+  the temple descent. The browser owner defines the required
+  [floor openings](../browser-client.md#candidate-ground-verdicts). Native entry/return and final visual review
+  passed in the shared Chromium, Firefox and WebKit roster. Subsequent service
+  mechanics and the dungeon destination belong to the expedition record. The
+  owner explicitly designated all current interiors as
+  [placeholders](../presentation-direction.md#placeholder-town-interiors): guide
+  images and visual iteration follow, with artwork acceptance still open. The
+  [first temple guide](2026-09-06-town-buildout.md#interior-guidance-pass) is now
+  selected by the owner. Its [modeled temple pass](2026-09-06-town-buildout.md#temple-model-implementation)
+  preserves geography and services and passed native play in all three engines.
+  Artwork-master acceptance remains separate.
 - **Server:** individual-deadline cutover merged in [PR #41](https://github.com/TusanHomichi/the-mortal-estate/pull/41)
   as `9f3f284` after both CI checks passed. [D5](../boundary-map.md#21-authoritative-individual-deadlines-d5)
   owns timing; the [cutover receipt](2026-09-05-individual-action-cooldowns.md) owns its proof.
-- **Private preview:** scene 06 is deployed: walking clips, full movement locks,
-  cursor-only feedback, and obstacle detours. Scene 05 is retained for rollback.
-  Scene 06 passed 152 browser tests and real movement proof in Chromium and Firefox.
+- **Private preview:** the September 7 current-game deployment replaces scene 06.
+  The [town record](2026-09-06-town-buildout.md#temple-patterns-of-daily-use) owns
+  release and host proof; the [development runbook](../../deploy/development/README.md)
+  owns operation. The exterior, current interiors, services and dungeon connection
+  use the real first-expedition server. Public signup remains a future stage.
 - **Source:** scene 06 routing/cursor changes, the GPU proof launcher, and the
   Godot retirement are carried here. The [code/context audit](2026-09-05-code-and-context-audit.md)
   records cleanup and verification; delivery does not update the private preview.
@@ -47,8 +139,9 @@ owner's and are numbered by the phase they guard.
   routes its operational contract.
 - **Start browser work:** [browser client](../browser-client.md) maps source,
   current behavior, limitations, and proof. The private play shell now consumes
-  server authority; candidate artwork integration, proportional chrome and
-  distance-matched animation remain unfinished.
+  server authority and includes an explicit expedition artwork study.
+  Proportional production chrome, final actor art and distance-matched animation
+  remain unfinished.
   [Presentation direction](../presentation-direction.md) owns the target.
 - **Separate stop line:** the presentation-adoption experiment remains before P1;
   remaining identity-proof slices are undispatched. Active browser work does not
@@ -88,8 +181,8 @@ This pause is not a final experiment disposition, a Nomos R2 verdict, a TME
 adoption decision, or a release of S3. TME's target remains accepted, its
 representative micro-scene remains unjudged, and G10 and G11 remain open.
 
-The 2026-08-31 target ruling selects orthographic 2:1 dimetric projection and
-ordinary world-up geometry. It does not release P1 or any Phase 10 slice. The
+The current [projection ruling](../presentation-direction.md#projection-and-surface-ruling)
+owns the selected camera and ordinary world-up geometry. It does not release P1 or any Phase 10 slice. The
 paused experiment's P0 packet carries a superseded camera, so resumption also
 requires fresh current-target evidence rather than reinterpretation of that
 historical digest.

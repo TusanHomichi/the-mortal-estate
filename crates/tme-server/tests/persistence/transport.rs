@@ -25,7 +25,7 @@ async fn issue_ticket(
     );
     let ticket: wire::SocketTicketV1 = serde_json::from_slice(&response.body).unwrap();
     assert_eq!(ticket.protocol_major, 1);
-    assert_eq!(ticket.supported_minors, vec![8]);
+    assert_eq!(ticket.supported_minors, vec![wire::PROTOCOL_MINOR]);
     ticket
 }
 

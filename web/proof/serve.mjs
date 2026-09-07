@@ -3,11 +3,11 @@
 // whole process group stopped afterwards. Nothing here asserts anything
 // about the scene; it only gets a real tab in front of it.
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { chromium, firefox } from "playwright";
+import { resolveProofBrowsers } from "./engines.mjs";
+export { ENGINE_NAMES, PROOF_ENGINES } from "./engines.mjs";
 
 export const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -34,32 +34,13 @@ export function requirePacket() {
   return path.resolve(packet);
 }
 
-/**
- * The engines every real-tab proof runs in (owner ruling, 2026-09-03): a
- * picture judged in one browser is judged in both. `TME_PROOF_BROWSER` narrows
- * a run to `chromium` or `firefox` for a single-engine look; the default is
- * both, and an engine whose binary Playwright has not installed refuses the
- * whole run with exit 3 rather than passing on the other one.
- */
-export const PROOF_ENGINES = { chromium, firefox };
-
+/** A narrowed engine is an inspection; complete proof uses the whole roster. */
 export function proofBrowsers() {
-  const requested = process.env.TME_PROOF_BROWSER?.trim() || "all";
-  const names = requested === "all" ? Object.keys(PROOF_ENGINES) : [requested];
-  const selected = [];
-  for (const name of names) {
-    const engine = PROOF_ENGINES[name];
-    if (engine === undefined) {
-      console.error(`TME_PROOF_BROWSER names an unknown engine: ${name}`);
-      process.exit(2);
-    }
-    const executablePath = engine.executablePath();
-    if (!existsSync(executablePath)) {
-      refuseUnavailable(`Playwright has no ${name} at ${executablePath}; run: npx playwright install ${name}`);
-    }
-    selected.push({ name, engine, executablePath });
+  try { return resolveProofBrowsers(process.env.TME_PROOF_BROWSER?.trim() || "all"); }
+  catch (error) {
+    if (error.message.includes("unknown engine")) { console.error(error.message); process.exit(2); }
+    refuseUnavailable(error.message);
   }
-  return selected;
 }
 
 export async function freePort() {

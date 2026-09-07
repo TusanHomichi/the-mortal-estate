@@ -44,12 +44,13 @@ def _run(root: Path, arguments: list[str], *, document: dict | None = None) -> s
 
 def produce(projection, destination: Path, *, world_document: str | None = None,
             replay_directory: Path | None = None, admin_url_file: str | None = None) -> list[Path]:
-    """Build the carried codec, capture in both engines, verify, publish together."""
+    """Build the carried codec, capture the full engine roster, verify, publish together."""
     root = projection.root
     if root != Path(__file__).resolve().parents[2]:
         raise capture.CaptureUnavailable("run fresh capture with the selected checkout's own Workbench tools")
     if (world_document is None) == (replay_directory is None):
         raise capture.CaptureUnavailable("configure exactly one live world or replay capture")
+    engines = json.loads((root / "web/proof/engines.json").read_text())
     verify(root, projection.sources)
     destination.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=".browser-capture-", dir=destination))
@@ -78,7 +79,7 @@ def produce(projection, destination: Path, *, world_document: str | None = None,
                 raise capture.CaptureUnavailable("live world does not use this Workbench's compiled runtime projection")
             with LiveServer(read_admin_url(admin_url_file), world) as server:
                 try:
-                    for engine in ("chromium", "firefox"):
+                    for engine in engines:
                         # Control credentials stay in the Python adapter. The page
                         # receives only a fresh, one-use ticket and uses native WSS.
                         public = LiveWireClient(server).public
@@ -95,18 +96,18 @@ def produce(projection, destination: Path, *, world_document: str | None = None,
                 finally:
                     shutil.copyfile(server.server_log, staging / "server.log")
         for configuration in configurations:
-            for engine in ("chromium", "firefox"):
+            for engine in engines:
                 _run(root, ["node", "web/proof/authoritative-capture.mjs"], document={**configuration, "engine": engine, "output": str(staging / engine)})
         verify(root, projection.sources)
         directories = sorted(staging.glob("*/live")) + sorted(staging.glob("*/replay"))
-        if len(directories) != (4 if world_document else 2):
-            raise capture.CaptureUnavailable("both engines did not produce all required captures")
+        if len(directories) != len(engines) * (2 if world_document else 1):
+            raise capture.CaptureUnavailable("the engine roster did not produce all required captures")
         for directory in directories:
             capture.bind(projection, capture.load(root, directory))
         # One directory rename publishes the completed batch; a failed engine
         # never leaves half of a new capture operation offered in the Workbench.
         batch = destination / ("batch-" + staging.name.removeprefix(".browser-capture-"))
-        (staging / "operation.json").write_text(json.dumps({"elapsed_seconds": time.monotonic() - began, "engines": ["chromium", "firefox"]}) + "\n")
+        (staging / "operation.json").write_text(json.dumps({"elapsed_seconds": time.monotonic() - began, "engines": engines}) + "\n")
         relative = [directory.relative_to(staging) for directory in directories]
         staging.rename(batch)
         return [batch / path for path in relative]

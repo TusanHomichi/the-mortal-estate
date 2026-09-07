@@ -117,12 +117,15 @@
     {
       "id": "waystation_clerk",
       "service_definition_id": "waystation_clerk",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 1
+          }
         }
       }
     }

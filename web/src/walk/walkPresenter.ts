@@ -8,7 +8,6 @@
 import {
   AdditiveBlending,
   BufferGeometry,
-  CanvasTexture,
   Float32BufferAttribute,
   LineBasicMaterial,
   LineLoop,
@@ -16,7 +15,6 @@ import {
   MeshBasicMaterial,
   PlaneGeometry,
   Scene,
-  SRGBColorSpace,
   Vector3,
   type OrthographicCamera,
 } from "three";
@@ -31,6 +29,7 @@ import {
   walkCursorDataUris,
   type WalkCursorKind,
 } from "./cursors";
+import { makeSoleTexture } from "./soleTexture";
 import { footprintsFromPath } from "./footprints";
 import { passabilityFrom, sameCell, type Cell } from "./layoutPassability";
 import { cellUnderPointer } from "./pointer";
@@ -58,7 +57,7 @@ export interface WalkPresenterOptions {
   space: FeelSpace;
   caretaker: FigureInstance;
   initialCell: Cell;
-  updateWallFade: (playerCell: Cell, now: number) => number;
+  onHoverCell: (cell: Cell | null) => void;
   onCellChanged: (previous: Cell, next: Cell) => void;
   /** Whether the camera re-centres on the caretaker at each landing (false inside a building). */
   cameraFollowsCaretaker: boolean;
@@ -88,55 +87,6 @@ const COMMITTED_FOOTPRINT_OPACITY = 1;
 
 function routeIdentity(route: readonly Cell[] | null): string {
   return route?.map((cell) => `${cell.i},${cell.j}`).join(";") ?? "";
-}
-
-function traceSole(context: CanvasRenderingContext2D): void {
-  context.beginPath();
-  context.moveTo(48, 12);
-  context.bezierCurveTo(65, 12, 76, 24, 74, 42);
-  context.bezierCurveTo(73, 54, 66, 60, 59, 66);
-  context.bezierCurveTo(54, 72, 55, 82, 61, 94);
-  context.bezierCurveTo(67, 108, 63, 127, 51, 132);
-  context.bezierCurveTo(38, 137, 27, 127, 28, 113);
-  context.bezierCurveTo(29, 101, 36, 92, 36, 81);
-  context.bezierCurveTo(36, 72, 29, 66, 24, 57);
-  context.bezierCurveTo(14, 40, 21, 20, 38, 14);
-  context.bezierCurveTo(41, 13, 45, 12, 48, 12);
-  context.closePath();
-}
-
-function paintSoleLayer(
-  context: CanvasRenderingContext2D,
-  colour: string,
-  opacity: number,
-  blur: number,
-): void {
-  context.save();
-  // Canvas bottom becomes the print's toe after the ground-plane rotation.
-  context.translate(16, 168);
-  context.scale(1, -1);
-  context.filter = `blur(${blur}px)`;
-  context.globalAlpha = opacity;
-  context.fillStyle = colour;
-  traceSole(context);
-  context.fill();
-  context.restore();
-}
-
-function makeSoleTexture(kind: "draft" | "committed"): CanvasTexture {
-  const drawing = document.createElement("canvas");
-  drawing.width = 128;
-  drawing.height = 192;
-  const context = drawing.getContext("2d");
-  if (context === null) throw new Error("the walk experiment could not draw its footprints");
-  context.clearRect(0, 0, drawing.width, drawing.height);
-  paintSoleLayer(context, "#8fb4ff", kind === "draft" ? 0.48 : 0.68, kind === "draft" ? 8 : 11);
-  paintSoleLayer(context, "#dfeaff", 0.9, 2.4);
-  paintSoleLayer(context, "#dfeaff", 0.55, 0.8);
-  const texture = new CanvasTexture(drawing);
-  texture.colorSpace = SRGBColorSpace;
-  texture.needsUpdate = true;
-  return texture;
 }
 
 function makeHoverOutline(): LineLoop<BufferGeometry, LineBasicMaterial> {
@@ -171,7 +121,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
     camera,
     space,
     caretaker,
-    updateWallFade,
   } = options;
   const passability = passabilityFrom(space);
   const soleTextures = {
@@ -194,9 +143,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   let landedFootprints: LandedFootprints | null = null;
   let hoverCell: Cell | null = null;
   stage.dataset.walkSpace = options.spaceName;
-  stage.dataset.walkFadedRuns = String(
-    updateWallFade(state.caretakerCell, performance.now() / 1000),
-  );
 
   const clearFootprints = (): void => {
     for (const footprint of footprints) {
@@ -276,6 +222,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
   };
 
   const updateHover = (): void => {
+    options.onHoverCell(hoverCell);
     if (hoverCell === null) {
       hoverOutline.visible = false;
       stage.dataset.walkOutline = "hidden";
@@ -428,13 +375,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
         }
         transition(advanced, now);
       }
-      // The wall fade follows the figure as presented, not the square it is
-      // still logically on: walking into a wall's cover during movement must
-      // fade that wall as soon as the figure reaches it.
-      const presented = presentWalk(now);
-      stage.dataset.walkFadedRuns = String(
-        updateWallFade({ i: Math.round(presented.i), j: Math.round(presented.j) }, now),
-      );
+      presentWalk(now);
 
       if (landedFootprints !== null) {
         const fade = Math.max(
@@ -453,6 +394,7 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       }
     },
     stop: (): void => {
+      options.onHoverCell(null);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("click", onClick);
@@ -474,7 +416,6 @@ export function createWalkPresenter(options: WalkPresenterOptions): WalkPresente
       delete stage.dataset.walkCommittedAt;
       delete stage.dataset.walkLandsAt;
       delete stage.dataset.walkSpace;
-      delete stage.dataset.walkFadedRuns;
       delete stage.dataset.caretakerCell;
       delete stage.dataset.caretakerProjection;
       delete stage.dataset.caretakerPresented;

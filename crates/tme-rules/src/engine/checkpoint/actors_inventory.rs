@@ -74,7 +74,7 @@ impl From<ItemInstanceCheckpointV2> for ItemInstanceState {
 copy_checkpoint!(ServiceInstanceCheckpointV2, ServiceInstanceState, {
     id: String,
     definition_id: String,
-    position: WorldPosition,
+    placement: crate::model::ServicePlacement,
 });
 copy_checkpoint!(BankCheckpointV2, BankState, {
     balances: BTreeMap<CharacterId, i64>,
@@ -301,6 +301,8 @@ impl From<AiCheckpointV3> for ActorAiState {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct NpcCheckpointV2 {
+    pub(super) patrol: Vec<crate::model::Coord>,
+    pub(super) patrol_next: usize,
     pub(super) follow_cadence_units: u32,
     pub(super) interactions: Vec<NpcInteractionCheckpointV2>,
     pub(super) following_character_id: Option<CharacterId>,
@@ -309,6 +311,8 @@ pub(super) struct NpcCheckpointV2 {
 impl From<&NpcState> for NpcCheckpointV2 {
     fn from(value: &NpcState) -> Self {
         Self {
+            patrol: value.patrol.clone(),
+            patrol_next: value.patrol_next,
             follow_cadence_units: value.follow_cadence_units,
             interactions: value.interactions.iter().map(Into::into).collect(),
             following_character_id: value.following_character_id.clone(),
@@ -319,6 +323,8 @@ impl From<&NpcState> for NpcCheckpointV2 {
 impl From<NpcCheckpointV2> for NpcState {
     fn from(value: NpcCheckpointV2) -> Self {
         Self {
+            patrol: value.patrol.clone(),
+            patrol_next: value.patrol_next,
             follow_cadence_units: value.follow_cadence_units,
             interactions: value.interactions.into_iter().map(Into::into).collect(),
             following_character_id: value.following_character_id,

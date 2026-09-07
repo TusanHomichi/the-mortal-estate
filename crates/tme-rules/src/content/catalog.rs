@@ -110,6 +110,7 @@ pub struct CatalogProfileDef {
     pub service_definitions: Vec<CatalogRegistryKey>,
     pub banks: Vec<CatalogRegistryKey>,
     pub locker_vaults: Vec<CatalogRegistryKey>,
+    pub creation_profiles: Vec<CatalogRegistryKey>,
 }
 
 fn deserialize_required_nullable_registry_key<'de, D>(
@@ -144,7 +145,8 @@ mod tests {
             "profession_actions": [],
             "service_definitions": [],
             "banks": [],
-            "locker_vaults": []
+            "locker_vaults": [],
+            "creation_profiles": []
         });
         let decoded: CatalogProfileDef = serde_json::from_value(valid.clone())
             .expect("explicit null skill catalog should decode");
@@ -186,6 +188,7 @@ pub struct CatalogV6 {
     pub service_definitions: BTreeMap<CatalogRegistryKey, ServiceDefinitionDef>,
     pub banks: BTreeMap<CatalogRegistryKey, BankDef>,
     pub locker_vaults: BTreeMap<CatalogRegistryKey, LockerVaultDef>,
+    pub creation_profiles: BTreeMap<CatalogRegistryKey, super::CharacterCreationProfileDef>,
     pub profiles: BTreeMap<CatalogProfileKey, CatalogProfileDef>,
 }
 
@@ -214,6 +217,7 @@ pub struct SelectedCatalog {
     pub service_definitions: Vec<ServiceDefinitionDef>,
     pub banks: Vec<BankDef>,
     pub locker_vaults: Vec<LockerVaultDef>,
+    pub creation_profiles: Vec<super::CharacterCreationProfileDef>,
 }
 
 impl CatalogV6 {
@@ -363,6 +367,14 @@ impl CatalogV6 {
             &mut errors,
         );
 
+        let creation_profiles = select_many(
+            "profiles.creation_profiles",
+            &profile.creation_profiles,
+            &self.creation_profiles,
+            |row| row.id.as_str(),
+            &mut errors,
+        );
+
         if !errors.is_empty() {
             return Err(ValidationError::new(errors));
         }
@@ -390,6 +402,7 @@ impl CatalogV6 {
             service_definitions,
             banks,
             locker_vaults,
+            creation_profiles,
         })
     }
 
@@ -434,6 +447,7 @@ impl CatalogV6 {
         validate_registry("service_definitions", &self.service_definitions, errors);
         validate_registry("banks", &self.banks, errors);
         validate_registry("locker_vaults", &self.locker_vaults, errors);
+        validate_registry("creation_profiles", &self.creation_profiles, errors);
         validate_registry("profiles", &self.profiles, errors);
 
         if self.profiles.is_empty() {

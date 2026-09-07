@@ -114,24 +114,30 @@
     {
       "id": "gallery_trainer",
       "service_definition_id": "gallery_trainer",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 2
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 2
+          }
         }
       }
     },
     {
       "id": "gallery_promoter",
       "service_definition_id": "gallery_promoter",
-      "location": {
-        "realm": "realm_0",
-        "level": "room_0",
-        "position": {
-          "x": 1,
-          "y": 2
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "room_0",
+          "position": {
+            "x": 1,
+            "y": 2
+          }
         }
       }
     }

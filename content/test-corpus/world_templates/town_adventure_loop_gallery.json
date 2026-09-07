@@ -1,5 +1,14 @@
 {
-  "arrivals": {},
+  "arrivals": {
+    "creation_arrival": {
+      "realm": "realm_0",
+      "level": "trailhead",
+      "position": {
+        "x": 1,
+        "y": 1
+      }
+    }
+  },
   "id": "town_adventure_loop_gallery",
   "kind": "world_template",
   "realms": {

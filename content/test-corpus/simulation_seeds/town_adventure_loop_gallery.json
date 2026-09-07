@@ -148,6 +148,7 @@
         }
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -272,12 +273,15 @@
     {
       "id": "waystation_counter",
       "service_definition_id": "waystation_counter",
-      "location": {
-        "realm": "realm_0",
-        "level": "waystation",
-        "position": {
-          "x": 2,
-          "y": 1
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "realm": "realm_0",
+          "level": "waystation",
+          "position": {
+            "x": 2,
+            "y": 1
+          }
         }
       }
     }

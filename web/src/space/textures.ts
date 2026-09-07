@@ -22,21 +22,21 @@ export async function decodeTextures(
   packet: VerifiedAssetPacket,
 ): Promise<Map<string, DecodedTexture>> {
   const decoded = new Map<string, DecodedTexture>();
-  const windTextureKeys = new Set(
+  const readableTextureKeys = new Set(
     Object.values(packet.manifest.spaces).flatMap((space) =>
       space.props
-        .filter((prop) => prop.sway)
         .map((prop) => `props/${prop.kind}`)
     ),
   );
-  if (packet.assets.has("props/grass_clump")) windTextureKeys.add("props/grass_clump");
+  if (packet.assets.has("props/grass_clump")) readableTextureKeys.add("props/grass_clump");
+  if (packet.assets.has("walls/door")) readableTextureKeys.add("walls/door");
   // Figure and structure models have their own verified-byte decoders.
   const sheets = [...packet.assets.entries()].filter(([key]) => !isModelKey(key));
   await Promise.all(
     sheets.map(async ([key, asset]) => {
       const blob = new Blob([asset.bytes], { type: "image/png" });
       let pixels: Uint8ClampedArray | null = null;
-      if (windTextureKeys.has(key)) {
+      if (readableTextureKeys.has(key)) {
         const readableBitmap = await createImageBitmap(blob);
         const canvas = document.createElement("canvas");
         canvas.width = readableBitmap.width;

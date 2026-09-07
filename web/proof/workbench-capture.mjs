@@ -2,14 +2,14 @@
 // Exercise the restored button and file-only selection through the served UI.
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
-import { launchProofBrowser, proofBrowsers } from "./serve.mjs";
+import { launchProofBrowser, proofBrowsers, ENGINE_NAMES } from "./serve.mjs";
 
 const { base, output } = JSON.parse(await new Promise(resolve => {
   let input = ""; process.stdin.on("data", chunk => { input += chunk; }); process.stdin.on("end", () => resolve(input));
 }));
 let offered;
 const engines = proofBrowsers();
-if (engines.length !== 2) throw new Error("Workbench capture proof requires both browser engines");
+if (engines.length !== ENGINE_NAMES.length) throw new Error("Workbench capture proof requires the complete engine roster");
 for (const engine of engines) {
   const launched = await launchProofBrowser(engine);
   try {
@@ -24,9 +24,9 @@ for (const engine of engines) {
       const result = await response;
       assert.equal(result.status(), 201);
       offered = (await result.json()).captures;
-      assert.equal(offered.length, 4);
+      assert.equal(offered.length, ENGINE_NAMES.length * 2);
       await page.waitForFunction(() => !document.getElementById("take-capture").disabled, null, { timeout: 30_000 });
-      assert.match(await page.locator("#capture-status").textContent(), /^4 captures in \d+\.\d s$/);
+      assert.match(await page.locator("#capture-status").textContent(), new RegExp(`^${ENGINE_NAMES.length * 2} captures in \\d+\\.\\d s$`));
     } else {
       await page.locator('button[data-view="capture"]').click();
     }
@@ -50,4 +50,4 @@ for (const engine of engines) {
     await page.close();
   } finally { await launched.stop(); }
 }
-await writeFile(output, JSON.stringify({ captures: offered, engines: ["chromium", "firefox"], button_and_selection: true }) + "\n");
+await writeFile(output, JSON.stringify({ captures: offered, engines: ENGINE_NAMES, button_and_selection: true }) + "\n");

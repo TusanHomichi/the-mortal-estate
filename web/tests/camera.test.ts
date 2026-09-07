@@ -9,21 +9,28 @@ import {
   cameraVerticalSize,
   createFeelCamera,
   focusFeelCamera,
-  projectedCellDiamondWidth,
+  projectedCellWidth,
   projectedHeightCoverTiles,
 } from "../src/camera";
 import { WALL_PROFILE } from "../src/wallGeometry";
 
 describe("the ruled feel camera", () => {
+  it("keeps nine ground rows in an enlarged interior at every display size", () => {
+    for (const [width, height] of [[768, 512], [1462, 753], [2924, 1506]]) {
+      const camera = createFeelCamera(width!, height!, spaceCameraFocus({ i: 7, j: 8 }));
+      expect(camera.zoom).toBe(1);
+      expect(projectedCellWidth(camera, width!)).toBeCloseTo(height! / (9 * Math.SQRT1_2), 6);
+    }
+  });
   it("projects one cell to a nine-cell-high field at 1280 by 800 (the ruled frame)", () => {
     const camera = createFeelCamera(1280, 800, { i: 5, j: 5 });
-    expect(projectedCellDiamondWidth(camera, 1280)).toBeCloseTo(1600 / 9, 6);
+    expect(projectedCellWidth(camera, 1280)).toBeCloseTo(800 / (9 * Math.SQRT1_2), 6);
   });
 
   it("one comparison step out widens the frame by the step ratio and keeps the focus centred", () => {
     const ruled = createFeelCamera(1280, 800, { i: 5, j: 5 });
     const stepOut = createFeelCamera(1280, 800, { i: 5, j: 5 }, -1);
-    expect(projectedCellDiamondWidth(stepOut, 1280)).toBeCloseTo((1600 / 9) / CAMERA_ZOOM_STEP_RATIO, 6);
+    expect(projectedCellWidth(stepOut, 1280)).toBeCloseTo((800 / (9 * Math.SQRT1_2)) / CAMERA_ZOOM_STEP_RATIO, 6);
     expect(stepOut.top - stepOut.bottom).toBeCloseTo((ruled.top - ruled.bottom) * CAMERA_ZOOM_STEP_RATIO, 9);
     const projected = new Vector3(5, CAMERA_TARGET_HEIGHT, 5).project(stepOut);
     expect(projected.x).toBeCloseTo(0, 12);
@@ -65,6 +72,17 @@ describe("the ruled feel camera", () => {
   });
 
   it("derives a wall's ground cover from the ruled camera and profile", () => {
-    expect(projectedHeightCoverTiles(WALL_PROFILE.capTop)).toBeCloseTo(5.39, 2);
+    expect(projectedHeightCoverTiles(WALL_PROFILE.capTop)).toBeCloseTo(WALL_PROFILE.capTop, 8);
+  });
+});
+
+describe("accepted front camera", () => {
+  it("uses zero yaw and 45-degree elevation by default, including recentering", () => {
+    const camera = createFeelCamera(1280, 800, { i: 11, j: 21 });
+    expect(camera.getWorldDirection(new Vector3()).y).toBeCloseTo(-Math.SQRT1_2, 8);
+    expect(new Vector3(11, 1, 21).project(camera).x).toBeCloseTo(new Vector3(11, 0, 21).project(camera).x, 8);
+    focusFeelCamera(camera, { i: 8, j: 17 });
+    expect(camera.position.x).toBe(8);
+    expect(camera.up.toArray()).toEqual([0, 1, 0]);
   });
 });

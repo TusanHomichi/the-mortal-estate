@@ -1,15 +1,17 @@
+import { randomUUID } from "node:crypto";
+import { probeWebKitHardware } from "./webkit-renderer.mjs";
 import { trustAuthority } from "./trusted-authority.mjs";
 // Browser/display lifetime and observed rendering capability for local proofs.
 import { spawn, execFileSync } from 'node:child_process';
 import { accessSync, constants, readdirSync } from 'node:fs';
-import { access, mkdtemp, rm } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
 export class ProofUnavailable extends Error { exitCode = 3; }
 
 export function rendererKind(renderer) {
-  if (!renderer || /generic|or similar/i.test(renderer)) return 'unknown';
+  if (!renderer || /generic|or similar|^Apple GPU$|^WebKit WebGL$/i.test(renderer)) return 'unknown';
   if (/swiftshader|llvmpipe|softpipe|software|lavapipe|swrast/i.test(renderer)) return 'software';
   if (/intel|nvidia|amd|radeon|apple|adreno|mali|powervr/i.test(renderer)) return 'hardware';
   return 'unknown';
@@ -46,7 +48,7 @@ async function startDisplay(mode, multipleWindows) {
     if (env.WAYLAND_DISPLAY) return { env: { ...env, MOZ_ENABLE_WAYLAND: '1' }, stop: async () => {} };
     if (env.DISPLAY) return { env, stop: async () => {} };
     const weston = executable('weston');
-    if (!weston) throw new ProofUnavailable('Hardware Firefox needs a display or Weston; install Weston or select TME_PROOF_RENDERER=software.');
+    if (!weston) throw new ProofUnavailable('Hardware browser proof needs a display or Weston; install Weston or select TME_PROOF_RENDERER=software.');
     const runtime = await mkdtemp(path.join(os.tmpdir(), 'tme-proof-wayland-'));
     Object.assign(env, { XDG_RUNTIME_DIR: runtime, WAYLAND_DISPLAY: 'tme-proof', MOZ_ENABLE_WAYLAND: '1' });
     delete env.DISPLAY;
@@ -71,7 +73,7 @@ async function startDisplay(mode, multipleWindows) {
   delete env.WAYLAND_DISPLAY;
   if (env.DISPLAY) return { env, stop: async () => {} };
   const xvfb = executable('Xvfb');
-  if (!xvfb) throw new ProofUnavailable('Software Firefox needs DISPLAY or Xvfb.');
+  if (!xvfb) throw new ProofUnavailable('Software browser proof needs DISPLAY or Xvfb.');
   const child = spawn(xvfb, ['-displayfd', '1', '-screen', '0', '1600x1000x24', '-nolisten', 'tcp'], { stdio: ['ignore', 'pipe', 'pipe'] });
   let output = '', number = '';
   child.stderr.on('data', chunk => { output = (output + chunk).slice(-8_000); });
@@ -104,14 +106,16 @@ export async function probeRenderer(browser) {
 }
 
 export async function launchProofBrowser({ name, engine, executablePath, trustedAuthority, multipleWindows = false }) {
+  if (!['chromium', 'firefox', 'webkit'].includes(name)) throw new ProofUnavailable(`Unknown browser engine: ${name}`);
   const requested = process.env.TME_PROOF_RENDERER?.trim() || 'auto';
   if (!['auto', 'hardware', 'software'].includes(requested)) throw new ProofUnavailable(`Unknown TME_PROOF_RENDERER: ${requested}`);
   const linux = process.platform === 'linux';
   const displayAvailable = !!(process.env.WAYLAND_DISPLAY || process.env.DISPLAY || executable('weston'));
   const mode = requested === 'auto'
-    ? (!linux || (renderDeviceAccessible() && (name !== 'firefox' || displayAvailable)) ? 'hardware' : 'software')
+    ? (!linux || (renderDeviceAccessible() && (name === 'chromium' || displayAvailable)) ? 'hardware' : 'software')
     : requested;
-  let display, browser, trust;
+  let display, browser, trust, gtkConfig;
+  const webkitToken = randomUUID();
   try {
     if (trustedAuthority) trust = await trustAuthority(name, trustedAuthority);
     if (name === 'chromium') {
@@ -120,7 +124,7 @@ export async function launchProofBrowser({ name, engine, executablePath, trusted
       const env = { ...process.env };
       if (mode === 'hardware') delete env.LIBGL_ALWAYS_SOFTWARE;
       browser = await engine.launch({ executablePath, headless: true, args, env });
-    } else {
+    } else if (name === 'firefox') {
       display = await startDisplay(mode, multipleWindows);
       const launch = trust?.profile ? options => engine.launchPersistentContext(trust.profile, options) : options => engine.launch(options);
       browser = await launch({ executablePath, headless: false, env: display.env,
@@ -129,15 +133,38 @@ export async function launchProofBrowser({ name, engine, executablePath, trusted
           'webgl.sanitize-unmasked-renderer': false },
       });
     }
-    const renderer = await probeRenderer(browser);
-    const observed = rendererKind(renderer);
+    if (name === 'webkit') {
+      display = linux ? await startDisplay(mode, true) : undefined;
+      const env = { ...(display?.env || process.env), ...(trust?.env || {}), TME_WEBKIT_PROBE: webkitToken };
+      if (linux) {
+        // GTK's font DPI scales the entire page independently of Playwright's
+        // viewport. Pin the proof profile to CSS's 96 DPI, not the host monitor.
+        gtkConfig = await mkdtemp(path.join(os.tmpdir(), 'tme-proof-gtk-'));
+        for (const version of ['gtk-3.0', 'gtk-4.0']) {
+          const directory = path.join(gtkConfig, version);
+          await mkdir(directory);
+          await writeFile(path.join(directory, 'settings.ini'), '[Settings]\ngtk-xft-dpi=98304\n');
+        }
+        env.XDG_CONFIG_HOME = gtkConfig;
+      }
+      if (mode === 'hardware') delete env.LIBGL_ALWAYS_SOFTWARE;
+      else env.LIBGL_ALWAYS_SOFTWARE = '1';
+      // Headed Linux selects Playwright's GTK port, matching Tauri's port family.
+      browser = await engine.launch({ executablePath, headless: false, env });
+    }
+    let renderer = await probeRenderer(browser);
+    let observed = rendererKind(renderer);
+    if (name === 'webkit' && renderer !== null && linux && mode === 'hardware') {
+      renderer = await probeWebKitHardware(browser, webkitToken);
+      observed = 'hardware';
+    }
     if (observed !== mode) throw new ProofUnavailable(`${name}: requested ${mode}, observed ${observed} (${renderer ?? 'no WebGL2'}). No renderer substitution is accepted.`);
     console.log(`RENDERER ${name}: ${observed} — ${renderer}`);
     return { browser, context: trust?.profile ? browser : undefined, renderer, rendering: observed,
-      stop: async () => { try { await browser.close(); } finally { try { await display?.stop(); } finally { await trust?.stop(); } } },
+      stop: async () => { try { await browser.close(); } finally { try { await display?.stop(); } finally { try { await trust?.stop(); } finally { if (gtkConfig) await rm(gtkConfig, { recursive: true, force: true }); } } } },
     };
   } catch (error) {
-    try { await browser?.close(); } finally { try { await display?.stop(); } finally { await trust?.stop(); } }
+    try { await browser?.close(); } finally { try { await display?.stop(); } finally { try { await trust?.stop(); } finally { if (gtkConfig) await rm(gtkConfig, { recursive: true, force: true }); } } }
     if (error instanceof ProofUnavailable) throw error;
     throw new ProofUnavailable(`${name} ${mode} browser could not start: ${error.message}`);
   }

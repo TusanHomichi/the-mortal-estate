@@ -22,10 +22,7 @@ use tme_authoring::{BuildMode, LandContract, build, repository_root};
 static COUNTER: AtomicUsize = AtomicUsize::new(0);
 
 fn lands() -> Vec<&'static LandContract> {
-    ["authoring_fixture", "identity_proof"]
-        .into_iter()
-        .map(|id| tme_authoring::land(id).expect("the land is carried"))
-        .collect()
+    tme_authoring::contract::LANDS.to_vec()
 }
 
 /// A throwaway root holding just one land's authored bytes, so a mutant never
@@ -308,4 +305,48 @@ fn the_tracked_projections_are_current_and_the_reports_reproduce() {
         );
     }
     assert!(first[1].contains("\"kind\": \"authored_land_compile_report\""));
+}
+
+#[test]
+fn a_flipped_byte_identity_attestation_is_rejected() {
+    every_land_rejects("review basis differs", |value| {
+        let current = value["master"]["byte_identical_to_reviewed_master"]
+            .as_bool()
+            .unwrap();
+        value["master"]["byte_identical_to_reviewed_master"] = json!(!current);
+    });
+}
+
+#[test]
+fn a_changed_review_packet_cannot_be_resigned() {
+    let land = tme_authoring::land("first_expedition").unwrap();
+    let root = staged_root(land);
+    let mut value = receipt(&root, land);
+    value["reviewed_encoding"]["review_manifest_sha256"] = json!("0".repeat(64));
+    write_receipt(&root, land, &value);
+    assert_rejects(&root, land, "review basis differs");
+}
+
+#[test]
+fn a_changed_companion_landing_and_resigned_receipt_fail_geography_identity() {
+    let land = tme_authoring::land("first_expedition").unwrap();
+    let root = staged_root(land);
+    let path = land.member("market").unwrap().document;
+    let mut document: Value = serde_json::from_slice(&fs::read(root.join(path)).unwrap()).unwrap();
+    *support::property(
+        support::object(&mut document, "transitions", "market_to_arrival"),
+        "landing_cell_x",
+    ) = json!(1);
+    let bytes = serde_json::to_vec_pretty(&document).unwrap();
+    let digest = format!("{:x}", <sha2::Sha256 as sha2::Digest>::digest(&bytes));
+    fs::write(root.join(path), bytes).unwrap();
+    let mut value = receipt(&root, land);
+    value["companions"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|file| file["path"] == path)
+        .unwrap()["sha256"] = json!(digest);
+    write_receipt(&root, land, &value);
+    assert_rejects(&root, land, "differs from its accepted geography");
 }

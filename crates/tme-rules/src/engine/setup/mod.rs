@@ -171,6 +171,8 @@ fn social_profile_from_def(def: &crate::content::SocialProfileDef) -> SocialProf
 
 fn npc_state_from_def(def: &crate::content::NpcDef) -> crate::model::NpcState {
     crate::model::NpcState {
+        patrol: def.patrol.clone(),
+        patrol_next: 0,
         follow_cadence_units: def.follow_cadence_units,
         interactions: def
             .interactions
@@ -855,11 +857,12 @@ impl GameDefinition {
             super::checkpoint::ContentIdentityV1::from_selected(&selected, &template)?;
         let compiled_catalog = catalog::compile(&selected);
         let compiled_template = world_template::compile(&template);
-        Ok(Arc::new(Self {
+        let definition = Arc::new(Self {
             catalog: compiled_catalog,
             world_template: compiled_template,
             content_identity,
-        }))
+        });
+        Ok(definition)
     }
 }
 

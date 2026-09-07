@@ -302,6 +302,7 @@ pub(super) fn compile(source: &SelectedCatalog) -> GameCatalog {
 
     let rules = &source.rules;
     GameCatalog {
+        creation_profiles: source.creation_profiles.clone(),
         boundary_policy: if source.clean_content {
             crate::content::ContentBoundaryPolicy::Clean
         } else {

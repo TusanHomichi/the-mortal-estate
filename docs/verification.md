@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 4
-status: Standing verification usage including native/WebAssembly protocol proof and gated authoritative browser capture.
+last_updated: 2026-09-06
+revision: 5
+status: Standing verification usage with the shared three-engine browser capability.
 public_safe: true
-summary: Lane usage, capabilities, shared native/browser codec proof, gated capture, exit codes, and local evidence.
+summary: Lane usage, shared browser roster, native capability evidence, gated capture, exit codes and receipts.
 routes:
   - tools/run_verification.py
   - tools/verification/**
@@ -85,7 +85,7 @@ private denylist. It is a stated limit, not a skip.
 
 | Capability | Supplied by |
 | --- | --- |
-| `browsers` | installed Playwright Chromium and Firefox; the actual capture still probes and requires working WebGL2 renderers |
+| `browsers` | installed Playwright engines from `web/proof/engines.json`; the actual capture still probes and requires working WebGL2 renderers |
 | `node` | a `node` on `PATH` whose major version is 22 or later, plus `npm` — asked, never assumed. Absent, the `web` lane is `UNAVAILABLE` |
 | `postgres` | `TME_PG_ADMIN_URL_FILE`, naming a readable file holding a superuser URL used only to create and drop scratch databases, plus `psql` |
 | `private-terms` | the private file resolved by `tools/boundary_common.py` (this checkout first, then its main checkout for a linked worktree). Absent, the banned-terms check **degrades** onto the tracked synthetic fixture: the mechanism still runs and still must pass, and the run says the real denylist was not proven |
@@ -103,7 +103,7 @@ tests with every ignored root absent.
 
 ## On-demand proofs
 
-`--scope capture` runs two-engine browser movement/captures and records an
+`--scope capture` runs full-roster browser movement/captures and records an
 authoritative observer frame for the paused presentation experiment. It needs
 external inputs; inspect the resolved plan before invoking it. Browser screenshots
 do not supply Workbench identity rasters or prove authoritative browser integration.
@@ -129,9 +129,9 @@ HTTPS/WebSocket. It needs a running deployment and is not part of any lane.
 
 The standing `web` lane proves install, typecheck, unit tests, and build. Its
 tests rebuild the Rust WebAssembly codec and consume the shared wire corpus.
-The gated browser capture proof additionally exercises both real browser
-engines through native WSS, exact replay, GPU/raycast correspondence, and the
-Workbench HTTP operation. It requires PostgreSQL and both installed browsers;
+The gated browser capture proof additionally exercises the complete browser
+roster through native WSS, exact replay, GPU/raycast correspondence, and the
+Workbench HTTP operation. It requires PostgreSQL and every rostered browser;
 missing capabilities are unavailable. Neither lane grants visual acceptance. Candidate-packet
 walk and screenshot commands, and their external inputs, are documented in
 [browser client](browser-client.md#operation-and-proof).

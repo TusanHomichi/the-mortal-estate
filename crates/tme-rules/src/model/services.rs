@@ -179,11 +179,19 @@ pub struct ServiceDefinition {
     pub capabilities: Vec<ServiceCapability>,
 }
 
+/// A service is attached to exactly one position owner.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+pub enum ServicePlacement {
+    Fixed { location: WorldPosition },
+    Actor { actor_id: super::ActorId },
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServiceInstanceState {
     pub id: String,
     pub definition_id: String,
-    pub position: WorldPosition,
+    pub placement: ServicePlacement,
 }
 
 /// A read-only join of mutable placement state and immutable service policy.
@@ -194,16 +202,19 @@ pub struct ServiceInstanceState {
 pub struct ResolvedService<'a> {
     instance: &'a ServiceInstanceState,
     definition: &'a ServiceDefinition,
+    position: &'a WorldPosition,
 }
 
 impl<'a> ResolvedService<'a> {
     pub(crate) fn new(
         instance: &'a ServiceInstanceState,
         definition: &'a ServiceDefinition,
+        position: &'a WorldPosition,
     ) -> Self {
         Self {
             instance,
             definition,
+            position,
         }
     }
 
@@ -220,7 +231,14 @@ impl<'a> ResolvedService<'a> {
     }
 
     pub fn position(self) -> &'a WorldPosition {
-        &self.instance.position
+        self.position
+    }
+
+    pub fn actor_id(self) -> Option<&'a super::ActorId> {
+        match &self.instance.placement {
+            ServicePlacement::Actor { actor_id } => Some(actor_id),
+            ServicePlacement::Fixed { .. } => None,
+        }
     }
 
     pub fn capabilities(self) -> &'a [ServiceCapability] {

@@ -112,6 +112,39 @@ pub(super) fn validate_checkpoint_references(engine: &Engine) -> Result<(), Chec
         }
     }
 
+    for actor in &engine.world.actors {
+        if let Some(npc) = &actor.npc {
+            if npc.follow_cadence_units == 0
+                || (npc.patrol.is_empty() && npc.patrol_next != 0)
+                || (!npc.patrol.is_empty()
+                    && (npc.patrol.len() < 2
+                        || npc.patrol.len() > 64
+                        || npc.patrol_next >= npc.patrol.len()))
+            {
+                return Err(CheckpointError::new(
+                    "checkpoint NPC patrol or cadence is invalid",
+                ));
+            }
+            for (index, cell) in npc.patrol.iter().enumerate() {
+                let mut location = actor.home_location.clone();
+                location.position = *cell;
+                if definition.world_position_status(&location)
+                    != Some(SeedWorldPositionStatus::Passable)
+                {
+                    return Err(CheckpointError::new(
+                        "checkpoint NPC patrol crosses blocked ground",
+                    ));
+                }
+                let next = npc.patrol[(index + 1) % npc.patrol.len()];
+                if cell.x.abs_diff(next.x) + cell.y.abs_diff(next.y) != 1 {
+                    return Err(CheckpointError::new(
+                        "checkpoint NPC patrol circuit is invalid",
+                    ));
+                }
+            }
+        }
+    }
+
     let mut service_ids = BTreeSet::new();
     for service in &engine.world.service_instances {
         if !service_ids.insert(&service.id)
@@ -125,7 +158,22 @@ pub(super) fn validate_checkpoint_references(engine: &Engine) -> Result<(), Chec
                 "checkpoint service identity is invalid",
             ));
         }
-        validate_position(definition, &service.position)?;
+        match &service.placement {
+            crate::model::ServicePlacement::Fixed { location } => {
+                validate_position(definition, location)?
+            }
+            crate::model::ServicePlacement::Actor { actor_id } => {
+                if engine
+                    .world
+                    .actor(actor_id)
+                    .is_none_or(|actor| actor.kind != crate::model::ActorKind::Npc)
+                {
+                    return Err(CheckpointError::new(
+                        "checkpoint service provider is not a known NPC",
+                    ));
+                }
+            }
+        }
     }
 
     for (instance_id, item) in &engine.world.item_instances {

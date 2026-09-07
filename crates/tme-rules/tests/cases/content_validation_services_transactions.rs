@@ -341,18 +341,22 @@ fn legacy_service_definition_and_instance_shell_is_strict_and_position_checked()
     missing_location.service_instances_mut()[0]
         .as_object_mut()
         .expect("service instance")
-        .remove("location");
-    assert_has(&decode_error(&missing_location), "missing field `location`");
+        .remove("placement");
+    assert_has(
+        &decode_error(&missing_location),
+        "missing field `placement`",
+    );
 
     let mut missing_position = parts("spell_learning_purchase_casting_xp");
-    missing_position.service_instances_mut()[0]["location"]
+    missing_position.service_instances_mut()[0]["placement"]["location"]
         .as_object_mut()
         .expect("service location")
         .remove("position");
     assert_has(&decode_error(&missing_position), "missing field `position`");
 
     let mut out_of_bounds = parts("spell_learning_purchase_casting_xp");
-    out_of_bounds.service_instances_mut()[0]["location"]["position"] = json!({"x": 99, "y": 1});
+    out_of_bounds.service_instances_mut()[0]["placement"]["location"]["position"] =
+        json!({"x": 99, "y": 1});
     assert_has(&seed_error(&out_of_bounds), "out of bounds");
 
     let mut no_capabilities = parts("spell_learning_purchase_casting_xp");

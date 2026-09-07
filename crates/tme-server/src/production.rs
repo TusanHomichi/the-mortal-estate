@@ -96,7 +96,10 @@ pub fn load_bootstrap(path: &Path) -> Result<PostgresBootstrap, String> {
     let template_path = resolve_reference(base, &manifest.world_template)?;
     let catalog: CatalogV6 = read_json(&catalog_path, MAX_CONTENT_BYTES)?;
     let template: WorldTemplateV3 = read_json(&template_path, MAX_CONTENT_BYTES)?;
-    if !catalog.clean_content || catalog.research_boundary.status != "clean_original_fixture" {
+    if tme_rules::content::boundary_policy(catalog.clean_content, &catalog.research_boundary)
+        .map_err(|error| error.to_string())?
+        != tme_rules::content::ContentBoundaryPolicy::Clean
+    {
         return Err("production catalog is not clean runtime content".to_string());
     }
     let definition = GameDefinition::from_content(catalog, manifest.catalog_profile, template)
@@ -387,7 +390,10 @@ mod tests {
             .find(|actor| actor.id.as_str() == "threshold_keeper")
             .expect("the keeper is seeded");
         assert_eq!(
-            service.position, keeper.location,
+            service.placement,
+            tme_rules::ServicePlacement::Fixed {
+                location: keeper.location.clone()
+            },
             "the restoration service stands with the keeper"
         );
 
@@ -396,6 +402,48 @@ mod tests {
 
         assert_eq!(bootstrap.characters.len(), 1);
         assert_eq!(bootstrap.characters[0].actor_id.as_str(), "player");
+    }
+
+    #[test]
+    fn temple_provider_squares_project_encodable_services() {
+        let directory = TestDirectory::create();
+        let declared = served_world("content/lands/first-expedition/world.json");
+        for provider in ["tomas", "balm_seller"] {
+            let mut world = declared.clone();
+            // Production admission binds both the actor and owned items to a
+            // stable character UUID; reproduce that binding in this fixture.
+            let source = fs::read_to_string(world["simulation_seed"].as_str().unwrap())
+                .unwrap()
+                .replace(
+                    "character:first_expedition:operator",
+                    "018f4d9e-8d57-7a1c-9d1a-8cb840d86dc3",
+                );
+            let mut seed: serde_json::Value = serde_json::from_str(&source).unwrap();
+            let actors = seed["actors"].as_array_mut().unwrap();
+            let location =
+                actors.iter().find(|row| row["id"] == provider).unwrap()["location"].clone();
+            actors
+                .iter_mut()
+                .find(|row| row["id"] == world["controlled_actor"])
+                .unwrap()["location"] = location;
+            let seed_path = directory.0.join(format!("{provider}-seed.json"));
+            fs::write(&seed_path, serde_json::to_vec(&seed).unwrap()).unwrap();
+            world["simulation_seed"] = serde_json::json!(seed_path);
+            let bootstrap = load_bootstrap(&manifest_for(&directory.0, &world)).unwrap();
+            let projection = bootstrap
+                .world
+                .engine
+                .observer_projection(&bootstrap.characters[0].actor_id, &[])
+                .unwrap();
+            let frame = crate::protocol_v1::frame(&projection.frame)
+                .expect("resident services must satisfy the actual wire contract");
+            let service = frame
+                .services_here
+                .iter()
+                .find(|service| service.service_id.as_str() == provider)
+                .unwrap();
+            assert_eq!(service.actor_id.as_ref().unwrap().as_str(), provider);
+        }
     }
 
     /// The rejection beside it: a template that fails the runtime's own

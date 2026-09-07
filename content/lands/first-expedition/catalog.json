@@ -1,0 +1,3402 @@
+{
+  "actor_definitions": {
+    "actor-definition/first_expedition/bakery_keeper": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/bakery_keeper",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Baker",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/balm_seller": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/balm_seller",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Maude",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/banker": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/banker",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Banker",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/cellar_scavenger": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 1,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "searchable_corpse"
+      },
+      "id": "actor/first_expedition/cellar_scavenger",
+      "kind": "monster",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Cellar Scavenger",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "scavenging_profile_id": "scavenging/original_provisional",
+      "social": {
+        "alignment_source": {
+          "alignment": "chaotic",
+          "kind": "inherent"
+        },
+        "behavior": "alignment_creature",
+        "nature": "other",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 2,
+        "defense": 4,
+        "hp": 6
+      },
+      "xp_value": 5
+    },
+    "actor-definition/first_expedition/chandler_keeper": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/chandler_keeper",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Chandler",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/forge_keeper": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/forge_keeper",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Smith",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/herbalist_keeper": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/herbalist_keeper",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Herbalist",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/lodge_keeper": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/lodge_keeper",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Lodge Keeper",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/outfitter_keeper": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/outfitter_keeper",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Outfitter",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/player": {
+      "ai": null,
+      "creature_traits": [],
+      "death": {
+        "remains": "searchable_corpse"
+      },
+      "id": "actor/first_expedition/player",
+      "kind": "player",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Mira",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "kind": "character"
+        },
+        "behavior": "adventurer",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 40,
+        "defense": 40,
+        "hp": 40
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/provisioner": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/provisioner",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Provisioner",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/sheriff": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/sheriff",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Sheriff",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/tomas": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/tomas",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Tomas",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/trainer_1": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/trainer_1",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Weapons Instructor",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/trainer_3": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/trainer_3",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Hand Combat Instructor",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/trainer_5": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/trainer_5",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Guild Instructor",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    },
+    "actor-definition/first_expedition/trainer_7": {
+      "ai": {
+        "aggro_radius": 4,
+        "awareness": {
+          "mode": "unrestricted"
+        },
+        "behavior": "hold_ground",
+        "cadence_units": 100,
+        "leash_range": 12,
+        "physical_attack_modes": [
+          "fight"
+        ]
+      },
+      "creature_traits": [],
+      "death": {
+        "remains": "none"
+      },
+      "id": "actor/first_expedition/trainer_7",
+      "kind": "npc",
+      "magic_resistance": {
+        "evidence_state": "original_provisional",
+        "natural_save_twentieths": 5
+      },
+      "monster_abilities": [],
+      "name": "Wizard Instructor",
+      "physical_damage_affinity_profile_id": "ordinary",
+      "social": {
+        "alignment_source": {
+          "alignment": "lawful",
+          "kind": "inherent"
+        },
+        "behavior": "civilian",
+        "nature": "human",
+        "owner_relation": "none"
+      },
+      "stats": {
+        "attack": 0,
+        "defense": 0,
+        "hp": 20
+      },
+      "xp_value": null
+    }
+  },
+  "banks": {
+    "bank/town_bank/first_expedition": {
+      "id": "town_bank",
+      "transaction_cap_gold": 80
+    }
+  },
+  "clean_content": true,
+  "creation_profiles": {
+    "creation/fighter": {
+      "actor_definition_id": "actor/first_expedition/player",
+      "arrival_id": "dock_arrival",
+      "attribute_bounds": {
+        "charisma": {
+          "creation_cap": 16,
+          "inborn": 10
+        },
+        "constitution": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "dexterity": {
+          "creation_cap": 17,
+          "inborn": 14
+        },
+        "intelligence": {
+          "creation_cap": 16,
+          "inborn": 12
+        },
+        "strength": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "wisdom": {
+          "creation_cap": 16,
+          "inborn": 12
+        }
+      },
+      "attribute_points": 15,
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 100
+        },
+        "items": [
+          {
+            "item_instance_id": "weathered_staff",
+            "position": "right_hand"
+          }
+        ]
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 12,
+          "constitution": 17,
+          "dexterity": 17,
+          "intelligence": 14,
+          "strength": 17,
+          "wisdom": 14
+        },
+        "identity": {
+          "base_class_id": "fighter",
+          "current_class_id": "fighter",
+          "display_class": "Fighter",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 40,
+          "max_hp": 40,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 40,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "staff"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "hand"
+          }
+        ]
+      },
+      "id": "creation/fighter",
+      "item_instances": {
+        "weathered_staff": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "weathered_staff"
+        }
+      },
+      "open_evidence": [
+        "starting_resources_loadout_and_nationality_provisional",
+        "combat_and_training_numbers_provisional",
+        "suggested_allocation_is_authored_not_a_recovered_roll"
+      ]
+    },
+    "creation/martial_artist": {
+      "actor_definition_id": "actor/first_expedition/player",
+      "arrival_id": "dock_arrival",
+      "attribute_bounds": {
+        "charisma": {
+          "creation_cap": 16,
+          "inborn": 10
+        },
+        "constitution": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "dexterity": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "intelligence": {
+          "creation_cap": 16,
+          "inborn": 12
+        },
+        "strength": {
+          "creation_cap": 17,
+          "inborn": 12
+        },
+        "wisdom": {
+          "creation_cap": 16,
+          "inborn": 12
+        }
+      },
+      "attribute_points": 17,
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 100
+        },
+        "items": []
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 12,
+          "constitution": 17,
+          "dexterity": 17,
+          "intelligence": 15,
+          "strength": 15,
+          "wisdom": 15
+        },
+        "identity": {
+          "base_class_id": "martial_artist",
+          "current_class_id": "martial_artist",
+          "display_class": "Martial Artist",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 40,
+          "max_hp": 40,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 40,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "staff"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "hand"
+          }
+        ]
+      },
+      "id": "creation/martial_artist",
+      "item_instances": {},
+      "open_evidence": [
+        "starting_resources_loadout_and_nationality_provisional",
+        "combat_and_training_numbers_provisional",
+        "suggested_allocation_is_authored_not_a_recovered_roll"
+      ]
+    },
+    "creation/thaumaturge": {
+      "actor_definition_id": "actor/first_expedition/player",
+      "arrival_id": "dock_arrival",
+      "attribute_bounds": {
+        "charisma": {
+          "creation_cap": 16,
+          "inborn": 8
+        },
+        "constitution": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "dexterity": {
+          "creation_cap": 16,
+          "inborn": 11
+        },
+        "intelligence": {
+          "creation_cap": 17,
+          "inborn": 12
+        },
+        "strength": {
+          "creation_cap": 17,
+          "inborn": 12
+        },
+        "wisdom": {
+          "creation_cap": 18,
+          "inborn": 14
+        }
+      },
+      "attribute_points": 20,
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 100
+        },
+        "items": [
+          {
+            "item_instance_id": "weathered_staff",
+            "position": "right_hand"
+          },
+          {
+            "item_instance_id": "thaumaturge_spell_book",
+            "position": "sack_item_1"
+          }
+        ]
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 11,
+          "constitution": 17,
+          "dexterity": 15,
+          "intelligence": 15,
+          "strength": 16,
+          "wisdom": 17
+        },
+        "identity": {
+          "base_class_id": "thaumaturge",
+          "current_class_id": "thaumaturge",
+          "display_class": "Thaumaturge",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 40,
+          "max_hp": 40,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 40,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "staff"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "hand"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "thaumaturge_magic"
+          }
+        ]
+      },
+      "id": "creation/thaumaturge",
+      "item_instances": {
+        "thaumaturge_spell_book": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "thaumaturge_spell_book"
+        },
+        "weathered_staff": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "weathered_staff"
+        }
+      },
+      "open_evidence": [
+        "starting_resources_loadout_and_nationality_provisional",
+        "combat_and_training_numbers_provisional",
+        "suggested_allocation_is_authored_not_a_recovered_roll"
+      ]
+    },
+    "creation/thief": {
+      "actor_definition_id": "actor/first_expedition/player",
+      "arrival_id": "dock_arrival",
+      "attribute_bounds": {
+        "charisma": {
+          "creation_cap": 17,
+          "inborn": 10
+        },
+        "constitution": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "dexterity": {
+          "creation_cap": 18,
+          "inborn": 12
+        },
+        "intelligence": {
+          "creation_cap": 17,
+          "inborn": 14
+        },
+        "strength": {
+          "creation_cap": 17,
+          "inborn": 11
+        },
+        "wisdom": {
+          "creation_cap": 16,
+          "inborn": 12
+        }
+      },
+      "attribute_points": 16,
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 100
+        },
+        "items": [
+          {
+            "item_instance_id": "weathered_staff",
+            "position": "right_hand"
+          },
+          {
+            "item_instance_id": "thief_spell_book",
+            "position": "sack_item_1"
+          }
+        ]
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 12,
+          "constitution": 17,
+          "dexterity": 15,
+          "intelligence": 17,
+          "strength": 14,
+          "wisdom": 14
+        },
+        "identity": {
+          "base_class_id": "thief",
+          "current_class_id": "thief",
+          "display_class": "Thief",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 40,
+          "max_hp": 40,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 40,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "staff"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "hand"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "thief_magic"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "thievery"
+          }
+        ]
+      },
+      "id": "creation/thief",
+      "item_instances": {
+        "thief_spell_book": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "thief_spell_book"
+        },
+        "weathered_staff": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "weathered_staff"
+        }
+      },
+      "open_evidence": [
+        "starting_resources_loadout_and_nationality_provisional",
+        "combat_and_training_numbers_provisional",
+        "suggested_allocation_is_authored_not_a_recovered_roll"
+      ]
+    },
+    "creation/wizard": {
+      "actor_definition_id": "actor/first_expedition/player",
+      "arrival_id": "dock_arrival",
+      "attribute_bounds": {
+        "charisma": {
+          "creation_cap": 17,
+          "inborn": 10
+        },
+        "constitution": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "dexterity": {
+          "creation_cap": 15,
+          "inborn": 11
+        },
+        "intelligence": {
+          "creation_cap": 18,
+          "inborn": 14
+        },
+        "strength": {
+          "creation_cap": 16,
+          "inborn": 11
+        },
+        "wisdom": {
+          "creation_cap": 17,
+          "inborn": 12
+        }
+      },
+      "attribute_points": 18,
+      "carried": {
+        "gold": {
+          "left_hand": 0,
+          "right_hand": 0,
+          "sack": 100
+        },
+        "items": [
+          {
+            "item_instance_id": "weathered_staff",
+            "position": "right_hand"
+          },
+          {
+            "item_instance_id": "wizard_spell_book",
+            "position": "sack_item_1"
+          }
+        ]
+      },
+      "character": {
+        "alignment_state": {
+          "alignment": "lawful",
+          "karma_points": 0
+        },
+        "attributes": {
+          "charisma": 13,
+          "constitution": 17,
+          "dexterity": 14,
+          "intelligence": 17,
+          "strength": 14,
+          "wisdom": 15
+        },
+        "identity": {
+          "base_class_id": "wizard",
+          "current_class_id": "wizard",
+          "display_class": "Wizard",
+          "nationality_id": "aldland"
+        },
+        "known_spells": [],
+        "physical_attribute_adds": {
+          "dexterity_adds": 0,
+          "strength_adds": 0
+        },
+        "progression": {
+          "experience": 0,
+          "level": 1
+        },
+        "promotion_history": [],
+        "resources": {
+          "hp": 40,
+          "max_hp": 40,
+          "max_mp": 40,
+          "max_stamina": 20,
+          "mp": 40,
+          "peak_hp": 40,
+          "stamina": 20
+        },
+        "skill_ledger": [
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "staff"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "hand"
+          },
+          {
+            "critique_rank": 0,
+            "learning_rate": 1,
+            "level": 1,
+            "practice_points": 0,
+            "track_id": "wizard_magic"
+          }
+        ]
+      },
+      "id": "creation/wizard",
+      "item_instances": {
+        "weathered_staff": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "weathered_staff"
+        },
+        "wizard_spell_book": {
+          "binding": {
+            "state": "unrestricted"
+          },
+          "definition_id": "wizard_spell_book"
+        }
+      },
+      "open_evidence": [
+        "starting_resources_loadout_and_nationality_provisional",
+        "combat_and_training_numbers_provisional",
+        "suggested_allocation_is_authored_not_a_recovered_roll"
+      ]
+    }
+  },
+  "damage_labels": {
+    "damage/fatal/alignment_social_law": {
+      "id": "fatal",
+      "name": "fatal"
+    },
+    "damage/heavy/alignment_social_law": {
+      "id": "heavy",
+      "name": "heavy"
+    },
+    "damage/light/alignment_social_law": {
+      "id": "light",
+      "name": "light"
+    },
+    "damage/moderate/alignment_social_law": {
+      "id": "moderate",
+      "name": "moderate"
+    },
+    "damage/severe/alignment_social_law": {
+      "id": "severe",
+      "name": "severe"
+    }
+  },
+  "id": "first_expedition",
+  "items": {
+    "item/bright_staff/first_expedition": {
+      "category": "staff",
+      "economy": {
+        "unit_burden": 1,
+        "unit_value_gold": 12
+      },
+      "id": "bright_staff",
+      "kind": "weapon",
+      "name": "Bright Staff",
+      "valid_placements": [
+        "hand",
+        "belt_back",
+        "sack"
+      ],
+      "weapon": {
+        "attack_modes": [
+          {
+            "damage_kind": "crushing",
+            "maximum_range": 0,
+            "mode": "fight"
+          }
+        ],
+        "block_value": 0,
+        "combat_add_rating": 2,
+        "cooldown_units": 1,
+        "default_attack_mode": "fight",
+        "handedness": "one_handed",
+        "skill_track_id": "staff"
+      }
+    },
+    "item/healing_balm/fidelity_gallery": {
+      "capability": {
+        "taxonomy_id": "healing_consumable"
+      },
+      "consumable": {
+        "effect": "healing",
+        "heal_per_round": 2
+      },
+      "economy": {
+        "unit_burden": 1
+      },
+      "id": "healing_balm",
+      "kind": "consumable",
+      "name": "Healing Balm",
+      "valid_placements": [
+        "hand",
+        "sack"
+      ]
+    },
+    "item/thaumaturge_spell_book": {
+      "capability": {
+        "spell_book_for": [
+          "thaumaturge_magic"
+        ]
+      },
+      "economy": {
+        "unit_burden": 1
+      },
+      "id": "thaumaturge_spell_book",
+      "kind": "book",
+      "name": "Thaumaturge Spell Book",
+      "valid_placements": [
+        "hand",
+        "sack"
+      ]
+    },
+    "item/thief_spell_book": {
+      "capability": {
+        "spell_book_for": [
+          "thief_magic"
+        ]
+      },
+      "economy": {
+        "unit_burden": 1
+      },
+      "id": "thief_spell_book",
+      "kind": "book",
+      "name": "Thief Spell Book",
+      "valid_placements": [
+        "hand",
+        "sack"
+      ]
+    },
+    "item/trade_charm/first_expedition": {
+      "economy": {
+        "unit_burden": 1,
+        "unit_value_gold": 8
+      },
+      "id": "trade_charm",
+      "kind": "gear",
+      "name": "Trade Charm",
+      "valid_placements": [
+        "hand",
+        "belt_side",
+        "sack"
+      ]
+    },
+    "item/weathered_staff/first_expedition": {
+      "category": "staff",
+      "economy": {
+        "unit_burden": 1
+      },
+      "id": "weathered_staff",
+      "kind": "weapon",
+      "name": "Weathered Staff",
+      "valid_placements": [
+        "hand",
+        "belt_back",
+        "sack"
+      ],
+      "weapon": {
+        "attack_modes": [
+          {
+            "damage_kind": "crushing",
+            "maximum_range": 0,
+            "mode": "fight"
+          }
+        ],
+        "block_value": 0,
+        "combat_add_rating": 1,
+        "cooldown_units": 1,
+        "default_attack_mode": "fight",
+        "handedness": "one_handed",
+        "skill_track_id": "staff"
+      }
+    },
+    "item/wizard_spell_book": {
+      "capability": {
+        "spell_book_for": [
+          "wizard_magic"
+        ]
+      },
+      "economy": {
+        "unit_burden": 1
+      },
+      "id": "wizard_spell_book",
+      "kind": "book",
+      "name": "Wizard Spell Book",
+      "valid_placements": [
+        "hand",
+        "sack"
+      ]
+    }
+  },
+  "kind": "catalog",
+  "lair_definitions": {},
+  "locker_vaults": {
+    "vault/town_vault/first_expedition": {
+      "capacity": 2,
+      "id": "town_vault"
+    }
+  },
+  "loot_tables": {},
+  "physical_damage_affinity_profiles": {
+    "affinity/ordinary": {
+      "id": "ordinary",
+      "responses": [
+        {
+          "damage_kind": "cutting",
+          "denominator": 1,
+          "numerator": 1
+        },
+        {
+          "damage_kind": "piercing",
+          "denominator": 1,
+          "numerator": 1
+        },
+        {
+          "damage_kind": "crushing",
+          "denominator": 1,
+          "numerator": 1
+        }
+      ]
+    }
+  },
+  "profession_actions": {},
+  "profiles": {
+    "profile/first_expedition": {
+      "actor_definitions": [
+        "actor-definition/first_expedition/player",
+        "actor-definition/first_expedition/lodge_keeper",
+        "actor-definition/first_expedition/banker",
+        "actor-definition/first_expedition/sheriff",
+        "actor-definition/first_expedition/outfitter_keeper",
+        "actor-definition/first_expedition/provisioner",
+        "actor-definition/first_expedition/bakery_keeper",
+        "actor-definition/first_expedition/herbalist_keeper",
+        "actor-definition/first_expedition/forge_keeper",
+        "actor-definition/first_expedition/chandler_keeper",
+        "actor-definition/first_expedition/tomas",
+        "actor-definition/first_expedition/balm_seller",
+        "actor-definition/first_expedition/trainer_1",
+        "actor-definition/first_expedition/trainer_3",
+        "actor-definition/first_expedition/trainer_5",
+        "actor-definition/first_expedition/trainer_7",
+        "actor-definition/first_expedition/cellar_scavenger"
+      ],
+      "banks": [
+        "bank/town_bank/first_expedition"
+      ],
+      "creation_profiles": [
+        "creation/fighter",
+        "creation/martial_artist",
+        "creation/thief",
+        "creation/wizard",
+        "creation/thaumaturge"
+      ],
+      "damage_labels": [
+        "damage/fatal/alignment_social_law",
+        "damage/heavy/alignment_social_law",
+        "damage/light/alignment_social_law",
+        "damage/moderate/alignment_social_law",
+        "damage/severe/alignment_social_law"
+      ],
+      "items": [
+        "item/healing_balm/fidelity_gallery",
+        "item/weathered_staff/first_expedition",
+        "item/trade_charm/first_expedition",
+        "item/bright_staff/first_expedition",
+        "item/thief_spell_book",
+        "item/wizard_spell_book",
+        "item/thaumaturge_spell_book"
+      ],
+      "lair_definitions": [],
+      "locker_vaults": [
+        "vault/town_vault/first_expedition"
+      ],
+      "loot_tables": [],
+      "physical_damage_affinity_profiles": [
+        "affinity/ordinary"
+      ],
+      "profession_actions": [],
+      "quests": [],
+      "rules_profile": "rules/area_path_terrain_spells",
+      "service_definitions": [
+        "service/lodge_keeper",
+        "service/banker",
+        "service/outfitter_keeper",
+        "service/provisioner",
+        "service/bakery_keeper",
+        "service/herbalist_keeper",
+        "service/forge_keeper",
+        "service/chandler_keeper",
+        "service/tomas",
+        "service/balm_seller",
+        "service/trainer_1",
+        "service/trainer_3",
+        "service/trainer_5",
+        "service/trainer_7"
+      ],
+      "skill_catalog": "skills/first_expedition",
+      "spawn_groups": [],
+      "spells": [
+        "spell/ember_bolt/first_expedition"
+      ],
+      "summon_templates": [],
+      "terrains": [
+        "terrain/expedition_water",
+        "terrain/expedition_grass",
+        "terrain/expedition_forest",
+        "terrain/expedition_sand",
+        "terrain/expedition_rock",
+        "terrain/expedition_town_ground",
+        "terrain/expedition_path",
+        "terrain/expedition_bridge",
+        "terrain/expedition_footprint",
+        "terrain/expedition_mark",
+        "terrain/expedition_prop_occupancy",
+        "terrain/expedition_wall",
+        "terrain/expedition_floor",
+        "terrain/expedition_closed_door",
+        "terrain/expedition_deferred",
+        "terrain/expedition_void",
+        "terrain/expedition_furniture"
+      ]
+    }
+  },
+  "quests": {},
+  "research_boundary": {
+    "notes": "Authorized authored geography and modern project gameplay content. Encounter, resource and training values are explicitly provisional; this catalog does not claim historical fidelity for inherited integration values.",
+    "review_refs": [
+      "docs/gameplay-baseline.md",
+      "content/lands/first-expedition/README.md"
+    ],
+    "status": "clean_authored_content"
+  },
+  "rules_profiles": {
+    "rules/area_path_terrain_spells": {
+      "burden": {
+        "coin_burden_per_gold": 1,
+        "heavily_loaded_max_per_strength": 30000,
+        "lightly_loaded_max_per_strength": 10000,
+        "moderately_loaded_max_per_strength": 20000
+      },
+      "combat": {
+        "attack_modes": {
+          "jumpkick": {
+            "cooldown_units": 1,
+            "damage_kind": "crushing",
+            "maximum_range_cap": 3,
+            "skill_levels_per_extra_hex": 3,
+            "stamina_cost": 1
+          },
+          "kick": {
+            "cooldown_units": 1,
+            "damage_kind": "crushing",
+            "maximum_range": 0
+          }
+        },
+        "block": {
+          "armor_encumbrance_percent_per_point": 2,
+          "armor_percent_cap": 80,
+          "armor_percent_per_point": 8,
+          "combat_add_penetration_percent_per_rating": 2,
+          "left_hand_selection_percent": 75,
+          "shield_percent_cap": 90,
+          "shield_percent_per_point": 10,
+          "strength_penetration_percent_per_add": 2
+        },
+        "damage": {
+          "heavy_label_min_percent": 40,
+          "minimum_damage": 1,
+          "moderate_label_min_percent": 20,
+          "roll_variation_modulus": 3,
+          "severe_label_min_percent": 70
+        },
+        "fumble": {
+          "base_percent": 5,
+          "minimum_percent": 1,
+          "skill_levels_per_reduction": 4
+        },
+        "hit": {
+          "attacker_attack_stat_divisor": 2,
+          "attacker_skill_level_divisor": 2,
+          "base_defender_score": 10,
+          "defender_defense_stat_divisor": 2,
+          "defender_dexterity_divisor": 3,
+          "non_character_defender_dexterity": 10
+        },
+        "practice": {
+          "fatal_blow_bonus_raw_points": 1,
+          "life_and_death_minimum_target_xp_per_attacker_level": 5,
+          "life_and_death_raw_points": 2,
+          "life_and_death_required_at_skill_level": 8,
+          "overwhelming_raw_points": 1,
+          "practice_raw_points": 1
+        },
+        "tuning_status": "original_provisional",
+        "wounds": {
+          "badly_wounded_max_percent": 50,
+          "near_death_max_percent": 20,
+          "wounded_max_percent": 99
+        }
+      },
+      "magic": {
+        "casting_practice": {
+          "evidence_state": "original_provisional",
+          "minimum_raw_points": 1,
+          "primary_attribute_points_per_bonus": 10,
+          "raw_points_per_mp": 1
+        },
+        "damage_interruption": {
+          "comparison": "strictly_greater",
+          "denominator": 5,
+          "evidence_state": "original_provisional",
+          "numerator": 1
+        },
+        "effect_families": {
+          "raise_dead": {
+            "evidence_state": "original_provisional",
+            "minimum_success_threshold": 1,
+            "roll_denominator": 20,
+            "success_threshold_per_magic_level": 1
+          }
+        },
+        "kill_experience": {
+          "area_or_illusion": {
+            "denominator": 5,
+            "numerator": 2
+          },
+          "directed": {
+            "denominator": 1,
+            "numerator": 1
+          },
+          "fraction_evidence_state": "original_provisional",
+          "rounding": "down",
+          "rounding_evidence_state": "original_provisional"
+        },
+        "mp_recovery": {
+          "active_item_policy": "highest_multiplier",
+          "evidence_state": "original_provisional",
+          "rounding": "down"
+        },
+        "resistance": {
+          "denominator": 20,
+          "denominator_evidence_state": "original_provisional",
+          "matching_boost_policy": "highest_matching",
+          "resolution_evidence_state": "original_provisional",
+          "success_comparison": "roll_at_or_below"
+        },
+        "thaum_above_skill": {
+          "evidence_state": "original_provisional",
+          "minimum_success_threshold": 1,
+          "penalty_per_missing_level": 1,
+          "roll_denominator": 20
+        },
+        "warmup": {
+          "evidence_state": "original_provisional",
+          "units": 1
+        }
+      },
+      "movement": {
+        "automatic_step_points": 1,
+        "controlled_path_points": 3
+      },
+      "progression": {
+        "growth_profiles": [
+          {
+            "class_id": "wizard",
+            "hit_points": {
+              "attribute": "constitution",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 8,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            },
+            "magic_points": {
+              "kind": "fixed",
+              "outcomes": [
+                {
+                  "amount": 6,
+                  "weight": 1
+                },
+                {
+                  "amount": 7,
+                  "weight": 1
+                }
+              ]
+            },
+            "physical_attribute_adds_by_level": [
+              {
+                "dexterity_adds": 1,
+                "level": 3,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 4,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 8,
+                "strength_adds": 1
+              }
+            ],
+            "stamina_points": {
+              "attribute": "strength",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 3,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            }
+          },
+          {
+            "class_id": "fighter",
+            "hit_points": {
+              "attribute": "constitution",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 8,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            },
+            "magic_points": {
+              "kind": "fixed",
+              "outcomes": [
+                {
+                  "amount": 6,
+                  "weight": 1
+                },
+                {
+                  "amount": 7,
+                  "weight": 1
+                }
+              ]
+            },
+            "physical_attribute_adds_by_level": [
+              {
+                "dexterity_adds": 1,
+                "level": 3,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 4,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 8,
+                "strength_adds": 1
+              }
+            ],
+            "stamina_points": {
+              "attribute": "strength",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 3,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            }
+          },
+          {
+            "class_id": "martial_artist",
+            "hit_points": {
+              "attribute": "constitution",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 8,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            },
+            "magic_points": {
+              "kind": "fixed",
+              "outcomes": [
+                {
+                  "amount": 6,
+                  "weight": 1
+                },
+                {
+                  "amount": 7,
+                  "weight": 1
+                }
+              ]
+            },
+            "physical_attribute_adds_by_level": [
+              {
+                "dexterity_adds": 1,
+                "level": 3,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 4,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 8,
+                "strength_adds": 1
+              }
+            ],
+            "stamina_points": {
+              "attribute": "strength",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 3,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            }
+          },
+          {
+            "class_id": "thief",
+            "hit_points": {
+              "attribute": "constitution",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 8,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            },
+            "magic_points": {
+              "kind": "fixed",
+              "outcomes": [
+                {
+                  "amount": 6,
+                  "weight": 1
+                },
+                {
+                  "amount": 7,
+                  "weight": 1
+                }
+              ]
+            },
+            "physical_attribute_adds_by_level": [
+              {
+                "dexterity_adds": 1,
+                "level": 3,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 4,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 8,
+                "strength_adds": 1
+              }
+            ],
+            "stamina_points": {
+              "attribute": "strength",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 3,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            }
+          },
+          {
+            "class_id": "thaumaturge",
+            "hit_points": {
+              "attribute": "constitution",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 8,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            },
+            "magic_points": {
+              "kind": "fixed",
+              "outcomes": [
+                {
+                  "amount": 6,
+                  "weight": 1
+                },
+                {
+                  "amount": 7,
+                  "weight": 1
+                }
+              ]
+            },
+            "physical_attribute_adds_by_level": [
+              {
+                "dexterity_adds": 1,
+                "level": 3,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 4,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 8,
+                "strength_adds": 1
+              }
+            ],
+            "stamina_points": {
+              "attribute": "strength",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 3,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            }
+          },
+          {
+            "class_id": "knight",
+            "hit_points": {
+              "attribute": "constitution",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 7,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 8,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            },
+            "magic_points": {
+              "kind": "fixed",
+              "outcomes": [
+                {
+                  "amount": 6,
+                  "weight": 1
+                },
+                {
+                  "amount": 7,
+                  "weight": 1
+                }
+              ]
+            },
+            "physical_attribute_adds_by_level": [
+              {
+                "dexterity_adds": 1,
+                "level": 3,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 4,
+                "strength_adds": 1
+              },
+              {
+                "dexterity_adds": 1,
+                "level": 8,
+                "strength_adds": 1
+              }
+            ],
+            "stamina_points": {
+              "attribute": "strength",
+              "bands": [
+                {
+                  "minimum_attribute": 0,
+                  "outcomes": [
+                    {
+                      "amount": 3,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 10,
+                  "outcomes": [
+                    {
+                      "amount": 4,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    }
+                  ]
+                },
+                {
+                  "minimum_attribute": 15,
+                  "outcomes": [
+                    {
+                      "amount": 5,
+                      "weight": 1
+                    },
+                    {
+                      "amount": 6,
+                      "weight": 1
+                    }
+                  ]
+                }
+              ],
+              "kind": "attribute_bands"
+            }
+          }
+        ],
+        "level_thresholds": [
+          {
+            "cumulative_experience": 0,
+            "level": 1
+          },
+          {
+            "cumulative_experience": 100,
+            "level": 2
+          },
+          {
+            "cumulative_experience": 300,
+            "level": 3
+          },
+          {
+            "cumulative_experience": 600,
+            "level": 4
+          },
+          {
+            "cumulative_experience": 1000,
+            "level": 5
+          },
+          {
+            "cumulative_experience": 1500,
+            "level": 6
+          },
+          {
+            "cumulative_experience": 2100,
+            "level": 7
+          },
+          {
+            "cumulative_experience": 2800,
+            "level": 8
+          },
+          {
+            "cumulative_experience": 3600,
+            "level": 9
+          },
+          {
+            "cumulative_experience": 4500,
+            "level": 10
+          }
+        ]
+      },
+      "resources": {
+        "active_hp_recovery": 1,
+        "inactive_hp_recovery": 2,
+        "inactive_stamina_recovery": 1,
+        "mp_recovery": 1,
+        "normal_movement_stamina_cost": 1,
+        "rapid_movement_stamina_cost": 2,
+        "recovery_interval_units": 2
+      },
+      "skills": {
+        "base_learning_rate": 1,
+        "practice_thresholds": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39
+        ],
+        "training": {
+          "experience_per_learning_rate": 3,
+          "gold_per_learning_rate": 7,
+          "maximum_learning_rates": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      }
+    }
+  },
+  "scavenging_profiles": {
+    "scavenging/original_provisional": {
+      "balm_below_hp_percent": 50,
+      "balm_chance_denominator": 4,
+      "balm_chance_numerator": 1,
+      "collects_gold": true,
+      "collects_ground_items": true,
+      "equips_items": true,
+      "search_radius": 6,
+      "searches_corpses": true,
+      "uses_healing_balm": true
+    }
+  },
+  "schema_version": 6,
+  "service_definitions": {
+    "service/bakery_keeper": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        }
+      ],
+      "id": "bakery_keeper",
+      "name": "Baker"
+    },
+    "service/balm_seller": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        }
+      ],
+      "id": "balm_seller",
+      "name": "Maude - balms"
+    },
+    "service/banker": {
+      "capabilities": [
+        {
+          "bank_id": "town_bank",
+          "id": "bank_access",
+          "kind": "bank"
+        }
+      ],
+      "id": "banker",
+      "name": "Banker"
+    },
+    "service/chandler_keeper": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        }
+      ],
+      "id": "chandler_keeper",
+      "name": "Chandler"
+    },
+    "service/forge_keeper": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        },
+        {
+          "id": "appraisal",
+          "kind": "item_service",
+          "operations": [
+            {
+              "kind": "appraise"
+            }
+          ]
+        }
+      ],
+      "id": "forge_keeper",
+      "name": "Smith"
+    },
+    "service/herbalist_keeper": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        }
+      ],
+      "id": "herbalist_keeper",
+      "name": "Herbalist"
+    },
+    "service/lodge_keeper": {
+      "capabilities": [
+        {
+          "id": "locker_access",
+          "kind": "locker",
+          "vault_id": "town_vault"
+        }
+      ],
+      "id": "lodge_keeper",
+      "name": "Lodge Keeper"
+    },
+    "service/outfitter_keeper": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        },
+        {
+          "id": "appraisal",
+          "kind": "item_service",
+          "operations": [
+            {
+              "kind": "appraise"
+            }
+          ]
+        }
+      ],
+      "id": "outfitter_keeper",
+      "name": "Outfitter"
+    },
+    "service/provisioner": {
+      "capabilities": [
+        {
+          "id": "trail_wares",
+          "kind": "merchant",
+          "player_sales": {
+            "pawn_listing_multiplier": 4
+          }
+        }
+      ],
+      "id": "provisioner",
+      "name": "Provisioner"
+    },
+    "service/tomas": {
+      "capabilities": [
+        {
+          "id": "restoration",
+          "kind": "restoration",
+          "operations": [
+            {
+              "outcome": {
+                "kind": "restore_resource",
+                "resource": "hp"
+              },
+              "transaction": {
+                "costs": [
+                  {
+                    "amount": 3,
+                    "kind": "carried_gold"
+                  }
+                ],
+                "id": "restore_hit_points",
+                "label": "Restore hit points",
+                "requirements": [
+                  {
+                    "amount": 3,
+                    "kind": "minimum_carried_gold"
+                  }
+                ],
+                "rewards": []
+              }
+            },
+            {
+              "outcome": {
+                "kind": "restore_resource",
+                "resource": "mp"
+              },
+              "transaction": {
+                "costs": [
+                  {
+                    "amount": 2,
+                    "kind": "carried_gold"
+                  }
+                ],
+                "id": "restore_magic_points",
+                "label": "Restore magic points",
+                "requirements": [
+                  {
+                    "amount": 2,
+                    "kind": "minimum_carried_gold"
+                  }
+                ],
+                "rewards": []
+              }
+            },
+            {
+              "outcome": {
+                "kind": "priest_resurrection"
+              },
+              "transaction": {
+                "costs": [],
+                "id": "priest_resurrection",
+                "label": "Restore the fallen",
+                "requirements": [],
+                "rewards": []
+              }
+            }
+          ]
+        },
+        {
+          "id": "temple_training",
+          "kind": "skill_training",
+          "offers": [
+            {
+              "eligible_class_ids": [
+                "thaumaturge"
+              ],
+              "maximum_category_level": 19,
+              "minimum_category_level": 0,
+              "track_id": "thaumaturge_magic"
+            }
+          ]
+        },
+        {
+          "id": "wizard_critique",
+          "kind": "skill_critique"
+        }
+      ],
+      "id": "tomas",
+      "name": "Tomas"
+    },
+    "service/trainer_1": {
+      "capabilities": [
+        {
+          "id": "weapons_training",
+          "kind": "skill_training",
+          "offers": [
+            {
+              "eligible_class_ids": [
+                "fighter",
+                "martial_artist",
+                "thief",
+                "wizard",
+                "thaumaturge",
+                "knight"
+              ],
+              "maximum_category_level": 19,
+              "minimum_category_level": 0,
+              "track_id": "staff"
+            }
+          ]
+        },
+        {
+          "id": "wizard_critique",
+          "kind": "skill_critique"
+        }
+      ],
+      "id": "trainer_1",
+      "name": "Weapons Instructor"
+    },
+    "service/trainer_3": {
+      "capabilities": [
+        {
+          "id": "hand_training",
+          "kind": "skill_training",
+          "offers": [
+            {
+              "eligible_class_ids": [
+                "fighter",
+                "martial_artist",
+                "thief",
+                "wizard",
+                "thaumaturge",
+                "knight"
+              ],
+              "maximum_category_level": 19,
+              "minimum_category_level": 0,
+              "track_id": "hand"
+            }
+          ]
+        },
+        {
+          "id": "wizard_critique",
+          "kind": "skill_critique"
+        }
+      ],
+      "id": "trainer_3",
+      "name": "Hand Combat Instructor"
+    },
+    "service/trainer_5": {
+      "capabilities": [
+        {
+          "id": "guild_training",
+          "kind": "skill_training",
+          "offers": [
+            {
+              "eligible_class_ids": [
+                "thief"
+              ],
+              "maximum_category_level": 19,
+              "minimum_category_level": 0,
+              "track_id": "thievery"
+            },
+            {
+              "eligible_class_ids": [
+                "thief"
+              ],
+              "maximum_category_level": 19,
+              "minimum_category_level": 0,
+              "track_id": "thief_magic"
+            }
+          ]
+        },
+        {
+          "id": "wizard_critique",
+          "kind": "skill_critique"
+        }
+      ],
+      "id": "trainer_5",
+      "name": "Guild Instructor"
+    },
+    "service/trainer_7": {
+      "capabilities": [
+        {
+          "id": "wizard_training",
+          "kind": "skill_training",
+          "offers": [
+            {
+              "eligible_class_ids": [
+                "wizard"
+              ],
+              "maximum_category_level": 19,
+              "minimum_category_level": 0,
+              "track_id": "wizard_magic"
+            }
+          ]
+        },
+        {
+          "id": "wizard_critique",
+          "kind": "skill_critique"
+        },
+        {
+          "id": "spell_teaching",
+          "kind": "spell_teaching",
+          "teachings": [
+            {
+              "spell_id": "ember_bolt"
+            }
+          ],
+          "training_capability_id": "wizard_training"
+        }
+      ],
+      "id": "trainer_7",
+      "name": "Wizard Instructor"
+    }
+  },
+  "skill_catalogs": {
+    "skills/first_expedition": {
+      "ladders": [
+        {
+          "id": "staff_measure",
+          "titles": [
+            {
+              "level": 0,
+              "title": "Unversed"
+            },
+            {
+              "level": 1,
+              "title": "First Measure"
+            },
+            {
+              "level": 2,
+              "title": "Second Measure"
+            },
+            {
+              "level": 3,
+              "title": "Third Measure"
+            },
+            {
+              "level": 4,
+              "title": "Fourth Measure"
+            },
+            {
+              "level": 5,
+              "title": "Fifth Measure"
+            },
+            {
+              "level": 6,
+              "title": "Sixth Measure"
+            },
+            {
+              "level": 7,
+              "title": "Seventh Measure"
+            },
+            {
+              "level": 8,
+              "title": "Eighth Measure"
+            },
+            {
+              "level": 9,
+              "title": "Ninth Measure"
+            },
+            {
+              "level": 10,
+              "title": "Tenth Measure"
+            },
+            {
+              "level": 11,
+              "title": "Eleventh Measure"
+            },
+            {
+              "level": 12,
+              "title": "Twelfth Measure"
+            },
+            {
+              "level": 13,
+              "title": "Thirteenth Measure"
+            },
+            {
+              "level": 14,
+              "title": "Fourteenth Measure"
+            },
+            {
+              "level": 15,
+              "title": "Fifteenth Measure"
+            },
+            {
+              "level": 16,
+              "title": "Sixteenth Measure"
+            },
+            {
+              "level": 17,
+              "title": "Seventeenth Measure"
+            },
+            {
+              "level": 18,
+              "title": "Eighteenth Measure"
+            },
+            {
+              "level": 19,
+              "title": "Nineteenth Measure"
+            }
+          ]
+        },
+        {
+          "id": "magic_measure",
+          "titles": [
+            {
+              "level": 0,
+              "title": "Unversed"
+            },
+            {
+              "level": 1,
+              "title": "First Measure"
+            },
+            {
+              "level": 2,
+              "title": "Second Measure"
+            },
+            {
+              "level": 3,
+              "title": "Third Measure"
+            },
+            {
+              "level": 4,
+              "title": "Fourth Measure"
+            },
+            {
+              "level": 5,
+              "title": "Fifth Measure"
+            },
+            {
+              "level": 6,
+              "title": "Sixth Measure"
+            },
+            {
+              "level": 7,
+              "title": "Seventh Measure"
+            },
+            {
+              "level": 8,
+              "title": "Eighth Measure"
+            },
+            {
+              "level": 9,
+              "title": "Ninth Measure"
+            },
+            {
+              "level": 10,
+              "title": "Tenth Measure"
+            },
+            {
+              "level": 11,
+              "title": "Eleventh Measure"
+            },
+            {
+              "level": 12,
+              "title": "Twelfth Measure"
+            },
+            {
+              "level": 13,
+              "title": "Thirteenth Measure"
+            },
+            {
+              "level": 14,
+              "title": "Fourteenth Measure"
+            },
+            {
+              "level": 15,
+              "title": "Fifteenth Measure"
+            },
+            {
+              "level": 16,
+              "title": "Sixteenth Measure"
+            },
+            {
+              "level": 17,
+              "title": "Seventeenth Measure"
+            },
+            {
+              "level": 18,
+              "title": "Eighteenth Measure"
+            },
+            {
+              "level": 19,
+              "title": "Nineteenth Measure"
+            }
+          ]
+        }
+      ],
+      "tracks": [
+        {
+          "display": "Staff",
+          "eligible_class_ids": [
+            "fighter",
+            "martial_artist",
+            "thief",
+            "wizard",
+            "thaumaturge",
+            "knight"
+          ],
+          "id": "staff",
+          "kind": "weapon",
+          "ladder_id": "staff_measure"
+        },
+        {
+          "display": "Wizard Magic",
+          "eligible_class_ids": [
+            "wizard"
+          ],
+          "id": "wizard_magic",
+          "kind": "magic",
+          "ladder_id": "magic_measure"
+        },
+        {
+          "display": "Hand Combat",
+          "eligible_class_ids": [
+            "fighter",
+            "martial_artist",
+            "thief",
+            "wizard",
+            "thaumaturge",
+            "knight"
+          ],
+          "id": "hand",
+          "kind": "martial_arts",
+          "ladder_id": "staff_measure"
+        },
+        {
+          "display": "Thievery",
+          "eligible_class_ids": [
+            "thief"
+          ],
+          "id": "thievery",
+          "kind": "thievery",
+          "ladder_id": "magic_measure"
+        },
+        {
+          "display": "Thief Magic",
+          "eligible_class_ids": [
+            "thief"
+          ],
+          "id": "thief_magic",
+          "kind": "magic",
+          "ladder_id": "magic_measure"
+        },
+        {
+          "display": "Thaumaturge Magic",
+          "eligible_class_ids": [
+            "thaumaturge"
+          ],
+          "id": "thaumaturge_magic",
+          "kind": "magic",
+          "ladder_id": "magic_measure"
+        }
+      ]
+    }
+  },
+  "spawn_groups": {},
+  "spells": {
+    "spell/ember_bolt/first_expedition": {
+      "acquisition": {
+        "gold_cost": 25
+      },
+      "casting": {
+        "cast_class": "character",
+        "method": "direct"
+      },
+      "effect": {
+        "damage_kind": "arcane",
+        "family": "direct_damage",
+        "potency": 3,
+        "resistance": {
+          "mitigation": {
+            "minimum_damage": 1,
+            "mode": "half_damage",
+            "rounding": "down"
+          },
+          "role": "incoming",
+          "tag": "arcane"
+        }
+      },
+      "id": "ember_bolt",
+      "lane": "wizard_magic",
+      "mp_cost": 2,
+      "name": "Ember Bolt",
+      "skill_requirement": 1,
+      "social": {
+        "hostile_act": true,
+        "town_law": "permitted"
+      },
+      "stamina_cost": 1,
+      "status": "draft",
+      "target": {
+        "kind": "actor",
+        "range": 3,
+        "requires_visible": true
+      }
+    }
+  },
+  "summon_templates": {},
+  "terrains": {
+    "terrain/expedition_bridge": {
+      "id": "expedition_bridge",
+      "name": "Bridge",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_closed_door": {
+      "id": "expedition_closed_door",
+      "name": "Closed Door",
+      "navigation": {
+        "blocks_sight": true,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_deferred": {
+      "id": "expedition_deferred",
+      "name": "Deferred",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_floor": {
+      "id": "expedition_floor",
+      "name": "Floor",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_footprint": {
+      "id": "expedition_footprint",
+      "name": "Footprint",
+      "navigation": {
+        "blocks_sight": true,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_forest": {
+      "id": "expedition_forest",
+      "name": "Forest",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_furniture": {
+      "id": "expedition_furniture",
+      "name": "Furniture",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_grass": {
+      "id": "expedition_grass",
+      "name": "Grass",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_mark": {
+      "id": "expedition_mark",
+      "name": "Mark",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_path": {
+      "id": "expedition_path",
+      "name": "Path",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_prop_occupancy": {
+      "id": "expedition_prop_occupancy",
+      "name": "Prop Occupancy",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_rock": {
+      "id": "expedition_rock",
+      "name": "Rock",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_sand": {
+      "id": "expedition_sand",
+      "name": "Sand",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_town_ground": {
+      "id": "expedition_town_ground",
+      "name": "Town Ground",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "walk",
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_void": {
+      "id": "expedition_void",
+      "name": "Void",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_wall": {
+      "id": "expedition_wall",
+      "name": "Wall",
+      "navigation": {
+        "blocks_sight": true,
+        "kind": "blocked"
+      }
+    },
+    "terrain/expedition_water": {
+      "id": "expedition_water",
+      "name": "Water",
+      "navigation": {
+        "blocks_sight": false,
+        "kind": "blocked"
+      }
+    }
+  }
+}

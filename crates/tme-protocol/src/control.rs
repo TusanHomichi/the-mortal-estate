@@ -136,6 +136,8 @@ pub enum ControlErrorCode {
     CsrfRejected,
     CharacterNotOwned,
     CharacterNotSelected,
+    CharacterCreationRefused,
+    CharacterCreationConflict,
     GameplayMarkLocked,
     ForgivenessUnavailable,
     Unavailable,

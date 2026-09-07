@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-04
-revision: 4
-status: Owner-accepted at Phase 7 and amended for the clean public-source cut. Audit clarifies that quarantine remains outside this checkout.
+last_updated: 2026-09-06
+revision: 7
+status: Owner-amended for historical gameplay reconstruction and geographic derivation; publication boundaries remain separate.
 public_safe: true
-summary: Source/product publication boundaries, external payloads, provenance, naming, and the clean public-source cut.
+summary: Source/product boundaries, the first-land map-template exception, external payloads, provenance, and naming.
 routes:
   - content/**
   - docs/**
@@ -36,7 +36,11 @@ Everything below follows from that separation. The source tree must hold its
 boundary every day, including while public; a release must additionally prove
 the exact artifact and surface it distributes.
 
-The requirement, from the charter, is that the public or public-bound tree:
+The default requirement, from the charter, is that the public or public-bound
+tree follows the rules below. The later owner rulings in
+[Historical gameplay reconstruction](#historical-gameplay-reconstruction) and
+[First-land map template](#first-land-map-template) supersede those rules in
+their stated scopes:
 
 - builds and runs without private reference material, provider credentials, or
   historical prototype roots;
@@ -52,11 +56,95 @@ The requirement, from the charter, is that the public or public-bound tree:
 This document owns the policy. [Boundary checks](boundary-checks.md) owns the
 machinery that enforces it, and is not duplicated here.
 
-## Three kinds of material
+## Historical gameplay reconstruction
+
+**Owner ruling (2026-09-06).** Reconstruct the selected historical game's exact
+gameplay on the modern stack with modern graphics and the explicitly authored
+living/dead-town changes. Restore or recreate the research workspace for that
+purpose. The [gameplay baseline](gameplay-baseline.md) owns fidelity accounting
+and deviations; the [surface brief](plans/2026-09-05-first-land-surface.md#living-town-dead-town-and-dungeon)
+owns the town and dungeon arrangement.
+
+This supersedes D2's blanket fresh-design requirement for baseline gameplay.
+Agents may recover and inspect private research, extract mechanical facts,
+compare versions and author specifications and original implementation against
+that evidence. The target is observable gameplay; historical code, protocols,
+storage and scheduling internals are not reconstruction requirements. Matching behavior, formulas and supported numerical values is
+permitted. Deliberate divergence is not a condition of acceptance. Prior original
+design decisions remain visible with explicit dispositions; provisional values
+and closed research questions are not automatically exact historical facts.
+
+Permitted geographic derivation also covers the first land's historical town as
+a dead-world quest space, its four initial dungeon levels and the three deeper
+historical levels reserved for later content. The existing geographic provenance
+and authoring requirements apply to every layer and connection.
+
+Research stays in an external private workspace. Source files, client binaries,
+extracted artwork, archived prose and bulk reference inventories stay there.
+Self-contained authored gameplay contracts may carry established mechanical
+facts and neutral evidence identities/digests; private records resolve those
+identities to exact sources. Public specs state the resulting rule without
+requiring private access. Builds, tests and runtime have no archive dependency.
+
+Within this scope, this ruling supersedes the default reference-as-specification
+prohibition, human-only conclusion step and payload restriction for mechanical
+facts and authorized geographic derivation. Copied code, art, audio, dialogue,
+branding and other expressive payloads receive no import permission. Naming,
+private spoilers, provenance, licensing and publication gates continue to apply.
+Private research may name sources; public naming restrictions must not prevent
+that investigation or erase design continuity. This ruling is project direction,
+not a claim of rights in third-party material.
+
+## First-land map template
+
+**Owner ruling (2026-09-05).** The owner explicitly changed the boundary and
+directed use of the selected historical land map as the first land's template.
+This permits direct geographic derivation, including tracing or retaining its
+overall shape, terrain arrangement, route topology, relative landmark positions,
+and coordinates. Recognizable layout and close correspondence are allowed;
+independent invention or deliberate distortion is not a condition of acceptance.
+The [surface design brief](plans/2026-09-05-first-land-surface.md) owns subsequent
+land-design decisions about what is retained or changed.
+
+This section is the sole owner of the exception. It supersedes the charter's
+carried original-geometry restriction, the map-shape homage limit, the general
+payload and reference-as-specification prohibitions, and D2's fresh-design
+requirement for these geographic facts. An agent may inspect and transcribe the
+selected map for that purpose, including with tools. The later [gameplay ruling](#historical-gameplay-reconstruction) extends this
+scope; remaining material follows the default policy.
+
+Raw source maps, screenshots, source files and extracted reference inventories
+stay in an external quarantine root. Derived first-land layouts, geographic
+specifications and authored map data may enter the tree through the ordinary
+authoring and promotion process. They must be described as template-derived,
+with provenance recording the inspected source identity and digest, the method,
+and subsequent changes; they must not claim independent geographic authorship.
+Source identification that crosses the naming guardrail stays in the external
+provenance record, with a neutral identifier and digest in carried records.
+The authored output must build and run without the external reference root.
+
+The ruling authorizes the geographic template; it does not establish a
+third-party license or waive required attribution. Names, story text, artwork,
+characters, gameplay tables and mechanics receive no import permission from
+this geographic exception. Mechanical facts follow the later
+[gameplay ruling](#historical-gameplay-reconstruction). Naming, hidden-world spoiler exclusion, asset provenance,
+authoring acceptance and external product-publication gates remain in force.
+Generated geography within this scope follows the same provenance and promotion
+requirements as manually derived geography.
+
+A map-derived specification must identify and inspect its exact source artifact
+and version before claiming correspondence. The
+[surface brief](plans/2026-09-05-first-land-surface.md#verified-template) records
+the selected template's neutral identity and digests. This policy amendment
+imports no raw map and accepts no finished land.
+
+## Kinds of material
 
 | Kind | Where it may live | May it reach the tree? |
 | --- | --- | --- |
-| **External reference material** — anything derived from someone else's work: files, assets, text, names, coordinate sets, geometry, bulk numeric tables, schemas, vocabularies, screenshots, recordings | a local-only quarantine root outside this checkout and its dependency graph | **No.** Never as payload, in any form, under any renaming |
+| **External reference material** — files, assets, text, names, coordinate sets, geometry, bulk numeric tables, schemas, vocabularies, screenshots, recordings from someone else's work | a local-only quarantine root outside this checkout and its dependency graph | No raw payload; the [first-land exception](#first-land-map-template) governs its permitted derived outputs |
+| **Authorized template-derived geography** | authored first-land documents and map data, with provenance | Only within the [first-land exception](#first-land-map-template) and ordinary authoring/promotion process |
+| **Authorized mechanical facts** | self-contained authored gameplay contracts and conformance cases with neutral evidence identities | Within the [gameplay reconstruction ruling](#historical-gameplay-reconstruction); no raw research or historical-code dependency |
 | **Private working material** — local prototypes, candidates, captures, session state, credentials, the private denylist | an ignored working root inside the checkout | No, except where a tracked file must exist to define or ignore it |
 | **Project expression** — original design, code, content, and documents authored here | the tree | Yes, that is what the tree is |
 
@@ -67,7 +155,8 @@ not a convention; it is the property the clean-room check exists to prove.
 
 ## The payload rule
 
-This is the definition everything else depends on.
+This is the default definition; the [reconstruction ruling](#historical-gameplay-reconstruction)
+permits the mechanical facts and geographic derivation it names.
 
 > **Using reference material to inform an originally written rule or value is
 > ordinary design work. Copying or reformatting a payload — even under new names,
@@ -87,7 +176,9 @@ the identity.
 external material -> inspection -> a human-authored conclusion -> project content
 ```
 
-Every arrow is a decision, and the middle one is a person. Nothing traverses this
+Outside the [authorized reconstruction scope](#historical-gameplay-reconstruction)
+and [first-land exception](#first-land-map-template), every arrow is a
+decision, and the middle one is a person. Nothing traverses this
 flow automatically, and no tool may be built that does — an automated path from
 reference material to project content is exactly the thing the boundary forbids,
 whatever it is named.
@@ -124,12 +215,11 @@ tell what this file is without re-reading this document?
 artefact is indistinguishable from clean content the moment the person who made
 it stops paying attention, which is the failure this contract exists to prevent.
 
-There is currently **no tracked lane for external payloads in this repository, and
-there is not going to be one.** The predecessor operated a marked internal lane
-that carried exact non-original gameplay rows with provenance, as a deliberate
-bridge. This project does not inherit it: nothing tracked here carries a payload
-from another work, and any proposal to create such a lane is an owner decision
-against the charter, not a slice detail.
+The [first-land exception](#first-land-map-template) and
+[gameplay reconstruction ruling](#historical-gameplay-reconstruction) own the
+authorized derivation lanes. Raw external payloads have no general tracked lane.
+Mechanical facts enter through self-contained authored contracts with evidence;
+restoring the research archive does not import its old runtime registrations.
 
 ## The evidence ladder
 
@@ -145,7 +235,7 @@ wins:
    argument about how a system should feel is not.
 5. **Reviewed, properly licensed third-party material**, with its provenance and
    licence recorded.
-6. **External reference material.** It may inform a human-authored conclusion. It
+6. **External reference material outside the [authorized reconstruction scope](#historical-gameplay-reconstruction).** It may inform a human-authored conclusion. It
    is **never** the basis of a specification, never a payload source, and **never
    appears in a document as the authority for a value.**
 
@@ -157,7 +247,9 @@ Two rules about the ladder itself:
 - **Nothing is promoted automatically.** Later, newer, or more detailed does not
   mean higher. A rung is a rung.
 
-Ruling **D2** binds every rung above: all exact mechanics, names, timings,
+Subject to the [gameplay reconstruction ruling](#historical-gameplay-reconstruction)
+and [first-land exception](#first-land-map-template), historical ruling **D2**
+binds every rung above: all exact mechanics, names, timings,
 penalties, and routes are reopened for fresh design, and **no document in this
 project may retain a private research route as authority.** Not as a citation, not
 as a footnote, not as a parenthetical.
@@ -173,7 +265,9 @@ Common vocabulary is common. Weapon categories, creature and service archetypes,
 and generic mechanics such as reach, ranged attacks, readiness, and
 terrain-constrained movement are not derived payloads by themselves.
 
-A homage is allowed when it is independently authored and clearly part of this
+Outside the [authorized reconstruction scope](#historical-gameplay-reconstruction)
+and [first-land exception](#first-land-map-template), a homage is allowed
+when it is independently authored and clearly part of this
 project's own expression. It should read as a nod, not as a near-copy of an asset,
 a location, a character, a table, a passage, a map shape, a packet schema, or a
 brand claim.
@@ -193,7 +287,8 @@ class — and it is **not a route around the quarantine**.
 - Third-party or community AI-library assets are someone else's generations under
   their own terms. Each needs a licence check **before even reference use**, with
   the terms recorded beside the provenance.
-- Generation prompted with, seeded by, or visibly reproducing another work's
+- Except for geography under the [first-land exception](#first-land-map-template),
+  generation prompted with, seeded by, or visibly reproducing another work's
   expression stays on the far side of the quarantine, exactly as the material
   itself would. A model is a copying mechanism when you point it at something.
 - A model's knowledge of other games is **not a clean content source**. Persistent

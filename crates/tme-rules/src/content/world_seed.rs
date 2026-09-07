@@ -2,8 +2,6 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::model::WorldPosition;
-
 use super::{ActorSeedDef, EcologySiteDef, GroundItemSeedDef, ItemInstanceSeedDef};
 
 /// Rules-owned initial-state payload carried by the sim-owned
@@ -24,7 +22,7 @@ pub struct WorldSeedDef {
 pub struct ServiceInstanceSeedDef {
     pub id: String,
     pub service_definition_id: String,
-    pub location: WorldPosition,
+    pub placement: crate::model::ServicePlacement,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

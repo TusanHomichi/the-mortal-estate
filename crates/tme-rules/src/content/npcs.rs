@@ -55,6 +55,7 @@ pub struct NpcInteractionDef {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NpcDef {
+    pub patrol: Vec<crate::model::Coord>,
     pub follow_cadence_units: u32,
     pub interactions: Vec<NpcInteractionDef>,
 }

@@ -18,6 +18,7 @@ export const REQUIRED_PROPS = [
   "tree_slim",
   "tree_broad",
   "tree_bare",
+  "grass_clump",
   "lantern_post",
   "shrine_table",
   "grave_marker",
@@ -76,7 +77,10 @@ export type FigureRows = Record<string, FigureRow>;
 export interface CellPlan {
   i: number;
   j: number;
+  /** A terrain swatch name, or reserved `void` for an unwalkable floor opening. */
   material: string;
+  /** Ground verdict, including static geometry occupancy, supplied by the candidate. */
+  walkable: boolean;
 }
 
 export type WallAxis = "x" | "z";
@@ -149,7 +153,7 @@ export interface FeelSpace {
 }
 
 export interface FeelManifest {
-  schema_version: 6;
+  schema_version: 7;
   assets: Record<AssetGroup, AssetRows>;
   figures: FigureRows;
   /** Which figure the start places; the client carries no caretaker of its own. */

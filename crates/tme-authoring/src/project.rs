@@ -236,9 +236,14 @@ fn topology(
         .edges
         .iter()
         .map(|edge| {
-            let direction = match edge.direction.as_str() {
-                "down" => VerticalDirection::Down,
-                "up" => VerticalDirection::Up,
+            let kind = match edge.direction.as_str() {
+                "down" => TopologyKindDef::Stairs {
+                    direction: VerticalDirection::Down,
+                },
+                "up" => TopologyKindDef::Stairs {
+                    direction: VerticalDirection::Up,
+                },
+                "passage" => TopologyKindDef::Passage,
                 other => {
                     return Err(format!(
                         "connectivity edge {} declares unknown direction {other:?}",
@@ -267,7 +272,7 @@ fn topology(
                             },
                         ),
                     },
-                    kind: TopologyKindDef::Stairs { direction },
+                    kind,
                     hidden: false,
                 },
             ))

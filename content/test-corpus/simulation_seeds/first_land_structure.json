@@ -98,6 +98,7 @@
         "realm": "testland"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -137,6 +138,7 @@
         "realm": "testland"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -176,6 +178,7 @@
         "realm": "testland"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -215,6 +218,7 @@
         "realm": "testland"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -254,6 +258,7 @@
         "realm": "testland"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -293,6 +298,7 @@
         "realm": "testland"
       },
       "npc": {
+        "patrol": [],
         "follow_cadence_units": 100,
         "interactions": [
           {
@@ -1401,15 +1407,18 @@
   "service_instances": [
     {
       "id": "bank",
-      "location": {
-        "level": "bank_interior",
-        "position": {
-          "x": 5,
-          "y": 5
-        },
-        "realm": "testland"
-      },
-      "service_definition_id": "bank"
+      "service_definition_id": "bank",
+      "placement": {
+        "kind": "fixed",
+        "location": {
+          "level": "bank_interior",
+          "position": {
+            "x": 5,
+            "y": 5
+          },
+          "realm": "testland"
+        }
+      }
     }
   ]
 }

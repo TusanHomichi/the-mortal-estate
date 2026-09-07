@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 5
-status: Standing and authored ownership boundaries from Phase 7; path and protocol ownership corrections only. Phase 7 owner acceptance remains pending.
+last_updated: 2026-09-07
+revision: 9
+status: Standing ownership boundaries including actor-bound resident services; historical baseline and individual deadlines apply.
 public_safe: true
-summary: Fact ownership, implemented seams, authored life/death boundaries, the individual timing ruling, and the AI boundary.
+summary: Fact ownership, resident movement and service placement, transaction authority and individual timing.
 always: true
 ---
 
@@ -42,11 +42,15 @@ Entries come in two kinds:
 An authored seam names the owner, the fact classes, and the invariants that hold
 whatever the mechanics turn out to be. It settles no mechanic.
 
-Owner ruling **D2** reopened, for fresh successor design, **all** exact
-mechanics, names, timings, penalties, and routes. Nothing carries forward as
-settled. Each authored seam below therefore ends with an explicit **Reopened**
-list, and that list is binding: an agent that finds a value in an authored seam
-has found a defect in this document, not a decision.
+Historical ruling **D2** reopened exact mechanics for fresh design. The owner
+superseded that blanket reset on September 6 with the
+[historical gameplay baseline](gameplay-baseline.md). Recover and prove the
+selected behavior; do not invent a replacement because its specification is
+missing. The [public boundary](public-boundary-policy.md#historical-gameplay-reconstruction)
+owns source use and derivation. The **Reopened** lists below now identify facts
+requiring evidence or a specific owner decision under that baseline; they do not
+require fresh invention. New death-world and lineage mechanics still need their
+own authored decisions. An unruled value is not a settled decision.
 
 Authoritative timing follows the September 5 replacement of D5: individual
 action deadlines, with a standard movement duration of three seconds. The
@@ -200,9 +204,28 @@ contents are real locations, not a copy of an inventory.
 **Proof.** `crates/tme-rules/tests/` inventory coverage; the rollback case in
 `service_transactions::late_reward_failure_rolls_back_costs_and_all_world_state`.
 
+## 1.7a Resident movement and attached services
+
+**Owner.** `engine/npcs.rs` owns resident travel; `engine/services.rs` resolves
+service placement. The [resident contract](town-resident-contract.md) owns the
+new-town behavior and its validation requirements.
+
+**Rule.** A resident moves through rules-owned deadlines and ordinary movement
+legality. An actor-bound service resolves its coordinate from that provider;
+its instance stores only the provider identity. Checkpoints preserve the circuit
+cursor and its independent deadline.
+
+**Never.** No decorative patrol with stationary service truth, copied mutable
+service coordinate, client-inferred provider identity or locally approved purchase.
+
+**Proof.** `engine/npcs/tests.rs`, the shared wire corpus and native temple proof
+in the [town record](plans/2026-09-06-town-buildout.md).
+
 ## 1.8 The shared transaction planner
 
-**Owner.** `crates/tme-rules/src/engine/transactions.rs`, with the authored shape
+**Owner.** `crates/tme-rules/src/engine/transactions.rs` owns plan types and service
+entry points; `transactions/plan.rs` owns read-only preflight and
+`transactions/commit.rs` coordinates commit, with the authored shape
 validated by `crates/tme-rules/src/content/validation/transactions.rs`.
 
 **Rule.** Requirements are evaluated in authored order; every cost and reward is
@@ -210,6 +233,10 @@ captured and preflighted **without mutation**; costs are coordinated before
 rewards; and a failure at any point leaves no partial world change. Domain owners
 keep their own fact authority — the planner coordinates them, it does not write
 their facts.
+
+Returned gold is covered by the transaction's coordinated payment and materializes
+at the actor's square through the inventory owner. It is part of the same
+transaction, including rollback if pile creation fails.
 
 **Never.** No provider adds an arbitrary predicate or effect callback, a parallel
 common mutation path, or a second receipt ledger.
@@ -753,8 +780,9 @@ owned by [agent workflow](agent-workflow.md).
 
 # Part 5: What this map does not decide
 
-- **Any reopened mechanic.** D2 reopened every exact mechanic, name, timing,
-  penalty, and route. Part 2 names owners and invariants; it chooses no values.
+- **Gameplay selection and fidelity.** The [gameplay baseline](gameplay-baseline.md)
+  supersedes D2's blanket reset. Part 2 names owners and invariants; it does not
+  establish historical values without evidence.
 - **The visual target.** [Presentation direction](presentation-direction.md).
 - **Content.** What lands, settlements, creatures, or services exist is authored
   content, bounded by [authoring contracts](authoring-contracts.md).

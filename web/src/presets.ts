@@ -1,6 +1,6 @@
 import { CAMERA_ZOOM_STEP_LIMIT } from "./camera";
 
-export const KNOWN_PRESETS = ["night", "dusk", "rain", "fog", "wind"] as const;
+export const KNOWN_PRESETS = ["day", "night", "dusk", "rain", "fog", "wind"] as const;
 export type Preset = (typeof KNOWN_PRESETS)[number];
 
 const known = new Set<string>(KNOWN_PRESETS);
@@ -58,4 +58,9 @@ export function windPresetSettings(
     gustPeriod: 9,
     direction: [0.86, 0.51],
   };
+}
+
+/** Review lighting phase; explicit day wins, then dusk, otherwise night. */
+export function lightingPeriod(presets: readonly Preset[]): "day" | "dusk" | "night" {
+  return presets.includes("day") ? "day" : presets.includes("dusk") ? "dusk" : "night";
 }

@@ -26,6 +26,7 @@ const PASSWORD: &str = "correct horse durable battery";
 
 // Each file owns a bounded proof responsibility; all share this test-only fixture scope.
 include!("persistence/durability.rs");
+include!("persistence/creation.rs");
 include!("persistence/social.rs");
 include!("persistence/mark_schedule.rs");
 include!("persistence/socket_commands.rs");

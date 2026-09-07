@@ -19,8 +19,9 @@ export const groundVertexShader = /* glsl */ `
 export const groundFragmentShader = /* glsl */ `
   uniform sampler2D swatch;
   uniform float swatchPeriod;
-  uniform float jointWidth;
   uniform float wetness;
+  uniform float waterSurface;
+  uniform float elapsed;
   uniform vec3 timeTint;
   uniform vec3 ambientColour;
   uniform vec3 keyColour;
@@ -31,11 +32,9 @@ export const groundFragmentShader = /* glsl */ `
   varying vec3 vWorldNormal;
 
   void main() {
-    vec2 worldUv = (vCellOrigin + vUv - vec2(0.5)) / swatchPeriod;
+    vec2 worldUv = vWorldPosition.xz / swatchPeriod;
+    worldUv += waterSurface * vec2(elapsed * 0.006, sin(elapsed * 0.18) * 0.012);
     vec3 base = texture2D(swatch, worldUv).rgb * timeTint;
-    float edgeDistance = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
-    float joint = smoothstep(0.0, jointWidth, edgeDistance);
-    base *= mix(0.72, 1.0, joint);
     base = mix(base, base * vec3(0.66, 0.74, 0.82), wetness * 0.32);
     float lambert = max(dot(normalize(vWorldNormal), normalize(keyDirection)), 0.0);
     vec3 lighting = ambientColour + keyColour * lambert;

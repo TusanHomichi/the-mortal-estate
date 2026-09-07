@@ -16,7 +16,7 @@ const captureBase = path.resolve(
   process.env.TME_CAPTURE_OUTPUT?.trim() || path.join(os.tmpdir(), "tme-walk-proof"),
 );
 
-// Two engines, two processes: the proof below is written once, for one
+// Each engine gets its own process: the proof below is written once, for one
 // browser, and the parent runs it per engine so each gets a fresh server, a
 // fresh tab, and its own capture directory.
 if (engines.length > 1) {

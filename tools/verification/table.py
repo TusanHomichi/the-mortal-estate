@@ -281,7 +281,7 @@ _STATIC: tuple[Step, ...] = (
     Step(
         key="capture.browser",
         owner="capture",
-        label="browser: two-engine movement and scene capture",
+        label="browser: full-roster movement and scene capture",
         argv=("node", "web/proof/walk-proof.mjs"),
         requires=("node", "feel-assets", "capture-output"),
         timeout=1800.0,

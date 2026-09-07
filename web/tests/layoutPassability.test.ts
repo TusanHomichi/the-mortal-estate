@@ -8,7 +8,7 @@ function layout(wallRuns: WallRun[] = [], props: FeelSpace["props"] = []): FeelS
     cells: Array.from({ length: 9 }, (_, index) => ({
       i: index % 3,
       j: Math.floor(index / 3),
-      material: "ground",
+      material: "ground", walkable: true,
     })),
     wall_runs: wallRuns,
     roofs: [],
@@ -126,14 +126,31 @@ describe("packet-layout passability", () => {
     expect(passability.blocked.has("1,1")).toBe(false);
   });
 
-  it("a static structure blocks its footprint and diagonal corner", () => {
+  it("authored ground blocks a static structure footprint and diagonal corner", () => {
     const space = layout();
     space.structures = [{ file: "house.glb", sha256: "a".repeat(64),
       cell_anchor: [1, 1], yaw: 0, footprint: { i0: 1, j0: 0, i1: 2, j1: 1 } }];
+    for (const cell of space.cells) cell.walkable = !(cell.i >= 1 && cell.j <= 1);
     const passability = passabilityFrom(space);
     for (const cell of ["1,0", "2,0", "1,1", "2,1"]) expect(passability.blocked.has(cell)).toBe(true);
     expect(canStep(passability, { i: 0, j: 2 }, { i: 1, j: 2 })).toBe(true);
     expect(canStep(passability, { i: 0, j: 1 }, { i: 1, j: 2 })).toBe(false);
+  });
+
+  it("blocks water without any wall, roof, or prop and refuses corner cutting", () => {
+    const space = layout();
+    space.cells[1]!.walkable = false;
+    const passability = passabilityFrom(space);
+    expect(canStep(passability, { i: 0, j: 0 }, { i: 1, j: 0 })).toBe(false);
+    expect(canStep(passability, { i: 0, j: 0 }, { i: 1, j: 1 })).toBe(false);
+    expect(canStep(passability, { i: 0, j: 0 }, { i: 0, j: 1 })).toBe(true);
+  });
+
+  it("a dock mesh does not override declared walkable ground", () => {
+    const space = layout();
+    space.structures = [{ file: "dock.glb", sha256: "a".repeat(64),
+      cell_anchor: [1, 1], yaw: 0, footprint: { i0: 1, j0: 0, i1: 1, j1: 2 } }];
+    expect(canStep(passabilityFrom(space), { i: 1, j: 0 }, { i: 1, j: 1 })).toBe(true);
   });
 
   it("a fixture blocks its tile", () => {

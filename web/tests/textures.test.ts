@@ -36,6 +36,21 @@ describe("decoding a sheet", () => {
     vi.unstubAllGlobals();
   });
 
+  it("keeps readable alpha for still prop cards and door cutouts", async () => {
+    const pixels = new Uint8ClampedArray([0, 0, 0, 0, 255, 255, 255, 255]);
+    vi.stubGlobal("createImageBitmap", vi.fn(async () => ({ width: 2, height: 1, close() {} })));
+    vi.stubGlobal("document", { createElement: () => ({
+      getContext: () => ({ drawImage() {}, getImageData: () => ({ data: pixels }) }),
+    }) });
+    const packet = {
+      manifest: { spaces: { s: { props: [{ kind: "tree", sway: false }] } } },
+      assets: new Map(["props/tree", "walls/door"].map(key => [key, { bytes: new ArrayBuffer(0) }])),
+    } as unknown as VerifiedAssetPacket;
+    const decoded = await decodeTextures(packet);
+    expect(decoded.get("props/tree")!.pixels).toBe(pixels);
+    expect(decoded.get("walls/door")!.pixels).toBe(pixels);
+  });
+
   it("decodes every sheet straight, never through a premultiplied round trip", async () => {
     const requests: ImageBitmapOptions[] = [];
     vi.stubGlobal(

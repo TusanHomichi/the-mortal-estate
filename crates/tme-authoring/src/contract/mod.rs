@@ -19,6 +19,7 @@ use tme_rules::{LawZoneDef, PresentationModeDef, SceneRoleDef, StagedViewportDef
 
 use crate::Result;
 
+pub mod first_expedition;
 pub mod fixture;
 pub mod identity_proof;
 
@@ -92,9 +93,19 @@ pub struct LandmarkContract {
     pub marker_class: &'static str,
 }
 
+/// How a member encodes a transition's local departure and return landing.
+#[derive(Debug, Clone, Copy)]
+pub enum TransitionLayout {
+    /// The marked feature is beside the departure; both directions share access.
+    AdjacentMarker,
+    /// The marker is the departure; explicit landing properties name the return.
+    Threshold,
+}
+
 /// One authored transition, owned by the member that declares it.
 #[derive(Debug, Clone, Copy)]
 pub struct TransitionContract {
+    pub layout: TransitionLayout,
     pub id: &'static str,
     pub target_member: &'static str,
     pub paired_transition: &'static str,
@@ -220,6 +231,9 @@ impl MemberContract {
 /// that is the only door from its authored bytes to a compiled land.
 #[derive(Debug)]
 pub struct LandContract {
+    /// An explicitly accepted visual review may need lossless authored encoding.
+    /// Both review identity and compiled geographic identity remain pinned.
+    pub reviewed_encoding: Option<ReviewedEncoding>,
     pub id: &'static str,
     pub realm_id: &'static str,
     pub realm_name: &'static str,
@@ -284,8 +298,20 @@ impl LandContract {
     }
 }
 
+/// Acceptance of geography encoded from a reviewed visual packet. This does
+/// not attest byte identity with that packet or accept its artwork.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ReviewedEncoding {
+    pub review_manifest_sha256: &'static str,
+    pub geography_sha256: &'static str,
+}
+
 /// Every land this compiler compiles.
-pub static LANDS: &[&LandContract] = &[&fixture::LAND, &identity_proof::LAND];
+pub static LANDS: &[&LandContract] = &[
+    &fixture::LAND,
+    &identity_proof::LAND,
+    &first_expedition::LAND,
+];
 
 pub fn land(id: &str) -> Result<&'static LandContract> {
     LANDS

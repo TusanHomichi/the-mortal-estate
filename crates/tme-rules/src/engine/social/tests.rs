@@ -141,6 +141,8 @@ fn lawful_npc_response_and_grudge_acquisition_require_same_level_visibility() {
     engine.world.actors[npc_index].social.nature = SocialNature::Human;
     engine.world.actors[npc_index].social.behavior = SocialBehavior::Civilian;
     engine.world.actors[npc_index].npc = Some(NpcState {
+        patrol: Vec::new(),
+        patrol_next: 0,
         follow_cadence_units: 1,
         interactions: Vec::new(),
         following_character_id: None,
@@ -479,6 +481,8 @@ fn npc_grudge_preempts_follow_and_follow_resumes_without_combat_priority() {
     engine.world.actors[npc_index].social.behavior = SocialBehavior::Civilian;
     engine.world.actors[npc_index].social.owner_relation = SocialOwnerRelation::None;
     engine.world.actors[npc_index].npc = Some(NpcState {
+        patrol: Vec::new(),
+        patrol_next: 0,
         follow_cadence_units: 1,
         interactions: Vec::new(),
         following_character_id: Some(followed_character_id),

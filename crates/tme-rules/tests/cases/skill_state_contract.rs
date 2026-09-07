@@ -490,11 +490,11 @@ fn knight_magic_rejects_spell_and_teaching_skill_gates() {
         .push(serde_json::json!({
             "id": "forbidden_knight_teacher",
             "service_definition_id": "forbidden_knight_teacher",
-            "location": {
+            "placement": {"kind":"fixed", "location": {
                 "realm": "realm_0",
                 "level": "room_0",
                 "position": {"x": 1, "y": 1}
-            }
+            }}
         }));
     assert!(content_error(&teaching_gate).contains(
         "service_definitions[0].capabilities[1].teachings[0] must not teach knight_magic"

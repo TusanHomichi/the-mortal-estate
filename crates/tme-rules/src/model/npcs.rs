@@ -21,6 +21,8 @@ pub struct NpcInteraction {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NpcState {
+    pub patrol: Vec<super::Coord>,
+    pub patrol_next: usize,
     pub follow_cadence_units: u32,
     pub interactions: Vec<NpcInteraction>,
     pub following_character_id: Option<CharacterId>,

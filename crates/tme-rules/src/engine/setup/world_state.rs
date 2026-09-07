@@ -24,7 +24,8 @@ pub(super) fn seed(definition: &GameDefinition, source: &WorldSeedDef) -> Result
                 .expect("validated actor definition");
             let character = character_sheet_from_actor(actor);
             let is_ready_automatic = actor_definition.kind != crate::model::ActorKind::Npc
-                || actor_definition.ai.is_some();
+                || actor_definition.ai.is_some()
+                || actor.npc.as_ref().is_some_and(|npc| !npc.patrol.is_empty());
             actor_state_from_definition(
                 actor_definition,
                 ActorInstanceState {
@@ -118,7 +119,7 @@ pub(super) fn seed(definition: &GameDefinition, source: &WorldSeedDef) -> Result
         .map(|instance| ServiceInstanceState {
             id: instance.id.clone(),
             definition_id: instance.service_definition_id.clone(),
-            position: instance.location.clone(),
+            placement: instance.placement.clone(),
         })
         .collect();
     let merchant_inventories = source

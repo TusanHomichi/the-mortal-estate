@@ -39,6 +39,7 @@ const SETTLEMENT_CLASSES: &[TileClass] = &[
 ];
 
 pub static LAND: LandContract = LandContract {
+    reviewed_encoding: None,
     id: "identity_proof",
     realm_id: "identity_proof",
     realm_name: "Identity Proof",

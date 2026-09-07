@@ -44,7 +44,8 @@ def proof(admin_url_file: str, output: Path) -> None:
         if result.returncode:
             raise AssertionError("Workbench browser UI proof failed")
         offered = json.loads(ui_report.read_bytes())["captures"]
-        assert len(offered) == 4, "live and replay must run in both engines"
+        engines = json.loads((ROOT / "web/proof/engines.json").read_text())
+        assert len(offered) == len(engines) * 2, "live and replay must cover the complete engine roster"
         for row in offered:
             taken = workbench.capture(row["capture_id"])
             frame = json.loads(json.loads((taken.directory / "capture.frame.json").read_bytes())["envelopes"][-1])["frame"]
@@ -88,7 +89,7 @@ def proof(admin_url_file: str, output: Path) -> None:
                 recorded_path.write_bytes(saved)
         output.mkdir(parents=True, exist_ok=True)
         shutil.copytree(workbench.session.directory / "captures", output / "captures", dirs_exist_ok=True)
-        (output / "proof.json").write_text(json.dumps({"captures": 4, "http_operation": True, "logical_correspondence": True,
+        (output / "proof.json").write_text(json.dumps({"captures": len(offered), "http_operation": True, "logical_correspondence": True,
             "recording_mutant_killed": True, "cached_capture_mutant_killed": True}, indent=2) + "\n")
         print(f"browser capture proof: {output}")
         print("TME_BROWSER_CAPTURE_PROOF_OK")

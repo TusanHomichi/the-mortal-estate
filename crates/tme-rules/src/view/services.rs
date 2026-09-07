@@ -73,6 +73,8 @@ pub struct RestorationOperationViewV1 {
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub struct ServiceViewV1 {
     pub service_id: String,
+    #[serde(deserialize_with = "deserialize_required_nullable_actor")]
+    pub actor_id: Option<crate::model::ActorId>,
     pub name: String,
     pub position: WorldPosition,
     pub capabilities: Vec<ServiceCapabilityViewV1>,
@@ -144,4 +146,10 @@ where
     D: Deserializer<'de>,
 {
     Option::<String>::deserialize(deserializer)
+}
+
+fn deserialize_required_nullable_actor<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<crate::model::ActorId>, D::Error> {
+    Option::<crate::model::ActorId>::deserialize(deserializer)
 }

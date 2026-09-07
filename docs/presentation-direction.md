@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-05
-revision: 38
-status: Accepted presentation direction including cursor-only availability; browser implementation routed separately. No new visual acceptance in the audit.
+last_updated: 2026-09-07
+revision: 54
+status: Temple daily-use wear and softer shadows are the latest candidate; NPC room activities, contextual idles and coastal-water direction recorded.
 public_safe: true
-summary: Accepted visual grammar, movement/readiness separation, construction, camera, chrome, scaling, and candidate rules.
+summary: Visual target, lived-in room wear, fixture lighting, NPC room activities, contextual idles and fixed presentation rulings.
 routes:
   - web/**
   - content/test-corpus/**
@@ -21,6 +21,18 @@ cutaway, and interface proposals remain historical evidence, not parallel
 implementation choices. The [paused experiment](#paused-experiment-presenter-evidence-order)
 has a separate stop line from the active browser feel work.
 
+## Continuous visual review
+
+Every visible game area remains subject to iteration: exterior travel, ground,
+shorelines, water, vegetation, architecture, interiors, characters and interface.
+The owner directed agents to inspect the actual view whenever working in or
+passing through an area, rather than concentrating visual review on the latest
+room. Fix a concrete defect in the active slice when bounded; otherwise retain
+a screenshot, location, specific observation, owning boundary and acceptance
+check in the relevant execution record. Placeholder status does not exempt an
+area from scrutiny. This is standing review direction, not blanket artwork-master
+acceptance or an instruction to indefinitely expand each deployment.
+
 ## The target
 
 > **An animated, weathered tactical map rendered in chunky illustrated pixels.**
@@ -30,9 +42,8 @@ miniature 3D diorama photographed from above.
 
 ### The grammar
 
-- a fixed orthographic **2:1 dimetric** gameplay projection at an intimate,
-  local play scale: square world cells project as diamonds, both perpendicular
-  wall faces remain readable, and standing geometry uses ordinary world up;
+- a fixed orthographic, straight-on gameplay projection at an intimate local
+  play scale, with the angle owned below and ordinary world-up geometry;
 - tile-coherent terrain over authoritative logical cells, with restrained visible
   joints rather than a requirement for invisible pixel-perfect seams;
 - broad intentional pixel clusters and large calm material fields rather than
@@ -51,15 +62,166 @@ miniature 3D diorama photographed from above.
 - information-dense UI that shares the world's art language without overwhelming
   the playfield.
 
+### Warm architectural direction
+
+**Owner direction, 2026-09-05.** After reviewing a generated guidance image
+based on the current arrival scene, the owner selected a warmer, more stylized,
+lived-in treatment and dispatched the arrival house and its immediate street
+as the first implementation. Substantial timber joinery, chunky stone footings,
+deep window and door reveals, softened slate edges and purposeful domestic
+details establish the architecture. Wear gathers at thresholds and exposed
+edges; vegetation gathers at foundations and the margins of maintained paths.
+Practical window and lantern light supports the inhabited feel.
+
+Shape and proportions must read at the selected gameplay camera. Roof coverage
+should leave enough facade visible to identify the entrance and domestic
+details. Broad, calm material fields and grouped vegetation retain the standing
+texture discipline. The visible logical grid remains welcome through organic
+ground treatment. This selects a direction and a bounded implementation study;
+the generated image is guidance, not a production master or an in-engine result.
+Native review still judges the implementation. The
+[surface brief](plans/2026-09-05-first-land-surface.md#stylized-arrival-house-study)
+owns the local study's scope and evidence.
+
+### Stylization and restrained charm
+
+**Owner direction, 2026-09-06.** Push the whole visual language further toward
+stylized, lived-in forms, with a small amount of cuteness. Strictly realistic
+surface rendering is no longer the aesthetic target. This applies to
+characters, architecture, furnishings, ground and trees together.
+
+Use softly bevelled, substantial forms, gentle asymmetry, warm colour and clear
+silhouettes. Show habitation through repairs, maintenance, folded cloth, stored
+supplies and wear that follows use. Keep broad quiet material fields; additional
+surface noise does not create life. Restrained charm can come from rounded pots,
+chunky boots, imperfect joinery and expressive posture. Avoid infantile
+proportions, exaggerated cartoon eyes, toy-like uniformity and decorative clutter
+that obscures play. The fixed camera, visible tactical grid, physical ground
+contact and serious narrative stakes retain their owners.
+
+**Character study dispatched.** The owner requested better character models and
+authorized trials using image-to-model tools, original Blender work, or both.
+Start with one adventurer and judge silhouette, face, outfit and motion at the
+ruled camera and native play size. A generated design is guidance; a generated
+mesh still needs editable geometry, a usable rig and material/motion inspection.
+The [live-character ruling](#live-characters) retains modular skinned equipment
+and clip-based animation. Specific proportions and models remain candidates;
+this direction accepts no new artwork master or provider subscription.
+
+**Character guide selection.** After comparing two generated adventurers, the
+owner preferred the first figure. Preserve its adult proportions, restrained
+facial stylization, practical layered outfit and warmth from materials and use.
+The second figure's stronger cartoon treatment overshot the intended charm.
+Do not interpret the broader style ruling as requiring enlarged heads or short
+limbs. The selected guidance identity and modeling trials belong to the
+[character study](plans/2026-09-06-character-study.md); model acceptance remains
+separate from this guide preference.
+
+### Asset sourcing order
+
+**Owner direction, 2026-09-07.** Use the retained Quaternius collection first
+when its assets match the selected visual direction. Check established CC0
+libraries for remaining needs, and use Meshy generation or suitable community
+models where existing assets do not supply the required shape or style.
+Original Blender work, generated guidance and material treatment can adapt
+these sources into a coherent result. Availability alone is no reason to adopt
+an asset that misses the target.
+
+Prefer useful silhouettes, proportions and construction over source rendering
+style. Review candidates with the game's materials, lights, fixed camera and
+native play size. Props, buildings, terrain and trees share the character's
+warm, inhabited visual language. Keep editable sources and record changes so
+an adapted asset remains reproducible.
+
+The [public-boundary policy](public-boundary-policy.md#kinds-of-material) owns admissibility
+and per-asset provenance. Retain the licence that accompanied each actual
+download, its source URL and content hashes externally; a site's present
+branding does not establish the licence of every pack or community item.
+The external source inventory is a research aid, never a build dependency or
+an accepted-artwork catalogue. Candidate integration and native review remain
+separate from artwork-master acceptance.
+
+### Placeholder town interiors
+
+**Owner ruling, 2026-09-06.** The current town interiors are placeholders.
+Their models, furnishings, materials and lighting establish no accepted room
+design. Generate interior guidance images, review their direction with the
+owner, then iterate the modeled rooms toward that guidance at the fixed gameplay
+camera. Keep the warm, inhabited architectural direction above.
+
+The accepted geographic layouts and current service integration can continue
+supporting gameplay and proof while appearance is replaced. Guide images grant
+no geography change or artwork-master acceptance. The
+[expedition record](plans/2026-09-06-first-expedition.md) owns that implementation;
+this section owns the interiors' visual status and subsequent design process.
+
+**Temple direction selected, 2026-09-06.** The owner selected the first temple
+guide's warm inhabited treatment and directed its modeled implementation.
+Substantial joinery, dressed stone around the guarded descent, proper enclosed
+lanterns, a linen-dressed altar, care supplies and a stocked balm counter are the
+selected vocabulary. Simplify the guide's dense floor wear at gameplay scale.
+The [town execution record](plans/2026-09-06-town-buildout.md#interior-guidance-pass)
+binds the guide identity and subsequent model proof. The selection accepts this
+visual direction; the new model still needs native review and does not inherit
+artwork-master acceptance. Other interiors retain placeholder status.
+
+**Temple refinement, 2026-09-07.** Reimagine the interior with stronger
+stylization and an older, worn appearance. Soft substantial forms, irregular
+joinery, repairs and wear from repeated use should convey a maintained working
+sanctuary in the rebuilt town. Give the room more space and a better arrangement:
+the older female balm seller belongs farther back beside stocked shelves, with
+her figure visible and approachable. Tomas is young, friendly and tired; he
+should wander the hall instead of remaining in a fixed altar pose. Keep the
+receiving area and routes to both residents and the dungeon descent clear.
+
+The [town execution record](plans/2026-09-06-town-buildout.md#temple-refinement-proposal)
+owns the selected guidance, lore inspection and implementation evidence. The owner
+then directed iteration toward this guide, including the requested larger or
+better-arranged room. The resulting 7×8 layout is a bounded amendment of the
+previously approved playable geography; it preserves the dungeon endpoints.
+The [resident contract](town-resident-contract.md) owns authoritative wandering
+and service binding. The [browser owner](browser-client.md#temple-resident-interaction-direction)
+records direct interaction and native framing. Resident models, furnishings and
+materials remain artwork candidates. This instruction accepts no artwork master.
+
+### Building purpose from the street
+
+**Owner direction, 2026-09-06.** Town buildings with a public or gameplay purpose
+must communicate that purpose through their exteriors. Readability is judged
+from the street at the fixed gameplay camera and normal play size. Roofs and
+foreground surfaces must leave the identifying features and entrance legible.
+
+Use the building's form, entrance treatment and visible activity to establish
+its role. Signs and symbols can reinforce that reading. A service building
+should not depend on a text label, a roof-hidden prop or a change of paint on a
+generic house to become identifiable. Maintain the shared warm architectural
+language while varying silhouettes, materials and signs of use to suit purpose.
+
+**Proposed design vocabulary:** a workshop may show a working bay, tools and
+materials; lodging may show a welcoming porch, a hanging sign and shared seating;
+a temple may show a distinct sacred entrance, tended lamps and protective
+stonework. These are visual candidates, not an accepted service roster or final
+building designs. Review the exterior in daylight as well as after lamps are lit.
+
+The [surface brief](plans/2026-09-05-first-land-surface.md#town-temple)
+owns the owner's specific temple and dungeon-entrance relationship. This section
+owns how a building's decided role becomes legible; visual acceptance remains
+with the owner.
+
 ### Projection and surface ruling
 
-**Owner ruling, 2026-08-31:** the world uses a fixed orthographic **2:1
-dimetric** gameplay projection. The camera has no perspective convergence, uses
-a 45-degree yaw around world up, and looks down at a 30-degree elevation. A
-square logical ground cell therefore projects as a diamond whose full screen
-width is twice its full screen height. The choice is dimetric rather than true
-isometric: the shallower camera presents actors and vertical structures more
-frontally while retaining an orthographic 3D world.
+**Owner ruling, 2026-09-05:** the world uses a fixed orthographic camera
+with **zero yaw and 45-degree elevation**, looking from positive world Z.
+Standing geometry remains upright, without shear. The owner selected the
+native straight-on arrival comparison after reviewing both front elevations.
+Square logical cells project as axis-aligned rectangles: horizontal world X
+stays horizontal on screen. The existing nine-row framing is retained; its
+projection derivation is owned by [proportional scaling](#proportional-scaling).
+
+This supersedes the August 31 dimetric selection (45-degree yaw, 30-degree
+elevation), including its September 3 reaffirmation. The direction requires
+entrances, roof clearance and attached details to read from the chosen view.
+It accepts the camera, not finished geography, building masters, or a presenter.
 
 Standing source geometry uses ordinary world up. Actors, walls, doors, posts,
 props, trees, and monsters receive no camera-facing shear or shared northwest
@@ -71,7 +233,7 @@ does not introduce compensation into the source model.
 An actor's feet/contact sit at the centre of its authoritative square ground
 cell. A nearby wall edge or doorway threshold does not replace or move that
 cell-centre anchor. Its rendered body may cover portions of several projected
-diamonds, but visual coverage does not redefine occupancy.
+cells, but visual coverage does not redefine occupancy.
 
 The camera stays close enough that one actor, the immediate traversable ground,
 and a nearby interaction anchor are readable at native play size. Geography
@@ -99,21 +261,10 @@ The later [browser-first contract](client-architecture.md#the-web-client) owns
 the current client choice; production presenter and tool acceptance still
 require the evidence gate below.
 
-**Reaffirmed (owner, 2026-09-03).** The owner asked to revisit the camera
-once more before locking it, this time in engine rather than by paintover:
-the lab rendered the served packet through a copy of this client under a
-straight-overhead, square-cell presentation with height drawn as a shared
-diagonal lean and figures seen from above — the classic tactical-map family
-this ruling had set aside — beside the ruled dimetric control, on the
-courtyard and the ground room at night and dusk. The interiors held up; the
-exteriors lost the volume this direction has been built to show — roofs
-became lids, wall faces became bands — and that loss is inherent to a
-top-down presentation, not a treatment gap. The owner ruled to keep the
-dimetric projection. What that family contributes is its play — cell count,
-cell ownership in the player's mind, a camera that snaps with the player,
-walls no one stands on — not its angle. The lab and its rig stay available
-should the question be reopened with the finished caretaker; its
-measurements stay in the lab.
+**Historical comparison, 2026-09-03:** a straight-overhead treatment with
+a shared diagonal lean was rejected after native courtyard/interior review.
+The September 5 selection retains ordinary world-up volume and supersedes
+that comparison's dimetric control. The earlier lab remains historical evidence.
 
 ### Tile assembly ruling
 
@@ -124,10 +275,10 @@ convention, and their quiet edge band; cracks, stones, grass blades, and other
 interior clusters do not have to continue pixel-for-pixel across the boundary.
 
 The terrain cell is one square logical world cell, projected by the accepted
-camera as a 2:1 screen diamond. The former **64 × 64 screen-pixel cell**, its
+camera according to the projection ruling above. The former **64 × 64 screen-pixel cell**, its
 one-pixel perimeter, and its 62 × 62 interior belonged to the superseded
-screen-square projection and carry no authority into the dimetric world. No
-raster source resolution, projected diamond bounds, native tile-edge length, or
+screen-square projection and carry no authority into the current world. No
+raster source resolution, projected cell bounds, native tile-edge length, or
 joint width is accepted yet; those are representative-scene calibration at the
 1280 × 800 minimum play surface. A comparison zoom chosen only to normalize two
 experimental cameras is evidence, not a production scale value.
@@ -141,10 +292,10 @@ once calibration closes.
 Building floors and wall runs use that same cell ruler. A wall run owns the tiles
 it stands on: the strip is drawn on each tile's camera-facing edge, the tile is
 never occupied, and a door tile is the crossing (owner ruling, 2026-09-02).
-Roofs are always-on exterior dressing on closed footprints and match the walls'
-motif. Entering a door loads the building's dedicated interior space; no
-roof-off cutaway or interior occlusion logic exists, and a roof owns no
-footprint, occupancy, or sorting fact.
+Roofs are exterior dressing on closed footprints and match the walls' motif.
+Entering a door loads the building's dedicated interior space. A roof owns no
+footprint or occupancy fact. Foreground visibility follows the surface-fading
+ruling below; it does not expose or imply a building interior.
 
 An actor — player or monster — remains anchored by its feet/contact point at the
 centre of exactly one authoritative square ground cell. Its body is not clipped
@@ -155,12 +306,31 @@ world-space construction. Visual extent never changes occupancy, walkability,
 targeting identity, or collision; those remain facts supplied to the renderer
 seam rather than inferred from projected bounds.
 
-The joint belongs to the world art. It is not a debug grid, editor overlay,
-selection cue, or substitute for authoritative targeting. This tolerance allows
-independently authored or generated tile candidates to enter the ordinary
-candidate lifecycle when they are visually coherent after assembly; it does not
-promote a generator output, waive provenance, or let a tile bypass owner visual
-acceptance.
+**Foreground visibility (owner, 2026-09-06).** A wall, roof, prop or canopy
+blocking the presented player fades smoothly toward 40% opacity and restores
+when the player clears it. The surface remains recognizable and the actual
+textured, animated character is visible through it. Select the offending surface
+of the placed object; unrelated instances stay opaque. Layered leaves must not
+accumulate opacity until they hide the character again. This supersedes the
+candidate figure silhouette and wall-only fade. It changes no occupancy,
+collision, targeting or authoritative visibility. The
+[browser client](browser-client.md#foreground-surface-fading) owns implementation
+and proof; final visual acceptance remains the owner's.
+
+**Visible grid experiment (owner, 2026-09-05).** The owner explicitly
+welcomes a visible gameplay grid and dispatched a new treatment alongside
+material refinement. Natural shoreline, relief and vegetation can retain their
+shapes while the presentation makes logical cells readable. A quiet persistent
+grid with clearer corner ticks and cursor-local emphasis is the first candidate.
+Grid edges identify cells; movement availability and refusal remain owned by
+the existing input feedback. They neither infer passability nor replace its
+source. Terrain/structures should naturally occlude ground marks; the grid does
+not paint over roofs. The exact colour, weight and emphasis are visual candidates.
+
+Material joints may still belong to the art, but they need not carry the entire
+gameplay grid. This amends the earlier art-joint-only treatment without changing
+the logical cell ruler or granting new targeting rules. Source provenance and
+native visual acceptance still apply to every material and grid candidate.
 
 ### Relative scale ruling
 
@@ -281,13 +451,13 @@ are not tracked build inputs or promoted runtime assets. This verdict clears P0
 only: it accepts no representative presenter result, Nomos boundary, renderer,
 engine, or platform.
 
-The 2026-08-31 dimetric ruling supersedes the packet's camera geometry and every
-intervening projection experiment. Any screen-square high-oblique, true
+The current [projection ruling](#projection-and-surface-ruling) supersedes
+the packet's camera geometry and intervening projection experiments. Any screen-square high-oblique, true
 isometric, or other camera visible in those digest-bound artifacts is explicit
 non-authority. Their remaining palette, material, surface-density, silhouette,
 motion, UI, and living/dead evidence stays useful where it does not depend on a
 retired projection. The packet's prior P0 clearance is historical for that
-bounded experiment; a production implementation of the accepted dimetric target
+bounded experiment; a production implementation of the accepted target
 must still earn the representative micro-scene verdict under the current
 production rule.
 
@@ -424,7 +594,8 @@ the remaining cooldown obvious. Travel animation and action readiness are
 separate presentation concerns; the figure follows its committed route. [Browser client](browser-client.md#movement-and-availability)
 owns current behavior; the [timing ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
 owns server authority and individual deadlines. Route allowance remains
-experiment tuning under D2; occluding walls fade.
+experiment tuning under D2. Foreground visibility follows the surface-fading
+ruling above.
 
 The owner's subsequent September 5 UI direction requires action availability to
 be immediately understandable. Ready, cooling down, and unreachable must have
@@ -441,9 +612,9 @@ routing and its limits are owned by client notes.
 ### Construction and viewport
 
 Its construction follows the lab's conclusions rather than re-deriving them:
-the camera is orthographic at 45-degree yaw and 30-degree elevation, with the
-frame governed by [proportional scaling](#proportional-scaling); ground cells are flat quads carrying material swatches in continuous world-plane
-coordinates; walls are real geometry built from a member profile in world
+the camera follows the [projection ruling](#projection-and-surface-ruling), with the
+frame governed by [proportional scaling](#proportional-scaling); ground cells carry material swatches in continuous world-plane coordinates;
+the local coastal study adds presentation relief under the browser contract; walls are real geometry built from a member profile in world
 units (plinth, sill, plaster, posts at every cell boundary, braces, lintel and
 door, cap front and cap top) so courses never seam; standing subjects other
 than characters are world-up billboards anchored at their cell centres at
@@ -529,6 +700,54 @@ position rather than a shared loop, and hold the root while art-derived canopy
 weight lets leaves move apart from trunk; grass follows the same rooted rule
 (owner ruling, 2026-09-02).
 
+#### Settling into an occupied square
+
+**Owner direction, 2026-09-07.** Players and NPCs should visibly inhabit the
+square they occupy. Idle behavior responds to whether they are alone or sharing
+it, how long they have remained there, and the immediate interaction context.
+A newly arrived character can settle before adopting a longer relaxed idle;
+characters should not all repeat one synchronized standing loop.
+
+Variety should communicate presence and personality through suitable weight
+shifts, stretches, attention changes, gear tending, or more settled poses where
+the surroundings support them. These are illustrative animation possibilities,
+not a required clip list. The owner explicitly included sitting down after a
+long quiet idle, with a natural sit-down and stand-up transition when movement
+or engagement resumes. This is intended behavior where the local space and
+context allow it, including an appropriate ground-seated pose; it does not
+require every square to contain a chair. Movement and interactions should
+interrupt or change the idle naturally. In-cell gestures and offsets must
+preserve readable square membership and leave room for other visible occupants.
+
+This is standing presentation direction for both players and NPCs, not an
+implemented system or a new exclusive-occupancy rule. Authoritative positions,
+occupancy legality, action readiness and service requirements retain their
+existing owners. Exact dwell thresholds, transition rules and clip repertoires
+remain implementation and visual-review work. The current basic idle and
+shared-square offsets do not fulfill this direction by themselves.
+
+#### NPC attention and room activities
+
+**Owner direction, 2026-09-07.** NPC idle presence includes looking around,
+turning toward people or activity, and carrying out small tasks in their room.
+They should not spend every idle facing straight ahead. Tomas may check the cot
+and straighten its blanket; Maude may stir a preparation, wipe her hands and
+return to her service position. These are preferred first examples, not a claim
+that the corresponding animation clips or activity scheduler exist.
+
+Start with a few deliberate, character-specific routines. Each should have a
+credible approach, contact pose, short activity and return to attention. Author
+reachable prop-contact anchors and fitted animations so hands meet the bowl or
+blanket, feet stay planted during the task, and cloth or held tools respond where
+needed. Head and torso attention can vary without requiring a full chore.
+Player interaction should interrupt or finish the brief gesture naturally;
+visual busywork must not introduce a new wait to receive an otherwise legal
+service. The [resident contract](town-resident-contract.md#movement-and-attention)
+continues to own movement and attention, and its service rules still apply.
+Travel between cells must use authoritative movement; the client cannot invent
+a chore route or relocate a provider through visual offsets. This is recorded
+direction for a subsequent implementation, not behavior delivered by room art.
+
 ### Chrome and actions
 
 The September 3 rulings below give the current target. The accepted layout
@@ -566,7 +785,10 @@ and not frames, and nothing else floats over the world.
 ### Accepted chrome layout
 
 **Owner ruling, 2026-09-03.** The layout is ruled from a
-painted plate in the lab, in the blackened-iron hand the owner chose: the
+painted plate in the lab, in the blackened-iron hand the owner chose. Its exact
+1920 × 1080 design-space play aperture is 1462 × 753 at `(33,21)`, recovered
+from the sliced plate manifest when the owner recalled the design on September 7.
+Those are design coordinates; proportional scaling below owns display behavior. The
 play view takes about three quarters of the width and seven tenths of the
 height at 1920 × 1080; the column on the right is one fifth of the width and
 holds, top to bottom, the bag, the six tabs, the two hands, the three vials,
@@ -605,23 +827,16 @@ to the side panels ruled below — while the window never moves. The owner's
 direction is that spare width expands the interface rather than filling it
 with stone; the ruling below says with what.
 
-**Visible cell count and ultrawide ruling (owner, 2026-09-03).** The play
-view is **nine cells tall**: nine ground-cell diamonds stacked along the play
-view's height at the design size, the extent the accepted layout already
-shows. That number is the fixed-cell camera's one input, and the camera's
-other values derive from it: under the ruled 30-degree elevation a cell's
-diamond is √2 · sin 30° ≈ 0.707 world units tall on screen, so the frame is
-nine of those, **≈ 6.36 world units** over the play view's full height; the
-diamond's pixel height is the play view's height over nine, its width twice
-that; and the count across the play view follows from the window's shape,
-about nine as well at the accepted layout. This supersedes the 6.31-unit
-frame of the viewport ruling, which was the lab's 5.05 one comparison step
-out and showed 8.93 cells; the difference is under one percent and the
-accepted composites, judged at that frame, stay true. The reference game's
-seven by seven was considered and set aside. What is authored is not
-derived: the actor's dimensions in world units stay authored under the
-one-metre-per-unit prop scale, and the actor's screen size follows from the
-camera; only the screen projection is derived here. On a display wider than 16:9 the play view
+**Visible cell count and ultrawide ruling (owner, 2026-09-03; projection
+amended 2026-09-05).** The play view is **nine ground-cell rows tall**.
+At the accepted elevation a row projects to sin 45° ≈ 0.707 world units
+vertically, giving **≈ 6.36 world units** over the full play view height.
+A cell's pixel height is the view height divided by nine; its width is that
+height divided by sin 45°. This preserves the preceding comparison's frame
+height while replacing its diamond geometry. Actor dimensions remain authored
+world units, with their screen extent derived from the camera. The earlier
+6.31-unit frame and seven-by-seven alternative remain superseded.
+On a display wider than 16:9 the play view
 keeps that extent and stays where the layout puts it; the spare width becomes
 **a forged side panel on each flank**, and the group readout and the
 active-effect icons move out of the play view into them. The chat does not
@@ -653,8 +868,8 @@ Deliberately unresolved, and not to be resolved by implementation:
 
 - the owner verdict on the representative micro-scene;
 - the exact native tile-edge length, joint width, and the actors' authored
-  world-unit dimensions within the ruled 45-degree-yaw, 30-degree-elevation
-  framing (the orthographic frame's size is not open: it derives from the
+  world-unit dimensions within the current projection ruling
+  and framing (the orthographic frame's size is not open: it derives from the
   ruled nine cells; the camera's distance along its view direction sets
   nothing but clipping);
 - the ultrawide side panels' pieces — the treatment is ruled, the assets
@@ -669,3 +884,69 @@ Deliberately unresolved, and not to be resolved by implementation:
   owns the accessibility floor those must clear);
 - which production tools and presenter earn a place, which is decided by the
   production rule and the bounded evidence plan, not in advance.
+
+### Temple material and framing experiment
+
+The early September 7 candidate used a brighter warm indoor fill and front-side
+key. The later [source-lighting ruling](#room-lighting-from-visible-sources)
+supersedes that treatment. Live figure palette grading interpolates between
+the two nearest colours; hard nearest-colour boundaries made detailed material
+maps speckle at native size. The camera retains zero yaw, 45-degree elevation
+and the ruled nine ground-cell rows. Automatic room-fitting zoom was withdrawn
+after the owner recalled the accepted UI design; larger interiors do not grant
+a different scale. Native visual acceptance remains open.
+
+The next art pass follows the same guide with substantial pegged furniture,
+inset cupboard doors, varied glazed care vessels, an open work ledger, folded
+and draped textiles, and restrained plants. Worn limestone, oak, limewash and
+faded red cloth use an illustrated material sheet. Floor joints retain the
+gameplay grid. Contact shading gives props weight without changing the light
+or camera contract. The [town execution record](plans/2026-09-06-town-buildout.md#temple-furniture-and-material-iteration)
+owns this candidate's implementation and verification receipts.
+
+The subsequent stairwell pass makes the dungeon entrance read as a descent:
+joined stone courses and worn coping define the floor opening, broad tread noses
+show foot wear, and a buried doorway recedes into darkness. A small low lantern
+initially lit the upper flight; the owner subsequently directed it farther down
+to reveal the descent, distinct from the room's west-wall lantern. Visual depth does not alter the authored traversal
+link or the player's standing cells. The [stairwell execution record](plans/2026-09-06-town-buildout.md#temple-stairwell-iteration)
+owns this candidate's source and proof receipts.
+
+The next guide-matching pass concentrates wear in readable shapes: staggered,
+clipped footing stones, recessed rubble behind actual openings in the plaster,
+slightly hewn timber edges, and softly stuffed bedding beneath rumpled cloth.
+Lighter limestone and varied floor texture orientation keep the square grid
+while reducing the repeated slab appearance. Existing materials are reused;
+added noise is not the visual target. The [surface-wear execution record](plans/2026-09-06-town-buildout.md#temple-stonework-and-textile-iteration)
+owns this candidate's implementation and proof.
+
+The subsequent daily-use pass follows travel and work: floor scuffs belong on
+frequent routes, dirt gathers beside walls, and a few local repairs interrupt
+the regular slabs. Open supplies, an interrupted ledger, used linen, spare
+blankets and uneven seating should suggest ongoing care. Keep clear standing
+cells clear; props belong on furniture or inside existing occupied footprints.
+The [daily-use execution record](plans/2026-09-06-town-buildout.md#temple-patterns-of-daily-use)
+owns the implementation and native proof. Shadow edges should be gentle enough
+that standing beside a lantern does not turn a character into a black cutout.
+
+### Room lighting from visible sources
+
+The owner rejected the temple's uniformly lit appearance on September 7.
+Lanterns and candles should produce local pools of light with believable falloff;
+their placement should explain the illumination. Use restrained indirect fill
+to preserve faces, movement feedback and grid readability. Corners and the
+dungeon threshold may recede into darkness. A room-wide directional key must
+not flatten the temple. The stair lantern belongs farther down the flight so
+it guides the eye toward the dungeon while the west-wall lantern lights the room.
+The [browser contract](browser-client.md#house-atmosphere) owns implementation;
+source strength, shadow tuning and visual acceptance remain candidate.
+
+### Coastal water by depth and exposure
+
+The owner rejected the current exterior water as short of the selected visual
+reference on September 7. Shallows should reveal the bottom and carry smaller,
+quieter movement, blending gradually into deeper, more active open water.
+Sheltered water and exposed coast should be distinguishable. Preserve the
+standing camera, geographic footprint and authoritative movement semantics.
+The [coastal-water follow-up](plans/2026-09-07-coastal-water.md) owns research,
+current implementation gaps, the proposed bounded experiment and its proof.

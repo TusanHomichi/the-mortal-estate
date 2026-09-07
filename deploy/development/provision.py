@@ -11,20 +11,31 @@ import socket
 import time
 import uuid
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 from common import REPO, UNITS, digest, document, run, write
 from services import install_units
 
 
 def validate_settings(settings):
-    if set(settings) != {"schema_version", "world_document", "ports"} or settings["schema_version"] != 1:
+    if set(settings) != {"schema_version", "world_document", "ports", "public_origin", "presentation_assets"} or settings["schema_version"] != 2:
         raise ValueError("development configuration shape is not current")
     ports = settings["ports"]
     if set(ports) != {"postgres", "server", "operations", "https"}:
         raise ValueError("configure all four development ports")
     if len(set(ports.values())) != 4 or any(type(port) is not int or not 1024 <= port <= 65535 for port in ports.values()):
         raise ValueError("ports must be distinct unprivileged integers")
+    origin = urlsplit(settings["public_origin"])
+    if (origin.scheme != "https" or not origin.hostname or origin.username or origin.password
+            or origin.path or origin.query or origin.fragment or origin.geturl() != settings["public_origin"]
+            or any(char.isspace() or char in '%"\\;$' for char in settings["public_origin"])):
+        raise ValueError("public_origin must be a canonical HTTPS origin")
+    if settings["presentation_assets"] is not None:
+        assets = Path(settings["presentation_assets"])
+        if not assets.is_absolute() or not assets.is_dir() or assets.resolve().is_relative_to(REPO):
+            raise ValueError("presentation_assets must name an external packet directory")
+        if settings["world_document"] != "content/lands/first-expedition/world.json":
+            raise ValueError("presentation study requires the first expedition world")
     path = (REPO / settings["world_document"]).resolve()
     if not path.is_relative_to(REPO) or not path.is_file():
         raise ValueError("served-world document must be carried in this checkout")
@@ -38,7 +49,9 @@ def development_seed(source):
     other = copy.deepcopy(players[0])
     other["id"] = "development_second"
     other["character_id"] = "character:development:second"
-    other["location"]["position"]["x"] += 1
+    # Sharing the declared traversable spawn is legal. Guessing an adjacent cell
+    # can place the test actor in water; copying item IDs gives two owners.
+    other["carried"] = {"gold": {"left_hand": 0, "right_hand": 0, "sack": 0}, "items": []}
     seed["actors"].append(other)
     seed["id"] = "private_development"
     return seed, [players[0]["id"], other["id"]]
@@ -49,6 +62,11 @@ def stage_release(site):
     if run(["git", "-C", REPO, "diff", "--name-only"]) or run(["git", "-C", REPO, "ls-files", "--others", "--exclude-standard"]):
         raise RuntimeError("stage source changes in Git before building a development release")
     tree = run(["git", "-C", REPO, "write-tree"])
+    # The packet digest is also bound by studyReceipt in this source tree.
+    if site.settings["presentation_assets"]:
+        packet = Path(site.settings["presentation_assets"])
+        if digest(packet / "feel-manifest.json") != json.loads((REPO / "web/src/play/studyReceipt.json").read_text())["asset_manifest_sha256"]:
+            raise RuntimeError("configured presentation packet does not match the browser")
     revision = run(["git", "-C", REPO, "rev-parse", "HEAD"])
     destination = site.root / "releases" / tree
     if destination.exists():
@@ -71,8 +89,12 @@ def stage_release(site):
             copied.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, copied)
         run(["npm", "--prefix", REPO / "web", "ci"], timeout=300, cwd=REPO)
-        run(["node", REPO / "web/proof/build-play.mjs", staging / "web"], timeout=600, cwd=REPO)
+        run(["node", REPO / "web/proof/build-play.mjs", staging / "web",
+             "first-expedition" if site.settings["presentation_assets"] else "inspection"], timeout=600, cwd=REPO)
         (staging / "web/play.html").rename(staging / "web/index.html")
+        if site.settings["presentation_assets"]:
+            from artwork import copy_artwork
+            copy_artwork(Path(site.settings["presentation_assets"]), staging / "web/feel-assets")
         if run(["git", "-C", REPO, "write-tree"]) != tree or run(["git", "-C", REPO, "diff", "--name-only"]):
             raise RuntimeError("source changed while building the release")
         document(staging / "release.json", {"schema_version": 1, "source_tree": tree, "base_commit": revision,
@@ -190,7 +212,7 @@ def install(site, configuration: Path, denylist: Path, postgres_bin: Path):
     document(site.config / "test-accounts.json", accounts)
     bootstrap(site, release, accounts)
     write(site.config / "server.env", f"TME_PUBLIC_LISTEN=127.0.0.1:{site.ports['server']}\nTME_OPS_LISTEN=127.0.0.1:{site.ports['operations']}\n"
-          f"TME_PUBLIC_HOST=localhost:{site.ports['https']}\nTME_PUBLIC_ORIGIN={site.origin}\n"
+          f"TME_PUBLIC_HOST={urlsplit(site.origin).netloc}\nTME_PUBLIC_ORIGIN={site.origin}\n"
           f"TME_BOOTSTRAP_MANIFEST={site.config}/bootstrap.json\nTME_BANNED_TERMS_FILE={site.config}/banned-terms.txt\nRUST_LOG=info\n")
     site.service("enable", *UNITS)
     site.service("start", UNITS[1], UNITS[2])
