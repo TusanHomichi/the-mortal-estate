@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry, Color, Mesh, ShaderMaterial, Vector2 } from "three";
 import type { FeelSpace } from "../feelTypes";
-import { TERRAIN_SUBDIVISIONS, type TerrainSurface } from "../terrainSurface";
+import { SEA_HEIGHT, TERRAIN_SUBDIVISIONS, type TerrainSurface } from "../terrainSurface";
 import type { Cell } from "../walk/layoutPassability";
 
 /** Cell addresses come from the packet, heights from the same surface as feet. */
@@ -34,12 +34,13 @@ export function createTacticalGrid(space: FeelSpace, surface: TerrainSurface) {
     name: "Tactical cell edges", transparent: true, depthWrite: false,
     uniforms: {
       ink: { value: new Color("#28352d") }, chalk: { value: new Color("#c4c6ad") },
+      seaHeight: { value: surface.coastal ? SEA_HEIGHT : -1e6 },
       focus: { value: new Vector2() }, focusEnabled: { value: 0 },
     },
-    vertexShader: `varying vec2 worldCell;
-      void main(){vec4 world=modelMatrix*vec4(position,1.);worldCell=world.xz;
+    vertexShader: `varying vec2 worldCell; varying float worldHeight;
+      void main(){vec4 world=modelMatrix*vec4(position,1.);worldCell=world.xz;worldHeight=world.y-.009;
       gl_Position=projectionMatrix*viewMatrix*world;}`,
-    fragmentShader: `varying vec2 worldCell;
+    fragmentShader: `varying vec2 worldCell; varying float worldHeight; uniform float seaHeight;
       uniform vec3 ink;uniform vec3 chalk;uniform vec2 focus;uniform float focusEnabled;
       void main(){
         vec2 f=fract(worldCell+.5);vec2 d=min(f,1.-f);
@@ -50,7 +51,7 @@ export function createTacticalGrid(space: FeelSpace, surface: TerrainSurface) {
         float outer=1.-smoothstep(.65,1.8,edge);
         float fine=1.-smoothstep(.1,.65,edge);
         float strength=.19+.13*corner+.2*nearby;
-        gl_FragColor=vec4(mix(ink,chalk,fine*.8),outer*strength);
+        gl_FragColor=vec4(mix(ink,chalk,fine*.8),outer*strength*smoothstep(seaHeight,seaHeight+.04,worldHeight));
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`,

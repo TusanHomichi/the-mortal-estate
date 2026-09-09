@@ -110,7 +110,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     # An interrupted or failed rerun must never leave an earlier aggregate PASS.
     (output / "verification.json").write_text(json.dumps({"verdict": "INCOMPLETE", "reason": "run has not completed"}) + "\n")
-    run(["npm", "--prefix", "web", "run", "build:play"])
+    run(["node", "web/proof/build-play.mjs", "web/dist/play", "inspection"])
     roster = json.loads((REPOSITORY_ROOT / "web/proof/engines.json").read_text())
     # Each browser/scenario gets a fresh database and freshly bootstrapped actor.
     reports = []

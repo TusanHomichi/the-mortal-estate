@@ -24,6 +24,11 @@ function feelAssetsPlugin(): Plugin {
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const requestPath = (request.url ?? "/").split("?", 1)[0]!;
+        if (requestPath === "/" || requestPath === "/index.html") {
+          request.url = "/play.html" + ((request.url ?? "").includes("?") ? "?" + request.url!.split("?").slice(1).join("?") : "");
+          next();
+          return;
+        }
         if (!requestPath.startsWith(ASSET_PREFIX)) {
           next();
           return;

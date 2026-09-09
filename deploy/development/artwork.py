@@ -9,17 +9,19 @@ def copy_artwork(source: Path, destination: Path):
     source = source.resolve(strict=True)
     if not source.is_dir() or source.is_relative_to(REPO):
         raise ValueError("presentation assets must be an external directory")
-    manifest = source / "feel-manifest.json"
-    receipt = json.loads((REPO / "web/src/play/studyReceipt.json").read_text())
-    if digest(manifest) != receipt["asset_manifest_sha256"]:
+    manifest = source / "pixel-manifest.json"
+    receipt = json.loads((REPO / "web/src/play/pixelReceipt.json").read_text())
+    if digest(manifest) != receipt["manifest_sha256"]:
         raise ValueError("presentation packet differs from this browser's receipt")
-    files = {"feel-manifest.json": digest(manifest)}
+    files = {"pixel-manifest.json": digest(manifest)}
 
     def visit(value):
         if isinstance(value, dict):
             if "file" in value and "sha256" in value:
                 name, expected = value["file"], value["sha256"]
                 relative = Path(name)
+                if relative.suffix != ".png":
+                    raise ValueError("pixel artwork must contain PNG images, not 3D assets")
                 if relative.is_absolute() or ".." in relative.parts or relative.as_posix() != name:
                     raise ValueError("presentation asset name must be a normalized relative path")
                 path = source / name

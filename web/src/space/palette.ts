@@ -43,7 +43,7 @@ export function paletteFor(
   }
   if (lightingPeriod(presets) === "day") return {
     background: new Color("#91adb8"), ambient: new Color("#d5e3ef"),
-    ambientIntensity: 1.15, key: new Color("#fff0d4"), keyIntensity: 2,
+    ambientIntensity: 0.68, key: new Color("#fff0d4"), keyIntensity: 2.7,
     lanternIntensity: 0, candleIntensity: 0, practicalShaderStrength: 0,
   };
   return lightingPeriod(presets) === "dusk"
@@ -72,5 +72,6 @@ export function paletteFor(
 /** Shared world-space key placement for geometry and procedural water lighting. */
 export function keyLightOffset(presets: readonly Preset[], outdoors: boolean): Vector3 {
   if (!outdoors) return new Vector3(-3.5, 12, 6);
-  return outdoors && lightingPeriod(presets) === "dusk" ? new Vector3(-10.5, 6, 6.5) : new Vector3(3.5, 12, -10.5);
+  if (lightingPeriod(presets) === "dusk") return new Vector3(-10.5, 6, 6.5);
+  return lightingPeriod(presets) === "day" ? new Vector3(-9, 10, 8) : new Vector3(-7, 12, 8);
 }

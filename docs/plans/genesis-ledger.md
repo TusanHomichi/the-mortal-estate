@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 48
-status: Preview renderer/login and path-control repairs deployed and verified; horseshoe town study remains next.
+last_updated: 2026-09-09
+revision: 68
+status: GPU pixel composition complete; repository, three-engine native and continuous ten-figure proof passed; hosted preview unchanged.
 public_safe: true
-summary: Current preview input restoration, horseshoe town study, temple iteration, resident services and remaining visual gates.
+summary: Pixel integration and the owner-directed renderer performance repair routed to their fact owners.
 ---
 
 # The genesis ledger
@@ -28,7 +28,48 @@ owner's and are numbered by the phase they guard.
 
 ## Current checkpoint
 
-Updated 2026-09-07.
+Updated 2026-09-09.
+
+**Current dispatch:** the owner selected the final pixel temple and directed a
+hard transition to pixel art, with exterior construction next. The
+[transition record](2026-09-08-pixel-art-transition.md) owns implementation,
+verification and the stopping point before the requested Codex update. The owner
+also removed the temporary gameplay HUD: keep direct movement and resident
+interaction while the real UI is designed. Read
+[presentation direction](../presentation-direction.md) and
+[pixel-art production](../pixel-art-production.md) before making more art.
+Do not resume the retired 3D product. The owner now directs pixel atmosphere and
+lighting through the [standing effects ruling](../presentation-direction.md#pixel-atmosphere-and-shader-effects),
+and explicitly approved the [bounded town geometry amendment](2026-09-05-first-land-surface.md#pixel-town-geography-amendment).
+Gameplay and the non-town island baseline retain their owners. Existing deployed previews are historical
+artifacts until an explicit release activation; this code cutover does not
+silently change running deployments.
+
+The owner has now dispatched [pixel exterior construction](2026-09-08-pixel-exterior.md):
+temple frontage, adjoining street and layered scenery against existing geography.
+That record owns the functional evidence, subsequent owner visual rejection and
+current nine-view composition and scale review. The owner selected the standard
+frontage as the continuation reference and retired neural attempts. The
+[connected standard-correction study](2026-09-08-pixel-exterior.md#connected-standard-correction-study)
+records the assembled town, corrected sampling and Deck/desktop scrolling proof.
+The owner subsequently requested [gameplay integration and pixel effects](2026-09-08-pixel-exterior.md#gameplay-integration-and-pixel-effects),
+selected the grey-stone temple treatment and requested a smaller cellar hatch.
+That execution record owns current source revisions, native proof and remaining
+style/device review. The owner subsequently directed installing the simplified
+Martial Artist; all eight facings now use that design. Tomas and Maude remain intact.
+The owner next directed [performance improvement before more effects](2026-09-09-pixel-performance.md).
+That record owns controlled profiling, the rendering repair and final evidence.
+The bounded repair passed repository and three-engine native proof; that record
+also owns the remaining WebKit moving-scene cost and physical-device limitations.
+The subsequent sustained ten-figure benchmark also exposes Firefox composition
+cost; its results and rendering-capacity limits remain in that same owner record.
+The owner then authorized [GPU-resident pixel composition](2026-09-09-pixel-gpu-composition.md).
+That execution record owns the completed cutover, comparisons, final proof and
+remaining device/capacity limits. The hosted preview has not been redeployed.
+
+The following town/3D checkpoint paragraphs are earlier implementation and
+deployment history. Their service facts survive; town-local placement is superseded by the September 9
+amendment and rendering follow-ups by the pixel-art ruling.
 
 The latest bounded [temple art iteration](2026-09-06-town-buildout.md#temple-patterns-of-daily-use)
 adds patterns of daily use and gentler fixture shadows toward the selected guide. The
@@ -38,15 +79,33 @@ resident services and the fixed camera retain their existing owners.
 
 The subsequent [preview repair](2026-09-06-town-buildout.md#preview-renderer-default-repair)
 fixes renderer entry selection and credential leakage during login startup;
-final deployed proof passed in all three browsers. The newly directed
-[town layout study](2026-09-06-town-buildout.md#horseshoe-layout-study) is next.
+final deployed proof passed in all three browsers. The subsequent
+[horseshoe study](2026-09-07-horseshoe-town.md) proved a ten-building candidate.
+The owner has since selected the [current roster](2026-09-05-first-land-surface.md#current-town-building-roster),
+and the [art guides](2026-09-08-town-art-guides.md) now cover that direction.
+The [September 8 implementation](2026-09-07-horseshoe-town.md#september-8-implementation)
+compiles nine members and seven service buildings. Full verification, three-browser
+gameplay/circulation and restored-world rehearsal passed; the private preview now
+serves the new town and coastal-water candidates after preserved-state migration.
 The subsequently reported [path-control regression](2026-09-07-path-controls.md)
 is repaired and deployed, with the exterior/temple input proof passing in all
-three browsers. That geography work remains next.
+three browsers. The current release and exact cutover evidence are recorded in
+the horseshoe execution record. Artwork and owner-device acceptance remain open.
+
+The preceding [town visual iterations](2026-09-08-town-visual-iteration.md)
+bring the selected seven-building town closer to its guide. The latest
+[shape and bank pass](2026-09-08-town-visual-iteration.md#upper-building-shapes-and-grouped-banks)
+adds varied upper-building pitch, individually offset slates and grouped bank
+stones while retaining the preceding material relief. It is deployed privately
+with unchanged gameplay and preserved saves. Chromium, Firefox and WebKit passed
+native comparisons, routes, night views and live controls. The execution record
+owns exact geometry/resource/frame observations and remaining visual/device
+acceptance. WebKit bank-view timing remains an open performance finding.
+Water issue #48 remains open; no artwork master is accepted.
 
 - **First expedition:** the owner approved the town and bounded entrance
   geography and directed implementation to continue. The
-  [execution record](2026-09-06-first-expedition.md) owns the authored twelve-area
+  [execution record](2026-09-06-first-expedition.md) records the original twelve-area
   world, five creation profiles, town services, temple descent, encounter and
   loot, instruction, storage and durable reconnect. The private visual study
   presents server authority using the verified external candidate artwork.

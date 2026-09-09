@@ -34,6 +34,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 import uuid
 from contextlib import closing
 from dataclasses import dataclass, field
@@ -296,6 +297,7 @@ class LiveServer:
     admin_url: str
     world: World
     keep: bool = False
+    public_origin: str | None = None
 
     run_directory: Path = field(init=False)
     database_name: str = field(init=False)
@@ -306,12 +308,22 @@ class LiveServer:
     username: str = field(init=False)
     password: str = field(init=False)
     origin: str = field(init=False)
+    local_origin: str = field(init=False)
     authority: Path = field(init=False)
     status: dict = field(init=False, default_factory=dict)
     _server: subprocess.Popen | None = field(init=False, default=None)
     _proxy: TlsProxy | None = field(init=False, default=None)
 
     def __enter__(self) -> "LiveServer":
+        if self.public_origin is not None:
+            origin = urlsplit(self.public_origin)
+            if (origin.scheme != "https" or not origin.hostname or origin.username is not None
+                    or origin.password is not None or origin.path or origin.query or origin.fragment
+                    or origin.geturl() != self.public_origin
+                    or any(char.isspace() or char in '%"\\;$' for char in self.public_origin)):
+                raise ValueError("public_origin must be a canonical HTTPS origin")
+            # Accessing port also refuses malformed and out-of-range ports before provisioning.
+            origin.port
         self.run_directory = Path(tempfile.mkdtemp(prefix="tme-live-"))
         self.server_log = self.run_directory / "server.log"
         self.database_name = f"tme_live_{secrets.token_hex(4)}"
@@ -365,7 +377,8 @@ class LiveServer:
         tls_port = reserve_port()
         self.authority, certificate, key = create_certificates(self.run_directory)
         self._proxy = self.start_proxy(tls_port, public_port, certificate, key)
-        self.origin = f"https://{PROXY_HOST}:{tls_port}"
+        self.local_origin = f"https://{PROXY_HOST}:{tls_port}"
+        self.origin = self.public_origin or self.local_origin
         print(f"origin: {self.origin}")
 
         environment = {
@@ -376,7 +389,7 @@ class LiveServer:
             "TME_BANNED_TERMS_FILE": str(REPOSITORY_ROOT / ".boundary" / "banned-terms.txt"),
             "TME_PUBLIC_LISTEN": f"127.0.0.1:{public_port}",
             "TME_OPS_LISTEN": f"127.0.0.1:{operations_port}",
-            "TME_PUBLIC_HOST": f"{PROXY_HOST}:{tls_port}",
+            "TME_PUBLIC_HOST": urlsplit(self.origin).netloc,
             "TME_PUBLIC_ORIGIN": self.origin,
             "TME_BOOTSTRAP_MANIFEST": str(manifest),
             # The server filters tracing from the environment, so without this

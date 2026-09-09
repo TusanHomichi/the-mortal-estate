@@ -1,5 +1,5 @@
 //! First-expedition geography accepted on 2026-09-06, with the owner's
-//! temple-layout amendment on 2026-09-07.
+//! temple-layout amendment on 2026-09-07 and town cutover on 2026-09-08.
 //! The review and encoding receipt are documented in the land README.
 use super::*;
 
@@ -22,8 +22,8 @@ const MAP_PROPERTIES: &[(&str, PropertyValue)] = &[
 
 pub static LAND: LandContract = LandContract {
     reviewed_encoding: Some(ReviewedEncoding {
-        review_manifest_sha256: "d132d434d60e20d15b2962834bfde80e6bd04d8cf8d01da615674c297dee8d73",
-        geography_sha256: "2ce205b35536006932437c855827575d26f61a26813ade0bc885160db95534d4",
+        review_manifest_sha256: "c8ddf6d5724e9f53361185c469cadb47f827c539bbb5c32f671844edabd263d0",
+        geography_sha256: "869e33951932dde1d470111c746802ee02cc141213019fe0c049c3da07f039be",
     }),
     id: "first_expedition",
     realm_id: "first_expedition",
@@ -87,19 +87,7 @@ pub static LAND: LandContract = LandContract {
                     scope: "clustered",
                 },
                 StructureContract {
-                    id: "arrival_5",
-                    scope: "clustered",
-                },
-                StructureContract {
-                    id: "arrival_6",
-                    scope: "clustered",
-                },
-                StructureContract {
                     id: "arrival_7",
-                    scope: "clustered",
-                },
-                StructureContract {
-                    id: "arrival_8",
                     scope: "clustered",
                 },
                 StructureContract {
@@ -147,33 +135,9 @@ pub static LAND: LandContract = LandContract {
                 },
                 TransitionContract {
                     layout: TransitionLayout::Threshold,
-                    id: "arrival_to_bakery",
-                    target_member: "bakery",
-                    paired_transition: "bakery_to_arrival",
-                    direction: "passage",
-                    marker_class: "",
-                },
-                TransitionContract {
-                    layout: TransitionLayout::Threshold,
-                    id: "arrival_to_herbalist",
-                    target_member: "herbalist",
-                    paired_transition: "herbalist_to_arrival",
-                    direction: "passage",
-                    marker_class: "",
-                },
-                TransitionContract {
-                    layout: TransitionLayout::Threshold,
                     id: "arrival_to_forge",
                     target_member: "forge",
                     paired_transition: "forge_to_arrival",
-                    direction: "passage",
-                    marker_class: "",
-                },
-                TransitionContract {
-                    layout: TransitionLayout::Threshold,
-                    id: "arrival_to_chandler",
-                    target_member: "chandler",
-                    paired_transition: "chandler_to_arrival",
                     direction: "passage",
                     marker_class: "",
                 },
@@ -420,112 +384,6 @@ pub static LAND: LandContract = LandContract {
             candidate_entry: false,
         },
         MemberContract {
-            id: "bakery",
-            document: "content/lands/first-expedition/bakery.tmj",
-            width: 3,
-            height: 3,
-            classes: &[
-                base("expedition_floor", false),
-                base("expedition_furniture", true),
-                base("expedition_void", true),
-                class(
-                    "expedition_blocked",
-                    TileRole::Passability { walkable: false },
-                ),
-                class(
-                    "expedition_walkable",
-                    TileRole::Passability { walkable: true },
-                ),
-            ],
-            tile_layers: &[
-                "base_terrain",
-                "routes",
-                "structure_footprints",
-                "landmark_marks",
-                "passability",
-            ],
-            object_layers: &["structures", "transitions", "landmarks"],
-            map_properties: MAP_PROPERTIES,
-            structures: &[],
-            landmarks: &[],
-            transitions: &[TransitionContract {
-                layout: TransitionLayout::Threshold,
-                id: "bakery_to_arrival",
-                target_member: "arrival",
-                paired_transition: "arrival_to_bakery",
-                direction: "passage",
-                marker_class: "",
-            }],
-            clustered_ground_class: None,
-            wall_terrain_ids: &[],
-            presentation: LevelPresentation {
-                scene_role: SceneRoleDef::Interior,
-                presentation_mode: PresentationModeDef::OverworldTown,
-                law_zone: LawZoneDef::None,
-                world_zoom: WorldZoomDef {
-                    screen_cell_pitch: [156, 104],
-                },
-                staged_viewport: Some(StagedViewportDef {
-                    frame_size: [1920, 1080],
-                    fit_whole_level: true,
-                }),
-            },
-            candidate_entry: false,
-        },
-        MemberContract {
-            id: "herbalist",
-            document: "content/lands/first-expedition/herbalist.tmj",
-            width: 4,
-            height: 3,
-            classes: &[
-                base("expedition_floor", false),
-                base("expedition_furniture", true),
-                base("expedition_void", true),
-                class(
-                    "expedition_blocked",
-                    TileRole::Passability { walkable: false },
-                ),
-                class(
-                    "expedition_walkable",
-                    TileRole::Passability { walkable: true },
-                ),
-            ],
-            tile_layers: &[
-                "base_terrain",
-                "routes",
-                "structure_footprints",
-                "landmark_marks",
-                "passability",
-            ],
-            object_layers: &["structures", "transitions", "landmarks"],
-            map_properties: MAP_PROPERTIES,
-            structures: &[],
-            landmarks: &[],
-            transitions: &[TransitionContract {
-                layout: TransitionLayout::Threshold,
-                id: "herbalist_to_arrival",
-                target_member: "arrival",
-                paired_transition: "arrival_to_herbalist",
-                direction: "passage",
-                marker_class: "",
-            }],
-            clustered_ground_class: None,
-            wall_terrain_ids: &[],
-            presentation: LevelPresentation {
-                scene_role: SceneRoleDef::Interior,
-                presentation_mode: PresentationModeDef::OverworldTown,
-                law_zone: LawZoneDef::None,
-                world_zoom: WorldZoomDef {
-                    screen_cell_pitch: [156, 104],
-                },
-                staged_viewport: Some(StagedViewportDef {
-                    frame_size: [1920, 1080],
-                    fit_whole_level: true,
-                }),
-            },
-            candidate_entry: false,
-        },
-        MemberContract {
             id: "forge",
             document: "content/lands/first-expedition/forge.tmj",
             width: 4,
@@ -559,59 +417,6 @@ pub static LAND: LandContract = LandContract {
                 id: "forge_to_arrival",
                 target_member: "arrival",
                 paired_transition: "arrival_to_forge",
-                direction: "passage",
-                marker_class: "",
-            }],
-            clustered_ground_class: None,
-            wall_terrain_ids: &[],
-            presentation: LevelPresentation {
-                scene_role: SceneRoleDef::Interior,
-                presentation_mode: PresentationModeDef::OverworldTown,
-                law_zone: LawZoneDef::None,
-                world_zoom: WorldZoomDef {
-                    screen_cell_pitch: [156, 104],
-                },
-                staged_viewport: Some(StagedViewportDef {
-                    frame_size: [1920, 1080],
-                    fit_whole_level: true,
-                }),
-            },
-            candidate_entry: false,
-        },
-        MemberContract {
-            id: "chandler",
-            document: "content/lands/first-expedition/chandler.tmj",
-            width: 4,
-            height: 3,
-            classes: &[
-                base("expedition_floor", false),
-                base("expedition_furniture", true),
-                base("expedition_void", true),
-                class(
-                    "expedition_blocked",
-                    TileRole::Passability { walkable: false },
-                ),
-                class(
-                    "expedition_walkable",
-                    TileRole::Passability { walkable: true },
-                ),
-            ],
-            tile_layers: &[
-                "base_terrain",
-                "routes",
-                "structure_footprints",
-                "landmark_marks",
-                "passability",
-            ],
-            object_layers: &["structures", "transitions", "landmarks"],
-            map_properties: MAP_PROPERTIES,
-            structures: &[],
-            landmarks: &[],
-            transitions: &[TransitionContract {
-                layout: TransitionLayout::Threshold,
-                id: "chandler_to_arrival",
-                target_member: "arrival",
-                paired_transition: "arrival_to_chandler",
                 direction: "passage",
                 marker_class: "",
             }],
@@ -813,8 +618,8 @@ pub static LAND: LandContract = LandContract {
     receipt_kind: "authored_land_promotion",
     receipt_status: "owner_accepted_first_expedition_geography",
     receipt_attested_by: "peter",
-    receipt_attested_on: "2026-09-07",
-    master_digest: "7e37e586161c2b8d6c9f46f3eb154d5697e0acc12a42ca6bd26217cf07c419e9",
+    receipt_attested_on: "2026-09-09",
+    master_digest: "0b6cd1149004780dbab45ec52ef9853751ed02e1962efba25317fdc6de09f6ee",
     authority: ReceiptAuthority {
         coordinates: true,
         terrain_and_passability: true,

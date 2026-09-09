@@ -1,47 +1,5 @@
 {
   "actor_definitions": {
-    "actor-definition/first_expedition/bakery_keeper": {
-      "ai": {
-        "aggro_radius": 4,
-        "awareness": {
-          "mode": "unrestricted"
-        },
-        "behavior": "hold_ground",
-        "cadence_units": 100,
-        "leash_range": 12,
-        "physical_attack_modes": [
-          "fight"
-        ]
-      },
-      "creature_traits": [],
-      "death": {
-        "remains": "none"
-      },
-      "id": "actor/first_expedition/bakery_keeper",
-      "kind": "npc",
-      "magic_resistance": {
-        "evidence_state": "original_provisional",
-        "natural_save_twentieths": 5
-      },
-      "monster_abilities": [],
-      "name": "Baker",
-      "physical_damage_affinity_profile_id": "ordinary",
-      "social": {
-        "alignment_source": {
-          "alignment": "lawful",
-          "kind": "inherent"
-        },
-        "behavior": "civilian",
-        "nature": "human",
-        "owner_relation": "none"
-      },
-      "stats": {
-        "attack": 0,
-        "defense": 0,
-        "hp": 20
-      },
-      "xp_value": null
-    },
     "actor-definition/first_expedition/balm_seller": {
       "ai": {
         "aggro_radius": 4,
@@ -169,48 +127,6 @@
       },
       "xp_value": 5
     },
-    "actor-definition/first_expedition/chandler_keeper": {
-      "ai": {
-        "aggro_radius": 4,
-        "awareness": {
-          "mode": "unrestricted"
-        },
-        "behavior": "hold_ground",
-        "cadence_units": 100,
-        "leash_range": 12,
-        "physical_attack_modes": [
-          "fight"
-        ]
-      },
-      "creature_traits": [],
-      "death": {
-        "remains": "none"
-      },
-      "id": "actor/first_expedition/chandler_keeper",
-      "kind": "npc",
-      "magic_resistance": {
-        "evidence_state": "original_provisional",
-        "natural_save_twentieths": 5
-      },
-      "monster_abilities": [],
-      "name": "Chandler",
-      "physical_damage_affinity_profile_id": "ordinary",
-      "social": {
-        "alignment_source": {
-          "alignment": "lawful",
-          "kind": "inherent"
-        },
-        "behavior": "civilian",
-        "nature": "human",
-        "owner_relation": "none"
-      },
-      "stats": {
-        "attack": 0,
-        "defense": 0,
-        "hp": 20
-      },
-      "xp_value": null
-    },
     "actor-definition/first_expedition/forge_keeper": {
       "ai": {
         "aggro_radius": 4,
@@ -236,48 +152,6 @@
       },
       "monster_abilities": [],
       "name": "Smith",
-      "physical_damage_affinity_profile_id": "ordinary",
-      "social": {
-        "alignment_source": {
-          "alignment": "lawful",
-          "kind": "inherent"
-        },
-        "behavior": "civilian",
-        "nature": "human",
-        "owner_relation": "none"
-      },
-      "stats": {
-        "attack": 0,
-        "defense": 0,
-        "hp": 20
-      },
-      "xp_value": null
-    },
-    "actor-definition/first_expedition/herbalist_keeper": {
-      "ai": {
-        "aggro_radius": 4,
-        "awareness": {
-          "mode": "unrestricted"
-        },
-        "behavior": "hold_ground",
-        "cadence_units": 100,
-        "leash_range": 12,
-        "physical_attack_modes": [
-          "fight"
-        ]
-      },
-      "creature_traits": [],
-      "death": {
-        "remains": "none"
-      },
-      "id": "actor/first_expedition/herbalist_keeper",
-      "kind": "npc",
-      "magic_resistance": {
-        "evidence_state": "original_provisional",
-        "natural_save_twentieths": 5
-      },
-      "monster_abilities": [],
-      "name": "Herbalist",
       "physical_damage_affinity_profile_id": "ordinary",
       "social": {
         "alignment_source": {
@@ -1533,10 +1407,7 @@
         "actor-definition/first_expedition/sheriff",
         "actor-definition/first_expedition/outfitter_keeper",
         "actor-definition/first_expedition/provisioner",
-        "actor-definition/first_expedition/bakery_keeper",
-        "actor-definition/first_expedition/herbalist_keeper",
         "actor-definition/first_expedition/forge_keeper",
-        "actor-definition/first_expedition/chandler_keeper",
         "actor-definition/first_expedition/tomas",
         "actor-definition/first_expedition/balm_seller",
         "actor-definition/first_expedition/trainer_1",
@@ -1587,10 +1458,7 @@
         "service/banker",
         "service/outfitter_keeper",
         "service/provisioner",
-        "service/bakery_keeper",
-        "service/herbalist_keeper",
         "service/forge_keeper",
-        "service/chandler_keeper",
         "service/tomas",
         "service/balm_seller",
         "service/trainer_1",
@@ -2624,19 +2492,6 @@
   },
   "schema_version": 6,
   "service_definitions": {
-    "service/bakery_keeper": {
-      "capabilities": [
-        {
-          "id": "trail_wares",
-          "kind": "merchant",
-          "player_sales": {
-            "pawn_listing_multiplier": 4
-          }
-        }
-      ],
-      "id": "bakery_keeper",
-      "name": "Baker"
-    },
     "service/balm_seller": {
       "capabilities": [
         {
@@ -2661,19 +2516,6 @@
       "id": "banker",
       "name": "Banker"
     },
-    "service/chandler_keeper": {
-      "capabilities": [
-        {
-          "id": "trail_wares",
-          "kind": "merchant",
-          "player_sales": {
-            "pawn_listing_multiplier": 4
-          }
-        }
-      ],
-      "id": "chandler_keeper",
-      "name": "Chandler"
-    },
     "service/forge_keeper": {
       "capabilities": [
         {
@@ -2695,19 +2537,6 @@
       ],
       "id": "forge_keeper",
       "name": "Smith"
-    },
-    "service/herbalist_keeper": {
-      "capabilities": [
-        {
-          "id": "trail_wares",
-          "kind": "merchant",
-          "player_sales": {
-            "pawn_listing_multiplier": 4
-          }
-        }
-      ],
-      "id": "herbalist_keeper",
-      "name": "Herbalist"
     },
     "service/lodge_keeper": {
       "capabilities": [

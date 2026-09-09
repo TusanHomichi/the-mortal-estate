@@ -355,7 +355,7 @@ async function assertCameraBelongsToSpace(page, focus) {
 }
 
 const vite = await startVite(packet);
-const baseUrl = vite.baseUrl;
+const baseUrl = `${vite.baseUrl}feel-scene.html`;
 
 let launched;
 try {

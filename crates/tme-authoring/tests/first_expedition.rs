@@ -27,16 +27,25 @@ fn accepted_geography_projects_exact_passages_stairs_and_dock_arrival() {
         land("first_expedition").unwrap(),
     )
     .unwrap();
-    assert_eq!(land.members().count(), 12);
-    assert_eq!(land.member("arrival").unwrap().report().passable_cells, 472);
+    assert_eq!(land.members().count(), 9);
+    assert_eq!(land.member("arrival").unwrap().report().passable_cells, 680);
+    for retired in ["bakery", "herbalist", "chandler"] {
+        assert!(land.member(retired).is_err());
+        assert!(
+            tme_authoring::land("first_expedition")
+                .unwrap()
+                .member(retired)
+                .is_err()
+        );
+    }
     assert_eq!(land.member("d1_entry").unwrap().report().passable_cells, 17);
     assert_eq!(
         land.arrival_member().unwrap().arrival(),
-        Some(Point { x: 9, y: 31 })
+        Some(Point { x: 8, y: 34 })
     );
     let world = serde_json::to_value(project(&land).unwrap()).unwrap();
     let edges = world["topology"].as_object().unwrap();
-    assert_eq!(edges.len(), 22);
+    assert_eq!(edges.len(), 16);
     assert_eq!(edges["route/arrival_to_market"]["kind"]["kind"], "passage");
     assert_eq!(
         edges["route/arrival_to_market"]["target"]["location"]["position"],
@@ -117,6 +126,32 @@ fn authored_cast_and_all_five_creation_choices_validate_through_runtime_rules() 
         7,
     )
     .unwrap();
+    assert_eq!(engine.world().service_instances.len(), 11);
+    for retired in ["bakery_keeper", "herbalist_keeper", "chandler_keeper"] {
+        assert!(
+            engine
+                .world()
+                .actors
+                .iter()
+                .all(|actor| actor.id.as_str() != retired)
+        );
+        assert!(
+            engine
+                .world()
+                .service_instances
+                .iter()
+                .all(|service| service.id != retired)
+        );
+    }
+    let provisions = &engine.world().merchant_inventories
+        [&tme_rules::model::MerchantInventoryId::new("provisioner", "trail_wares")];
+    assert_eq!(provisions.listings.len(), 12);
+    assert!(
+        provisions
+            .listings
+            .iter()
+            .all(|listing| listing.price_gold == 5)
+    );
     assert_eq!(definition.creation_profiles().len(), 5);
     let mut created = engine;
     for profile in definition.creation_profiles() {

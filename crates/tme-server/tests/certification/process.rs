@@ -22,6 +22,11 @@ fn spawn_server_child(
         Command::new(env!("CARGO_BIN_EXE_tme-server"))
             .arg("serve")
             .env_clear()
+            .env(
+                "TME_BANNED_TERMS_FILE",
+                std::env::var_os("TME_BANNED_TERMS_FILE")
+                    .expect("certification requires an explicit boundary terms file"),
+            )
             .env("CREDENTIALS_DIRECTORY", credentials)
             .env("TME_PUBLIC_LISTEN", public_address.to_string())
             .env("TME_OPS_LISTEN", operations_address.to_string())
@@ -30,7 +35,7 @@ fn spawn_server_child(
             .env("TME_BOOTSTRAP_MANIFEST", manifest)
             .stdin(Stdio::null())
             .stdout(Stdio::null())
-            .stderr(Stdio::null())
+            .stderr(Stdio::inherit())
             .spawn()
             .unwrap(),
     )

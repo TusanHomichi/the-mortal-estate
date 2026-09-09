@@ -59,23 +59,36 @@ class PrivateDeployment(unittest.TestCase):
         from artwork import copy_artwork
         packet = self.root / "packet"
         packet.mkdir()
-        (packet / "room.glb").write_bytes(b"synthetic geometry")
+        (packet / "room.png").write_bytes(b"synthetic image")
         (packet / "private-notes.txt").write_text("must not be copied")
-        manifest = packet / "feel-manifest.json"
-        manifest.write_text(json.dumps({"assets": [{"file": "room.glb", "sha256": digest(packet / "room.glb")}]}))
+        manifest = packet / "pixel-manifest.json"
+        manifest.write_text(json.dumps({"assets": [{"file": "room.png", "sha256": digest(packet / "room.png")}]}))
         source = self.root / "source"
-        receipt = source / "web/src/play/studyReceipt.json"
-        document(receipt, {"asset_manifest_sha256": digest(manifest)})
+        receipt = source / "web/src/play/pixelReceipt.json"
+        document(receipt, {"manifest_sha256": digest(manifest)})
         with patch("artwork.REPO", source):
             copy_artwork(packet, self.root / "copied")
-            self.assertEqual({p.name for p in (self.root / "copied").iterdir()}, {"feel-manifest.json", "room.glb"})
-            (packet / "room.glb").write_bytes(b"changed")
+            self.assertEqual({p.name for p in (self.root / "copied").iterdir()}, {"pixel-manifest.json", "room.png"})
+            (packet / "room.png").write_bytes(b"changed")
             with self.assertRaises(ValueError):
                 copy_artwork(packet, self.root / "refused")
             self.assertFalse((self.root / "refused").exists())
             manifest.write_text("{}")
             with self.assertRaises(ValueError):
                 copy_artwork(packet, self.root / "wrong-manifest")
+
+    def test_pixel_release_refuses_retired_mesh_packet(self):
+        from artwork import copy_artwork
+        packet = self.root / "packet"
+        packet.mkdir()
+        (packet / "room.glb").write_bytes(b"synthetic retired mesh")
+        manifest = packet / "pixel-manifest.json"
+        document(manifest, {"assets": [{"file": "room.glb", "sha256": digest(packet / "room.glb")}]})
+        source = self.root / "source"
+        document(source / "web/src/play/pixelReceipt.json", {"manifest_sha256": digest(manifest)})
+        with patch("artwork.REPO", source), self.assertRaisesRegex(ValueError, "PNG"):
+            copy_artwork(packet, self.root / "refused-mesh")
+        self.assertFalse((self.root / "refused-mesh").exists())
 
     def test_state_cannot_be_installed_inside_source(self):
         with self.assertRaises(ValueError):

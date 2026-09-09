@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 47
-status: Current lookup index including restored authoritative path controls and the horseshoe town direction.
+last_updated: 2026-09-09
+revision: 52
+status: Current lookup index including owner-authorized GPU pixel composition and the bounded town geography amendment.
 public_safe: true
-summary: Lookup links for path controls, settlement arrangement, resident activity, lighting, coastal water and proof.
+summary: Lookup links for GPU pixel composition, production, atmosphere, town geography, path controls and standing rulings.
 always: true
 ---
 
@@ -22,41 +22,43 @@ experimental gameplay tuning.
 
 ## Closed
 
+The September 8 pixel-art ruling supersedes earlier 3D presentation choices;
+linked 3D evidence remains historical.
+
 | Topic | Lookup cue | Owner |
 | --- | --- | --- |
 | Implementation stack | Fixed stack; widening needs a decision. | [AGENTS.md](../AGENTS.md#operating-rules) |
 | Gameplay authority | One reusable rules boundary. | [boundary map](boundary-map.md#the-boundaries) |
-| Client shape and baseline | Three.js browser; Godot retired September 5. | [client architecture](client-architecture.md#the-web-client) |
+| Client shape and baseline | GPU 2D pixel-art browser with reusable Canvas preparation; historical 3D tools retain their explicit diagnostic role. | [client architecture](client-architecture.md#the-web-client) |
 | Browser and desktop proof | Shared browser matrix; Tauri targets also require packaged-webview proof. | [client architecture](client-architecture.md#the-web-client) |
 | Town residents | Authored patrols and actor-bound services; temple interaction request. | [resident contract](town-resident-contract.md) |
-| Living-town arrangement | Horseshoe toward the dock, temple at its head; central feature undecided and layout study pending. | [surface brief](plans/2026-09-05-first-land-surface.md#horseshoe-town-arrangement) |
+| Living-town arrangement | Horseshoe toward the dock, temple at its head; central feature undecided and candidate awaiting review. | [surface brief](plans/2026-09-05-first-land-surface.md#horseshoe-town-arrangement) |
+| Current town roster | Seven service buildings; selected consolidation and deferrals. | [surface brief](plans/2026-09-05-first-land-surface.md#current-town-building-roster) |
+| Pixel town geometry | Owner-approved town-local fit to the reviewed artwork; wider island baseline retained. | [surface amendment](plans/2026-09-05-first-land-surface.md#pixel-town-geography-amendment) |
+| Pixel atmosphere and lighting | Height-aware lighting, fog, weather and selective foliage wind; chopping deferred. | [presentation direction](presentation-direction.md#pixel-atmosphere-and-shader-effects) |
 | Continuous visual review | Inspect every visible area; fix bounded defects or record screenshot-backed follow-ups. | [presentation direction](presentation-direction.md#continuous-visual-review) |
 | Preview entry point | Whole current playable build privately; future account creation and invited play require later activation. | [server notes](server-notes.md#private-development-deployment) |
-| Live characters | Live rigs and modular equipment; material treatment remains candidate. | [presentation direction](presentation-direction.md#live-characters) |
+| Live characters | Directional sprites with adult proportions; matching gaits and equipment art remain open. | [presentation direction](presentation-direction.md#live-characters) |
 | Inhabiting a square | Contextual idle variety for players and NPCs; standing visual direction, not yet implemented. | [presentation direction](presentation-direction.md#settling-into-an-occupied-square) |
 | NPC daily activity | Looking around and small room-specific chores; fitted prop contact, interruptible attention and authoritative travel; not yet implemented. | [presentation direction](presentation-direction.md#npc-attention-and-room-activities) |
-| Interior lighting | Visible fixtures explain temple illumination; restrained indirect fill and a lower stair lantern. | [presentation direction](presentation-direction.md#room-lighting-from-visible-sources) |
-| Coastal water | Visible bottom and quieter shallows with depth/exposure transitions; follow-up remains open. | [presentation direction](presentation-direction.md#coastal-water-by-depth-and-exposure) |
 | Individual movement cooldown | Every committed preview move gets a full interval and locks competing movement. | [browser client](browser-client.md#movement-and-availability) |
 | Playable path controls | Footprint draft, endpoint confirmation and server assessment; cancellation clears only uncommitted input. | [browser client](browser-client.md#authoritative-play-controls) |
-| World projection and standing geometry | Revised camera ruling and world-up construction. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) |
-| Tile and building assembly | Shared cell ruler, visible-grid experiment, dedicated interiors and exterior roofs. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
-| Architectural feel | Warm stylized direction; arrival house and street dispatched for native review. | [presentation direction](presentation-direction.md#warm-architectural-direction) |
-| Stylization and character target | Restrained charm; first adventurer guide preferred after comparison. | [presentation direction](presentation-direction.md#stylization-and-restrained-charm) |
-| Asset sourcing | Retained kits first, then suitable CC0 and provider candidates; native style fit governs selection. | [presentation direction](presentation-direction.md#asset-sourcing-order) |
-| Town building identity | Exteriors communicate purpose; the surface brief owns the temple's role. | [presentation direction](presentation-direction.md#building-purpose-from-the-street) |
-| Spaces and portals | Current browser experiment and its limits. | [browser client](browser-client.md#movement-and-availability) |
-| Structure, cards, and character sources | Construction and source/output split. | [presentation direction](presentation-direction.md#structure-and-cards) |
+| World projection and standing geometry | Consistent camera-presenting upright art over shared authoritative cells. | [presentation direction](presentation-direction.md#projection-and-surface-ruling) |
+| Tile and building assembly | Shared cell identity for terrain, overlays, placement and pointing. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
+| Architectural feel | Warm inhabited architecture with readable, consistently scaled entrances. | [presentation direction](presentation-direction.md#warm-architectural-direction) |
+| Stylization and character target | Adult figures, understated faces and the selected temple ensemble. | [presentation direction](presentation-direction.md#stylization-and-restrained-charm) |
+| Asset sourcing | Reviewed image sources, sprite preparation, directional art and native review. | [production method](pixel-art-production.md#tool-roles-and-model-preference) |
+| Town building identity | Exteriors communicate purpose; the surface brief owns the temple's role. | [presentation direction](presentation-direction.md#warm-architectural-direction) |
+| Spaces and portals | Authoritative transitions retain their identity across pixel room and map views. | [browser client](browser-client.md#movement-and-availability) |
 | Viewport and relative scale | Scale evidence; later display ruling also applies. | [presentation direction](presentation-direction.md#relative-scale-ruling) |
-| Interior camera | Space-owned focus indoors. | [presentation direction](presentation-direction.md#interior-camera) |
 | Ground-contact anchoring | Visual extent never defines occupancy. | [presentation direction](presentation-direction.md#tile-assembly-ruling) |
-| Movement and readiness | Presentation direction; experiment tuning remains reopened. | [presentation direction](presentation-direction.md#movement-and-readiness) |
+| Movement and readiness | Server-owned readiness; committed routes and fixed sprite pivots. | [production method](pixel-art-production.md#movement-and-animation-continuity) |
 | Chrome and actions | Current interface target; earlier layouts superseded. | [presentation direction](presentation-direction.md#chrome-and-actions) |
 | Chrome layout | Accepted layout; assets remain candidates. | [presentation direction](presentation-direction.md#accepted-chrome-layout) |
-| Proportional scaling | Ruled cell count and ultrawide treatment; assets remain open. | [presentation direction](presentation-direction.md#proportional-scaling) |
+| Proportional scaling | Stable world proportions and sufficient actual display detail. | [presentation direction](presentation-direction.md#proportional-scaling) |
 | One world | D4: no player-selectable divergent histories. | [server notes](server-notes.md#the-world-instance-and-what-it-is-for) |
 | Individual authoritative deadlines | September 5 replaces the shared-pulse ruling. | [boundary map](boundary-map.md#21-authoritative-individual-deadlines-d5) |
-| Presenting cooldowns | Authoritative readiness comes from the observer; browser integration remains open. | [client architecture](client-architecture.md#authority) |
+| Presenting cooldowns | Authoritative readiness comes from the observer. | [client architecture](client-architecture.md#authority) |
 | Content contracts | Authored facts have one owner. | [boundary map](boundary-map.md#11-the-authoredruntime-contract-seam) |
 | Content validation | Rust owns gameplay-semantic validation. | [boundary map](boundary-map.md#13-rust-is-the-sole-gameplay-semantic-validator-and-it-fails-closed) |
 | Authoring and member counts | Compiler owns land semantics; members are content. | [authoring compiler](authoring-compiler.md#what-it-compiles) |
@@ -70,7 +72,8 @@ experimental gameplay tuning.
 | Two enforcement points | Repository scan and content-load validation. | [boundary checks](boundary-checks.md#the-second-enforcement-point-the-content-validator) |
 | Internal migrations | Atomic cutover; no compatibility adapters. | [agent workflow](agent-workflow.md#no-compatibility-adapters) |
 | Proof method | Exercise and identify the real path. | [agent workflow](agent-workflow.md#verification) |
-| Retired presentation pipelines | Re-entry requires the accepted evidence gate. | [presentation direction](presentation-direction.md#retired-pipelines-carry-no-authority) |
+| Pixel-art product and production method | Detailed pixel art is primary; the selected temple sets the benchmark. | [visual ruling](presentation-direction.md#pixel-art-decision), [production method](pixel-art-production.md) |
+| Retired presentation pipelines | 3D is retired as a product direction; reopening needs an owner decision. | [visual ruling](presentation-direction.md#pixel-art-decision) |
 | Verification source and lanes | Runner owns steps; inspect its resolved plan. | [verification](verification.md#the-four-lanes) |
 | Unavailable proof | Missing capability cannot become a pass. | [verification](verification.md#what-the-exit-code-means) |
 | Working roots | Disposable files, retention, and promotion. | [working-root policy](working-root-policy.md) |

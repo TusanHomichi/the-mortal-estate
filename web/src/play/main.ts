@@ -1,6 +1,5 @@
 import "./style.css";
 import { WireCodec } from "../authoritative/codec";
-import { AuthoritativeRenderer } from "../authoritative/renderer";
 import { PlayControl, type ControlView } from "./control";
 import { ActorInteraction } from "./actorInteraction";
 import { GameplayPanel } from "./gameplayPanel";
@@ -12,11 +11,7 @@ import { walkCursorDataUris, WALK_CURSOR_HOTSPOT } from "../walk/cursors";
 const element = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const canvas = element<HTMLCanvasElement>("world-canvas");
 // A deployed artwork build cannot fall back to diagnostics through its URL.
-const rendered = import.meta.env.TME_PLAY_PRESENTATION === "first-expedition" ||
-  new URLSearchParams(location.search).get("study") === "first-expedition";
-const view = rendered
-  ? await import("./studyRenderer").then(module => module.ExpeditionStudyRenderer.create(canvas, 768, 512))
-  : new AuthoritativeRenderer(canvas, 768, 512);
+const view = await import("./rendererFactory").then(module => module.createPlayRenderer(canvas));
 const directions: Record<string, string> = { "play.north": "north", "play.east": "east", "play.south": "south", "play.west": "west" };
 const buttons = [...document.querySelectorAll<HTMLButtonElement>("[data-action]")];
 let preferences = loadPreferences();
@@ -108,7 +103,23 @@ function pointer(event: MouseEvent) {
   const rect = canvas.getBoundingClientRect();
   return view.pointer((event.clientX - rect.left) * view.width / rect.width, (event.clientY - rect.top) * view.height / rect.height)?.coordinate ?? null;
 }
-canvas.addEventListener("click", event => { canvas.focus(); walk.click(pointer(event)); });
+canvas.addEventListener("click", event => {
+  canvas.focus();
+  const target = pointer(event), snapshot = current?.snapshot;
+  const frame = snapshot?.envelope.frame, here = frame?.observation_center.position;
+  // A second click on the occupied stair square selects its current server offer.
+  // Ordinary route confirmation still belongs entirely to PathControls.
+  if (canvas.dataset.presentation === "pixel-art" && event.detail === 2 && target &&
+      target.x === here?.x && target.y === here.y && snapshot && frame) {
+    const traversals = frame.action_options.filter(option => option.enabled && option.intent?.kind === "traverse");
+    if (traversals.length === 1) {
+      walk.cancel();
+      control.offeredAction(snapshot.generation, "character", traversals[0]!.id);
+      return;
+    }
+  }
+  walk.click(target);
+});
 canvas.addEventListener("mousemove", event => walk.hoverAt(pointer(event)));
 canvas.addEventListener("mouseleave", () => walk.hoverAt(null));
 canvas.addEventListener("contextmenu", event => {

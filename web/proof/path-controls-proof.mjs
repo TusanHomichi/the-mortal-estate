@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { mkdir, writeFile } from 'node:fs/promises';
-import { OrthographicCamera, Vector3 } from 'three';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { launchProofBrowser, proofBrowsers } from './serve.mjs';
 let input='';for await(const chunk of process.stdin)input+=chunk;
 const config=JSON.parse(input);input='';await mkdir(config.output,{recursive:true});
+const geography=JSON.parse(await readFile(new URL('../../content/lands/first-expedition/generated/workbench_projection.json',import.meta.url),'utf8'));
 const reports=[];
 for(const spec of proofBrowsers()){
- const launch=await launchProofBrowser(spec);let page;
+ const launch=await launchProofBrowser({...spec,trustedAuthority:config.authority});let page;
  const commands=[],previews=[],errors=[];let frame;
  try{
   page=await launch.browser.newPage({viewport:{width:1280,height:1000}});await page.bringToFront();
@@ -21,13 +21,9 @@ for(const spec of proofBrowsers()){
   const here=()=>structuredClone(frame.observation_center);
   const point=async target=>{
    const box=await canvas.boundingBox();assert(box);
-   const height=9*Math.sin(Math.PI/4),camera=new OrthographicCamera(-height*1.5/2,height*1.5/2,height/2,-height/2,.1,100);
-   const center=here().level==='temple'?{x:3,y:3.5}:here().position;
-   const focus=new Vector3(center.x,1.22,center.y);camera.position.copy(focus).add(new Vector3(0,8,8));camera.lookAt(focus);camera.updateMatrixWorld(true);
-   const p=new Vector3(target.x,0,target.y).project(camera);
-   // Use the visible portion of a partially clipped edge square.
-   return {x:Math.max(box.x+10,Math.min(box.x+box.width-10,box.x+(p.x+1)*box.width/2)),
-    y:Math.max(box.y+10,Math.min(box.y+box.height-10,box.y+(1-p.y)*box.height/2))};
+   const projection=JSON.parse(await canvas.getAttribute('data-pixel-projection'));
+   const p={x:projection.origin.x+target.x*projection.step.x,y:projection.origin.y+target.y*projection.step.y};
+   return {x:box.x+p.x*box.width/512,y:box.y+p.y*box.height/512};
   };
   const click=async(target,options)=>{await canvas.scrollIntoViewIfNeeded();const p=await point(target);await page.mouse.click(p.x,p.y,options);};
   const draft=async target=>{await ready();await click(target);await wait(()=>document.querySelector('#world-canvas').dataset.walkState==='draft');
@@ -37,11 +33,29 @@ for(const spec of proofBrowsers()){
    assert.equal(commands.length,count+1);await ready();assert.equal(commands.length,count+1);
   };
   const move=async target=>{const count=commands.length;await draft(target);await click(target);await completed(count);};
+  const walkTo=async target=>{
+   const location=here(),key=p=>`${p.x},${p.y}`,member=geography.members.find(m=>m.member===location.level);
+   const open=new Set(member.cells.filter(c=>c.passable).map(key));
+   for(const edge of geography.connectivity.edges.filter(e=>e.from_member===location.level))if(key(edge.from)!==key(target))open.delete(key(edge.from));
+   const queue=[location.position],previous=new Map([[key(location.position),null]]);let found=false;
+   for(let n=0;n<queue.length;n++){
+    const p=queue[n];if(key(p)===key(target)){found=true;break;}
+    for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){
+     const q={x:p.x+dx,y:p.y+dy};if(open.has(key(q))&&!previous.has(key(q))){previous.set(key(q),p);queue.push(q);}
+    }
+   }
+   assert(found,'No authored route for the native proof');const route=[];
+   for(let p=target;previous.get(key(p))!==null;p=previous.get(key(p)))route.unshift(p);
+   while(route.length)await move(route.splice(0,3).at(-1));
+  };
   await page.goto(config.origin+'/index.html');await wait(()=>document.body.dataset.playReady==='true');
   await page.locator('#username').fill(config.username);await page.locator('#password').fill(config.password);
   await page.getByRole('button',{name:'Sign in',exact:true}).click();await wait(()=>document.body.dataset.phase==='selecting');
+  const signedInUrl=page.url();
+  assert(![config.username,config.password].some(value=>signedInUrl.includes(value)||signedInUrl.includes(encodeURIComponent(value))),
+   'Credentials must not appear in the signed-in URL');
   await page.locator('#character').selectOption({label:config.character});await page.getByRole('button',{name:'Enter world',exact:true}).click();await ready();
-  assert.equal(await canvas.getAttribute('data-presentation'),'first-expedition-study');
+  assert.equal(await canvas.getAttribute('data-presentation'),'pixel-art');
   const initial=here();assert.equal(initial.level,'arrival');
   const start=initial.position;
   const open=new Set(frame.tiles.filter(t=>t.passable===true&&!t.transition).map(t=>`${t.position.x},${t.position.y}`));
@@ -67,18 +81,20 @@ for(const spec of proofBrowsers()){
   await draft(target);await page.getByRole('button',{name:'Reconnect',exact:true}).click();await ready();
   assert.equal(await canvas.getAttribute('data-walk-state'),'idle');assert.deepEqual(here(),initial);
   if(config.temple){
-   assert.deepEqual(start,{x:6,y:8});
-   await move({x:6,y:7});assert.equal(here().level,'temple');
+   const entrance=geography.connectivity.edges.find(e=>e.from_member==='arrival'&&e.to_member==='temple');
+   const exit=geography.connectivity.edges.find(e=>e.from_member==='temple'&&e.to_member==='arrival');
+   await walkTo(entrance.from);assert.equal(here().level,'temple');
    assert.equal(await canvas.getAttribute('data-walk-state'),'idle');
    await draft({x:3,y:3});await canvas.screenshot({path:`${config.output}/${spec.name}-temple-draft.png`});
    const count=commands.length;await click({x:3,y:3});await completed(count);assert.deepEqual(here().position,{x:3,y:3});
-   await move({x:3,y:6});await move({x:3,y:7});assert.deepEqual(here(),initial);
+   await move(entrance.to);await move(exit.from);assert.equal(here().level,'arrival');
+   await walkTo(start);assert.deepEqual(here(),initial);
   }
   await page.getByRole('button',{name:'Sign out',exact:true}).click();await wait(()=>document.body.dataset.phase==='signed_out');
   assert.deepEqual(errors,[]);
   reports.push({engine:spec.name,verdict:'PASS',first_click_nonmutating:true,second_click_one_command:true,native_double_click:true,
    escape_and_right_click_cancel:true,cooldown_input_locked:true,reconnect_discards_draft:true,temple_transition:!!config.temple,
-   restored_initial_position:true,commands:commands.length,server_previews:previews.length});
+   restored_initial_position:true,credentials_absent_from_url:true,commands:commands.length,server_previews:previews.length});
   console.log('PASS authoritative footprint controls',spec.name);
  }catch(error){
   await page?.screenshot({path:`${config.output}/${spec.name}-failure.png`}).catch(()=>{});

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 4
-status: Private development and current-game preview deployment; installed-host proof recorded separately.
+last_updated: 2026-09-08
+revision: 5
+status: Private development pixel-art deployment and explicit diagnostics; installed-host proof recorded separately.
 public_safe: true
-summary: Isolated services, matching server/browser/artwork releases, private preview origins, installed UI proof and recovery.
+summary: Isolated services, matching pixel browser/artwork releases, private preview origins, installed UI proof and recovery.
 ---
 
 # Private development server
@@ -78,10 +78,12 @@ addition to the world and ports. Schema 1 is refused. For a local diagnostic
 installation use the example's localhost origin and null assets. For an
 owner-authorized remote preview, use its canonical HTTPS origin, the first
 expedition world document, and the absolute external candidate-packet directory.
-The packet must match the browser's study receipt. Staging copies only the
+The `pixel-manifest.json` packet must match the browser's `pixelReceipt.json`. Staging copies only the
 manifest and its verified asset references into the immutable browser release;
-private source files and unrelated packet files are excluded. The browser is built in fixed `first-expedition` presentation mode. Both the root
-and direct index entry render the world without a query parameter. The actual server supplies every area,
+private source files and unrelated packet files are excluded. Only PNG artwork is
+admitted; retired mesh packets are refused. The browser is built in fixed
+`pixel-art` presentation mode. Both the root
+and direct index entry render the pixel world without a query parameter. The actual server supplies every area,
 resident, service and transition; the preview is not a local movement scene.
 
 The operator's existing TLS reverse proxy forwards the public host and WebSocket

@@ -1,5 +1,6 @@
+import { verifySha256 } from "../src/assetDigest";
 import { describe, expect, it } from "vitest";
-import { FIGURE_PALETTE_MAX, POINT_LIGHTS_MAX, parseFeelManifest, verifySha256 } from "../src/manifest";
+import { FIGURE_PALETTE_MAX, POINT_LIGHTS_MAX, parseFeelManifest } from "../src/manifest";
 import {
   REQUIRED_PROPS,
   REQUIRED_ROOFS,

@@ -44,6 +44,7 @@ patreon.com          # creator-support link carried verbatim in two Kenney notic
 twitter.com          # creator profile link carried verbatim in two Kenney notices
 
 # --- Code and configuration patterns matching hostname heuristics ---
+gl.link                   # WebGL gl.LINK_STATUS constant, not a network hostname
 18-main.service           # systemd template instance name in postgresql@18-main.service
 context.store             # facet engine store field access in server facet code
 self.inner.draining.store # atomic boolean store operation in HTTP drain state
@@ -71,3 +72,6 @@ www.w3.org         # the SVG namespace URI in web/src/walk/cursors.ts (cursor ar
 history.siggraph.org # primary technical-art paper cited in the coastal-water research plan
 kstocky.github.io    # contributing developer's authored calm-water-zone portfolio, research citation only
 developer.nvidia.com # GPU Gems primary implementation reference for depth-dependent water, research citation only
+openai.com # official Images 2.5 announcement supplied by owner; art-tool availability citation only
+retrodiffusion.ai # official standard/neural Pixel Fixer documentation in the pixel-art production guide; research citation only
+www.gamedeveloper.com # owner-supplied developer breakdown of pixel lighting, fog and foliage; research citation only

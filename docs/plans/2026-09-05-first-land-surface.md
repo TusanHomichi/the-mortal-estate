@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 21
-status: Implemented expedition geography retained pending the newly directed horseshoe town layout study.
+last_updated: 2026-09-09
+revision: 24
+status: Seven-building town retained; owner authorizes fitting rebuilt-town geometry to the connected pixel scene.
 public_safe: true
-summary: Surface and settlement constraints, horseshoe town direction, civic services and temple dungeon access.
+summary: Bounded pixel-town geography amendment; seven services and non-town island baseline retained.
 ---
 
 # First-land surface direction
@@ -45,12 +45,56 @@ town feels accumulated rather than arranged at mechanically equal intervals.
 These placements are study proposals, not additional owner decisions.
 
 The next layout study must fit the retained settlement envelope, preserve
-temple access to the dungeon, accommodate every existing service and check
+temple access to the dungeon, accommodate the retained service roles below and check
 foreground occlusion at the fixed camera. Any moved entrance must migrate its
 authored passage, arrival, collision and presentation together. Below-ground
-connections remain governed by their recovered geography. The currently
-deployed arrangement has not yet been rebuilt to this direction; the
-[town plan](2026-09-06-town-buildout.md#horseshoe-layout-study) tracks the work.
+connections remain governed by their recovered geography. The
+[horseshoe study](2026-09-07-horseshoe-town.md) records the exterior candidate
+and its proof. It remains separate from the currently deployed
+arrangement until geographic review and promotion.
+
+### Pixel-town geography amendment
+
+**Owner decision (2026-09-09):** for gameplay integration, fit the rebuilt town's
+footprints, routes, collision terrain and entrances to the connected pixel-art
+scene. The owner explicitly accepted that recommendation after clarification.
+Retain all seven service buildings and their existing interior/service identities,
+temple descent and the broader island baseline. This amends town-local cell
+placement, including its dock arrival; it does not authorize redesign of the
+rest of the island or land south of the coastal dock. The
+[land receipt](../../content/lands/first-expedition/README.md#september-9-pixel-town-encoding)
+owns the actual encoded geography and hashes, and the
+[exterior execution record](2026-09-08-pixel-exterior.md#gameplay-integration-and-pixel-effects)
+owns implementation and proof. No deployed-world activation is implied.
+
+### Current town building roster
+
+**Owner decision (2026-09-08):** keep seven service buildings for the current
+town. The sheriff shares the bank and the locker room remains inside the lodge.
+
+| Building | Selected role |
+| --- | --- |
+| Temple | Tomas, resurrection, the balm seller and the town's dungeon entrance |
+| Bank and sheriff's office | Banking and town law in one civic building |
+| Lodge and locker room | Storage, gathering and the recovered-equipment table |
+| Training hall | Spaces for the class trainers and instruction |
+| Forge | Smithing, weapons and armour |
+| Outfitter / tannery | Leatherwork, clothing and adventuring equipment |
+| Provisions shop | Food and general supplies, including the proposed bakery and chandler goods |
+
+There is no standalone bakery, chandler or herbalist in the current roster.
+The herbalist is deferred; this does not move a separate herbalist service into
+the temple or remove its existing balm seller. No separate sheriff building,
+replacement houses or central landmark is selected by this decision. The
+released space allows subsequent gardens, homes or gathering-space studies.
+
+This supersedes the earlier ten-building study's program, not its historical
+proof receipts. It settles the planned roster and consolidation of retail roles;
+existing inventory values and service mechanics retain their gameplay owners.
+The [horseshoe execution record](2026-09-07-horseshoe-town.md) tracks the atomic
+authored migration still required. The [art guide record](2026-09-08-town-art-guides.md)
+tracks the generated direction for these buildings. The currently served world
+still carries the earlier arrangement until that migration is complete.
 
 ### Town temple
 

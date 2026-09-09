@@ -19,6 +19,7 @@ export class PathControls {
   private spaceIdentity = "";
   private draft: Cell[] | null = null;
   private committed: Cell[] | null = null;
+  private committedObserved = false;
   private target: Coord | null = null;
   private hover: Coord | null = null;
   private serial = 0;
@@ -40,11 +41,15 @@ export class PathControls {
     if (this.identity !== identity || state.phase !== "playing" || !this.ready) {
       this.clearDraft(); this.identity = identity;
     }
-    if (this.ready || !frame || state.phase !== "playing") this.committed = null;
+    // Receipts and unrelated ready frames can precede the landing. Only an
+    // observed displacement/cooldown establishes the submitted move's handoff.
+    const start=this.committed?.[0],at=frame?.observation_center.position;
+    if (start && at && (!frame!.can_act || start.i!==at.x || start.j!==at.y)) this.committedObserved=true;
+    if ((this.ready && this.committedObserved) || !frame || state.phase !== "playing") this.committed = null;
     this.render();
   }
   hoverAt(target: Coord | null): void { this.hover = target; this.refused = false; this.render(); }
-  cancel(): void { this.clearDraft(); this.render(); }
+  cancel(): void { if(this.ready)this.committed=null; this.clearDraft(); this.render(); }
   private clearDraft(): void {
     ++this.serial; this.transport.cancelPathPreview();
     this.draft = null; this.target = null; this.checking = false; this.confirm = false; this.refused = false;
@@ -57,6 +62,7 @@ export class PathControls {
       if (!this.checking) void this.assess(true);
       return;
     }
+    this.committed=null;
     this.clearDraft();
     const frame = this.state!.snapshot!.envelope.frame;
     this.draft = target && proposePath(frame, target);
@@ -80,6 +86,7 @@ export class PathControls {
     if (commit || this.confirm) {
       this.draft = null; this.target = null; this.confirm = false;
       this.committed = route;
+      this.committedObserved = false;
       // Draw before synchronous control emission so the renderer can bind the
       // traversed prefix to the authoritative landing, including partial moves.
       this.render();

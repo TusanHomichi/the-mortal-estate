@@ -5,7 +5,7 @@ import type { SurfaceSample } from "../terrainSurface";
  */
 export function pathCover(sample: SurfaceSample, x: number, z: number): number {
   const margin = 4 * sample.lane * (1 - sample.lane);
-  const irregularity = Math.sin(x * 7.1 + Math.sin(z * 3.3)) * .11
-    + Math.sin(z * 11.3 - x * 4.7) * .055;
+  const irregularity = Math.sin(x * 2.1 + Math.sin(z * 3.3)) * .19
+    + Math.sin(z * 7.3 - x * 4.7) * .07;
   return Math.max(0, Math.min(1, sample.lane + irregularity * margin));
 }
