@@ -1,13 +1,13 @@
 # First expedition
 
-This land encodes the owner-accepted town surface, ten service interiors and
+This land encodes the owner-accepted town surface, seven service interiors and
 bounded first-floor entrance. The [surface brief](../../../docs/plans/2026-09-05-first-land-surface.md#geography-acceptance-and-implementation-2026-09-06)
 owns acceptance; the [execution record](../../../docs/plans/2026-09-06-first-expedition.md)
 owns gameplay integration, native expedition proof and remaining limitations.
 
-The arrival member is 27 by 36 with 472 walkable cells and dock arrival `(9,31)`.
+The arrival member is 27 by 36 with 680 walkable cells and dock arrival `(8,34)`.
 The dungeon entrance is seven by seven with 17 walkable cells. Closed doors and
-the remaining cropped cells bound deferred content. Twenty ordinary directed
+the remaining cropped cells bound deferred content. Fourteen ordinary directed
 passages join town to its interiors. Temple `(0,4)` descends to entrance `(5,4)`;
 entrance `(6,4)` returns to temple `(0,5)`. The selected historical correspondence
 remains explicitly provisional as recorded in the surface brief.
@@ -43,7 +43,7 @@ landing cannot preserve the accepted geographic identity.
 
 ## Inputs and outputs
 
-The twelve `.tmj` members, `promotion.json`, `catalog.json`, `simulation_seed.json` and `world.json` are
+The nine `.tmj` members, `promotion.json`, `catalog.json`, `simulation_seed.json` and `world.json` are
 authored inputs. `generated/` is deterministic compiler output; regenerate with
 `cargo run -p tme-authoring`, and check with the same command plus `-- --check`.
 Builds and runtime require no private packet, archive, encoding script or wiki.
@@ -60,7 +60,7 @@ furniture is occupancy, not a wall with a projected structural shadow.
 
 The [gameplay provenance](gameplay.provenance.md) distinguishes recovered
 creation bounds and class relationships from provisional loadouts, resources,
-growth, encounter values and service inventory. The cast includes fifteen town
+growth, encounter values and service inventory. The cast includes twelve town
 residents and one bounded encounter. `world.json` is the served-world declaration;
 no server has a built-in default for it.
 
@@ -81,3 +81,43 @@ promotion receipt. The original review remains archived outside the checkout.
 [The town record](../../../docs/plans/2026-09-06-town-buildout.md#september-7-temple-iteration)
 owns this implementation. The [resident contract](../../../docs/town-resident-contract.md)
 owns Maude and Tomas's service bindings and circuit; artwork remains candidate.
+
+## September 8 town amendment
+
+The owner selected the seven-building roster and directed its implementation.
+The horseshoe places the temple at its crown, retains the dock and water cells,
+and removes three standalone retail members. The [town record](../../../docs/plans/2026-09-07-horseshoe-town.md#september-8-implementation)
+owns inventory disposition and cutover proof. Retained interior geometry and the
+temple/dungeon connection remain unchanged.
+
+The current layout receipt SHA-256 is
+`aa9c82d286a0bb6c6da2b4236e9851f437e2a3743e550e43adbc939f2d2c8133`.
+Its independently derived geographic SHA-256 is
+`4a49d0cb2e2f495e64bdb60ce100927f0c4dfce9b64eb3cc2e05722c3d57b39d`.
+These replace the September 7 anchors; the earlier review remains archived.
+Artwork and scenic water are candidates, not accepted masters.
+
+## September 9 pixel-town encoding
+
+The owner explicitly approved fitting the rebuilt town's authored geometry to
+the connected pixel scene, as recorded in the
+[surface amendment](../../../docs/plans/2026-09-05-first-land-surface.md#pixel-town-geography-amendment).
+The arrival remains 27 by 36, with seven structures and fourteen ordinary
+passages. All eight companion Tiled files are byte-identical to the previous
+encoding; their services and the temple/dungeon pair remain unchanged. Only the
+arrival map and controlled-player dock seed move. No wider island map is edited.
+
+The external geometric review records the source scene digest, uniform projection,
+seven footprints/access/return pairs, coast, pond masks, street lines and prop
+anchors. An independent canonical geographic record, derived from those explicit
+facts and retained interiors, agrees with the Rust compiler. Blocked terrain
+replaced by a bridge is correctly omitted from the resulting terrain stack.
+The promotion receipt and reviewed Rust contract pin together:
+
+- Master `0b6cd1149004780dbab45ec52ef9853751ed02e1962efba25317fdc6de09f6ee`.
+- Geometric review `c8ddf6d5724e9f53361185c469cadb47f827c539bbb5c32f671844edabd263d0`.
+- Canonical geography `869e33951932dde1d470111c746802ee02cc141213019fe0c049c3da07f039be`.
+
+This receipt grants no artwork-master, tuning or canon authority. The
+[exterior execution](../../../docs/plans/2026-09-08-pixel-exterior.md#gameplay-integration-and-pixel-effects)
+owns runtime presentation proof. Hosted state has not been migrated or activated.

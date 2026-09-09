@@ -87,8 +87,8 @@
       "location": {
         "level": "arrival",
         "position": {
-          "x": 9,
-          "y": 31
+          "x": 8,
+          "y": 34
         },
         "realm": "first_expedition"
       },
@@ -296,86 +296,6 @@
     },
     {
       "active_effects": [],
-      "actor_definition_id": "actor/first_expedition/bakery_keeper",
-      "carried": {
-        "gold": {
-          "left_hand": 0,
-          "right_hand": 0,
-          "sack": 0
-        },
-        "items": []
-      },
-      "id": "bakery_keeper",
-      "location": {
-        "level": "bakery",
-        "position": {
-          "x": 0,
-          "y": 2
-        },
-        "realm": "first_expedition"
-      },
-      "npc": {
-        "follow_cadence_units": 100,
-        "interactions": [
-          {
-            "outcome": {
-              "kind": "speak"
-            },
-            "response": "Take a look at the goods. There is work enough outside these walls.",
-            "transaction": {
-              "costs": [],
-              "id": "greeting",
-              "label": "Speak",
-              "requirements": [],
-              "rewards": []
-            }
-          }
-        ],
-        "patrol": []
-      }
-    },
-    {
-      "active_effects": [],
-      "actor_definition_id": "actor/first_expedition/herbalist_keeper",
-      "carried": {
-        "gold": {
-          "left_hand": 0,
-          "right_hand": 0,
-          "sack": 0
-        },
-        "items": []
-      },
-      "id": "herbalist_keeper",
-      "location": {
-        "level": "herbalist",
-        "position": {
-          "x": 0,
-          "y": 2
-        },
-        "realm": "first_expedition"
-      },
-      "npc": {
-        "follow_cadence_units": 100,
-        "interactions": [
-          {
-            "outcome": {
-              "kind": "speak"
-            },
-            "response": "Take a look at the goods. There is work enough outside these walls.",
-            "transaction": {
-              "costs": [],
-              "id": "greeting",
-              "label": "Speak",
-              "requirements": [],
-              "rewards": []
-            }
-          }
-        ],
-        "patrol": []
-      }
-    },
-    {
-      "active_effects": [],
       "actor_definition_id": "actor/first_expedition/forge_keeper",
       "carried": {
         "gold": {
@@ -388,46 +308,6 @@
       "id": "forge_keeper",
       "location": {
         "level": "forge",
-        "position": {
-          "x": 0,
-          "y": 2
-        },
-        "realm": "first_expedition"
-      },
-      "npc": {
-        "follow_cadence_units": 100,
-        "interactions": [
-          {
-            "outcome": {
-              "kind": "speak"
-            },
-            "response": "Take a look at the goods. There is work enough outside these walls.",
-            "transaction": {
-              "costs": [],
-              "id": "greeting",
-              "label": "Speak",
-              "requirements": [],
-              "rewards": []
-            }
-          }
-        ],
-        "patrol": []
-      }
-    },
-    {
-      "active_effects": [],
-      "actor_definition_id": "actor/first_expedition/chandler_keeper",
-      "carried": {
-        "gold": {
-          "left_hand": 0,
-          "right_hand": 0,
-          "sack": 0
-        },
-        "items": []
-      },
-      "id": "chandler_keeper",
-      "location": {
-        "level": "chandler",
         "position": {
           "x": 0,
           "y": 2
@@ -757,30 +637,6 @@
       },
       "definition_id": "trade_charm"
     },
-    "stock/bakery_keeper/0": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/bakery_keeper/1": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/bakery_keeper/2": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/bakery_keeper/3": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
     "stock/balm_seller/0": {
       "binding": {
         "state": "unrestricted"
@@ -800,30 +656,6 @@
       "definition_id": "healing_balm"
     },
     "stock/balm_seller/3": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/chandler_keeper/0": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/chandler_keeper/1": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/chandler_keeper/2": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/chandler_keeper/3": {
       "binding": {
         "state": "unrestricted"
       },
@@ -852,30 +684,6 @@
         "state": "unrestricted"
       },
       "definition_id": "bright_staff"
-    },
-    "stock/herbalist_keeper/0": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/herbalist_keeper/1": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/herbalist_keeper/2": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
-    },
-    "stock/herbalist_keeper/3": {
-      "binding": {
-        "state": "unrestricted"
-      },
-      "definition_id": "healing_balm"
     },
     "stock/outfitter_keeper/0": {
       "binding": {
@@ -913,6 +721,18 @@
       },
       "definition_id": "healing_balm"
     },
+    "stock/provisioner/10": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/11": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
     "stock/provisioner/2": {
       "binding": {
         "state": "unrestricted"
@@ -920,6 +740,42 @@
       "definition_id": "healing_balm"
     },
     "stock/provisioner/3": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/4": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/5": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/6": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/7": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/8": {
+      "binding": {
+        "state": "unrestricted"
+      },
+      "definition_id": "healing_balm"
+    },
+    "stock/provisioner/9": {
       "binding": {
         "state": "unrestricted"
       },
@@ -982,49 +838,37 @@
         {
           "item_instance_id": "stock/provisioner/3",
           "price_gold": 5
-        }
-      ]
-    },
-    {
-      "capability_id": "trail_wares",
-      "service_instance_id": "bakery_keeper",
-      "stock": [
+        },
         {
-          "item_instance_id": "stock/bakery_keeper/0",
+          "item_instance_id": "stock/provisioner/4",
           "price_gold": 5
         },
         {
-          "item_instance_id": "stock/bakery_keeper/1",
+          "item_instance_id": "stock/provisioner/5",
           "price_gold": 5
         },
         {
-          "item_instance_id": "stock/bakery_keeper/2",
+          "item_instance_id": "stock/provisioner/6",
           "price_gold": 5
         },
         {
-          "item_instance_id": "stock/bakery_keeper/3",
-          "price_gold": 5
-        }
-      ]
-    },
-    {
-      "capability_id": "trail_wares",
-      "service_instance_id": "herbalist_keeper",
-      "stock": [
-        {
-          "item_instance_id": "stock/herbalist_keeper/0",
+          "item_instance_id": "stock/provisioner/7",
           "price_gold": 5
         },
         {
-          "item_instance_id": "stock/herbalist_keeper/1",
+          "item_instance_id": "stock/provisioner/8",
           "price_gold": 5
         },
         {
-          "item_instance_id": "stock/herbalist_keeper/2",
+          "item_instance_id": "stock/provisioner/9",
           "price_gold": 5
         },
         {
-          "item_instance_id": "stock/herbalist_keeper/3",
+          "item_instance_id": "stock/provisioner/10",
+          "price_gold": 5
+        },
+        {
+          "item_instance_id": "stock/provisioner/11",
           "price_gold": 5
         }
       ]
@@ -1048,28 +892,6 @@
         {
           "item_instance_id": "stock/forge_keeper/3",
           "price_gold": 12
-        }
-      ]
-    },
-    {
-      "capability_id": "trail_wares",
-      "service_instance_id": "chandler_keeper",
-      "stock": [
-        {
-          "item_instance_id": "stock/chandler_keeper/0",
-          "price_gold": 5
-        },
-        {
-          "item_instance_id": "stock/chandler_keeper/1",
-          "price_gold": 5
-        },
-        {
-          "item_instance_id": "stock/chandler_keeper/2",
-          "price_gold": 5
-        },
-        {
-          "item_instance_id": "stock/chandler_keeper/3",
-          "price_gold": 5
         }
       ]
     },
@@ -1159,36 +981,6 @@
       "service_definition_id": "provisioner"
     },
     {
-      "id": "bakery_keeper",
-      "placement": {
-        "kind": "fixed",
-        "location": {
-          "level": "bakery",
-          "position": {
-            "x": 0,
-            "y": 2
-          },
-          "realm": "first_expedition"
-        }
-      },
-      "service_definition_id": "bakery_keeper"
-    },
-    {
-      "id": "herbalist_keeper",
-      "placement": {
-        "kind": "fixed",
-        "location": {
-          "level": "herbalist",
-          "position": {
-            "x": 0,
-            "y": 2
-          },
-          "realm": "first_expedition"
-        }
-      },
-      "service_definition_id": "herbalist_keeper"
-    },
-    {
       "id": "forge_keeper",
       "placement": {
         "kind": "fixed",
@@ -1202,21 +994,6 @@
         }
       },
       "service_definition_id": "forge_keeper"
-    },
-    {
-      "id": "chandler_keeper",
-      "placement": {
-        "kind": "fixed",
-        "location": {
-          "level": "chandler",
-          "position": {
-            "x": 0,
-            "y": 2
-          },
-          "realm": "first_expedition"
-        }
-      },
-      "service_definition_id": "chandler_keeper"
     },
     {
       "id": "tomas",

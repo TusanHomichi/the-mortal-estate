@@ -54,7 +54,7 @@ try {
           if (message.type() === "error") errors.push(`console: ${message.text()}`);
         });
         try {
-          await page.goto(`${vite.baseUrl}?${query}`, { waitUntil: "networkidle", timeout: 30_000 });
+          await page.goto(`${vite.baseUrl}feel-scene.html?${query}`, { waitUntil: "networkidle", timeout: 30_000 });
           await page.waitForFunction(() => document.body.dataset.sceneReady === "true", null, { timeout: 30_000 });
           const state = await page.locator("#feel-stage").getAttribute("data-scene-state");
           if (state !== "ready") errors.push(`scene: ${await page.locator("#scene-banner").innerText()}`);

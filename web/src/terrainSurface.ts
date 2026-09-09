@@ -1,4 +1,6 @@
 import type { FeelSpace } from "./feelTypes";
+import { sampleCoastalProfile } from "./coastalProfile";
+import { createInlandShore } from "./inlandShore";
 
 export const SEA_HEIGHT = -0.24;
 const RESOLUTION = 8;
@@ -19,7 +21,10 @@ export interface TerrainSurface {
 export function createTerrainSurface(space: FeelSpace): TerrainSurface {
   const coastal = space.weather && space.cells.some(c => c.material === "water");
   const cells = new Map(space.cells.map(c => [`${c.i},${c.j}`, c]));
+  const inlandShore = coastal ? createInlandShore(space) : () => null;
   const materialAt = (i: number, j: number): string => cells.get(`${i},${j}`)?.material ?? "water";
+  const coast = space.cells.filter(c => c.material !== "water" && c.material !== "floor_planks" &&
+    [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz]) => ["water", "floor_planks"].includes(materialAt(c.i+dx!,c.j+dz!))));
   function weights(x: number, z: number): Omit<SurfaceSample, "height"> {
     // A small continuous perturbation breaks perfectly straight tile edges.
     const px = x + Math.sin(z * 5.3 + x * 1.7) * 0.065;
@@ -33,7 +38,7 @@ export function createTerrainSurface(space: FeelSpace): TerrainSurface {
       if (m === "lane" || m === "earth") lane += w;
       if (m === "meadow") meadow += w;
     }
-    return { land, lane, meadow };
+    return { land: inlandShore(x, z) ?? land, lane, meadow };
   }
   function vertex(x: number, z: number): SurfaceSample {
     const w = weights(x, z);
@@ -41,7 +46,10 @@ export function createTerrainSurface(space: FeelSpace): TerrainSurface {
     const material = materialAt(Math.round(x), Math.round(z));
     // Foundations and their apron stay level; paths settle to the same datum.
     const apron = material === "earth";
-    const bank = -.43 * (1 - smooth(.22, .86, w.land));
+    let distance = 200;
+    if (w.land < .86) for (const c of coast) distance = Math.min(distance, Math.hypot(x-c.i,z-c.j));
+    const depth = sampleCoastalProfile(space.coastal_profile, x, z, distance).depth;
+    const bank = (SEA_HEIGHT - depth) * (1 - smooth(.22, .86, w.land));
     const rolling = (.07 + .045 * Math.sin(x * .7) * Math.cos(z * .51)) * w.meadow;
     const height = apron ? 0 : bank + rolling * (1 - smooth(.05, .55, w.lane)) * smooth(.7, 1, w.land);
     return { ...w, height };

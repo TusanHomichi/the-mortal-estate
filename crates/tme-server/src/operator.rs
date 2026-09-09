@@ -16,6 +16,17 @@ use crate::store::{AuditEvent, audit, serializable};
 
 pub async fn run(arguments: &[String]) -> Result<bool, String> {
     match arguments {
+        [bootstrap, command, path] if bootstrap == "bootstrap" && command == "content-identity" => {
+            let bootstrap = crate::production::load_bootstrap(Path::new(path))?;
+            println!("{}", serde_json::to_string(bootstrap.world.engine.definition().content_identity()).map_err(|e| e.to_string())?);
+            Ok(true)
+        }
+        [checkpoint, command, before, after, input, plan, output]
+            if checkpoint == "checkpoint" && command == "migrate-content" =>
+        {
+            prepare_content_migration(before, after, input, plan, output)?;
+            Ok(true)
+        }
         [contract, versions] if contract == "contract" && versions == "versions" => {
             println!("{}", serde_json::json!({
                 "storage": {
@@ -68,8 +79,53 @@ pub async fn run(arguments: &[String]) -> Result<bool, String> {
             Ok(true)
         }
         [] => Ok(false),
-        _ => Err("usage: tme-server [contract versions | migrate | bootstrap verify <path> | account create --username <name> --display-name <name> --compromised-passwords <path> | account set-password --username <name> --compromised-passwords <path> | store verify | store restore-fence --confirm-restored-database]".to_string()),
+        _ => Err("usage: tme-server [checkpoint migrate-content <before-bootstrap> <after-bootstrap> <checkpoint> <plan> <output> | contract versions | migrate | bootstrap verify <path> | account create --username <name> --display-name <name> --compromised-passwords <path> | account set-password --username <name> --compromised-passwords <path> | store verify | store restore-fence --confirm-restored-database]".to_string()),
     }
+}
+
+/// Prepare an offline artifact only. Database installation belongs to the
+/// fenced deployment transaction after backup and a restore rehearsal.
+fn prepare_content_migration(
+    before: &str,
+    after: &str,
+    input: &str,
+    plan: &str,
+    output: &str,
+) -> Result<(), String> {
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+    let before = crate::production::load_bootstrap(Path::new(before))?;
+    let after = crate::production::load_bootstrap(Path::new(after))?;
+    if before.world.facet_id != after.world.facet_id || before.world.key != after.world.key {
+        return Err("content migration must retain the same world identity".into());
+    }
+    let bytes = std::fs::read(input).map_err(|e| e.to_string())?;
+    let checkpoint = FacetCheckpointV5::from_bytes(bytes).map_err(|e| e.to_string())?;
+    let plan: tme_rules::CheckpointContentMigration =
+        serde_json::from_slice(&std::fs::read(plan).map_err(|e| e.to_string())?)
+            .map_err(|e| e.to_string())?;
+    let migrated = tme_rules::Engine::migrate_content_checkpoint(
+        before.world.engine.definition().clone(),
+        after.world.engine.definition().clone(),
+        &checkpoint,
+        &plan,
+    )
+    .map_err(|e| e.to_string())?;
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(output)
+        .map_err(|e| e.to_string())?;
+    file.write_all(migrated.as_bytes())
+        .map_err(|e| e.to_string())?;
+    file.sync_all().map_err(|e| e.to_string())?;
+    println!(
+        "{}",
+        serde_json::json!({"before_sha256": format!("{:x}", Sha256::digest(checkpoint.as_bytes())),
+        "after_sha256": format!("{:x}", Sha256::digest(migrated.as_bytes())), "database_modified": false})
+    );
+    Ok(())
 }
 
 async fn operator_pool() -> Result<PgPool, String> {

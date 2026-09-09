@@ -137,6 +137,7 @@ export interface PortalPlacement {
 }
 
 export interface FeelSpace {
+  coastal_profile?: import("./coastalProfile").CoastalProfile;
   structures: StructurePlacement[];
   grid_extents: { i: number; j: number };
   cells: CellPlan[];

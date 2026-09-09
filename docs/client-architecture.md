@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-06
-revision: 14
-status: Three-engine browser matrix including WebKit; packaged desktop and presentation integration proof remain open.
+last_updated: 2026-09-09
+revision: 18
+status: Owner-authorized GPU pixel composition with Canvas 2D preparation; gameplay authority and diagnostic boundaries unchanged.
 public_safe: true
-summary: Browser control authority, shared codec, three-engine proof, renderer evidence and packaged desktop obligations.
+summary: Browser authority, GPU pixel composition and effect passes, Canvas preparation, shared codec and three-engine proof.
 routes:
   - web/**
   - crates/tme-protocol/**
@@ -19,10 +19,24 @@ hold whatever the client looks like.
 [presentation direction](presentation-direction.md) owns the visual target.
 The owner retired Godot on September 5. The browser is the sole client runtime;
 a read-only authoritative browser observer now supplies diagnostic Workbench
-capture. A separate private play shell implements authoritative control and
-reconciliation through the same renderer seam; candidate artwork integration
-remains unfinished.
+capture. The private play shell implements authoritative control and reconciliation
+through the same renderer seam, now drawing the selected pixel-art temple.
 Contracts below describe obligations, not claims of completed browser features.
+
+The owner's subsequent September 8 ruling selects Canvas 2D pixel art as the
+primary playable presentation and retires the 3D product path. It adds no runtime
+dependency or gameplay authority. The [transition record](plans/2026-09-08-pixel-art-transition.md)
+owns the cutover; [pixel-art production](pixel-art-production.md) owns the art
+method. Three.js remains only for explicit diagnostics and retired reference
+tools, excluded from the default product bundle. The September 9 owner direction
+adds raw WebGL pixel effects for lighting, atmosphere and foliage to the Canvas
+2D compositor. This adds no third-party runtime or gameplay authority; the
+[presentation ruling](presentation-direction.md#pixel-atmosphere-and-shader-effects)
+owns that direction and browser client owns the delivered pipeline.
+The subsequent owner-authorized [GPU composition cutover](plans/2026-09-09-pixel-gpu-composition.md)
+retains colour and lighting surfaces in WebGL and composes scenery and figures
+there. Canvas 2D prepares reusable rasters and overlays. This is the same 2D
+pixel-art product and renderer boundary, with no new dependency or game authority.
 
 ## Authority
 
@@ -60,7 +74,7 @@ because none of those rules was ever about an engine.
 
 Its baseline:
 
-- TypeScript on Vite, rendering with Three.js on WebGL2, on Node 22 for the
+- TypeScript on Vite, rendering pixel art with WebGL composition/effects and Canvas 2D preparation, on Node 22 for the
   toolchain. Dependencies are pinned by the committed lockfile and restored
   with `npm ci`; `web/node_modules/` and `web/dist/` are ignored roots
   ([working-root policy](working-root-policy.md#the-roots)).
@@ -253,8 +267,9 @@ The diagnostic authoritative renderer supplies matching color, identity raster,
 and sidecar output for [Workbench addressing](workbench-v0.md#what-a-capture-is).
 Its neutral target owner uses observer rows; the same meshes supply the image,
 GPU identity pass, and raycast pointer targets. It draws no candidate artwork
-and implements no gameplay controls. The candidate-packet feel scene remains
-a separate local experiment awaiting production authoritative integration.
+and implements no gameplay controls. The older candidate-packet 3D feel scene
+is a retired local reference tool, with no planned production integration. The
+pixel renderer consumes observed actors and the same neutral semantic targets.
 
 ## Input and the accessibility floor
 
@@ -298,7 +313,8 @@ Production packaging must exclude proof fixtures, test code, and private packets
 | Surface | What it proves | Limit |
 | --- | --- | --- |
 | `web` verification lane | Typecheck, browser unit tests, build | Synthetic inputs; no live server |
-| Full-roster walk proof | Real Three.js movement, cursor, facing, portals and rendering | Candidate packet; no authoritative wire |
+| Pixel temple proof | Native pixel rendering, shared grid, route movement, resident services, descent and reconnect | Selected temple packet; exterior art and completed character gaits remain open |
+| Retired full-roster walk proof | Earlier Three.js movement and rendering tool | Reference implementation only; no product presentation claim |
 | Native and WebAssembly protocol corpus | Current and refused wire formats through the same Rust codec | No production control UI |
 | `tools/run_server_live_proof.py` | Real TLS sign-in, admission, land, individual cooldowns, reconnect, logout | Python wire observer; no rendered browser claim |
 | Installed private browser UI proof | Two tabs, real HTTPS/WSS controls, offset deadlines, reconnect, movement, logout and 200% text | Owner-invoked against the private development deployment; normal CA verification across the browser roster |

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 9
-status: Standing ownership boundaries including actor-bound resident services; historical baseline and individual deadlines apply.
+last_updated: 2026-09-08
+revision: 10
+status: Standing ownership boundaries including offline content migration; historical baseline and individual deadlines apply.
 public_safe: true
-summary: Fact ownership, resident movement and service placement, transaction authority and individual timing.
+summary: Fact ownership, checkpoint migration, resident services, transaction authority and individual timing.
 always: true
 ---
 
@@ -414,6 +414,11 @@ lifecycle, wall-clock scheduling, durable persistence, recovery, and the
 exhaustive rules-to-wire conversion. It calls into the rules boundary for every
 gameplay decision. One process serves one world instance; one database holds one
 world row, enforced by a singleton unique index.
+
+For an explicit [offline content cutover](server-notes.md#offline-content-cutover),
+the rules checkpoint owner prepares and validates the complete replacement.
+Deployment installs those opaque bytes under a stopped-writer fence and an exact
+checkpoint comparison; it does not interpret or edit their gameplay fields.
 
 **Never.** The server does not compute a gameplay outcome, reorder authoritative
 rules events, or hold a second copy of world state outside the checkpoint. It

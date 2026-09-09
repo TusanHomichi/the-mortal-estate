@@ -1,0 +1,20 @@
+body[data-pixel-art] { background: #191919; color: #e3d5bd; }
+body[data-pixel-art] canvas { image-rendering: pixelated; border: 0; margin: auto; }
+body[data-pixel-art] .world-grid { display: block; }
+body[data-pixel-art][data-phase="playing"] main,
+body[data-pixel-art][data-phase="connecting"] main,
+body[data-pixel-art][data-phase="disconnected"] main { max-width: none; padding: 0; margin: 0; }
+body[data-pixel-art] #world { margin: 0; }
+body[data-pixel-art] #session-actions { position: fixed; top: .5rem; right: .5rem; z-index: 2; }
+body[data-pixel-art][data-phase="playing"] #feedback:not(:empty),
+body[data-pixel-art][data-phase="disconnected"] #feedback:not(:empty) {
+  position: fixed; bottom: .5rem; left: .5rem; background: #191919; padding: .4rem .7rem; z-index: 2;
+}
+/* The diagnostic controls remain available in explicit inspection builds only. */
+body[data-pixel-art] .controls,
+body[data-pixel-art] #gameplay,
+body[data-pixel-art] #position,
+body[data-pixel-art] .legend,
+body[data-pixel-art] #settings,
+body[data-pixel-art][data-phase="playing"] header { display: none; }
+.pixel-graphics-error { position: fixed; top: 5rem; left: 1.5rem; z-index: 3; padding: .75rem; color: #ead5ae; background: #151519; }

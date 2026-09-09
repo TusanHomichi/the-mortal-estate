@@ -62,10 +62,10 @@ def stage_release(site):
     if run(["git", "-C", REPO, "diff", "--name-only"]) or run(["git", "-C", REPO, "ls-files", "--others", "--exclude-standard"]):
         raise RuntimeError("stage source changes in Git before building a development release")
     tree = run(["git", "-C", REPO, "write-tree"])
-    # The packet digest is also bound by studyReceipt in this source tree.
+    # The pixel packet digest is bound by this source tree's presentation receipt.
     if site.settings["presentation_assets"]:
         packet = Path(site.settings["presentation_assets"])
-        if digest(packet / "feel-manifest.json") != json.loads((REPO / "web/src/play/studyReceipt.json").read_text())["asset_manifest_sha256"]:
+        if digest(packet / "pixel-manifest.json") != json.loads((REPO / "web/src/play/pixelReceipt.json").read_text())["manifest_sha256"]:
             raise RuntimeError("configured presentation packet does not match the browser")
     revision = run(["git", "-C", REPO, "rev-parse", "HEAD"])
     destination = site.root / "releases" / tree
@@ -90,8 +90,7 @@ def stage_release(site):
             shutil.copyfile(source, copied)
         run(["npm", "--prefix", REPO / "web", "ci"], timeout=300, cwd=REPO)
         run(["node", REPO / "web/proof/build-play.mjs", staging / "web",
-             "first-expedition" if site.settings["presentation_assets"] else "inspection"], timeout=600, cwd=REPO)
-        (staging / "web/play.html").rename(staging / "web/index.html")
+             "pixel-art" if site.settings["presentation_assets"] else "inspection"], timeout=600, cwd=REPO)
         if site.settings["presentation_assets"]:
             from artwork import copy_artwork
             copy_artwork(Path(site.settings["presentation_assets"]), staging / "web/feel-assets")

@@ -1,4 +1,6 @@
+import { verifySha256 } from "./assetDigest";
 import { parseStructures } from "./space/structures";
+import { parseCoastalProfile } from "./coastalProfile";
 import {
   type FigureRow,
   ASSET_GROUPS,
@@ -386,6 +388,7 @@ function parseSpace(
       "light_sources",
       "weather",
       "portals",
+      ...(value.coastal_profile === undefined ? [] : ["coastal_profile"]),
     ])
   ) {
     throw new Error("a candidate feel space has unknown or missing fields");
@@ -530,6 +533,10 @@ function parseSpace(
     throw new Error("the candidate feel space weather or portals are invalid");
   }
   const portals = value.portals.map(parsePortal);
+  const coastalProfile = value.coastal_profile === undefined ? undefined : parseCoastalProfile(value.coastal_profile);
+  if (coastalProfile && (!value.weather || !cells.some(c => c.material === "water"))) {
+    throw new Error("coastal profile requires an outdoor water space");
+  }
   if (new Set(portals.map((portal) => `${portal.cell[0]},${portal.cell[1]}`)).size !== portals.length) {
     throw new Error("a candidate feel space has duplicate portal cells");
   }
@@ -549,6 +556,7 @@ function parseSpace(
       candles: lights.candles.map((candle) => [...candle] as [number, number, number]),
     },
     weather: value.weather,
+    ...(coastalProfile ? { coastal_profile: coastalProfile } : {}),
     portals,
   };
 }
@@ -645,21 +653,6 @@ export function parseFeelManifest(value: unknown): FeelManifest {
   );
   validateSpaces(spaces, start);
   return { schema_version: 7, assets, figures, caretaker, start, spaces };
-}
-
-function bytesToHex(bytes: Uint8Array): string {
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-export async function verifySha256(
-  bytes: ArrayBuffer,
-  expected: string,
-  subtle: SubtleCrypto = globalThis.crypto.subtle,
-): Promise<void> {
-  const digest = await subtle.digest("SHA-256", bytes);
-  if (bytesToHex(new Uint8Array(digest)) !== expected) {
-    throw new Error("asset digest does not match the manifest");
-  }
 }
 
 export async function fetchVerifiedAssetPacket(

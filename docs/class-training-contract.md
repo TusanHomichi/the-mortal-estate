@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-06
-revision: 5
-status: Five authored creation profiles and bounded town instruction are implemented; typed critique delivered; historical numerical reconciliation remains open.
+last_updated: 2026-09-08
+revision: 7
+status: Five authored creation profiles and bounded town instruction are implemented; typed critique delivered; historical numerical reconciliation and later class display naming remain open; Martial Artist is retained for now.
 public_safe: true
-summary: Recovered class bounds, durable creation, promotion, instruction roles, private critique and explicit provisional values.
+summary: Recovered class bounds, durable creation, instruction, provisional values and retained Martial Artist working name.
 routes:
   - crates/tme-rules/src/engine/training.rs
   - crates/tme-rules/src/engine/training/**
@@ -24,6 +24,12 @@ training interaction contract. The [gameplay baseline](gameplay-baseline.md)
 owns fidelity and version selection. The [boundary map](boundary-map.md#111-one-mutation-boundary-per-actor-state-family)
 owns implementation seams. Public labels below are existing mechanical role
 labels; they do not settle final names or NPC dialogue.
+The owner directed a display-name discussion as each class's reusable art begins
+(September 8), starting with Martial Artist. Existing class labels remain working
+names. The owner explicitly retained Martial Artist for now after discussing
+alternatives. A display-name decision does not itself alter
+class mechanics, content IDs, creation profiles or teacher relationships.
+
 
 ## Class and teacher relationships
 

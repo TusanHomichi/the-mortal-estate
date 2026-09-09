@@ -19,7 +19,7 @@ export function addGrassCover(group: Group, space: FeelSpace, surface: TerrainSu
       const wear = pathCover(sample, px, pz);
       if (sample.land < .84 || wear > .53) continue;
       const edgeHeight = 1 - Math.max(0, wear - .18) * 1.3;
-      placements.push({ x: px, z: pz, h: (c.material === "meadow" ? .31 : .12) * (.9 + random() * .2) * edgeHeight, yaw: random() * Math.PI * 2 });
+      placements.push({ x: px, z: pz, h: (c.material === "meadow" ? .31 : .075) * (.9 + random() * .2) * edgeHeight, yaw: random() * Math.PI * 2 });
     }
   }
   const positions: number[] = [], colours: number[] = [], indices: number[] = [];
@@ -35,7 +35,7 @@ export function addGrassCover(group: Group, space: FeelSpace, surface: TerrainSu
   }
   const geometry = new BufferGeometry(); geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions),3));
   geometry.setAttribute("color", new BufferAttribute(new Float32Array(colours),3)); geometry.setIndex(indices); geometry.computeVertexNormals();
-  const material = new MeshStandardMaterial({ name: "LivingGrass", color: new Color("#98a75b"), roughness: 1, side: DoubleSide, vertexColors: true });
+  const material = new MeshStandardMaterial({ name: "LivingGrass", color: new Color("#899557"), roughness: 1, side: DoubleSide, vertexColors: true });
   const flowerMaterial = new MeshStandardMaterial({ name: "MeadowFlowers", roughness: 1, side: DoubleSide, vertexColors: true });
   const depth = new MeshDepthMaterial({ depthPacking: RGBADepthPacking, side: DoubleSide });
   const trail = Array.from({length: 8}, () => new Vector3(-1000,-1000,-1000));

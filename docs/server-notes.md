@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 22
-status: Standing server contract with durable creation, transient authentication and matching private preview releases.
+last_updated: 2026-09-08
+revision: 24
+status: Standing server contract with offline checkpoint preparation, private preview releases and explicit study origins.
 public_safe: true
-summary: Durable creation, server authority, transient authentication, private preview deployment, storage identity and teardown.
+summary: Server authority, persistence, offline migration, private preview deployment, remote study origins and teardown.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -106,6 +106,27 @@ durable roster. Additional created characters are permitted. The complete roster
 must agree with the recovered world's character actors; the seed is no longer
 mistaken for an exhaustive permanent roster.
 
+## Offline content cutover
+
+Normal checkpoint hydration still refuses a changed content identity. The rules
+checkpoint owner exposes `Engine::migrate_content_checkpoint` for an explicit
+operator-prepared content cutover. Its plan pins both definition digests, retires
+only named unburdened NPCs and service instances, and merges remaining merchant
+listings into an existing compatible provider without changing item IDs, prices,
+listing origin or quantities. Player state is never reseeded. It refuses retained
+actors whose current or home positions need relocation and reuses full checkpoint
+hydration to validate the result. This is an offline migration, not a recovery
+fallback or a second supported in-memory shape.
+
+The server command `checkpoint migrate-content <before-bootstrap> <after-bootstrap>
+<checkpoint> <plan> <output>` validates both complete definitions, retains the
+world identity and writes a new private canonical artifact. It does not connect
+to or modify a database. `bootstrap content-identity <path>` reports the validated
+identity used when preparing that plan. Deployment must own backup, stopped
+writers, compare-and-swap installation, matching source receipts, restart proof
+and rollback; ordinary activation still rejects changed served content. The
+[town execution record](plans/2026-09-07-horseshoe-town.md) tracks the first use.
+
 ## Transient control authentication
 
 Control API v4 returns an explicit redacted-debug session token with the login
@@ -145,6 +166,13 @@ decision with their own implementation and proof.
 The installed-service proof is explicit because it can restart the persistent
 private world. The [execution receipt](plans/2026-09-05-private-play-loop.md)
 records two-client timing, reconnect/restart and fenced-restore evidence.
+
+Owner-authorized disposable studies may give `LiveServer` an explicit canonical
+HTTPS `public_origin`. Its listener stays on loopback; `local_origin` identifies
+that TLS frontend, while server admission validates the actual remote origin
+and host. The operator owns the external TLS proxy and account access. This does
+not activate a persistent release or public enrollment. The separate
+[pixel study](plans/2026-09-08-pixel-temple.md#remote-owner-access) uses this seam.
 
 ## Which world the one process serves
 
@@ -530,6 +558,12 @@ provisions per entry in `GATED_TESTS` and never reuses one.
   than a documented manual procedure.
 
 ### The EV certification's runner-owned identity
+
+Server children clear ambient environment variables, then explicitly receive the
+parent's boundary-terms file alongside their private fixture configuration. Their
+startup diagnostics remain visible. Omitting that file made isolated-checkout
+certification depend on an untracked denylist and hid the load failure behind a
+socket-bind timeout; the child must prove the same content boundary as its parent.
 
 `ev_certification.rs` and `postgres/database_recovery_tests.rs::ev_database_fault_certification` assert
 the environment they were given, and none of it can be satisfied by accident:

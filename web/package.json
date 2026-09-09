@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "pretest": "node proof/build-codec.mjs",
     "test": "vitest run",
-    "build": "vite build && node proof/build-play.mjs",
+    "build": "node proof/build-play.mjs",
     "dev": "vite",
     "build:play": "node proof/build-play.mjs"
   },

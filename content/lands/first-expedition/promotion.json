@@ -1,6 +1,6 @@
 {
   "attested_by": "peter",
-  "attested_on": "2026-09-07",
+  "attested_on": "2026-09-09",
   "authority": {
     "content_canon": false,
     "coordinates": true,
@@ -29,20 +29,8 @@
       "sha256": "a3e71a80278cb264c821b1c3a744aa33e8c7f9c9227cb98afbbfb0a3d35729bc"
     },
     {
-      "path": "content/lands/first-expedition/bakery.tmj",
-      "sha256": "adde958777f7c74422e1361030ed550a1d9581a9fa57e5aa2b89319af20e167a"
-    },
-    {
-      "path": "content/lands/first-expedition/herbalist.tmj",
-      "sha256": "49a61f8a9ac1869ede643b3945d81862d20b9aa772c3b2ea852b8fa8e054615e"
-    },
-    {
       "path": "content/lands/first-expedition/forge.tmj",
       "sha256": "60b67973dcd876e4444bda8a9fdffcb6cf225bedc2c6388d0ef1742f643e24c3"
-    },
-    {
-      "path": "content/lands/first-expedition/chandler.tmj",
-      "sha256": "88c8858c209a245b8e51424c240d9cbeb85133c27bba175ddde5c2eecdd0c596"
     },
     {
       "path": "content/lands/first-expedition/temple.tmj",
@@ -61,7 +49,7 @@
   "master": {
     "byte_identical_to_reviewed_master": false,
     "path": "content/lands/first-expedition/arrival.tmj",
-    "sha256": "7e37e586161c2b8d6c9f46f3eb154d5697e0acc12a42ca6bd26217cf07c419e9"
+    "sha256": "0b6cd1149004780dbab45ec52ef9853751ed02e1962efba25317fdc6de09f6ee"
   },
   "research_boundary": {
     "review_refs": [
@@ -70,8 +58,8 @@
     ]
   },
   "reviewed_encoding": {
-    "geography_sha256": "2ce205b35536006932437c855827575d26f61a26813ade0bc885160db95534d4",
-    "review_manifest_sha256": "d132d434d60e20d15b2962834bfde80e6bd04d8cf8d01da615674c297dee8d73"
+    "geography_sha256": "869e33951932dde1d470111c746802ee02cc141213019fe0c049c3da07f039be",
+    "review_manifest_sha256": "c8ddf6d5724e9f53361185c469cadb47f827c539bbb5c32f671844edabd263d0"
   },
   "schema_version": 1,
   "status": "owner_accepted_first_expedition_geography"

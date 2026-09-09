@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 13
-status: Temple daily-use pass and current-game preview, followed by renderer-default and login URL leak repairs.
+last_updated: 2026-09-08
+revision: 15
+status: Temple and preview repairs retained; subsequent horseshoe exterior candidate has its own execution record.
 public_safe: true
-summary: Town and temple iteration, real-game preview deployment, renderer selection and login safety repairs with evidence.
+summary: Town and temple iteration, preview repairs and routing to the subsequent horseshoe exterior study.
 ---
 
 # Town buildout
@@ -805,10 +805,8 @@ three engines. The external receipt retains failures separately from final proof
 
 The owner subsequently directed the
 [horseshoe arrangement](2026-09-05-first-land-surface.md#horseshoe-town-arrangement).
-The next exterior study should compare a blockout against the settlement
-envelope, dock arrival sightline, temple/dungeon access and every service
-entrance, then review it at the fixed gameplay camera. Reserve the central
-feature's space while its identity remains open. The layout has not been
-implemented or deployed by the renderer/login repair; those checks prove the
-existing world. Updated geographic receipts and native traversal proof belong
-to the subsequent authored layout migration.
+The [September 7 study](2026-09-07-horseshoe-town.md) now owns the
+candidate blockout, fixed-camera review and traversal evidence. The renderer/login
+repair and path-control repair proved the existing world; they did not promote
+this new arrangement. Geographic review and the subsequent authored migration
+remain separate gates.

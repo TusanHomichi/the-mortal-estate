@@ -1,22 +1,23 @@
 ---
-last_updated: 2026-09-07
-revision: 24
-status: Deployment-bound rendered world, guarded login and authoritative two-click path controls; artwork remains candidate.
+last_updated: 2026-09-09
+revision: 42
+status: GPU pixel composition verified through repository checks, three-engine native walks and sustained crowd measurements.
 public_safe: true
-summary: Rendered entry, guarded login, authoritative path planning, resident presentation and browser verification.
+summary: Pixel scene binding, GPU colour and lighting composition, reusable Canvas preparations, native profiling and sustained crowd measurement.
 routes:
   - web/**
+  - tools/run_pixel_temple.py
 ---
 
 # Browser client
 
-The browser is the active feel surface. It loads an external candidate packet
-into Three.js and runs local movement experiments. The feel scene does not authenticate or implement production gameplay legality.
-A separate read-only diagnostic observer consumes the authoritative wire for
-Workbench capture. The private play shell uses that renderer with server-owned
-movement and lifecycle control. The first-expedition study presents the authored
-world using verified candidate artwork; artwork deployments bind that renderer
-into the build. Diagnostic inspection builds remain available for proof worlds.
+The browser is the active play surface. The default product draws pixel art with
+GPU pixel composition with Canvas 2D preparation and consumes server-owned movement, actors, services and lifecycle.
+The connected town and temple have candidate artwork; the other interiors have
+an explicitly labelled map pending room construction. A separate read-only
+Three.js diagnostic observer supports Workbench capture; explicit inspection
+builds support synthetic proof worlds. Earlier 3D local scene tools are retained
+as retired references and are excluded from the default product bundle.
 [Client architecture](client-architecture.md) owns the client contract;
 [presentation direction](presentation-direction.md) owns the visual target;
 [Server notes](server-notes.md) owns server implementation and the direct wire proof. Use the [checkpoint](plans/genesis-ledger.md#current-checkpoint)
@@ -27,17 +28,204 @@ for deployment and work status.
 | Work | Start here | Proof |
 | --- | --- | --- |
 | Private authoritative play | `web/src/play/`, `web/play.html` | actual adapter tests, installed `web/proof/play-proof.mjs` |
+| Primary pixel art | `web/src/play/pixelRenderer.ts`, `pixelOverlays.ts`, `pixelPacket.ts`, `pixelGeometry.ts`, `pixelMotion.ts` | `web/tests/pixelPacket.test.ts`, `web/tests/pixelMotion.test.ts`, `web/proof/pixel-temple-proof.mjs` |
+| Pixel composition and atmosphere | `web/src/play/pixelCompositor.ts`, `pixelEffects.ts`, `pixelEffectsShader.ts`, `pixelEffectsConfig.ts` | `web/proof/pixel-effects-proof.mjs`, native exterior/temple walks, sustained crowd proof |
 | Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
-| Startup and packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
-| Movement, pointing, cooldown | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
-| Scene assembly and lighting | `web/src/space/SpaceScene.ts`, `palette.ts`, `cardLighting.ts` | geometry, palette, lighting tests and real-tab captures |
-| Coastal surface and grass | `web/src/terrainSurface.ts`, `web/src/space/ground.ts`, `coastalGround.ts`, `groundCover.ts`, `grassCover.ts` | surface contact/material/cover tests and native walking captures |
-| Foreground visibility | `web/src/space/surfaceOcclusion.ts`, `surfaceAlpha.ts` | surface occlusion tests, native layered-opacity and walking captures |
-| Live figures and structures | `web/src/space/figureRig.ts`, `structures.ts` | rig, structure, facing and occupancy tests |
-| Camera and comparison controls | `web/src/camera.ts`, `presets.ts` | camera and preset tests |
+| Retired 3D packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
+| Retired local movement | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
+| Retired scene and lighting | `web/src/space/SpaceScene.ts`, `palette.ts`, `cardLighting.ts` | geometry, palette, lighting tests and real-tab captures |
+| Retired coastal rendering | `web/src/terrainSurface.ts`, `web/src/space/ground.ts`, `coastalGround.ts`, `groundCover.ts`, `grassCover.ts` | surface contact/material/cover tests and native walking captures |
+| Retired 3D foreground | `web/src/space/surfaceOcclusion.ts`, `surfaceAlpha.ts` | surface occlusion tests, native layered-opacity and walking captures |
+| Retired 3D figures | `web/src/space/figureRig.ts`, `structures.ts` | rig, structure, facing and occupancy tests |
+| Retired camera comparisons | `web/src/camera.ts`, `presets.ts` | camera and preset tests |
 | Browser/display lifecycle | `web/proof/browser.mjs`, `serve.mjs` | launcher tests and observed renderer probes |
 
 Paths in a row share the first path's directory unless written in full.
+
+## Pixel-art presentation
+
+`npm --prefix web run build` and
+`node web/proof/build-play.mjs <external-output>` create the pixel-art product.
+The explicit mode name is `pixel-art`; its URL cannot switch renderers.
+`tools/run_pixel_temple.py --admin-url-file <file> --assets <external-packet>
+--output <external-directory>` builds and serves it on a disposable local
+first-expedition authority, placing the existing seeded player in the temple.
+The launcher prints the local URL and writes private access details with mode
+0600; Ctrl-C stops the server and removes those details. Add `--proof` for the
+complete three-engine interaction loop; `--engine` narrows that to inspection.
+Add `--exterior` to start outside the temple and select the exterior walking,
+entry/return, resize, reconnect and missing-art proof.
+The existing 3D preview and its output are not launcher inputs.
+
+The pixel packet uses the existing explicit external `/feel-assets/` mount.
+`pixelReceipt.json` pins its manifest; the loader checks each PNG digest and the
+current geographic promotion. Static context may be a complete interior or a
+moving exterior window: compare bounds within the authored member and exactly
+match passability inside that supplied window, including duplicate-row refusal.
+The renderer uses observed actor rows and shared
+path/resident controls, clears visual authority on disconnect and shows an
+explicit map view in other unfinished interiors. Arrival uses the layered
+exterior described below. Images and generation
+provenance remain external candidates. The [execution record](plans/2026-09-08-pixel-temple.md)
+owns native evidence and remaining visual findings.
+`pixelGeometry.ts` supplies one set of cell bounds for the persistent grid,
+hover/route outlines and pointer inversion. Only observed passable tiles add
+grid edges, and adjacent tiles share a single drawn edge. The room plate carries
+material texture without a competing regular tile pattern. Sprite canvas
+resolution and transparent padding are independent of its gameplay display
+height. Pixel packet version 4 binds the current geography master and review,
+all seven exterior doorway bounds, whole-scene images, foreground masks, temple
+patches, sprite anchors, and effect maps/profiles. Versions 1–3 are refused.
+Furniture and scenery hide grid ink, ground contents and actors behind them
+without changing collision. Visibility selects shared cells, never a private grid.
+
+`pixelViewport.ts` selects integer scenery scale against a 640-by-360 minimum
+logical view: 1280-by-800 uses 640-by-400 at 2x; 1920-by-1080 uses 640-by-360 at
+3x. Camera translation follows the interpolated ground anchor and clamps at scene
+bounds. Small rooms centre inside the available view; larger rooms scroll.
+The exact canvas CSS size avoids browser resampling and fractional border loss.
+The terrain and environment effects retain that native grid. Ground-grid and
+route ink rasterize on a logical-size overlay before nearest enlargement, so
+Canvas-antialiased line endpoints cannot leak finer pixels into the scenery.
+Characters use a
+**finer raster layer**, with high-quality reduction directly to their displayed
+size and cached per-frame rasters. They are not first reduced to the scenery's
+coarser logical grid: that discarded half their detail and was rejected by the
+owner. The room-relative body height remains 96 logical pixels inside the temple,
+72 outside, and 44 in unfinished map views. At 2x the temple body receives 192
+actual pixels. Native scenery block proofs exclude the intentionally finer
+character/contact layer; they do not claim the whole frame has one coarse grid.
+Pointing, feet, occlusion and movement still share one geometric projection.
+
+The pixel motion sampler follows the committed route by distance, including
+corners, and bounds visual travel by the observed remaining cooldown. Gait phase
+comes from traveled distance. The traveler uses a fixed south-reference body
+scale across poses so walking frames retain their authored weight shift rather
+than being resized to identical heights. Each traveler walk direction shares
+its standing rotation's fixed ground pivot in the packet. A lifted boot or
+swinging hem must not redefine that pivot from the frame's opaque bounds; doing
+so jerks the whole sprite against its route. Other characters retain their
+existing frame calibration. Drawn anchors never change authoritative occupancy.
+The owner subsequently removed the provisional gameplay HUD. Pixel presentation
+suppresses the diagnostic sidebar, directional buttons, generic gameplay panels,
+coordinate/legend readouts, settings panel and in-world heading. Necessary sign-in,
+character selection, session controls and resident dialogs remain. The single
+column preserves the room's native display budget. The temple has no title or
+coordinate banner; unillustrated areas retain their explicit map label.
+
+Established route drafting and endpoint/double-click confirmation remain. A double
+click on the occupied stair square selects the sole enabled `traverse` option
+from the current server frame through `offeredAction`; it cannot invent a
+traversal, resolve an ambiguous offer or bypass readiness. This retains descent
+and return after removing the temporary action selector. The native proof checks
+HUD absence, direct stairs and ordinary movement together. Generic equipment and
+other panel-only interactions await the real UI; diagnostic proofs remain explicit.
+
+### Layered arrival exterior
+
+`play/pixelExterior.ts` selects layers from the 1254-square connected scene and twelve
+explicit alpha foreground layers. The packet binds a uniform 48-by-32 cell
+projection to every authored arrival entrance. Figures, contents and foreground
+share depth order. Picking uses the same foreground alpha; ground pointing is
+independent of overhanging art. Authored Tiled data, compiled by Rust, owns all
+passability, footprints, routes and paired transition landings. The
+[bounded geography amendment](plans/2026-09-05-first-land-surface.md#pixel-town-geography-amendment)
+authorizes fitting the rebuilt town to this scene. Other island geography is
+outside this slice; the sea south of the dock remains open.
+
+`data-pixel-projection` and `data-pixel-viewport` expose the actual presentation
+transform to browser proof. Walking proofs plan against authored connectivity
+but issue only endpoints present in the current observation; a wall corner may
+hide a later square on the route. A map plan cannot grant visibility.
+
+### Pixel rendering performance
+
+`pixelCompositor.ts` composes colour, material/height and normal surfaces into
+three GPU render targets in the visible canvas's WebGL context. Immutable image
+textures are uploaded once and reused for ordered, clipped quads. Foreground
+lighting samples use the same rectangle and alpha as their colour layer; actor
+height and normal masks are evaluated in the shader. The final atmosphere pass
+samples these GPU surfaces directly. Unillustrated map views use the same output
+with atmosphere disabled. Native inspection copies the visible canvas only when
+explicitly taking a measurement.
+
+`pixelCadence.ts` retains a 30Hz render-deadline phase across delayed callbacks,
+with a 0.1ms comparison tolerance for timestamp rounding. Missed intervals are
+skipped; there are no catch-up bursts and no change to gameplay deadlines.
+The renderer retains its composition while actors, snapshot, input and viewport
+are unchanged. Atmospheric shader time advances independently. Movement updates
+quad coordinates and shader inputs; it does not upload three full-screen images.
+Canvas 2D prepares reusable fine sprite rasters, text, contact marks and ground
+ink. `pixelOverlays.ts` keys ink on observed tile facts and input overlays in
+authored pixel coordinates, so camera travel reuses it. Mutating a prepared image
+explicitly invalidates its GPU texture. Scene/scale changes release image
+textures; disposal deletes textures, framebuffers, buffers and programs. The LUT
+uploads only on selection changes. All caches are discardable presentation data.
+
+`data-pixel-actor-bounds` exposes the bodies actually presented for native pointing
+proof, including interpolation and shared-square offsets. Clearing presentation
+removes these bounds as well as the projection. Resize also invalidates pointing
+until the new viewport has actually been drawn; it cannot use the preceding
+frame's projection on a cleared canvas. This grants no actor observation,
+occupancy or service authority. A WebGL failure displays an accessible reload
+message and stops the rendering loop.
+
+`tools/run_pixel_temple.py --proof --profile` runs the native performance profile
+through the normal product and disposable authority. It records CPU submission
+costs and cadence at both display sizes, with screenshots/readbacks outside its
+stationary and real-command movement samples. Profile windows are run without
+other task-owned browser proofs or builds. Those measurements do not establish
+physical-device or scanout FPS. The [performance execution record](plans/2026-09-09-pixel-performance.md)
+owns the preceding baseline. The [GPU execution record](plans/2026-09-09-pixel-gpu-composition.md)
+owns the cutover comparison, final measurements and remaining limitations.
+`pixel-pointing.mjs` waits for the rendered viewport, then reads its projection
+and bounds together for native proof input. This presentation readiness is
+separate from the server's permission to act.
+
+`node web/proof/pixel-crowd-proof.mjs EXTERNAL_PACKET EXTERNAL_OUTPUT [ENGINE]`
+measures the built renderer with synthetic one- and ten-figure presentation
+inputs. It requires sustained motion, full-detail artwork and on-screen bodies;
+the fixture never enters the product or sends wire frames. `pixel-profile.mjs`
+owns the shared renderer instrumentation and statistics. This benchmark isolates
+rendering cost from gameplay waits and does not prove multiplayer/server capacity.
+Its exact workload and limitations belong to the performance execution record.
+
+### Pixel atmosphere and lighting
+
+The [visual ruling](presentation-direction.md#pixel-atmosphere-and-shader-effects)
+selects the Graveyard Keeper approach. `pixelEffects.ts` directs GPU composition
+of height, foliage, emitter and normal maps in the same foreground order as colour, adding
+observed character silhouettes at their real displayed resolution. Its raw WebGL
+pass uses nearest sampling for scene/effect maps. The colour lookup texture uses
+interpolation between colour values, which does not blur spatial image pixels.
+Missing WebGL or shader compilation failure refuses startup; context loss clears
+the visible scene and pointing and displays a reload message.
+
+Delivered effects include world-phased interior-leaf deformation with fixed
+roots and silhouettes, low fog attenuated by object height, sparse rain streaks,
+ambient palette profiles, local lantern/fire flicker with normal/depth response,
+and simple tapered cast shadows for four nearby casters. Each caster receives
+a sun shade outdoors and up to three nearby light shades. At most eight local
+lights shade a view. Height/normal maps are coarse authored lighting planes,
+not recovered physical geometry or finely painted four-direction normal art.
+The source painting still carries its original light/shadow information; this
+is an initial lighting layer, not complete unlit production art.
+
+The packet supplies validated `day`, `dusk`, `night`, `rain` and `fog` presentation
+profiles, selected through `?atmosphere=<name>` for review. Day is the default.
+No simulated weather schedule or time-of-day gameplay clock is added. Interior
+fog, rain and wind are disabled, and room lighting is stable across outdoor
+profiles. Environment effects quantize world coordinates to the scenery lattice;
+the finer character colour/alpha raster survives the pass.
+
+`node web/proof/pixel-effects-proof.mjs <external-packet> <external-output>` runs
+all three engines through actual maps and isolated shader surfaces. It proves
+wind stays inside the foliage mask, scenery integer blocks, height-aware fog,
+front-versus-back illumination and indoor weather isolation. Those controlled
+surface checks complement the live authority walks; they are not gameplay proof.
+The [exterior execution record](plans/2026-09-08-pixel-exterior.md#gameplay-integration-and-pixel-effects)
+owns current asset/proof receipts and remaining visual work.
+
 The standing TypeScript check rejects unused imports, locals, and parameters.
 
 ## Authoritative diagnostic capture
@@ -81,16 +269,24 @@ command reconciliation, candidate artwork integration, or a preview deployment.
 
 ## Deployed presentation selection
 
-An artwork deployment builds `play` in `first-expedition` mode. Renderer selection
-is bound into that browser artifact, so `/`, `/index.html`, reloads and query
-changes all retain the rendered world. Missing or mismatched artwork fails
-explicitly; it does not select the overhead diagnostic renderer. The default
-`inspection` build remains available for synthetic proof worlds and can explicitly
-select the expedition study through its inspection query parameter.
-The deployment runbook owns selection of the matching artwork packet.
-`web/proof/play-entry-proof.mjs` checks all three entry paths in the browser roster
-against an installed artifact; its JSON stdin supplies `origin`, `presentation`,
-`output` and an optional scratch TLS `authority`.
+The default build selects `play/rendererFactory.ts`, which imports only the pixel
+renderer. A build-time module audit refuses Three.js or diagnostic rendering in
+that artifact. `/`, `/index.html`, reloads and query changes retain pixel art;
+the development root also routes to `play.html`. Missing or mismatched artwork
+fails explicitly. No URL or asset failure chooses another renderer.
+
+Only an explicit `inspection` build replaces the factory with
+`play/inspectionFactory.ts` for synthetic worlds. Retired `first-expedition` and
+`pixel-temple` build modes are refused before output creation. The old local
+3D scene is reachable solely at `feel-scene.html` in development/reference tools;
+it is not a production entry or fallback. Its specialized capture/walk callers
+name that entry explicitly.
+
+The deployment runbook owns selection of the matching `pixel-manifest.json`
+packet and `pixelReceipt.json`; staging copies only hash-bound PNG references.
+`web/proof/play-entry-proof.mjs` checks root, index and obsolete selector URLs
+against an installed artifact in the browser roster. Its JSON stdin supplies
+`origin`, `presentation`, `output` and an optional scratch TLS `authority`.
 
 ## Login startup safety
 
@@ -201,7 +397,11 @@ request bounds paths to three steps; the Rust codec validates each request.
 `play/control.ts::previewPath` sends the existing non-mutating path-preview
 request through the real socket. It correlates replies by request, actor,
 epoch, origin and path, without changing the command cursor or authority.
-`play/pathControls.ts` owns only discardable draft/confirmation state. A normal
+`play/pathControls.ts` owns only discardable draft/confirmation state. A command
+receipt and unrelated ready frames may precede its position frame. Retain the
+committed route until displacement/cooldown has been observed, then authoritative
+readiness retires it. Space changes and replacement input also clear it; a ready
+user can cancel an unlanded submitted route after refusal. A normal
 second click reassesses the route; a fast double-click waits for its in-flight
 assessment. Refused or partial assessment cannot silently confirm a different
 endpoint. The eventual sequenced command remains subject to current server
@@ -265,6 +465,10 @@ provided it never runs late and does not release the cooldown.
 
 ## Packet and rendering contracts
 
+The 3D packet, lighting and scene sections below describe retained reference
+tools. They are not current pixel-art production requirements. The active
+pipeline is [pixel-art presentation](#pixel-art-presentation).
+
 `manifest.ts` validate current schema 7. Schemas 1–6 and absent
 required fields are refused; there is no compatibility parser. Assets remain
 outside the checkout. A packet is a candidate, not an accepted master.
@@ -303,6 +507,11 @@ the authored material identity or any walking verdict. Both the coastal material
 blend and grass placement consume this wear field. Worn path centres remain
 clear; shorter edge blades may cross into the margins of lane cells. Other
 authored materials, including stone and decks, keep their separate surfaces.
+Restrained dry-turf patches and small worn path stones belong to the coastal
+ground shader. Scene geometry, coastal ground and water share the palette's key
+direction; the exterior key illuminates street-facing relief from the front-left
+in the current visual candidate. The [town iteration](plans/2026-09-08-town-visual-iteration.md)
+records its native comparison and remaining art work.
 
 `grassCover.ts` builds curved geometry blades, with shorter town grass and taller
 meadow cover. Grass and flowers are grouped into small spatial instance batches
@@ -358,6 +567,12 @@ TME_FEEL_ASSETS=/absolute/path/outside-checkout npm --prefix web run dev
 Use Vite's printed loopback URL. `web/vite.config.ts` serves the external packet
 only during development. `web/dist/` does not package or serve private assets.
 An absent or refused packet produces an absence banner.
+
+Comparative captures that substitute earlier source modules must preserve the
+exact runtime dependency URLs, including Vite dependency-version queries. A
+second Three.js module instance invalidates the matched baseline even when the
+scene renders. The [shape-pass execution record](plans/2026-09-08-town-visual-iteration.md#upper-building-shapes-and-grouped-banks)
+owns the discovery and qualification of earlier comparisons.
 
 `presets.ts` owns query controls, for example `?preset=night,wind&zoom=-1`.
 Whole-number zoom steps from −3 to 3 change world height by a quarter per step;
@@ -454,6 +669,36 @@ Stone, planks and other authored materials retain their own swatches.
 Gentle meadow relief is presentation only. It adds no cells, traversal costs,
 height legality or server authority. Noncoastal spaces retain flat ground.
 
+`inlandShore.ts` derives closed water contours from the existing water/deck cells,
+rounds their corners and applies gentle deterministic variation. Components that
+reach missing cells retain the existing open-coast treatment. Shared terrain
+sampling owns the resulting bank, seabed and ground contact; natural ground also
+covers dry scenic corners within water cells, with submerged fragments clipped
+by the water datum. This changes no cell material, standing verdict or route.
+`inlandShore.test.ts` covers wet/dry centres, rounded corners, open/deck-connected
+water, islands, diagonal contacts and overlapping pond bounds. The
+[pond iteration](plans/2026-09-08-town-visual-iteration.md#rounded-pond-shoreline)
+owns the native comparison and deployment evidence.
+
+Coastal ground also adds a deterministic, sparse batch of embedded faceted stones
+through `groundStones.ts`. Water-neighbour cells receive a denser sampling pass;
+a narrow dry-side margin groups larger stones with open gaps between patches.
+Broad vertex colour tones retain their facets in building shadows.
+It keeps portal clearance and quiet lane centres;
+instances have no occupancy or traversal authority. Ground texture combines broad
+wear with smaller scuffs, while submerged pebble outlines use angular profiles.
+The inland contour keeps gentler large bends with smaller edge irregularity.
+Candidate buildings, dock timbers and tree bark use original embedded tangent
+normal maps through the existing GLB material loader. Those maps change shading,
+not geometry, practical-light metadata or foreground-fade ownership. The
+[surface texture iteration](plans/2026-09-08-town-visual-iteration.md#material-relief-and-broken-ground)
+owns asset provenance, comparison and resource evidence. The subsequent
+[shape and bank pass](plans/2026-09-08-town-visual-iteration.md#upper-building-shapes-and-grouped-banks)
+varies upper-building pitch and individual slate positions in the external
+candidate GLBs. Vertex normals follow the deformation; attached smoke markers
+follow their chimneys. Textures, mesh topology, placements and gameplay masks
+retain their existing owners.
+
 Coastal vegetation follows [Coastal ground cover](#coastal-ground-cover).
 Other exterior spaces keep the card-clump treatment; `grass_clump` remains part
 of that vocabulary.
@@ -496,9 +741,32 @@ recorded in the [surface receipt](plans/2026-09-05-first-land-surface.md#arrival
 and coarse offshore. It samples the existing bank beneath decks and retains a
 shore-distance attribute; it changes no movement cells. `coastalWater.ts` applies
 three analytical swells on the GPU, finer normal ripples, view-dependent sky
-colour, crest lighting and bank-intersection foam. It uses one opaque draw with
-no scene-copy or reflection-camera pass. Key direction comes from the same
-palette helper as the scene light. This is an original small-wave approximation,
+colour, crest lighting and bank-intersection foam. It uses one transparent water draw over one continuous opaque seabed, with
+no scene-copy or reflection-camera pass. `seabedSurface.ts` refines submerged
+bank triangles to the terrain lattice and stitches shared edge midpoints into
+adjoining coarse triangles. This prevents the earlier coarse bottom cutting
+through the ground while preserving the water mesh and offshore density.
+`seabedSurface.test.ts` proves bank contact, unchanged input and a closed interior
+edge topology across refinement. Natural ground fragments below the water datum
+are omitted in favour of this continuous bottom. Ground shadow overlays stop at the water datum and blend
+before the sea, and tactical grid ink fades at the waterline instead of tracing
+submerged tile skirts. Dry cell addresses, grid emphasis and legality are unchanged.
+Both geometry and fine ripple strength
+follow optical depth and exposure. `coastalProfile.ts` validates bounded scenic
+depth/exposure zones at the asset boundary; `terrainSurface.ts` samples the same
+submerged height field used by water and shore geometry. These optional profiles
+are restricted to outdoor water spaces. Their depths grant no gameplay authority. Key direction comes from the same
+palette helper as the scene light. Eye-path absorption and a low normal-incidence
+reflection term preserve the shallow bottom, with stronger absorption in deep
+water. The seabed carries sand, stones and a restrained animated daylight light
+pattern; it shares the surface elapsed uniform and fades that pattern with depth.
+Exposed swells reach a combined 0.22 world-unit amplitude before depth/shelter
+attenuation. Broad sky glints and a directional sun highlight reveal their slopes.
+These remain procedural shading choices without additional render targets.
+Daylight uses a stronger directional key and lower ambient fill; the coastal
+ground's shadow overlay deepens contact while the tactical grid retains its
+separate presentation. Interior source lighting retains its own profile.
+This is an original analytical-wave approximation,
 not an FFT ocean or a buoyancy simulation.
 
 The [coastal-water follow-up](plans/2026-09-07-coastal-water.md) records the
@@ -578,28 +846,11 @@ experiment; native results are recorded in the surface brief.
 
 ## First-expedition presentation study
 
-The [deployed presentation contract](#deployed-presentation-selection) selects
-the private visual study for the authored first-expedition world. Inspection
-builds can select it with `play.html?study=first-expedition`. `play/studyReceipt.json` owns the current candidate artwork
-manifest digest and binds it to the accepted geography review.
-`play/studyBinding.ts` verifies that ancestry against the geography receipt,
-then verifies the artwork manifest bytes against the study receipt. It separately
-checks the server's master identity, realm, level, bounds and passability window
-before presenting a frame. Artwork iteration does not re-sign geography, and an
-old or mismatched asset packet is refused. The selected guide digest records
-visual provenance only; it grants no runtime or master-acceptance authority.
-Exterior contexts move with the observer; interiors supply the whole room.
-Missing or mismatched study assets refuse presentation and never substitute
-private gameplay content or make the transport report a false protocol error.
-
-`play/studyRenderer.ts` reuses `SpaceScene` and the verified original candidate
-assets through the existing external asset boundary. It never creates a local
-walk presenter. All positions and actions remain server-owned. Short movement
-interpolation follows already committed positions; small within-square figure
-offsets keep a player and service NPC distinguishable. The candidate residents
-are removed from static scenery and instantiated only from observed actor rows.
-Ground-item and corpse markers and the shared fallback actor rig remain
-provisional presentation. This study grants no artwork-master acceptance.
+The earlier 3D playable study is retired. Its renderer, actor binding, receipt
+and tests were removed in the [pixel-art cutover](plans/2026-09-08-pixel-art-transition.md).
+The authored world, server authority and interaction controls remain active in
+the pixel renderer. Historical implementation details remain in earlier execution
+records; do not restore the removed query selector or 3D asset packet.
 
 ### Temple resident interaction direction
 
@@ -608,28 +859,23 @@ balm seller herself to open balm buying. The person must be visible and
 targetable beside her shelving; a decorative counter is not the service target.
 Connect that interaction to her observed actor/service identity and the existing
 server-projected purchase options. Opening the interface grants no purchase
-eligibility, range exception or automatic transaction. The current private
-client also retains its existing service action controls.
+eligibility, range exception or automatic transaction. The explicit diagnostic
+client retains its generic service action controls. The pixel view uses the
+resident interaction directly.
 
 The [resident contract](town-resident-contract.md) owns Tomas's circuit, attention
-pause, service binding and persistence. `studyActors.ts` retains one visual
-instance per observed actor, interpolates committed location changes and keeps
-idle animation running across unrelated frames. Occluding opaque scenery blocks
-picking; faded surfaces allow it. `actorInteraction.ts` builds the resident panel
-from observed identity and current projected offers, closes it on authority loss,
-and preserves disabled purchases as disabled.
+pause, service binding and persistence. `pixelRenderer.ts` retains observed actor
+identity and interpolates committed routes. Sprite anchors and foreground depth
+supply pointing without changing occupancy. `actorInteraction.ts` builds the
+resident panel from observed identity and current projected offers, closes it on
+authority loss, and preserves disabled purchases as disabled.
 
-The receipt explicitly maps resident IDs to candidate figure names, with every
-model dependency digest-bound. Missing declared figures refuse the study. The
-interior camera retains the fixed angle and nine-row world scale. The current
-private-play page still uses its older 768 × 512 diagnostic canvas; it does not
-implement the [accepted UI aperture](presentation-direction.md#accepted-chrome-layout).
-Full chrome integration must use that aperture and the proportional-scaling
-ruling before framing acceptance. Native evidence exercises right-click picking, a valid
-purchase, insufficient-funds refusal, observed patrol movement, priest service
-access, reconnect and the dungeon return. The
-[presentation owner](presentation-direction.md#placeholder-town-interiors) owns
-the room and residents' visual direction.
+The pixel packet maps resident IDs to hash-bound directional sprite PNGs; missing
+declared assets refuse loading. Native evidence exercises right-click picking,
+a valid purchase, insufficient-funds refusal, observed patrol movement, priest
+service access, reconnect and the dungeon return. The
+[presentation owner](presentation-direction.md#stylization-and-restrained-charm)
+owns the room and residents' visual direction.
 
 ### Skill critique feedback
 

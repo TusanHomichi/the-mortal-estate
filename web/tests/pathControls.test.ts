@@ -60,7 +60,29 @@ describe("authoritative two-click path controls",()=>{
     expect(s.shown().kind).toBe("committed");expect(s.shown().cursor).toBe("waiting");
     s.current.pending=false;s.current.snapshot!.envelope.frame.can_act=false;s.controls.present(s.current);
     expect(s.shown().cursor).toBe("waiting");
-    s.current.snapshot!.envelope.frame.can_act=true;s.controls.present(s.current);expect(s.shown().route).toBeNull();
+    s.current.snapshot!.envelope.frame.can_act=true;s.current.snapshot={...s.current.snapshot!,generation:s.current.snapshot!.generation+1};s.controls.present(s.current);expect(s.shown().route).toBeNull();
+  });
+  it("retains the committed route when a receipt precedes its position frame",async()=>{
+    const s=setup();s.controls.click({x:3,y:0});s.controls.click({x:3,y:0});s.accept(0);await tick();
+    const route=s.shown().route;
+    s.current.pending=true;s.controls.present(s.current);
+    s.current.pending=false;s.controls.present(s.current);
+    expect(s.shown().route).toEqual(route);expect(s.shown().kind).toBe("committed");
+    // An unrelated resident frame may still carry the old ready player pose.
+    s.current.snapshot={...s.current.snapshot!,generation:s.current.snapshot!.generation+1};
+    s.controls.present(s.current);expect(s.shown().route).toEqual(route);
+    s.current.snapshot={...s.current.snapshot!,generation:s.current.snapshot!.generation+1};
+    s.current.snapshot!.envelope.frame.observation_center.position={x:3,y:0};
+    s.current.snapshot!.envelope.frame.can_act=false;s.controls.present(s.current);
+    expect(s.shown().route).toEqual(route);
+    s.current.snapshot={...s.current.snapshot!,generation:s.current.snapshot!.generation+1};s.current.snapshot!.envelope.frame.can_act=true;s.controls.present(s.current);
+    expect(s.shown().route).toBeNull();
+  });
+  it("lets a new draft or explicit cancel retire an unlanded submitted route",async()=>{
+    const s=setup();s.controls.click({x:3,y:0});s.controls.click({x:3,y:0});s.accept(0);await tick();
+    s.controls.click({x:0,y:1});expect(s.shown().kind).toBe("draft");
+    expect(s.shown().route?.at(-1)).toEqual({i:0,j:1});
+    s.controls.cancel();expect(s.shown().route).toBeNull();
   });
   it("retains a draft across unrelated actor updates",()=>{
     const s=setup();s.controls.click({x:2,y:0});s.current.snapshot = { ...s.current.snapshot!, generation:2 };

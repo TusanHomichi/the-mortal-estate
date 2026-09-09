@@ -41,7 +41,7 @@ operating rules; detailed workflow and verification usage have linked owners.
   before handing off.
 
 **Stack:** Rust for rules, protocol, simulation, authoring, and one
-PostgreSQL-backed server; TypeScript and Three.js for the browser client; Tauri
+PostgreSQL-backed server; TypeScript, GPU-composited 2D pixel art with Canvas 2D asset preparation and WebGL effect passes for the browser client (Three.js only for diagnostics and retired reference tools); Tauri
 for its ruled desktop shell; Python for checks and tools. Widening it needs an
 owner decision. Keep adjustable facts in validated content and each mutation in its
 owning boundary.
@@ -83,6 +83,7 @@ when the task needs their evidence. Keep machine setup and session logs local.
 | [docs/client-architecture.md](docs/client-architecture.md) | the client's standing contract |
 | [docs/browser-client.md](docs/browser-client.md) | browser source map, movement, rendering, packet and proof contracts |
 | [docs/presentation-direction.md](docs/presentation-direction.md) | the visual target |
+| [docs/pixel-art-production.md](docs/pixel-art-production.md) | pixel-art source, sprites, alpha, sampling, motion and native review |
 | [docs/workbench-v0.md](docs/workbench-v0.md) | the owner-agent spatial reference tool — pointing |
 | [docs/workbench-v1.md](docs/workbench-v1.md) | the same tool's editing half — staged operations, candidates, Apply |
 | [docs/test-corpus-provenance.md](docs/test-corpus-provenance.md) | what `content/test-corpus/` is and is not |

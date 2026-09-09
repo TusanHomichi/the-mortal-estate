@@ -20,9 +20,22 @@ from tempfile import TemporaryDirectory
 
 import boundary_test_support  # noqa: F401  (puts tools/ on sys.path)
 import run_server_live_proof as live_proof
-from live_server_harness import REPOSITORY_ROOT, ProofError, World
+from live_server_harness import REPOSITORY_ROOT, LiveServer, ProofError, World
 
 PROOF_DOCUMENT = "content/lands/identity-proof/world.json"
+
+
+class RemoteOriginAdmission(unittest.TestCase):
+    def test_invalid_origins_are_refused_before_database_or_filesystem_effects(self):
+        for origin in ("http://example.test", "https://example.test/path",
+                       "https://user:secret@example.test", "https://example.test?query",
+                       "https://example.test#fragment", "https://example.test:99999",
+                       "https://example.test:bad", "https://example.test\n"):
+            with self.subTest(origin=origin):
+                server = LiveServer("unused", World("unused"), public_origin=origin)
+                with self.assertRaises(ValueError):
+                    server.__enter__()
+                self.assertFalse(hasattr(server, "run_directory"))
 
 
 def centre(x: int, y: int) -> str:
