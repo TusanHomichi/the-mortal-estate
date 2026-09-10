@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-10
-revision: 58
-status: Current lookup index includes reopened 3D presentation and pixel production retirement.
+revision: 59
+status: Current lookup index routes client implementation and reopened presentation to their maintained owners.
 public_safe: true
-summary: Lookup links for reopened 3D, pixel-tool retirement, game entry, dungeon geography, preview refresh and gameplay rulings.
+summary: Lookup links for client implementation, presentation, game entry, dungeon geography, preview refresh and gameplay rulings.
 always: true
 ---
 
@@ -32,7 +32,7 @@ the pixel-only restriction. Earlier visual choices remain evidence to reassess.
 | --- | --- | --- |
 | Implementation stack | Fixed stack; widening needs a decision. | [AGENTS.md](../AGENTS.md#operating-rules) |
 | Gameplay authority | One reusable rules boundary. | [boundary map](boundary-map.md#the-boundaries) |
-| Client shape and baseline | Installed GPU pixel browser; Three.js replacement development authorized, with atomic cutover obligations. | [client architecture](client-architecture.md#the-web-client) |
+| Client shape and baseline | Browser stack and atomic renderer cutover obligations; implemented state is in the browser owner. | [client architecture](client-architecture.md#the-web-client), [browser client](browser-client.md) |
 | Browser and desktop proof | Shared browser matrix; Tauri targets also require packaged-webview proof. | [client architecture](client-architecture.md#the-web-client) |
 | Town residents | Authored patrols and actor-bound services; temple interaction request. | [resident contract](town-resident-contract.md) |
 | Living-town arrangement | Horseshoe toward the dock, temple at its head; central feature undecided and candidate awaiting review. | [surface brief](plans/2026-09-05-first-land-surface.md#horseshoe-town-arrangement) |

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-06
-revision: 11
-status: Standing workflow; historical gameplay specifications start from recovered evidence under the owner-directed baseline.
+last_updated: 2026-09-10
+revision: 13
+status: Standing workflow; internal-cutover policy is conditional on server-owned activation status.
 public_safe: true
-summary: Scope, context loading, specification sourcing, ownership, implementation, verification, CI, and closeout.
+summary: Scope, context loading, ownership, conditional internal cutovers, saved-state obligations, verification and closeout.
 always: true
 ---
 
@@ -218,11 +218,14 @@ of oversized files is not the current inventory.
 
 ## No compatibility adapters
 
-This project is **pre-external-boundary**. No externally distributed client, real
-persistent player data, released save or content format, public API consumer, or
-deployed service interface exists.
+Check the current activation status in the
+[server owner](server-notes.md#the-external-boundary-when-it-activates) before
+choosing a migration policy. Private saved-state preservation and explicit
+offline migration obligations also belong to
+[server notes](server-notes.md#offline-content-cutover).
 
-While that is true, architectural coherence and one clean current contract take
+**Before external product-boundary activation**, the following policy applies.
+Architectural coherence and one clean current contract take
 priority over compatibility with obsolete internal shapes. The default is **no
 compatibility adapters**: no aliases, dual parsers, fallback selectors, behavioural
 legacy fallbacks, deprecated fields, translation layers, or shims kept alive
@@ -246,10 +249,8 @@ explicit reject cases for exactly this reason.
 Migration during this phase is **one atomic cutover followed by fast validation**,
 never dual schemas or a staged internal compatibility period.
 
-Compatibility becomes a real requirement only when an explicit project decision
-records a real external boundary. Do not infer activation from the existence of a
-version number. The policy that applies after activation is owned by
-[server-notes.md](server-notes.md#the-external-boundary-when-it-activates).
+The activation criteria and policy after activation are owned by
+[server notes](server-notes.md#the-external-boundary-when-it-activates).
 
 ## Verification
 

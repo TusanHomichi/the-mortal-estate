@@ -22,8 +22,8 @@ operating rules; detailed workflow and verification usage have linked owners.
   of exact correspondence.
   D5 owns authoritative timing. Read the [rulings](docs/boundary-map.md#what-an-authored-seam-does-and-does-not-settle)
   before designing either.
-- **Atomic internal cutovers.** The external product boundary is not active.
-  Follow the [no-compatibility policy](docs/agent-workflow.md#no-compatibility-adapters):
+- **Atomic internal cutovers.** Check the [server-owned activation status](docs/server-notes.md#the-external-boundary-when-it-activates).
+  Before activation, follow the [no-compatibility policy](docs/agent-workflow.md#no-compatibility-adapters):
   migrate every caller and proof together; prove retired shapes refused.
 - **Keep raw references out.** No quarantine directory or raw external reference
   payload belongs in this checkout. Authorized derived geography follows the

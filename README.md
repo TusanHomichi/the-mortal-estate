@@ -35,9 +35,8 @@ is the
 For what the browser implements now, read
 [browser client](docs/browser-client.md);
 [presentation direction](docs/presentation-direction.md) owns the accepted target.
-The playable client now uses GPU-composited pixel art for the connected town and
-temple. [Pixel-art production](docs/pixel-art-production.md)
-records the source, sprite and rendering techniques.
+[Pixel-art production](docs/pixel-art-production.md) records provenance and
+rendering techniques for the retained town and interior assets.
 
 ## Working here
 
