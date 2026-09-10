@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-11
-revision: 1
+revision: 2
 status: Runtime exports and native proof complete, with explicit artwork and gameplay limits retained.
 public_safe: true
 summary: Bounded dungeon character playback, authoritative event consumption, male/female walk variants and proof plan.
@@ -75,6 +75,15 @@ were independently refused when missing or digest-mismatched. No runtime or
 animation-binding errors were observed. Native captures were visually inspected.
 Block selection is covered by wire-shaped unit fixtures; a deterministic incoming
 block was not added to the native scenario, so this record does not claim one.
+
+PR review found that local doors emitted internal world-transition events that
+were absent from observed movement. Rules now projects only adjacent, same-level,
+self-targeting door transitions through the existing visible movement event.
+Paired doors, other transitions and hidden actors remain excluded. A regression
+test consumes actual committed closed-door and open-door path events; native
+motion scenarios now require walking onto a closed door and sprinting through
+the opened doorway. This correction requires fresh release and full/native proof;
+the delivery PR carries the final receipts.
 
 The first selected verification run was COMPLETE: docs, real-denylist boundary
 checks, TypeScript, all 581 browser tests and the production build passed. Parent

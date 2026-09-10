@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-11
-revision: 58
+revision: 59
 status: Controlled Martial Artist bodies, shared combat and walking variants verified in all three native browsers.
 public_safe: true
 summary: Shared world shell, dungeon martial bodies and motion, retained pixel interiors and release-bound browser proof.
@@ -132,7 +132,9 @@ time, including hidden-tab time, without granting readiness or creating damage.
 
 Walking uses a complete visible local actor-moved chain beginning at the previous
 cell and ending at the current one. Gait phase follows rendered distance, using
-the body's own walk. Remaining authoritative time bounds visual travel; a ready
+the body's own walk. Rules projects adjacent self-targeting local-door transitions
+as movement; paired doors and other transitions retain snap placement. Remaining
+authoritative time bounds visual travel; a ready
 frame ends it. The fixed-direction camera follows the rendered observer anchor.
 Incomplete chains and area transitions snap to supplied placement.
 The intended distance-closing flying kick remains gameplay work; this renderer
