@@ -75,7 +75,7 @@ fn set_terrain(
     parameters: &SetTerrain,
 ) -> Result<()> {
     let gid = gid_of(member, document, &parameters.class, |role| {
-        matches!(role, TileRole::Base { .. })
+        matches!(role, TileRole::Base { .. } | TileRole::Door { .. })
     })?;
     let (width, height) = envelope(document)?;
     for cell in &parameters.cells {

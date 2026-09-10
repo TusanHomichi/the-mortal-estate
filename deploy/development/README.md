@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-08
-revision: 5
-status: Private development pixel-art deployment and explicit diagnostics; installed-host proof recorded separately.
+last_updated: 2026-09-10
+revision: 7
+status: Private preview refresh follows standing latest-build authorization; matching releases and preserved-state proof remain required.
 public_safe: true
-summary: Isolated services, matching pixel browser/artwork releases, private preview origins, installed UI proof and recovery.
+summary: Isolated services, latest-build preview operation, bound raster and dungeon mesh releases, UI proof and recovery.
 ---
 
 # Private development server
@@ -80,10 +80,12 @@ owner-authorized remote preview, use its canonical HTTPS origin, the first
 expedition world document, and the absolute external candidate-packet directory.
 The `pixel-manifest.json` packet must match the browser's `pixelReceipt.json`. Staging copies only the
 manifest and its verified asset references into the immutable browser release;
-private source files and unrelated packet files are excluded. Only PNG artwork is
-admitted; retired mesh packets are refused. The browser is built in fixed
-`pixel-art` presentation mode. Both the root
-and direct index entry render the pixel world without a query parameter. The actual server supplies every area,
+private source files and unrelated packet files are excluded. That raster receipt
+admits only PNGs. The separate `web/src/play/dungeon/receipt.json` binds the
+self-contained dungeon body and motion GLBs, which are copied and verified in
+the same release. The browser is built in fixed `world` mode; retired `pixel-art`
+mode is refused. Root and direct index entries use the same area-selected world
+renderer without a query parameter. The actual server supplies every area,
 resident, service and transition; the preview is not a local movement scene.
 
 The operator's existing TLS reverse proxy forwards the public host and WebSocket
@@ -100,8 +102,9 @@ configured public origin and host. Host-specific proxy configuration and access
 credentials remain outside this repository.
 
 A release updates the matching server, codec, browser, content and artwork
-atomically through `stage` and `activate`. Deployment is explicit after proof;
-it does not serve a moving checkout. An isolated temporary Git index may carry
+atomically through `stage` and `activate`. The [standing preview ruling](../../docs/server-notes.md#private-development-deployment)
+authorizes refresh as part of completing playable work. Activate after proof;
+the service does not serve a moving checkout. An isolated temporary Git index may carry
 the reviewed working tree for staging without changing the user's index or refs.
 Retain its source-tree identity in the release receipt. Changing the selected
 land requires a separately bootstrapped private installation or an owner-approved

@@ -35,7 +35,8 @@ export interface PixelManifest {
 export interface PixelPacket { manifest: PixelManifest; images: Map<string, HTMLImageElement> }
 
 export function validatePixelManifest(value: PixelManifest): void {
-  if (value.schema_version !== 4 || value.status !== "candidate" ||
+  if (value.schema_version !== 7) throw new Error("Pixel packet schema is retired or unknown.");
+  if (value.status !== "candidate" ||
       value.geography_review_manifest_sha256 !== promotion.reviewed_encoding.review_manifest_sha256 ||
       value.geography_master_sha256 !== promotion.master.sha256 ||
       !value.figures.traveler || !value.figures.tomas || !value.figures.maude ||
@@ -44,6 +45,7 @@ export function validatePixelManifest(value: PixelManifest): void {
   }
   validateExterior(value.exterior);
   validatePixelEffects(value.effects);
+  if ("dungeon" in value) throw new Error("Retired pixel dungeon artwork.");
   if(!Array.isArray(value.temple_foreground)||!value.temple_foreground.length||value.temple_foreground.length>32)throw new Error("Missing temple foreground.");
   for(const p of value.temple_foreground)if(![p.x,p.y,p.width,p.height,p.depth].every(Number.isInteger)||
     p.x<0||p.y<0||p.width<1||p.height<1||p.x+p.width>512||p.y+p.height>512||p.depth<p.y||p.depth>512)throw new Error("Invalid temple foreground calibration.");
@@ -80,7 +82,8 @@ export function validatePixelManifest(value: PixelManifest): void {
   }
 }
 export function pixelFiles(value: PixelManifest): PixelFile[] {
-  return [...pixelEffectFiles(value.effects), value.background, value.exterior.background, ...value.exterior.foreground, ...Object.values(value.figures).flatMap(figure =>
+  return [...pixelEffectFiles(value.effects), value.background, value.exterior.background, ...value.exterior.foreground,
+    ...Object.values(value.figures).flatMap(figure =>
     [...Object.values(figure.rotations), ...Object.values(figure.walk).flat()])];
 }
 export async function loadPixelPacket(): Promise<PixelPacket> {

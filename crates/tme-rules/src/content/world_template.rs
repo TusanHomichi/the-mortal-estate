@@ -134,6 +134,9 @@ pub enum TopologyKindDef {
         reciprocal_endpoint_id: String,
         initial_state: DoorStateDef,
     },
+    LocalDoor {
+        initial_state: DoorStateDef,
+    },
     Stairs {
         direction: VerticalDirection,
     },
@@ -159,6 +162,9 @@ impl<'de> Deserialize<'de> for TopologyKindDef {
                 reciprocal_endpoint_id: String,
                 initial_state: DoorStateDef,
             },
+            LocalDoor {
+                initial_state: DoorStateDef,
+            },
             Stairs {
                 direction: VerticalDirection,
             },
@@ -181,6 +187,7 @@ impl<'de> Deserialize<'de> for TopologyKindDef {
                 reciprocal_endpoint_id,
                 initial_state,
             },
+            Raw::LocalDoor { initial_state } => Self::LocalDoor { initial_state },
             Raw::Stairs { direction } => Self::Stairs { direction },
             Raw::Pit => Self::Pit,
             Raw::Climb { direction } => Self::Climb { direction },

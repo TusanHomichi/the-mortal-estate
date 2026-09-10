@@ -25,6 +25,7 @@ pub(crate) fn digest(members: &BTreeMap<String, Member>, graph: &Connectivity) -
                 json!({
                     "width": member.width(), "height": member.height(), "cells": cells,
                     "structures": member.structures(), "landmarks": member.landmarks(),
+                    "doors": member.doors(),
                     "arrival": member.arrival(),
                 }),
             )

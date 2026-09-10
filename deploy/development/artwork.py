@@ -15,13 +15,13 @@ def copy_artwork(source: Path, destination: Path):
         raise ValueError("presentation packet differs from this browser's receipt")
     files = {"pixel-manifest.json": digest(manifest)}
 
-    def visit(value):
+    def visit(value, extension):
         if isinstance(value, dict):
             if "file" in value and "sha256" in value:
                 name, expected = value["file"], value["sha256"]
                 relative = Path(name)
-                if relative.suffix != ".png":
-                    raise ValueError("pixel artwork must contain PNG images, not 3D assets")
+                if relative.suffix != extension:
+                    raise ValueError("presentation asset has the wrong format for its receipt")
                 if relative.is_absolute() or ".." in relative.parts or relative.as_posix() != name:
                     raise ValueError("presentation asset name must be a normalized relative path")
                 path = source / name
@@ -33,11 +33,12 @@ def copy_artwork(source: Path, destination: Path):
                     raise ValueError("presentation asset digest mismatch")
                 files[name] = expected
             for child in value.values():
-                visit(child)
+                visit(child, extension)
         elif isinstance(value, list):
             for child in value:
-                visit(child)
-    visit(json.loads(manifest.read_text()))
+                visit(child, extension)
+    visit(json.loads(manifest.read_text()), ".png")
+    visit(json.loads((REPO / "web/src/play/dungeon/receipt.json").read_text()), ".glb")
     destination.mkdir(parents=True)
     for name, expected in files.items():
         target = destination / name

@@ -1,23 +1,26 @@
 ---
-last_updated: 2026-09-09
-revision: 42
-status: GPU pixel composition verified through repository checks, three-engine native walks and sustained crowd measurements.
+last_updated: 2026-09-10
+revision: 57
+status: Four-floor Three.js integration verified and installed on the private preview.
 public_safe: true
-summary: Pixel scene binding, GPU colour and lighting composition, reusable Canvas preparations, native profiling and sustained crowd measurement.
+summary: Installed shared world shell, area-selected dungeon rendering, retained pixel interiors and release-bound browser proof.
 routes:
   - web/**
   - tools/run_pixel_temple.py
+  - tools/run_dungeon_proof.py
 ---
 
 # Browser client
 
-The browser is the active play surface. The default product draws pixel art with
-GPU pixel composition with Canvas 2D preparation and consumes server-owned movement, actors, services and lifecycle.
-The connected town and temple have candidate artwork; the other interiors have
-an explicitly labelled map pending room construction. A separate read-only
-Three.js diagnostic observer supports Workbench capture; explicit inspection
-builds support synthetic proof worlds. Earlier 3D local scene tools are retained
-as retired references and are excluded from the default product bundle.
+The browser is the active play surface. One world shell consumes server-owned
+movement, actors, services and lifecycle. `worldRenderer.ts` selects Three.js for
+the four dungeon floors and the retained pixel renderer for town, temple and
+service interiors. A separate read-only diagnostic observer supports Workbench
+capture; explicit inspection builds support synthetic proof worlds. Older study
+renderers are excluded from the product. The
+[live dungeon execution](plans/2026-09-10-live-dungeons.md) owns the cutover and
+verification status; the [3D ruling](presentation-direction.md#3d-reopening)
+owns the selected visual direction.
 [Client architecture](client-architecture.md) owns the client contract;
 [presentation direction](presentation-direction.md) owns the visual target;
 [Server notes](server-notes.md) owns server implementation and the direct wire proof. Use the [checkpoint](plans/genesis-ledger.md#current-checkpoint)
@@ -28,8 +31,9 @@ for deployment and work status.
 | Work | Start here | Proof |
 | --- | --- | --- |
 | Private authoritative play | `web/src/play/`, `web/play.html` | actual adapter tests, installed `web/proof/play-proof.mjs` |
-| Primary pixel art | `web/src/play/pixelRenderer.ts`, `pixelOverlays.ts`, `pixelPacket.ts`, `pixelGeometry.ts`, `pixelMotion.ts` | `web/tests/pixelPacket.test.ts`, `web/tests/pixelMotion.test.ts`, `web/proof/pixel-temple-proof.mjs` |
+| Town and interior pixel art | `web/src/play/pixelRenderer.ts`, `pixelOverlays.ts`, `pixelPacket.ts`, `pixelGeometry.ts`, `pixelMotion.ts` | `web/tests/pixelPacket.test.ts`, `web/tests/pixelMotion.test.ts`, `web/proof/pixel-temple-proof.mjs` |
 | Pixel composition and atmosphere | `web/src/play/pixelCompositor.ts`, `pixelEffects.ts`, `pixelEffectsShader.ts`, `pixelEffectsConfig.ts` | `web/proof/pixel-effects-proof.mjs`, native exterior/temple walks, sustained crowd proof |
+| Live dungeon rendering | `web/src/play/worldRenderer.ts`, `dungeon/` | `web/tests/dungeonRenderer.test.ts`, `web/proof/dungeon-proof.mjs` |
 | Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
 | Retired 3D packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
 | Retired local movement | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
@@ -45,17 +49,26 @@ Paths in a row share the first path's directory unless written in full.
 ## Pixel-art presentation
 
 `npm --prefix web run build` and
-`node web/proof/build-play.mjs <external-output>` create the pixel-art product.
-The explicit mode name is `pixel-art`; its URL cannot switch renderers.
+`node web/proof/build-play.mjs <external-output>` create the world product.
+The explicit mode name is `world`; retired `pixel-art` mode is refused. Area selection cannot be overridden through the URL.
 `tools/run_pixel_temple.py --admin-url-file <file> --assets <external-packet>
 --output <external-directory>` builds and serves it on a disposable local
 first-expedition authority, placing the existing seeded player in the temple.
 The launcher prints the local URL and writes private access details with mode
 0600; Ctrl-C stops the server and removes those details. Add `--proof` for the
 complete three-engine interaction loop; `--engine` narrows that to inspection.
+Add `--entry --proof` for class allocation, two-resolution entry captures,
+a lost-reply retry after a real creation commit, admission and durable roster
+proof in all three browsers. Each run uses disposable authority.
 Add `--exterior` to start outside the temple and select the exterior walking,
 entry/return, resize, reconnect and missing-art proof.
 The existing 3D preview and its output are not launcher inputs.
+`tools/run_dungeon_proof.py --release <immutable-release> --admin-url-file <file>
+--output <external-directory>` checks all four floors, the temple round trip,
+actor-menu traversal and missing/stale dungeon asset refusal in all three browsers.
+Its release must match its complete file receipt and this checkout's content;
+the harness uses that release's explicit server binary without a rebuild or fallback.
+`--engine` or `--scenario` narrows the evidence.
 
 The pixel packet uses the existing explicit external `/feel-assets/` mount.
 `pixelReceipt.json` pins its manifest; the loader checks each PNG digest and the
@@ -73,16 +86,36 @@ hover/route outlines and pointer inversion. Only observed passable tiles add
 grid edges, and adjacent tiles share a single drawn edge. The room plate carries
 material texture without a competing regular tile pattern. Sprite canvas
 resolution and transparent padding are independent of its gameplay display
-height. Pixel packet version 4 binds the current geography master and review,
+height. Town pixel packet version 7 binds the current geography master and review,
 all seven exterior doorway bounds, whole-scene images, foreground masks, temple
-patches, sprite anchors, and effect maps/profiles. Versions 1–3 are refused.
+patches, sprite anchors, and effect maps/profiles. Versions 1–6 and retired dungeon tile payloads are refused.
 Furniture and scenery hide grid ink, ground contents and actors behind them
 without changing collision. Visibility selects shared cells, never a private grid.
 
+`pixelActorAnchors` owns displayed occupant placement. A lone actor's foot/contact
+anchor is the projected tile center. Shared-tile offsets apply only after visible
+living actors finish arriving at the same cell; an actor moving toward an occupied
+destination cannot displace its occupant early. Departure or removal restores the
+remaining lone actor to center. Drawing, contact rings, and picking
+use the same computed anchors. The current two-position shared layout remains
+provisional; larger crowds need a separate layout pass.
+
 `pixelViewport.ts` selects integer scenery scale against a 640-by-360 minimum
 logical view: 1280-by-800 uses 640-by-400 at 2x; 1920-by-1080 uses 640-by-360 at
-3x. Camera translation follows the interpolated ground anchor and clamps at scene
-bounds. Small rooms centre inside the available view; larger rooms scroll.
+3x for town. Pixel camera translation follows the interpolated ground anchor and
+clamps at scene bounds. Small rooms centre inside the available view; larger
+rooms scroll. Dungeon areas use the selected perspective camera and a fixed
+player-centred seven-by-seven display, including black unseen space. Display
+framing never changes the server's sight range or action legality. All four
+floors consume their bounded observer scene window; terrain and door meshes are
+created only for observed frame rows. The live renderer, asset cutover and
+remaining art limitations are detailed in the
+[live dungeon record](plans/2026-09-10-live-dungeons.md).
+
+The observer can open their own actor menu to use an enabled server-offered stair
+action, including a landing directly on stairs. Observed stair markers and door
+states are drawn; concealed closed doors remain masonry. Door-state changes
+invalidate the overlay cache.
 The exact canvas CSS size avoids browser resampling and fractional border loss.
 The terrain and environment effects retain that native grid. Ground-grid and
 route ink rasterize on a logical-size overlay before nearest enlargement, so
@@ -178,7 +211,7 @@ other task-owned browser proofs or builds. Those measurements do not establish
 physical-device or scanout FPS. The [performance execution record](plans/2026-09-09-pixel-performance.md)
 owns the preceding baseline. The [GPU execution record](plans/2026-09-09-pixel-gpu-composition.md)
 owns the cutover comparison, final measurements and remaining limitations.
-`pixel-pointing.mjs` waits for the rendered viewport, then reads its projection
+`world-pointing.mjs` waits for the rendered viewport, then reads its projection
 and bounds together for native proof input. This presentation readiness is
 separate from the server's permission to act.
 
@@ -310,14 +343,32 @@ while a movement button or key sends a single-step intent.
 Only a validated server frame changes position or grants readiness. Recovery
 progress is cosmetic; reaching its end cannot enable action input.
 
-`play/creationPanel.ts` presents immutable server creation options, allocation
-bounds and a point-budget display before character selection. Rules own the
-allocation and loadout. An uncertain creation response keeps the original draft
-and request ID in memory for an unchanged retry; editing that pending draft is
-refused. A successful response updates the roster without admitting a socket.
+`play/entryShell.ts` presents sign-in, character roster, creation and connection
+recovery as full-screen game menus. `entryStyle.css` owns the shared frame,
+controls and responsive Deck/desktop layouts. `entryBackdrop.ts` paints the
+already verified town image once and enlarges it by an integer; it does not
+reuse retired blob URLs, fetch unverified artwork or add an animation loop.
+The production world hides the entry completely after admission. Startup still
+keeps login disabled until the codec and renderer are ready.
+
+`play/creationPanel.ts` uses class radios and six plus/minus attribute rows.
+`creationAllocation.ts` checks the catalog's bounds and exact spend; rules remain
+the final validator. A new class starts at its minimums with the whole pool
+available. Reset restores those minimums. The form does not consume or expose
+the catalog's authored suggested allocation, following the
+[entry presentation ruling](presentation-direction.md#entry-and-character-creation).
+Name and a complete allocation are required before Create.
+Nationalities are omitted from presentation; profile IDs retain catalog meaning.
+`creationTheme.ts` owns original class emblems and short presentation descriptions.
+
+An uncertain creation response exposes a copied pending draft from `control.ts`
+and locks edits and Back. Retry submits the same draft and request ID. A successful
+response updates and selects the new roster entry without admitting a socket.
+Back closes an unsubmitted sheet; sign-out clears transient creation state.
 The [server contract](server-notes.md#character-creation-admission) owns atomic
 creation and replay; the [class contract](class-training-contract.md#character-creation)
-owns profile meaning. Sign-out clears the draft and creation options.
+owns profile meaning. The [entry execution record](plans/2026-09-09-game-entry.md)
+owns verification and visual evidence.
 
 `authoritative/gameplay.ts` reads the Rust-validated frame's character, equipment
 and assessed action options. `play/gameplayPanel.ts` presents these in the private
@@ -418,6 +469,10 @@ cursors. Rendered ground picking ignores foreground roof/crown elevations.
 After an authoritative landing, movement follows the confirmed route's traversed
 prefix when it matches, with a short presentation animation. This animation
 does not own occupancy or cooldown. Portal transitions discard the old overlay.
+A proposed route may continue through an observed **open** door whose destination
+is exactly its own realm, level and cell. A closed local door may be the endpoint;
+opening ends the move there. The [gameplay ruling](gameplay-baseline.md#local-door-movement)
+owns this behavior. Other transitions terminate proposals; server preview decides outcomes.
 
 `web/proof/path-controls-proof.mjs` takes private JSON on stdin containing
 `origin`, `username`, `password`, `character`, `output` and optional `temple`.
@@ -867,8 +922,14 @@ The [resident contract](town-resident-contract.md) owns Tomas's circuit, attenti
 pause, service binding and persistence. `pixelRenderer.ts` retains observed actor
 identity and interpolates committed routes. Sprite anchors and foreground depth
 supply pointing without changing occupancy. `actorInteraction.ts` builds the
-resident panel from observed identity and current projected offers, closes it on
-authority loss, and preserves disabled purchases as disabled.
+actor panel from observed identity and current projected offers, closes it on
+authority loss, and preserves disabled actions as disabled. Alongside services,
+it shows physical attacks and direct or warmed spells whose typed actor target
+matches the clicked identity. Coordinate, area, self-targeted and unrelated
+actions are not assigned to a creature by location or display name. Dispatch
+retains the original character action group and re-resolves the current offer,
+including its target and hostility authorization. Opening the panel sends no
+command. The retired gameplay HUD remains absent.
 
 The pixel packet maps resident IDs to hash-bound directional sprite PNGs; missing
 declared assets refuse loading. Native evidence exercises right-click picking,

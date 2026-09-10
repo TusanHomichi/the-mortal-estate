@@ -15,8 +15,9 @@ use std::path::Path;
 
 use tme_rules::model::{Coord, VerticalDirection, WorldPosition};
 use tme_rules::{
-    CatalogProfileKey, CatalogV6, LevelDef, RealmDef, TopologyEdgeDef, TopologyKindDef,
-    TopologyTargetDef, WORLD_TEMPLATE_KIND, WORLD_TEMPLATE_SCHEMA_VERSION, WorldTemplateV3,
+    CatalogProfileKey, CatalogV6, DoorStateDef, LevelDef, RealmDef, TopologyEdgeDef,
+    TopologyKindDef, TopologyTargetDef, WORLD_TEMPLATE_KIND, WORLD_TEMPLATE_SCHEMA_VERSION,
+    WorldTemplateV3,
 };
 
 use crate::Result;
@@ -154,6 +155,33 @@ pub fn project(land: &Land) -> Result<WorldTemplateV3> {
     let arrival = arrival_member
         .arrival()
         .ok_or("the arrival member carries no arrival")?;
+    let mut topology = topology(contract, land)?;
+    for member in land.members() {
+        for door in member.doors() {
+            if land.connectivity().edges.iter().any(|edge| {
+                edge.from_member == member.id() && edge.from == door.at && edge.direction == "door"
+            }) {
+                continue;
+            }
+            let at = position(contract, member.id(), door.at);
+            let id = format!("door/{}/{}/{}", member.id(), door.at.x, door.at.y);
+            topology.insert(
+                id,
+                TopologyEdgeDef {
+                    at: at.clone(),
+                    target: TopologyTargetDef::Position { location: at },
+                    kind: TopologyKindDef::LocalDoor {
+                        initial_state: if door.open {
+                            DoorStateDef::Open
+                        } else {
+                            DoorStateDef::Closed
+                        },
+                    },
+                    hidden: door.hidden,
+                },
+            );
+        }
+    }
     Ok(WorldTemplateV3 {
         schema_version: WORLD_TEMPLATE_SCHEMA_VERSION,
         kind: WORLD_TEMPLATE_KIND.into(),
@@ -164,7 +192,7 @@ pub fn project(land: &Land) -> Result<WorldTemplateV3> {
             contract.arrival_id.to_owned(),
             position(contract, arrival_member.id(), arrival),
         )]),
-        topology: topology(contract, land.connectivity())?,
+        topology,
     })
 }
 
@@ -230,8 +258,9 @@ fn position(contract: &'static LandContract, member: &str, point: Point) -> Worl
 
 fn topology(
     contract: &'static LandContract,
-    graph: &Connectivity,
+    land: &Land,
 ) -> Result<BTreeMap<String, TopologyEdgeDef>> {
+    let graph = land.connectivity();
     graph
         .edges
         .iter()
@@ -244,6 +273,35 @@ fn topology(
                     direction: VerticalDirection::Up,
                 },
                 "passage" => TopologyKindDef::Passage,
+                "door" => {
+                    let paired = graph
+                        .edges
+                        .iter()
+                        .find(|other| {
+                            other.from_member == edge.to_member
+                                && other.from == edge.to
+                                && other.to_member == edge.from_member
+                                && other.to == edge.from
+                                && other.direction == "door"
+                        })
+                        .ok_or_else(|| format!("door edge {} lacks its reciprocal", edge.id))?;
+                    let door = land
+                        .member(&edge.from_member)?
+                        .doors()
+                        .iter()
+                        .find(|door| door.at == edge.from)
+                        .ok_or_else(|| format!("door edge {} lacks authored state", edge.id))?;
+                    TopologyKindDef::Door {
+                        binding_id: format!("binding/{}", std::cmp::min(&edge.id, &paired.id)),
+                        endpoint_id: edge.id.clone(),
+                        reciprocal_endpoint_id: paired.id.clone(),
+                        initial_state: if door.open {
+                            DoorStateDef::Open
+                        } else {
+                            DoorStateDef::Closed
+                        },
+                    }
+                }
                 other => {
                     return Err(format!(
                         "connectivity edge {} declares unknown direction {other:?}",

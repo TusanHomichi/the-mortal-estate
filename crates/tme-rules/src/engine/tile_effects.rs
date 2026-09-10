@@ -358,7 +358,39 @@ impl Engine {
             }
         }
 
-        let terrain_name = if tile_effects.is_empty() {
+        // Hidden topology is absent from offered navigation, but its closed door
+        // still occupies the cell. Filtering discovery must not erase physics.
+        let hidden_closed_door = self
+            .definition
+            .world_template
+            .navigation
+            .get(location)
+            .is_some_and(|edges| {
+                edges
+                    .iter()
+                    .any(|edge| edge.kind == NavigationKind::Door && edge.hidden)
+            })
+            && !self
+                .world
+                .hidden_transition_revealed
+                .get(location)
+                .copied()
+                .unwrap_or(false)
+            && !self
+                .world
+                .door_states
+                .get(location)
+                .copied()
+                .unwrap_or(false);
+        if hidden_closed_door {
+            passable = false;
+            move_cost = None;
+            traversal = None;
+            sight_overlay_blocks = Some(true);
+        }
+        let terrain_name = if hidden_closed_door {
+            "Wall".to_owned()
+        } else if tile_effects.is_empty() {
             terrain.name.clone()
         } else {
             format!(

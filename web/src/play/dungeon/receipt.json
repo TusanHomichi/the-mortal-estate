@@ -1,0 +1,11 @@
+{
+  "status": "candidate",
+  "body": {
+    "file": "dungeon-adventurer.glb",
+    "sha256": "7b022a9e35a944105659f0421fe7cdc0bfc849b722edb88752e7dcd84823eb83"
+  },
+  "motion": {
+    "file": "dungeon-motion.glb",
+    "sha256": "ad0c0fb473ecd1a4e56a7fa967680bf8c095383e6a386e6689d5125b63bff3c1"
+  }
+}

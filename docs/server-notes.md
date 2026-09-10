@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-08
-revision: 24
-status: Standing server contract with offline checkpoint preparation, private preview releases and explicit study origins.
+last_updated: 2026-09-09
+revision: 25
+status: Standing server contract with latest-build private preview refresh and preserved-state content migration.
 public_safe: true
-summary: Server authority, persistence, offline migration, private preview deployment, remote study origins and teardown.
+summary: Server authority, persistence, offline migration, standing preview refresh authorization, remote study origins and teardown.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -114,8 +114,18 @@ operator-prepared content cutover. Its plan pins both definition digests, retire
 only named unburdened NPCs and service instances, and merges remaining merchant
 listings into an existing compatible provider without changing item IDs, prices,
 listing origin or quantities. Player state is never reseeded. It refuses retained
-actors whose current or home positions need relocation and reuses full checkpoint
-hydration to validate the result. This is an offline migration, not a recovery
+actors whose current or home positions remain impassable after explicitly declared
+member translations and reuses full checkpoint hydration to validate the result.
+The strict plan requires `relocations` and `initialize_new_topology`; retired plans
+without those fields are refused. Member translations preserve every typed live
+location, NPC patrol and remembered location, including keyed door and hidden
+state. Duplicate, overflowing, absent-member or out-of-bounds transforms fail.
+Retained navigation must keep its kind, concealment ownership and translated target.
+New topology state requires explicit initialization; existing mutable door and
+revelation state survives. Bootstrap
+`initial_events` remain immutable history at their original coordinates; the
+deployment retains the source-definition binding beside its migration receipt.
+This is an offline migration, not a recovery
 fallback or a second supported in-memory shape.
 
 The server command `checkpoint migrate-content <before-bootstrap> <after-bootstrap>
@@ -162,6 +172,16 @@ admission or authorization to open enrollment. The private preview serves the
 whole current playable build, including exterior travel and interior transitions.
 Public enrollment and external product-boundary activation remain a later owner
 decision with their own implementation and proof.
+
+The September 9 owner ruling requires the private preview to run the latest
+verified playable build. Refreshing it is part of completing playable changes
+and merges, with standing authorization to stage, back up, activate and prove
+the matching server, browser, content and artwork; do not ask again for ordinary
+preview deployment. This is an agent closeout obligation, not an unattended
+deployment service. Keep immutable release receipts, preserve saved state and
+rehearse required migrations. A failed build or unsafe migration keeps the last
+working release live and must be reported explicitly. This ruling grants neither
+world resets nor public enrollment. The development runbook owns the operations.
 
 The installed-service proof is explicit because it can restart the persistent
 private world. The [execution receipt](plans/2026-09-05-private-play-loop.md)

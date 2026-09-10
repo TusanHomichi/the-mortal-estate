@@ -90,7 +90,7 @@ def stage_release(site):
             shutil.copyfile(source, copied)
         run(["npm", "--prefix", REPO / "web", "ci"], timeout=300, cwd=REPO)
         run(["node", REPO / "web/proof/build-play.mjs", staging / "web",
-             "pixel-art" if site.settings["presentation_assets"] else "inspection"], timeout=600, cwd=REPO)
+             "world" if site.settings["presentation_assets"] else "inspection"], timeout=600, cwd=REPO)
         if site.settings["presentation_assets"]:
             from artwork import copy_artwork
             copy_artwork(Path(site.settings["presentation_assets"]), staging / "web/feel-assets")

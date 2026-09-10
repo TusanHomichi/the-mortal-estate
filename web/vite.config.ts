@@ -67,7 +67,7 @@ function feelAssetsPlugin(): Plugin {
           return;
         }
         const extension = path.extname(resolved).toLowerCase();
-        const contentType = extension === ".json" ? "application/json" : "image/png";
+        const contentType = extension === ".json" ? "application/json" : extension === ".glb" ? "model/gltf-binary" : "image/png";
         response.statusCode = 200;
         response.setHeader("Content-Type", contentType);
         response.setHeader("Cache-Control", "no-store");

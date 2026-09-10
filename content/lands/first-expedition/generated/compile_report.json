@@ -5,7 +5,10 @@
   "member_digests": {
     "content/lands/first-expedition/arrival.tmj": "0b6cd1149004780dbab45ec52ef9853751ed02e1962efba25317fdc6de09f6ee",
     "content/lands/first-expedition/bank.tmj": "bd5004f952a05abefe8ef0797e395799728dd97b5642fa379155c263824920da",
-    "content/lands/first-expedition/d1_entry.tmj": "020c3dada5b04116620fed668f9b07f651f72262ffd001d667fbad323f7b2314",
+    "content/lands/first-expedition/d1_entry.tmj": "910ecd9f7e598f07213209a4f895984059bd857f43f9f973da9e04b9ca40d404",
+    "content/lands/first-expedition/d2.tmj": "28416c60d6dfc8306bc2edfaca7fd507533b683e43d2686ffa645c16d7bd71a5",
+    "content/lands/first-expedition/d3.tmj": "28548b7ca3e7e4052b8737a8ad03beaa468737969bdd851b8ba7a08d551353a4",
+    "content/lands/first-expedition/d4.tmj": "7659d0e14a5a1df7a244bd7a7dbf227dd08ae074027668065f5fb193dd0cf4b5",
     "content/lands/first-expedition/forge.tmj": "60b67973dcd876e4444bda8a9fdffcb6cf225bedc2c6388d0ef1742f643e24c3",
     "content/lands/first-expedition/lodge.tmj": "788e4a84c7d763a8fb144b5f94877da9fbdf93a15fe074a175eebadb5c2b6071",
     "content/lands/first-expedition/market.tmj": "a3e71a80278cb264c821b1c3a744aa33e8c7f9c9227cb98afbbfb0a3d35729bc",
@@ -148,15 +151,112 @@
     },
     {
       "member": "d1_entry",
-      "width": 7,
-      "height": 7,
-      "passable_cells": 17,
-      "route_cells": 1,
+      "width": 36,
+      "height": 43,
+      "passable_cells": 635,
+      "route_cells": 0,
       "structure_footprint_cells": 0,
       "structures": [],
-      "landmarks": [],
+      "landmarks": [
+        "deferred_access_01",
+        "deferred_access_02",
+        "deferred_access_03",
+        "deferred_access_04",
+        "deferred_access_05",
+        "deferred_access_06",
+        "deferred_access_07",
+        "deferred_access_08",
+        "deferred_access_09",
+        "deferred_access_10",
+        "reserved_surface_exit"
+      ],
       "transitions": [
+        "d1_entry_to_d2_guild",
+        "d1_entry_to_d2_stair_1",
+        "d1_entry_to_d2_stair_2",
+        "d1_entry_to_d2_stair_3",
         "d1_entry_to_temple"
+      ],
+      "arrival": null
+    },
+    {
+      "member": "d2",
+      "width": 38,
+      "height": 43,
+      "passable_cells": 686,
+      "route_cells": 0,
+      "structure_footprint_cells": 0,
+      "structures": [],
+      "landmarks": [
+        "deferred_access_01",
+        "deferred_access_02",
+        "deferred_access_03",
+        "deferred_access_04",
+        "deferred_access_05",
+        "reserved_external_portal",
+        "reserved_surface_exit"
+      ],
+      "transitions": [
+        "d2_to_d1_entry_guild",
+        "d2_to_d1_entry_stair_1",
+        "d2_to_d1_entry_stair_2",
+        "d2_to_d1_entry_stair_3",
+        "d2_to_d3_grand_8",
+        "d2_to_d3_grand_9",
+        "d2_to_d3_lake",
+        "d2_to_d3_stair_1",
+        "d2_to_d3_stair_2",
+        "d2_to_d3_stair_3",
+        "d2_to_d3_stair_4",
+        "d2_to_d3_stair_5"
+      ],
+      "arrival": null
+    },
+    {
+      "member": "d3",
+      "width": 36,
+      "height": 43,
+      "passable_cells": 765,
+      "route_cells": 0,
+      "structure_footprint_cells": 0,
+      "structures": [],
+      "landmarks": [
+        "deferred_access_01",
+        "deferred_access_02",
+        "reserved_external_portal"
+      ],
+      "transitions": [
+        "d3_to_d2_grand_8",
+        "d3_to_d2_grand_9",
+        "d3_to_d2_lake",
+        "d3_to_d2_stair_1",
+        "d3_to_d2_stair_2",
+        "d3_to_d2_stair_3",
+        "d3_to_d2_stair_4",
+        "d3_to_d2_stair_5",
+        "d3_to_d4_stair_1",
+        "d3_to_d4_stair_2",
+        "d3_to_d4_stair_3"
+      ],
+      "arrival": null
+    },
+    {
+      "member": "d4",
+      "width": 37,
+      "height": 43,
+      "passable_cells": 585,
+      "route_cells": 0,
+      "structure_footprint_cells": 0,
+      "structures": [],
+      "landmarks": [
+        "deferred_access_01",
+        "deferred_access_02",
+        "reserved_external_portal"
+      ],
+      "transitions": [
+        "d4_to_d3_stair_1",
+        "d4_to_d3_stair_2",
+        "d4_to_d3_stair_3"
       ],
       "arrival": null
     }
@@ -276,16 +376,436 @@
         "direction": "passage"
       },
       {
+        "id": "route/d1_entry_to_d2_guild",
+        "from_member": "d1_entry",
+        "from": {
+          "x": 35,
+          "y": 29
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 1,
+          "y": 29
+        },
+        "direction": "passage"
+      },
+      {
+        "id": "route/d1_entry_to_d2_stair_1",
+        "from_member": "d1_entry",
+        "from": {
+          "x": 7,
+          "y": 39
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 6,
+          "y": 39
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d1_entry_to_d2_stair_2",
+        "from_member": "d1_entry",
+        "from": {
+          "x": 15,
+          "y": 3
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 14,
+          "y": 3
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d1_entry_to_d2_stair_3",
+        "from_member": "d1_entry",
+        "from": {
+          "x": 28,
+          "y": 21
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 27,
+          "y": 21
+        },
+        "direction": "down"
+      },
+      {
         "id": "route/d1_entry_to_temple",
         "from_member": "d1_entry",
         "from": {
-          "x": 6,
-          "y": 4
+          "x": 25,
+          "y": 7
         },
         "to_member": "temple",
         "to": {
           "x": 0,
           "y": 5
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d2_to_d1_entry_guild",
+        "from_member": "d2",
+        "from": {
+          "x": 0,
+          "y": 29
+        },
+        "to_member": "d1_entry",
+        "to": {
+          "x": 34,
+          "y": 29
+        },
+        "direction": "passage"
+      },
+      {
+        "id": "route/d2_to_d1_entry_stair_1",
+        "from_member": "d2",
+        "from": {
+          "x": 7,
+          "y": 39
+        },
+        "to_member": "d1_entry",
+        "to": {
+          "x": 6,
+          "y": 39
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d2_to_d1_entry_stair_2",
+        "from_member": "d2",
+        "from": {
+          "x": 15,
+          "y": 3
+        },
+        "to_member": "d1_entry",
+        "to": {
+          "x": 16,
+          "y": 3
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d2_to_d1_entry_stair_3",
+        "from_member": "d2",
+        "from": {
+          "x": 28,
+          "y": 21
+        },
+        "to_member": "d1_entry",
+        "to": {
+          "x": 27,
+          "y": 21
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d2_to_d3_grand_8",
+        "from_member": "d2",
+        "from": {
+          "x": 37,
+          "y": 34
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 0,
+          "y": 34
+        },
+        "direction": "door"
+      },
+      {
+        "id": "route/d2_to_d3_grand_9",
+        "from_member": "d2",
+        "from": {
+          "x": 37,
+          "y": 33
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 0,
+          "y": 33
+        },
+        "direction": "door"
+      },
+      {
+        "id": "route/d2_to_d3_lake",
+        "from_member": "d2",
+        "from": {
+          "x": 37,
+          "y": 25
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 1,
+          "y": 25
+        },
+        "direction": "passage"
+      },
+      {
+        "id": "route/d2_to_d3_stair_1",
+        "from_member": "d2",
+        "from": {
+          "x": 4,
+          "y": 3
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 1,
+          "y": 3
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d2_to_d3_stair_2",
+        "from_member": "d2",
+        "from": {
+          "x": 18,
+          "y": 23
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 15,
+          "y": 23
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d2_to_d3_stair_3",
+        "from_member": "d2",
+        "from": {
+          "x": 25,
+          "y": 28
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 22,
+          "y": 28
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d2_to_d3_stair_4",
+        "from_member": "d2",
+        "from": {
+          "x": 31,
+          "y": 31
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 29,
+          "y": 32
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d2_to_d3_stair_5",
+        "from_member": "d2",
+        "from": {
+          "x": 34,
+          "y": 15
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 31,
+          "y": 15
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d3_to_d2_grand_8",
+        "from_member": "d3",
+        "from": {
+          "x": 0,
+          "y": 34
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 37,
+          "y": 34
+        },
+        "direction": "door"
+      },
+      {
+        "id": "route/d3_to_d2_grand_9",
+        "from_member": "d3",
+        "from": {
+          "x": 0,
+          "y": 33
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 37,
+          "y": 33
+        },
+        "direction": "door"
+      },
+      {
+        "id": "route/d3_to_d2_lake",
+        "from_member": "d3",
+        "from": {
+          "x": 0,
+          "y": 25
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 36,
+          "y": 25
+        },
+        "direction": "passage"
+      },
+      {
+        "id": "route/d3_to_d2_stair_1",
+        "from_member": "d3",
+        "from": {
+          "x": 2,
+          "y": 3
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 5,
+          "y": 3
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d3_to_d2_stair_2",
+        "from_member": "d3",
+        "from": {
+          "x": 16,
+          "y": 23
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 19,
+          "y": 23
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d3_to_d2_stair_3",
+        "from_member": "d3",
+        "from": {
+          "x": 23,
+          "y": 28
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 25,
+          "y": 28
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d3_to_d2_stair_4",
+        "from_member": "d3",
+        "from": {
+          "x": 29,
+          "y": 31
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 30,
+          "y": 31
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d3_to_d2_stair_5",
+        "from_member": "d3",
+        "from": {
+          "x": 32,
+          "y": 15
+        },
+        "to_member": "d2",
+        "to": {
+          "x": 33,
+          "y": 15
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d3_to_d4_stair_1",
+        "from_member": "d3",
+        "from": {
+          "x": 9,
+          "y": 17
+        },
+        "to_member": "d4",
+        "to": {
+          "x": 7,
+          "y": 17
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d3_to_d4_stair_2",
+        "from_member": "d3",
+        "from": {
+          "x": 30,
+          "y": 17
+        },
+        "to_member": "d4",
+        "to": {
+          "x": 29,
+          "y": 18
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d3_to_d4_stair_3",
+        "from_member": "d3",
+        "from": {
+          "x": 32,
+          "y": 39
+        },
+        "to_member": "d4",
+        "to": {
+          "x": 30,
+          "y": 39
+        },
+        "direction": "down"
+      },
+      {
+        "id": "route/d4_to_d3_stair_1",
+        "from_member": "d4",
+        "from": {
+          "x": 8,
+          "y": 17
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 10,
+          "y": 17
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d4_to_d3_stair_2",
+        "from_member": "d4",
+        "from": {
+          "x": 29,
+          "y": 17
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 29,
+          "y": 17
+        },
+        "direction": "up"
+      },
+      {
+        "id": "route/d4_to_d3_stair_3",
+        "from_member": "d4",
+        "from": {
+          "x": 31,
+          "y": 39
+        },
+        "to_member": "d3",
+        "to": {
+          "x": 31,
+          "y": 39
         },
         "direction": "up"
       },
@@ -368,8 +888,8 @@
         },
         "to_member": "d1_entry",
         "to": {
-          "x": 5,
-          "y": 4
+          "x": 24,
+          "y": 7
         },
         "direction": "down"
       },
@@ -389,7 +909,7 @@
       }
     ]
   },
-  "world_template_sha256": "6646cf614b7fff7aa762db59258d3f14a1d132f145386a8bf867c7914a9b7210",
+  "world_template_sha256": "3d4348a6e19a5892c757b6543a8fa6629813b63f8d442e425e63db62e9042a53",
   "terrain_registry_catalog": "content/lands/first-expedition/catalog.json",
   "terrain_registry_profile": "profile/first_expedition"
 }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {pixelCellPoint} from './pixel-pointing.mjs';
+import {worldCellPoint} from './world-pointing.mjs';
 import {readFile,writeFile} from 'node:fs/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
 let input='';for await(const chunk of process.stdin)input+=chunk;
@@ -19,7 +19,7 @@ try {
  const canvas=page.locator('#world-canvas');
  const ready=()=>wait(()=>document.body.dataset.phase==='playing'&&document.querySelector('#world-canvas').dataset.canAct==='true'&&document.querySelector('#world-canvas').dataset.pending==='false');
  const here=()=>structuredClone(frame.observation_center);
- const click=async(cell,options)=>{const p=await pixelCellPoint(page,cell);await page.mouse.click(p.x,p.y,options);};
+ const click=async(cell,options)=>{const p=await worldCellPoint(page,cell);await page.mouse.click(p.x,p.y,options);};
  const move=async cell=>{
   await ready();const count=commands.length;
   await click(cell,{clickCount:2,delay:60});

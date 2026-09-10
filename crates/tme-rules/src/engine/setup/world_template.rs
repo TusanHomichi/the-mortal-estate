@@ -71,6 +71,13 @@ pub(super) fn compile(source: &WorldTemplateV3) -> WorldTemplate {
                     DoorStateDef::Closed => DoorState::Closed,
                 }),
             ),
+            TopologyKindDef::LocalDoor { initial_state } => (
+                NavigationKind::Door,
+                Some(match initial_state {
+                    DoorStateDef::Open => DoorState::Open,
+                    DoorStateDef::Closed => DoorState::Closed,
+                }),
+            ),
             TopologyKindDef::Stairs { direction } => (NavigationKind::Stairs { direction }, None),
             TopologyKindDef::Pit => (NavigationKind::Pit, None),
             TopologyKindDef::Climb { direction } => (NavigationKind::Climb { direction }, None),

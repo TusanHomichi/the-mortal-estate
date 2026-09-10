@@ -9,7 +9,7 @@ export interface Frame {
   logical_time: string; ready_at: string; can_act: boolean;
   observer_actor_id: string; observation_center: Position;
   tiles: { position: Coord; terrain_id?: string; passable?: boolean; transition?: unknown }[];
-  actors: { actor_id: string; position: Position; name: string }[];
+  actors: { actor_id: string; position: Position; name: string; life_state?: string }[];
   corpses: { corpse_id: string; location: Position }[];
   ground_items: { item_instance_id: string; location: Position }[];
   gold_piles: { gold_pile_id: string; location: Position }[];

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {pixelCellPoint} from './pixel-pointing.mjs';
+import {worldCellPoint} from './world-pointing.mjs';
 import {writeFile} from 'node:fs/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
 import {installPixelProfile,beginPixelProfile,finishPixelProfile} from './pixel-profile.mjs';
@@ -14,7 +14,7 @@ try {
  await page.waitForFunction(()=>document.body.dataset.playReady==='true');await page.locator('#username').fill(config.username);await page.locator('#password').fill(config.password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Enter world',exact:true}).click();
  const ready=()=>page.waitForFunction(()=>document.body.dataset.phase==='playing'&&document.querySelector('#world-canvas').dataset.canAct==='true'&&document.querySelector('#world-canvas').dataset.pending==='false');await ready();
  const canvas=page.locator('#world-canvas');
- const move=async cell=>{await ready();const p=await pixelCellPoint(page,cell);await page.mouse.click(p.x,p.y,{clickCount:2,delay:60});await page.waitForFunction(()=>document.querySelector('#world-canvas').dataset.canAct==='false');await ready();};
+ const move=async cell=>{await ready();const p=await worldCellPoint(page,cell);await page.mouse.click(p.x,p.y,{clickCount:2,delay:60});await page.waitForFunction(()=>document.querySelector('#world-canvas').dataset.canAct==='false');await ready();};
  const reports=[];
  for(const level of ['temple','arrival']){
   assert.equal(frame.observation_center.level,level);

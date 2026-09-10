@@ -60,8 +60,8 @@ fn hidden_door_is_absent_from_action_context_until_revealed() {
         "hidden adjacent door must not appear on exit drafts"
     );
     assert!(
-        !hidden_east.blocked,
-        "hidden closed door should not block as a door before reveal"
+        hidden_east.blocked,
+        "concealed closed door must block as masonry before reveal"
     );
 
     engine
@@ -99,6 +99,7 @@ fn hidden_door_is_absent_from_action_context_until_revealed() {
         .find(|exit| exit.direction == Direction::East)
         .expect("east exit should exist");
     assert_eq!(hidden_again_east.transition, None);
+    assert!(hidden_again_east.blocked);
 }
 
 #[test]

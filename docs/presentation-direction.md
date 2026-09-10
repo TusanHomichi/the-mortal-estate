@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-09
-revision: 64
-status: Pixel town integration, grey-stone temple and Graveyard Keeper-style effects directed; character detail must survive scaling.
+last_updated: 2026-09-10
+revision: 83
+status: Selected dungeon perspective now used by the four-floor renderer; art and motion remain provisional.
 public_safe: true
-summary: Pixel art, preserved character detail, temple material and hatch direction, atmosphere and lighting reference.
+summary: Live dungeon direction uses the selected camera, original wall heights, black unseen areas and limited torches; character work remains.
 routes:
   - web/**
   - content/test-corpus/**
@@ -16,7 +16,109 @@ This Canonical document owns what the game should look like.
 [browser client](browser-client.md) owns implemented behavior;
 [pixel-art production](pixel-art-production.md) owns the reproducible art method.
 Earlier camera, mesh, lighting and presenter decisions are preserved in
-[presentation history](plans/2026-09-08-presentation-3d-history.md), not parallel active options.
+[presentation history](plans/2026-09-08-presentation-3d-history.md), historical evidence to reassess under the reopening below.
+
+## 3D reopening
+
+**Owner ruling, September 10, 2026:** reopen 3D presentation. The previous
+modeled temple is a useful quality benchmark; town exteriors still need work
+and the dungeon has not had a finished 3D pass. This supersedes the September 8
+prohibition on 3D product development. The following pixel-specific sections
+record the previous direction and retained town/interior renderer, not a mandate
+to produce more pixel artwork.
+
+Begin with a player-centred 7-by-7 dungeon comparison, including walls and black
+unobserved cells. Use real standing geometry and an adjustable elevated camera;
+the owner likes the approximately 60-degree guide and explicitly values changing
+camera elevation without redrawing assets. That guide is not a calibrated camera
+acceptance. Retain centered feet for a lone occupant and consistent adult/door
+scale. Camera changes never reveal unobserved cells or move authoritative cells.
+
+**Wall-edge follow-up:** wall runs and their door frames/leaves share the tile
+edge facing the player. The bottom (foreground) wall uses its tile's farther
+edge instead. The whole bottom wall tile remains non-occupiable; shifting its
+visible wall does not create another floor square. Join perpendicular wall runs
+at their common edge intersection, and keep door hinges attached to that same
+wall plane. In the private study, dark crossed tiles distinguish the retained
+blocked area; this is a diagnostic treatment, not accepted final floor art.
+World topology and passability remain authored/rules-owned.
+
+**Height follow-up:** raise the bottom wall enough to conceal its blocked strip
+at the chosen 60-degree view without covering the next walkable row. The north
+wall adjoining the north doorway finishes flush with the existing doorway top.
+Keep the door leaf at human scale; increased wall height elsewhere uses masonry
+above the opening rather than stretching the door. This calibration is a study
+at the chosen angle, not a promise that one fixed height hides a full row at
+every camera elevation.
+
+The visible wall/door join requires one continuous cap profile across the run,
+including matching top, depth and front edges. Equal maximum mesh heights alone
+do not prove alignment. Closed-door art must not expose a full-cell floor patch
+above the lintel where it reads as a raised doorway top. This is a drawing
+correction; doorway passability and server observation retain their owners.
+
+**Fixed-camera traversal clarification:** the owner's adjacent-room concern
+means walking south of the same wall while retaining the camera direction. It
+does not require a reverse camera or an orbit. The owner confirmed that the
+existing placement handles that case. Preserve this placement; the agent's
+proposed wall-footprint overhaul came from a mistaken interpretation and is
+withdrawn. The remaining comparison concerns the small foreground blocked strip
+exposed by mild perspective. Camera and height trials remain private studies
+pending visual acceptance, with authored blockage unchanged. The subsequent
+taller-wall trial was rejected: its extra height would loom as the north wall
+when entering the southern room. Keep the original wall heights; continue camera
+comparison rather than raising masonry to hide the perspective strip.
+
+**Selected camera approach:** the owner selected the 55-degree elevation with
+mild straight-line perspective (20-degree vertical field of view) and the
+original wall heights. Keep camera orientation fixed through movement. This
+replaces the taller-wall trial and the 60-degree camera as the current dungeon
+presentation baseline. Adjoining-room traversal and responsive framing remain
+visual review concerns; selection of this approach does not accept unfinished
+dungeon art. The live dispatch below separately authorizes integration.
+Preserve the previously directed 40-percent
+transparency for a wall or door obscuring an observed character; restore opaque
+materials when the obstruction clears. This changes drawing, not world geometry,
+passability or what the server permits the player to observe.
+
+
+**Unseen-area and lighting ruling:** after comparing fog and portable-light
+ideas, the owner selected complete black for unobserved areas, with occasional
+wall-mounted torches providing limited pools of dungeon light. Retire the fog
+veil and automatic player light from the study. Torch placement and falloff
+shape the observed scene; they never expose hidden rooms or creatures, replace
+authoritative visibility, or silently alter gameplay sight range. Treat local
+baked/cached architectural lighting and bounded nearby light work as the initial
+performance approach. Exact torch placements, final falloff and character
+lighting remain art/integration work.
+
+**Live dungeon dispatch:** the owner approved connecting all four existing
+layouts to live 3D presentation next, with art refinement during actual play.
+Town and temple keep their current presentation for this bounded integration.
+The [live execution record](plans/2026-09-10-live-dungeons.md) owns implementation
+and proof; this does not accept unfinished body, motion or scenery assets.
+
+Prefer a better player body than the default Quaternius models. Existing custom
+rigs are candidates, not accepted appearance. Mesh, rig and motion sources can
+be evaluated separately. The owner specifically rejected treating the existing
+walk, jog and run clips as good enough. Review foot contact, weight transfer,
+turning, starts/stops and combat at the intended camera and play scale; merely
+loading or renaming clips is not motion-quality proof.
+
+The owner suggested generated motion video as a possible reference for Blender
+keyframing. Evaluate short isolated actions with a locked camera, full body and
+visible ground contact. This is a reference experiment, not automatic motion
+capture, approval of generated anatomy or a new video-provider subscription.
+
+**Tool retirement:** remove the PixelLab MCP and the installed pixel-fixer
+production tools. Stop new sprite-generation and pixel-treatment work. Preserve
+existing artwork, source receipts and the installed preview while the replacement
+is developed. General image generation and 3D tooling remain available.
+
+The [reopening execution](plans/2026-09-10-3d-reopening.md) owns the bounded
+comparison and handoff. Browser runtime and the atomic product migration remain
+with [client architecture](client-architecture.md). Hunting-area timing remains
+a [gameplay proposal](gameplay-baseline.md); this is a presentation ruling.
 
 ## Pixel-art decision
 
@@ -27,11 +129,9 @@ next directed exterior construction in this style. The
 [transition record](plans/2026-09-08-pixel-art-transition.md) owns implementation
 and the stopping-point handoff.
 
-Pixel art is the primary production direction. Do not resume 3D scene, mesh,
-rig, water or vegetation polish as a competing product track. Existing
-3D work may supply project-owned geography, proportions or guidance references;
-its rendering limitations do not dictate the pixel-art style. Diagnostic tools
-and historical evidence do not confer product authority.
+The September 8 ruling made pixel art the primary production direction and
+retired 3D product polish. The [September 10 reopening](#3d-reopening) supersedes
+that restriction. Historical tools still need review before product reuse.
 
 This is owner acceptance of the visual direction and benchmark, not automatic
 promotion of every generated file to an editable production master. Animation,
@@ -45,12 +145,33 @@ for continued work; the assembled district still needs its own visual review.
 The [exterior record](plans/2026-09-08-pixel-exterior.md#connected-standard-correction-study)
 owns the resulting connected candidate and proof.
 
+## Entry and character creation
+
+**Owner direction, September 9:** everything leading into play must feel like
+the game, including sign-in, the roster, creation and connection recovery.
+Use a full-screen game composition over the existing pixel world, restrained
+framed controls, readable type and class emblems. Avoid website navigation,
+account-dashboard cards and development explanations in the player flow.
+
+Creation presents the five starting classes and the recovered base attributes,
+class caps and unassigned points from the authoritative catalog. Nationality
+choices are deferred. Do not invent stat effects, a sixth starting class or
+new character art to fill this screen. The [class contract](class-training-contract.md#character-creation)
+owns mechanical facts; the [browser contract](browser-client.md#private-authoritative-play)
+owns entry behavior. The delivered layout remains subject to owner visual review.
+
+**Owner follow-up, September 9:** do not offer a recommended point allocation
+unless recovered evidence substantiates it. The current catalog suggestions are
+authored examples, so the creation screen omits that option. Players distribute
+their points manually; Reset points restores the selected class's minimums and
+returns the full pool to spend again.
+
 ## Pixel atmosphere and shader effects
 
 **Owner ruling, September 9:** retain the Graveyard Keeper approach to animated
 pixel environments: height-aware fog, weather, and wind-driven foliage are part
 of the playable pixel-art direction. This applies to the pixel renderer; the
-retired 3D presentation remains retired. The primary technical reference is the
+3D reopening above supersedes the earlier retirement restriction. The primary technical reference is the
 [developer’s effects breakdown](https://www.gamedeveloper.com/programming/graveyard-keeper-how-the-graphics-effects-are-made).
 
 Keep environment effects on the scenery's native pixel lattice and preserve
@@ -139,11 +260,45 @@ enough top surface to establish depth. Doors, windows, faces and bodies must
 remain prominent; the exterior must not become a field of roofs and the tops
 of heads. Match the selected interior's deliberate upright presentation.
 
+The September 9 dungeon clarification retains the town view as the first camera
+reference. A dungeon-specific treatment is permitted if the town convention does
+not read well in tight corridors; do not introduce that difference without a
+concrete comparison. Use the current town and temple artwork with the existing
+character as the dungeon guide inputs. The subsequent consistency clarification
+kept upright subjects as the first choice, followed by a hold for live reference
+dungeon observation. After that visit, the owner dispatched a square-ground
+comparison with walls covering about one row. The subsequent clarification
+explicitly permits a separate, steeper dungeon treatment, including a more
+overhead character view and walls differing from town. The current comparison
+retains upright artwork to isolate the spacing and framing change; town
+presentation no longer constrains a later dungeon art revision. This permission
+and experiment do not constitute final camera or artwork acceptance.
+
+The owner subsequently directed a fixed, player-centred 7-by-7 dungeon playfield:
+three cells each way, counting walls and black unknown cells within the 49-cell
+footprint. Fit the complete field to the available screen with a corrected native
+pixel grid and integer enlargement; higher resolution must enlarge the scene
+rather than leave a small fixed-size board. The owner prefers the generated
+60-degree study as the next art guide, including more overhead characters and
+structures. Its angle label is an illustrative target, not a measured camera
+calibration or an accepted sprite master. The current renderer still uses the
+existing upright character art. The owner subsequently rejected that upright
+figure in the dungeon; matching overhead sprites and architecture are required
+before the candidate preview advances. New generated studies remain candidates.
+The proposed wider distinction between hunting
+and safe areas is recorded in the [gameplay baseline](gameplay-baseline.md#hunting-and-safe-area-proposal).
+
 Ground recedes on parallel axes. Upright artwork deliberately presents more of
 its front toward the viewer than a physically correct elevated camera would.
 Do not infer a compulsory camera pitch from the ground-cell aspect ratio or
 force upright subjects through a physical 45-degree projection. Ground contact
 and shared cell identity stay fixed; rendering never changes occupancy or reach.
+
+The full first dungeon floor uses a scrolling interior. Its staged frame declares
+`fit_whole_level: false`; a room that declares whole-level composition still has
+to fit its stated frame. The retired projected-shadow requirement must not force
+an extra blocked cell behind each wall. Pixel foregrounds and shadows belong to
+presentation; they cannot thicken the recovered collision layout.
 
 ### Tile assembly ruling
 
@@ -210,10 +365,9 @@ those boundaries.
 
 ### Live characters
 
-Characters use directional sprite artwork and matching animation. Preserve
+The installed pixel presentation uses directional sprite artwork and matching animation. Preserve
 identity, adult proportions and fixed gait pivots. Equipment appearance and
-combat clips must be designed for this presentation; earlier requirements for
-skinned meshes and modular 3D rigs are superseded. Do not claim a held standing
+combat clips for its replacement follow the [3D reopening](#3d-reopening). Do not claim a held standing
 pose as finished walking animation.
 
 #### Settling into an occupied square
@@ -331,3 +485,7 @@ See [the historical ruling](plans/2026-09-08-presentation-3d-history.md#room-lig
 ### Coastal water by depth and exposure
 
 See [the historical ruling](plans/2026-09-08-presentation-3d-history.md#coastal-water-by-depth-and-exposure).
+
+The September 9 four-floor dungeon continuation permits provisional generated
+floor, wall and door tiles. The [pixel production owner](pixel-art-production.md#provisional-dungeon-tiles--september-9)
+records their preparation and acceptance boundary.

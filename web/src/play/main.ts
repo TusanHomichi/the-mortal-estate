@@ -1,17 +1,17 @@
-import "./style.css";
 import { WireCodec } from "../authoritative/codec";
 import { PlayControl, type ControlView } from "./control";
 import { ActorInteraction } from "./actorInteraction";
 import { GameplayPanel } from "./gameplayPanel";
 import { CreationPanel } from "./creationPanel";
+import { EntryShell } from "./entryShell";
 import { actions, loadPreferences, savePreferences, type Action } from "./preferences";
 import { PathControls } from "./pathControls";
 import { walkCursorDataUris, WALK_CURSOR_HOTSPOT } from "../walk/cursors";
 
 const element = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
-const canvas = element<HTMLCanvasElement>("world-canvas");
+const surface = element("world-surface");
 // A deployed artwork build cannot fall back to diagnostics through its URL.
-const view = await import("./rendererFactory").then(module => module.createPlayRenderer(canvas));
+const view = await import("./rendererFactory").then(module => module.createPlayRenderer(element<HTMLCanvasElement>("world-canvas")));
 const directions: Record<string, string> = { "play.north": "north", "play.east": "east", "play.south": "south", "play.west": "west" };
 const buttons = [...document.querySelectorAll<HTMLButtonElement>("[data-action]")];
 let preferences = loadPreferences();
@@ -20,10 +20,10 @@ const cursors = walkCursorDataUris();
 const walk = new PathControls({ previewPath: path => control.previewPath(path),
   cancelPathPreview: () => control?.cancelPathPreview(), command: intent => control.command(intent) }, state => {
   view.presentWalk(state);
-  canvas.style.cursor = `url("${cursors[state.cursor]}") ${WALK_CURSOR_HOTSPOT.x} ${WALK_CURSOR_HOTSPOT.y}, ${state.cursor === "waiting" ? "wait" : "default"}`;
-  canvas.dataset.walkState = state.route ? state.kind : "idle";
-  canvas.dataset.walkRoute = JSON.stringify(state.route ?? []);
-  canvas.dataset.walkCursor = state.cursor;
+  view.canvas.style.cursor = `url("${cursors[state.cursor]}") ${WALK_CURSOR_HOTSPOT.x} ${WALK_CURSOR_HOTSPOT.y}, ${state.cursor === "waiting" ? "wait" : "default"}`;
+  view.canvas.dataset.walkState = state.route ? state.kind : "idle";
+  view.canvas.dataset.walkRoute = JSON.stringify(state.route ?? []);
+  view.canvas.dataset.walkCursor = state.cursor;
   const announcement = element("movement-announcement");
   const text = state.cursor === "waiting" ? "Waiting for server readiness." : state.cursor === "refused"
     ? "That square cannot be reached in this move." : state.route ? "Route planned. Click its endpoint again to move. Escape clears it." : "Click a square to plan your route.";
@@ -31,8 +31,8 @@ const walk = new PathControls({ previewPath: path => control.previewPath(path),
 });
 const gameplay = new GameplayPanel(element("gameplay"), (generation, group, action, amount) => control.offeredAction(generation, group, action, amount));
 const residentInteraction = new ActorInteraction((generation, group, action) => control.offeredAction(generation, group, action));
-const creation = new CreationPanel(element<HTMLFormElement>("creation-form"), draft => control.createCharacter(draft));
-let shownCreatedCharacter: string | null = null;
+const creation = new CreationPanel(element<HTMLFormElement>("creation-form"), draft => control.createCharacter(draft), () => control.closeCreation());
+const entry = new EntryShell();
 let shownGeneration: number | null = null;
 let lastPhase = "";
 let current: ControlView;
@@ -46,28 +46,21 @@ function present(state: ControlView): void {
   element("selection").hidden = state.phase !== "selecting";
   element("world").hidden = state.phase === "signed_out" || state.phase === "selecting";
   element("session-actions").hidden = state.phase === "signed_out";
-  element("connection").textContent = { signed_out: "Signed out", selecting: "Choose your character", connecting: "Connecting…", playing: "Connected", disconnected: "Disconnected — world authority cleared" }[state.phase];
+  entry.present(state);
+  element("connection").textContent = { signed_out: "", selecting: "", connecting: "Opening the gates…", playing: "", disconnected: "Reconnect to return to your character." }[state.phase];
   element("feedback").textContent = state.feedback;
   for (const id of ["login", "enter", "reconnect", "logout", "open-creation"]) element<HTMLButtonElement>(id).disabled = state.busy;
   element<HTMLButtonElement>("enter").disabled = state.busy || state.characters.length === 0;
   for (const button of buttons) button.disabled = state.busy || state.pending || state.phase !== "playing" || !state.snapshot?.envelope.frame.can_act;
-  const select = element<HTMLSelectElement>("character");
-  if ([...select.options].map(option => option.value).join() !== state.characters.map(row => row.character_id).join()) {
-    select.replaceChildren(...state.characters.map(row => { const option = document.createElement("option"); option.value = row.character_id; option.textContent = row.display_name; return option; }));
-  }
-  if (state.createdCharacterId !== shownCreatedCharacter) {
-    shownCreatedCharacter = state.createdCharacterId;
-    if (shownCreatedCharacter) select.value = shownCreatedCharacter;
-  }
   if (state.snapshot?.generation !== shownGeneration) {
     shownGeneration = state.snapshot?.generation ?? null; arrival = performance.now();
     if (state.snapshot) {
       try {
         view.present(state.snapshot);
-        delete canvas.dataset.presentationError;
+        delete view.canvas.dataset.presentationError;
       } catch {
         view.clear();
-        canvas.dataset.presentationError = "unavailable";
+        view.canvas.dataset.presentationError = "unavailable";
         element("feedback").textContent = "The presentation does not match this world, or could not be rendered.";
       }
       const frame = state.snapshot.envelope.frame, p = frame.observation_center.position;
@@ -80,16 +73,15 @@ function present(state: ControlView): void {
   walk.present(state);
   document.body.dataset.phase = state.phase;
   // Sanitized authority facts support the installed UI proof and operator diagnosis.
-  canvas.dataset.actor = state.snapshot?.envelope.frame.observer_actor_id ?? "";
-  canvas.dataset.readyAt = state.snapshot?.envelope.frame.ready_at ?? "";
-  canvas.dataset.logicalTime = state.snapshot?.envelope.frame.logical_time ?? "";
-  canvas.dataset.canAct = String(state.snapshot?.envelope.frame.can_act ?? false);
-  canvas.dataset.sequence = state.nextSequence;
-  canvas.dataset.worldRevision = state.snapshot?.envelope.world_revision ?? "";
-  canvas.dataset.pending = String(state.pending);
+  view.canvas.dataset.actor = state.snapshot?.envelope.frame.observer_actor_id ?? "";
+  view.canvas.dataset.readyAt = state.snapshot?.envelope.frame.ready_at ?? "";
+  view.canvas.dataset.logicalTime = state.snapshot?.envelope.frame.logical_time ?? "";
+  view.canvas.dataset.canAct = String(state.snapshot?.envelope.frame.can_act ?? false);
+  view.canvas.dataset.sequence = state.nextSequence;
+  view.canvas.dataset.worldRevision = state.snapshot?.envelope.world_revision ?? "";
+  view.canvas.dataset.pending = String(state.pending);
   if (lastPhase !== state.phase) {
-    if (state.phase === "selecting") select.focus();
-    if (state.phase === "playing") canvas.focus();
+    if (state.phase === "playing") view.canvas.focus();
     if (state.phase === "signed_out") element("username").focus();
     lastPhase = state.phase;
   }
@@ -100,16 +92,16 @@ function act(action: Action): void {
 }
 for (const button of buttons) button.onclick = () => act(button.dataset.action as Action);
 function pointer(event: MouseEvent) {
-  const rect = canvas.getBoundingClientRect();
+  const rect = view.canvas.getBoundingClientRect();
   return view.pointer((event.clientX - rect.left) * view.width / rect.width, (event.clientY - rect.top) * view.height / rect.height)?.coordinate ?? null;
 }
-canvas.addEventListener("click", event => {
-  canvas.focus();
+surface.addEventListener("click", event => {
+  view.canvas.focus();
   const target = pointer(event), snapshot = current?.snapshot;
   const frame = snapshot?.envelope.frame, here = frame?.observation_center.position;
   // A second click on the occupied stair square selects its current server offer.
   // Ordinary route confirmation still belongs entirely to PathControls.
-  if (canvas.dataset.presentation === "pixel-art" && event.detail === 2 && target &&
+  if (event.detail === 2 && target &&
       target.x === here?.x && target.y === here.y && snapshot && frame) {
     const traversals = frame.action_options.filter(option => option.enabled && option.intent?.kind === "traverse");
     if (traversals.length === 1) {
@@ -120,13 +112,13 @@ canvas.addEventListener("click", event => {
   }
   walk.click(target);
 });
-canvas.addEventListener("mousemove", event => walk.hoverAt(pointer(event)));
-canvas.addEventListener("mouseleave", () => walk.hoverAt(null));
-canvas.addEventListener("contextmenu", event => {
+surface.addEventListener("mousemove", event => walk.hoverAt(pointer(event)));
+surface.addEventListener("mouseleave", () => walk.hoverAt(null));
+surface.addEventListener("contextmenu", event => {
   event.preventDefault(); walk.cancel();
   if (!("pickActor" in view) || !current.snapshot || current.phase !== "playing") return;
   event.preventDefault();
-  const rect = canvas.getBoundingClientRect();
+  const rect = view.canvas.getBoundingClientRect();
   const actorId = view.pickActor((event.clientX - rect.left) * view.width / rect.width,
     (event.clientY - rect.top) * view.height / rect.height);
   if (actorId) residentInteraction.open(actorId, current);
@@ -164,7 +156,7 @@ element<HTMLFormElement>("login-form").onsubmit = event => {
   const value = password.value; password.value = "";
   void control.login(element<HTMLInputElement>("username").value, value).catch(() => {});
 };
-element("enter").onclick = () => { void control.select(element<HTMLSelectElement>("character").value).catch(() => {}); };
+element("enter").onclick = () => { void control.select(entry.characterId).catch(() => {}); };
 element("open-creation").onclick = () => { void control.openCreation().catch(() => {}); };
 element("reconnect").onclick = () => { void control.reconnect().catch(() => {}); };
 element("logout").onclick = () => { void control.logout().catch(() => {}); };

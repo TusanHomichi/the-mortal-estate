@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-07
-revision: 5
-status: Historical gameplay baseline with owner-directed temple resident behavior and explicit provisional values.
+last_updated: 2026-09-10
+revision: 10
+status: Historical gameplay baseline with four-floor reconstruction, remaining traversal gaps and a hunting/safe-area timing proposal.
 public_safe: true
-summary: Exact gameplay target, rebuilt-town resident direction, fidelity accounting and provisional values.
+summary: Historical gameplay target, local-door movement ruling, geography, fidelity accounting and remaining proposals.
 routes:
   - crates/tme-rules/**
   - content/**
@@ -42,6 +42,64 @@ other historical gameplay systems. Exactness is a target to prove, not a claim
 that the carried implementation already matches. Source release 1.11 is an
 available evidence source; it is not an assertion that later releases behaved
 identically. Contradictory versions remain visible until selected explicitly.
+
+**September 9 continuation:** the owner directs sustained implementation toward
+class and gameplay correspondence, using the restored private research library,
+its underlying archive and live sources as needed. The installed contemporary
+reference client is authorized for comparative observation. Bind those
+observations to the actual client/version and conditions; similarity does not
+silently turn a modern observation into an original-release fact. Existing
+source conflicts and numerical gaps still require their stated evidence or an
+explicit rule selection. Bounded implementation and supervised delegated work
+continue without repeatedly requesting permission for routine decisions.
+
+**Dungeon continuation:** the owner directs all four selected dungeon floors,
+omitting the fourth-floor locker-room cutout because storage already has a town
+location. The [execution plan](plans/2026-09-09-dungeon-one.md) owns source selection,
+encoding and proof. Remaining fidelity work includes concealed-door discovery,
+cavern access under current corner rules, water/pit traversal, environmental hazards, darkness, garden access and reserved
+surface or external portal destinations. Their geography is retained; current traversal does
+not establish historical behavior.
+
+The owner also directs a separate concealed or peripheral thieves-guild entrance,
+with a dungeon route that avoids the main streets and their sheriff. The recovered revision-1.11 client help independently supports hostility toward
+neutral thieves and disguise exceptions for knights and advanced thieves. The
+recovered thief field guide explicitly confirms sheriff disguise detection and
+two secret dungeon exits from the guild. The sheriff’s crossbow response still
+needs corroboration; none of this response is implemented yet. The [class contract](class-training-contract.md#thief-guild-continuation--september-9)
+owns the guild trainer, skill and spell venue. Detection,
+AI hostility and combat belong to rules. Preserve the basement route and reserved
+surface stair while recovering the applicable evidence. The exact town building
+or hidden-door position remains unauthored.
+
+## Local-door movement
+
+**Owner clarification, September 10:** entering a closed local dungeon door opens
+it and ends that movement on the doorway tile, including when the requested
+three-cell sprint had remaining steps. An already-open local door allows the
+remaining steps to continue, subject to the existing movement budget, terrain
+and other authoritative restrictions. Opening does not queue the unused steps
+for a later action. This is an explicit owner-selected gameplay rule; no new
+historical source claim is implied.
+
+The shared rules evaluator owns both preview and commit. Browser proposals may
+target a closed doorway but may continue through a local doorway only when its
+observed state is open. Paired transitions between distinct endpoints retain
+their existing behavior; this clarification concerns local corridor doors.
+
+## Hunting and safe-area proposal
+
+The September 9 owner discussion proposes a tactical, turn-based presentation
+for hunting/combat areas and possibly more real-time movement outside combat or
+in safe areas. The fixed 7-by-7 dungeon view and preference for the 60-degree
+art study are concrete presentation directions, owned by
+[presentation direction](presentation-direction.md#projection-and-surface-ruling).
+The area classification and timing split remain a proposal. No change to action
+durations, NPC deadlines, server sight range or the current
+[D5 ruling](boundary-map.md#21-authoritative-individual-deadlines-d5) is implied.
+A later gameplay slice must settle which areas qualify, what “turn based” means
+with multiple players and automatic actors, and how crossing area boundaries
+preserves pending actions and deadlines. This comparison changes only rendering.
 
 ## Explicit differences and conflicts
 

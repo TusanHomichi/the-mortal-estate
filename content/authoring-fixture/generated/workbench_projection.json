@@ -4699,7 +4699,8 @@
             "y": 8
           }
         }
-      ]
+      ],
+      "doors": []
     },
     {
       "member": "interior",
@@ -5610,7 +5611,8 @@
             "y": 3
           }
         }
-      ]
+      ],
+      "doors": []
     }
   ],
   "connectivity": {

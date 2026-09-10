@@ -31,6 +31,8 @@ pub enum TileRole {
     /// Ground truth for a cell. Carries a terrain identity and a passability
     /// verdict.
     Base { blocked: bool },
+    /// Operable doorway on traversable ground, projected as local topology.
+    Door { open: bool, hidden: bool },
     /// An authored route overlay. A route crossing blocked ground replaces it.
     Route,
     /// A structure footprint cell. Always blocks.
@@ -337,7 +339,7 @@ pub fn land(id: &str) -> Result<&'static LandContract> {
 /// two chances to disagree.
 pub fn layer_of(role: TileRole) -> &'static str {
     match role {
-        TileRole::Base { .. } => "base_terrain",
+        TileRole::Base { .. } | TileRole::Door { .. } => "base_terrain",
         TileRole::Route => "routes",
         TileRole::Footprint => "structure_footprints",
         TileRole::Mark => "landmark_marks",

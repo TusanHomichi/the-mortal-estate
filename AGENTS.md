@@ -41,7 +41,7 @@ operating rules; detailed workflow and verification usage have linked owners.
   before handing off.
 
 **Stack:** Rust for rules, protocol, simulation, authoring, and one
-PostgreSQL-backed server; TypeScript, GPU-composited 2D pixel art with Canvas 2D asset preparation and WebGL effect passes for the browser client (Three.js only for diagnostics and retired reference tools); Tauri
+PostgreSQL-backed server; TypeScript with Three.js dungeon rendering and retained GPU-composited pixel town/interiors, Canvas 2D asset preparation and WebGL effects for the browser client (under the [visual ruling](docs/presentation-direction.md#3d-reopening)); Tauri
 for its ruled desktop shell; Python for checks and tools. Widening it needs an
 owner decision. Keep adjustable facts in validated content and each mutation in its
 owning boundary.
@@ -124,6 +124,8 @@ Reopened product decisions; action timing; multiple live worlds; external
 product-boundary activation or outside players; publication; visual acceptance
 and accepted masters; adding an AI runtime; Git lifecycle work; spending; and
 effects outside this machine. Timing changes follow the current D5 ruling.
+Routine private-preview refresh already has standing authorization under the
+[latest-build ruling](docs/server-notes.md#private-development-deployment).
 
 If a request conflicts with an owner ruling, the charter, a boundary, or the
 public-boundary policy, state the conflict and risk and get explicit owner

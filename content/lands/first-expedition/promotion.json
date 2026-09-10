@@ -42,7 +42,19 @@
     },
     {
       "path": "content/lands/first-expedition/d1_entry.tmj",
-      "sha256": "020c3dada5b04116620fed668f9b07f651f72262ffd001d667fbad323f7b2314"
+      "sha256": "910ecd9f7e598f07213209a4f895984059bd857f43f9f973da9e04b9ca40d404"
+    },
+    {
+      "path": "content/lands/first-expedition/d2.tmj",
+      "sha256": "28416c60d6dfc8306bc2edfaca7fd507533b683e43d2686ffa645c16d7bd71a5"
+    },
+    {
+      "path": "content/lands/first-expedition/d3.tmj",
+      "sha256": "28548b7ca3e7e4052b8737a8ad03beaa468737969bdd851b8ba7a08d551353a4"
+    },
+    {
+      "path": "content/lands/first-expedition/d4.tmj",
+      "sha256": "7659d0e14a5a1df7a244bd7a7dbf227dd08ae074027668065f5fb193dd0cf4b5"
     }
   ],
   "kind": "authored_land_promotion",
@@ -54,12 +66,13 @@
   "research_boundary": {
     "review_refs": [
       "docs/plans/2026-09-05-first-land-surface.md",
-      "content/lands/first-expedition/README.md"
+      "content/lands/first-expedition/README.md",
+      "docs/plans/2026-09-09-dungeon-one.md"
     ]
   },
   "reviewed_encoding": {
-    "geography_sha256": "869e33951932dde1d470111c746802ee02cc141213019fe0c049c3da07f039be",
-    "review_manifest_sha256": "c8ddf6d5724e9f53361185c469cadb47f827c539bbb5c32f671844edabd263d0"
+    "geography_sha256": "56e414e7fdeee374eab714fbae38770b5a8f06a592998f6a57a2690593857d55",
+    "review_manifest_sha256": "a476f7f0ac5a440c4af65307d46a8e9d882a0e7910a9337a4aebcfbf00dd2c19"
   },
   "schema_version": 1,
   "status": "owner_accepted_first_expedition_geography"
