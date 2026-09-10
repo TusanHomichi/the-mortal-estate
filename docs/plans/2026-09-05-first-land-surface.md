@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-09
-revision: 24
-status: Seven-building town retained; owner authorizes fitting rebuilt-town geometry to the connected pixel scene.
+revision: 26
+status: Seven-building town retained; all four selected dungeon floors are the active dungeon target.
 public_safe: true
-summary: Bounded pixel-town geography amendment; seven services and non-town island baseline retained.
+summary: Pixel-town amendment and four-floor continuation; non-town island baseline retained.
 ---
 
 # First-land surface direction
@@ -12,6 +12,13 @@ This Planning design brief owns the first land's surface design decisions.
 The [public-boundary ruling](../public-boundary-policy.md#first-land-map-template)
 owns permission to use the historical map as a template and its provenance
 requirements. This brief accepts no authored master and supplies no source map.
+
+## First dungeon continuation (2026-09-09)
+
+The owner now directs copying all four selected dungeon floors, with the fourth-floor locker cutout omitted. The
+[four-floor execution plan](2026-09-09-dungeon-one.md) supersedes the earlier
+bounded entrance crop as the active dungeon implementation target. Other floor
+and surface decisions retain their owners.
 
 ## Decided by the owner (2026-09-05)
 

@@ -39,7 +39,10 @@ impl Engine {
         let level = self
             .level_at(center)
             .ok_or_else(|| StepError::new("static scene context level is missing"))?;
-        let (min, max) = if level.scene_role == crate::model::SceneRole::Interior {
+        let (min, max) = if level
+            .staged_viewport
+            .is_some_and(|viewport| viewport.fit_whole_level)
+        {
             (
                 Coord { x: 0, y: 0 },
                 Coord {

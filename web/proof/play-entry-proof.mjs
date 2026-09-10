@@ -6,7 +6,7 @@ import { launchProofBrowser, proofBrowsers } from "./serve.mjs";
 let input = "";
 for await (const chunk of process.stdin) input += chunk;
 const config = JSON.parse(input);
-assert(["inspection", "pixel-art"].includes(config.presentation));
+assert(["inspection", "world"].includes(config.presentation));
 const reports = [];
 for (const spec of proofBrowsers()) {
   const launched = await launchProofBrowser({ ...spec, trustedAuthority: config.authority });
@@ -17,7 +17,7 @@ for (const spec of proofBrowsers()) {
       await page.goto(config.origin + entry);
       await page.waitForFunction(() => document.body.dataset.playReady === "true", undefined, { polling: 50, timeout: 60_000 });
       const presentation = await page.locator("#world-canvas").getAttribute("data-presentation");
-      assert.equal(presentation, config.presentation === "pixel-art" ? "pixel-art" : null,
+      assert.equal(presentation, config.presentation === "world" ? "pixel-art" : null,
         `${spec.name}: ${entry} selected the wrong renderer`);
       reports.push({ engine: spec.name, entry, presentation });
     }

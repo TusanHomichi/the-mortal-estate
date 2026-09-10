@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-06
-revision: 4
-status: Three declared lands; first-expedition geography accepted with verified encoding, threshold passages and explicit landings.
+revision: 6
+status: Three declared lands; four-floor encoding includes local and paired doors and explicit deferred-access regions.
 public_safe: true
 summary: Land declarations, geographic acceptance, deterministic compilation, transition layouts, Workbench and rejection proof.
 routes:
@@ -166,6 +166,30 @@ complementary up/down stairs, and projects paired `passage` directions as normal
 runtime passages. Every member must be reachable from the sole arrival member.
 The graph never infers a landing from visual assets or substitutes stairs for a
 room entrance. Workbench projections expose the compiled landing explicitly.
+
+### Doors and deferred access
+
+A `Door` tile role describes traversable ground occupied by an operable local
+door, with authored open/closed and concealed state. The compiler emits one
+`local_door` topology edge targeting its own cell, unless an explicit paired
+`door` transition occupies it. Paired door thresholds must be visible, share
+the same initial state, and land on their own access cell. The graph projects
+reciprocal runtime door endpoints and suppresses duplicate local edges. Runtime rules own subsequent
+opening, closing and revelation. Routes, footprints or markers over a doorway
+are rejected; an initially open concealed door is rejected. Paired doors that
+connect different cells retain their separate reciprocal-endpoint contract.
+The canonical geography and Workbench view carry initial door states explicitly.
+Static passability denotes underlying traversable ground; runtime state owns a
+closed or concealed door's current effect.
+
+Every floor component must be accounted for. The arrival and every declared transition access/landing root their reachable
+components; overlapping normal roots are allowed. A contract-declared `deferred_access` landmark may identify exactly one
+additional disconnected component whose traversal is explicitly unfinished.
+Each deferred root must be passable and disjoint from all normal entries and
+preceding deferred components; an
+unmarked island or a newly connected deferred root is rejected. These landmarks
+grant no runtime arrival or portal. The [four-floor record](plans/2026-09-09-dungeon-one.md)
+owns the present source-derived cavern exceptions and their missing traversal.
 
 ## The candidate path
 

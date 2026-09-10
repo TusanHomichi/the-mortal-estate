@@ -302,6 +302,13 @@ impl Engine {
             }
             remaining -= cost;
             if let Some(edge) = automatic {
+                // A local door targets its own tile. Opening it ends the
+                // movement on that tile even when the request had remaining
+                // steps; an already-open local door does not (opens_door is
+                // false) and the sprint continues. Paired doors target a
+                // distinct endpoint and keep their transition-and-continue
+                // behavior.
+                let stops_after_opening = opens_door && edge.target == attempted;
                 current = edge.target.clone();
                 steps.push(MovementStep {
                     direction,
@@ -316,7 +323,7 @@ impl Engine {
                         remaining_after: remaining,
                     },
                 });
-                if edge.kind != NavigationKind::Door {
+                if edge.kind != NavigationKind::Door || stops_after_opening {
                     return self.finish_movement_plan(
                         actor_index,
                         MovementPlanDraft {

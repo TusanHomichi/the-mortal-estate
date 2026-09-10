@@ -351,7 +351,7 @@ pub fn base_classes(member: &'static MemberContract) -> Vec<&'static str> {
     member
         .classes
         .iter()
-        .filter(|class| matches!(class.role, TileRole::Base { .. }))
+        .filter(|class| matches!(class.role, TileRole::Base { .. } | TileRole::Door { .. }))
         .map(|class| class.name)
         .collect()
 }

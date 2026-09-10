@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { createCharacterManually } from "./creation-allocation.mjs";
 import { launchProofBrowser, PROOF_ENGINES } from "./serve.mjs";
 let input = "";
 for await (const chunk of process.stdin) input += chunk;
@@ -96,13 +97,8 @@ try {
   await page.locator("#username").fill(config.username); await page.locator("#password").fill(config.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await wait(() => document.body.dataset.phase === "selecting");
-  await page.getByRole("button", { name: "Create a new character", exact: true }).click();
-  await page.locator("#creation-form").waitFor({ state: "visible" });
-  assert.equal(await page.locator("#creation-profile option").count(), 5);
-  await page.locator("#creation-profile").selectOption("creation/wizard");
-  await page.locator("#creation-name").fill("Expedition Arrival");
-  await page.getByRole("button", { name: "Create character", exact: true }).click();
-  await wait(() => document.querySelector("#character").selectedOptions[0]?.textContent === "Expedition Arrival");
+  await createCharacterManually(page, { className: "Wizard", name: "Expedition Arrival" });
+  await wait(() => document.querySelector("#character input:checked")?.getAttribute("aria-label") === "Expedition Arrival");
   await page.getByRole("button", { name: "Enter world", exact: true }).click(); await ready();
   assert(frame.observer_actor_id.startsWith("created/"));
   assert.deepEqual(here().position, { x:9,y:31 });
@@ -117,8 +113,8 @@ try {
   await walkTo(seller.x,seller.y); await action(i => i.kind === "buy_from_merchant" && i.item_instance_ids.length === 1, { service: "balm_seller" });
   assert(frame.carried.items.some(i => i.item.item_definition_id === "healing_balm"));
   await mark("temple"); await enter("d1_entry");
-  assert.deepEqual(here().position, { x:5,y:4 }); await mark("descent");
-  await walkTo(4,6);
+  assert.deepEqual(here().position, { x:24,y:7 }); await mark("descent");
+  await walkTo(23,9);
   for (let attempts=0; attempts<6 && frame.actors.some(a => a.actor_id === "cellar_scavenger" && a.life_state !== "dead"); attempts++) {
     await action(i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger" && i.mode === "fight");
   }

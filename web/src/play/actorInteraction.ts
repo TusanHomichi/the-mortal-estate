@@ -1,18 +1,37 @@
-import { actionGroups, type ActionGroup } from "../authoritative/gameplay";
+import { actionGroups, type ActionGroup, type OfferedAction } from "../authoritative/gameplay";
 import type { Snapshot } from "../authoritative/state";
 import type { ControlView } from "./control";
 
-/** Provider identity comes from the server, never a display name or art filename. */
+function targetsActor(action: OfferedAction, actorId: string): boolean {
+  const intent = action.intent;
+  if (intent?.kind === "physical_attack") return intent.target_actor_id === actorId;
+  if (intent?.kind === "cast_spell" || intent?.kind === "cast_warmed_spell") {
+    const target = intent.target as { kind: string; actor_id?: string } | null;
+    return target?.kind === "actor" && target.actor_id === actorId;
+  }
+  return false;
+}
+
+/** Provider and combat target identities come from the server, never names or art. */
 export function actorActionGroups(snapshot: Snapshot, actorId: string): ActionGroup[] {
   const frame = snapshot.envelope.frame;
   if (!frame.actors.some(actor => actor.actor_id === actorId)) return [];
+  // Explicit traversal is only ever the observed character's own move. The
+  // server supplies the intent; the menu never derives stairs from terrain.
+  const observer = actorId === frame.observer_actor_id;
   const keys = new Set(frame.services_here.filter(service => service.actor_id === actorId)
     .map(service => `service:${service.service_id}`));
   keys.add(`npc:${actorId}`);
-  return actionGroups(frame).filter(group => keys.has(group.key));
+  return actionGroups(frame).flatMap(group => {
+    if (keys.has(group.key)) return [group];
+    if (group.key !== "character") return [];
+    const actions = group.actions.filter(action => targetsActor(action, actorId)
+      || (observer && action.enabled && action.intent?.kind === "traverse"));
+    return actions.length ? [{ ...group, actions }] : [];
+  });
 }
 
-/** Opening a resident only reveals options. Dispatch still re-resolves the current offer. */
+/** Opening an actor only reveals options. Dispatch re-resolves the current offer. */
 export class ActorInteraction {
   private actorId: string | null = null;
   private generation: number | null = null;
@@ -51,7 +70,7 @@ export class ActorInteraction {
       const groups = actorActionGroups(snapshot, this.actorId);
       if (!groups.length) {
         const hint = document.createElement("p");
-        hint.textContent = "Move onto their square to interact.";
+        hint.textContent = "No actions are currently offered for this character. Services require sharing their square.";
         this.content.append(hint);
       }
       for (const group of groups) {

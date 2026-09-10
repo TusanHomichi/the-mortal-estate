@@ -18,6 +18,7 @@ export interface ControlView {
   phase: Phase; busy: boolean; characters: readonly Character[]; snapshot: Snapshot | null;
   pending: boolean; feedback: string; nextSequence: string;
   creationOptions: readonly CreationOption[]; createdCharacterId: string | null;
+  creationRetry: CreationDraft | null;
 }
 export interface Transport {
   fetch: typeof fetch;
@@ -38,7 +39,7 @@ export class PlayControl {
   private nextSequence = 1n;
   private pending: Pending | null = null;
   private preview: { id: string; finish: (value: PathPreviewResult | null) => void } | null = null;
-  private feedback = "Sign in to enter the private world.";
+  private feedback = "";
   private queue: Promise<unknown> = Promise.resolve();
   private busy = 0;
   private creationOptions: CreationOption[] = [];
@@ -60,7 +61,8 @@ export class PlayControl {
   get view(): ControlView {
     return { phase: this.phase, busy: this.busy > 0, characters: this.bootstrap?.characters ?? [],
       snapshot: this.state.snapshot, pending: this.pending !== null, feedback: this.feedback, nextSequence: this.nextSequence.toString(),
-      creationOptions: this.creationOptions, createdCharacterId: this.createdCharacterId };
+      creationOptions: this.creationOptions, createdCharacterId: this.createdCharacterId,
+      creationRetry: this.pendingCreation ? structuredClone(this.pendingCreation.draft) : null };
   }
   private emit(): void { this.changed(this.view); }
   private serial<T>(work: () => Promise<T>): Promise<T> {
@@ -68,7 +70,7 @@ export class PlayControl {
     const result = this.queue.then(work).catch(error => {
       // Transport errors may contain URLs; rejected documents may contain secrets.
       if (this.token && this.phase === "connecting") { this.detach(); this.phase = "disconnected"; }
-      this.feedback = error instanceof ControlFailure ? error.message : "Connection failed. Reconnect to recover control state.";
+      this.feedback = error instanceof ControlFailure ? error.message : this.pendingCreation ? "The reply was lost. Retry creation to confirm your character." : this.phase === "signed_out" ? "Connection failed. Try signing in again." : "Connection failed. Try again.";
       throw new Error(this.feedback);
     }).finally(() => { --this.busy; this.emit(); });
     this.queue = result.catch(() => {});
@@ -113,7 +115,7 @@ export class PlayControl {
       const value = await this.request<Login>("/login", "login_response_v1", { decoder: "login_request_v1", value: { username, password } });
       password = "";
       this.token = value.session_token; this.bootstrap = value.bootstrap;
-      this.phase = "selecting"; this.feedback = "Choose a character.";
+      this.phase = "selecting"; this.feedback = "";
     });
   }
   select(characterId: string): Promise<void> {
@@ -126,11 +128,16 @@ export class PlayControl {
   openCreation(): Promise<void> {
     return this.serial(async () => {
       if (!this.bootstrap || this.phase !== "selecting") throw new ControlFailure("Sign in first.");
+      if (this.pendingCreation) throw new ControlFailure("Retry the previous creation to confirm its outcome.");
       const value = await this.request<{ options: CreationOption[] }>("/characters/creation", "character_creation_options_v1",
         { decoder: "session_bootstrap_request_v1", value: {} });
       this.creationOptions = value.options;
-      this.feedback = value.options.length ? "Choose a class and allocate your attribute points." : "This world has no character creation profiles.";
+      this.feedback = value.options.length ? "" : "This world has no character creation profiles.";
     });
+  }
+  closeCreation(): void {
+    if (this.busy || this.pendingCreation || this.phase !== "selecting") return;
+    this.creationOptions = []; this.feedback = ""; this.emit();
   }
   createCharacter(draft: CreationDraft): Promise<void> {
     return this.serial(async () => {

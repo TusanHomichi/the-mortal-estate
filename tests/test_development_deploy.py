@@ -66,9 +66,11 @@ class PrivateDeployment(unittest.TestCase):
         source = self.root / "source"
         receipt = source / "web/src/play/pixelReceipt.json"
         document(receipt, {"manifest_sha256": digest(manifest)})
+        (packet / "body.glb").write_bytes(b"synthetic bound mesh")
+        document(source / "web/src/play/dungeon/receipt.json", {"body": {"file": "body.glb", "sha256": digest(packet / "body.glb")}})
         with patch("artwork.REPO", source):
             copy_artwork(packet, self.root / "copied")
-            self.assertEqual({p.name for p in (self.root / "copied").iterdir()}, {"pixel-manifest.json", "room.png"})
+            self.assertEqual({p.name for p in (self.root / "copied").iterdir()}, {"pixel-manifest.json", "room.png", "body.glb"})
             (packet / "room.png").write_bytes(b"changed")
             with self.assertRaises(ValueError):
                 copy_artwork(packet, self.root / "refused")
@@ -77,7 +79,7 @@ class PrivateDeployment(unittest.TestCase):
             with self.assertRaises(ValueError):
                 copy_artwork(packet, self.root / "wrong-manifest")
 
-    def test_pixel_release_refuses_retired_mesh_packet(self):
+    def test_town_packet_refuses_mesh_in_raster_receipt(self):
         from artwork import copy_artwork
         packet = self.root / "packet"
         packet.mkdir()
@@ -86,7 +88,7 @@ class PrivateDeployment(unittest.TestCase):
         document(manifest, {"assets": [{"file": "room.glb", "sha256": digest(packet / "room.glb")}]})
         source = self.root / "source"
         document(source / "web/src/play/pixelReceipt.json", {"manifest_sha256": digest(manifest)})
-        with patch("artwork.REPO", source), self.assertRaisesRegex(ValueError, "PNG"):
+        with patch("artwork.REPO", source), self.assertRaisesRegex(ValueError, "wrong format"):
             copy_artwork(packet, self.root / "refused-mesh")
         self.assertFalse((self.root / "refused-mesh").exists())
 

@@ -3,12 +3,24 @@ import type { Coord, Frame } from "../authoritative/state";
 /** Art calibration only. It carries no passability or transition destinations. */
 export interface PixelProjection { origin: Coord; step: Coord }
 export const TEMPLE_PROJECTION: PixelProjection = { origin: { x: 76, y: 110 }, step: { x: 63, y: 44 } };
+/** Shared town/dungeon adult body height, before integer display enlargement. */
+export const PIXEL_WORLD_ACTOR_HEIGHT=72;
 export function pixelSceneryRect(point: Coord, foot: Coord, width: number, aspect: number) {
   const height=width/aspect;
   return {x:point.x-foot.x*width,y:point.y-foot.y*height,width,height,depth:point.y};
 }
 export function projectPixel(cell: Coord, projection: PixelProjection): Coord {
   return { x: projection.origin.x + cell.x * projection.step.x, y: projection.origin.y + cell.y * projection.step.y };
+}
+/** A lone body keeps its cell center; destination reservations do not make a crowd. */
+export function pixelActorAnchors(actors: readonly {id:string;at:Coord;target:Coord}[], observer:string, projection:PixelProjection):Map<string,Coord> {
+  const settled=actors.filter(actor=>actor.at.x===actor.target.x&&actor.at.y===actor.target.y);
+  return new Map(actors.map(actor=>{
+    const point=projectPixel(actor.at,projection);
+    const sharing=settled.includes(actor)&&settled.some(other=>other.id!==actor.id&&other.at.x===actor.at.x&&other.at.y===actor.at.y);
+    if(sharing)point.x+=actor.id===observer?-11:11;
+    return [actor.id,point];
+  }));
 }
 export function unprojectPixel(point: Coord, projection: PixelProjection): Coord {
   return { x: Math.round((point.x - projection.origin.x) / projection.step.x),

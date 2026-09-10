@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
+import { createCharacterManually } from "./creation-allocation.mjs";
 import { launchProofBrowser, PROOF_ENGINES } from "./serve.mjs";
 
 let input = "";
@@ -36,11 +37,8 @@ try {
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await wait(() => document.body.dataset.phase === "selecting");
     if (config.scenario === "town_adventure_loop_gallery") {
-      await page.getByRole("button", { name: "Create a new character", exact: true }).click();
-      await page.locator("#creation-form").waitFor({ state: "visible" });
-      await page.locator("#creation-name").fill("New Arrival");
-      await page.getByRole("button", { name: "Create character", exact: true }).click();
-      await wait(() => document.querySelector("#character").selectedOptions[0]?.textContent === "New Arrival");
+      await createCharacterManually(page, { className: "Wizard", name: "New Arrival" });
+      await wait(() => document.querySelector("#character input:checked")?.getAttribute("aria-label") === "New Arrival");
     }
     await page.getByRole("button", { name: "Enter world", exact: true }).click();
     await wait(() => document.body.dataset.phase === "playing");

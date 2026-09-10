@@ -1,7 +1,9 @@
+import {isDungeon} from './dungeon/view';
+import { prepareEntryBackdrop } from "./entryBackdrop";
 import type { Snapshot, Coord } from "../authoritative/state";
 import type { WalkPresentation } from "./pathControls";
 import { loadPixelPacket, bindPixelSpace, type PixelPacket, type PixelFigure } from "./pixelPacket";
-import { TEMPLE_PROJECTION, projectPixel, unprojectPixel, pixelDirection, pixelSpriteRect } from "./pixelGeometry";
+import { TEMPLE_PROJECTION, PIXEL_WORLD_ACTOR_HEIGHT, projectPixel, unprojectPixel, pixelDirection, pixelSpriteRect, pixelActorAnchors } from "./pixelGeometry";
 import { pixelCamera, pixelViewport } from "./pixelViewport";
 import { PixelExteriorRenderer, exteriorLayerCovers, type ExteriorLayer } from "./pixelExterior";
 import { pixelTravelDuration, samplePixelTravel, pixelStrideFrame } from "./pixelMotion";
@@ -16,23 +18,25 @@ interface Sprite {
 }
 interface Hit { id: string; x: number; y: number; width: number; height: number; depth: number }
 const SIZE = 512;
+/** Levels presented by the Three renderer; this renderer refuses them before touching presentation. */
+
 /** Primary pixel presentation. No transports, commands, deadlines or gameplay ledger. */
 export class PixelRenderer {
   private readonly floor = document.createElement("canvas");
-  private readonly overlays = new PixelOverlays();
+  private readonly overlays: PixelOverlays;
   private readonly graphicsError = document.createElement("p");
   private viewport = {width:512,height:512,scale:1};
   private roomOffset = {x:0,y:0};
   private readonly resize = () => {
     this.viewport=pixelViewport(window.innerWidth,window.innerHeight);
     const {width,height,scale}=this.viewport;
-    this.canvas.width=width*scale;this.canvas.height=height*scale;
-    this.canvas.style.width=`${width*scale}px`;this.canvas.style.height=`${height*scale}px`;
+    this.canvas.width=Math.round(width*scale);this.canvas.height=Math.round(height*scale);
+    this.canvas.style.width=`${this.canvas.width}px`;this.canvas.style.height=`${this.canvas.height}px`;
     this.canvas.dataset.pixelViewport=JSON.stringify(this.viewport);
     this.canvas.dataset.pixelNativeSize=`${width}x${height}`;
     this.canvas.dataset.pixelSpriteRaster=`${width*scale}x${height*scale}`;
     this.pointingReady=false;this.hits=[];
-    delete this.canvas.dataset.pixelProjection;delete this.canvas.dataset.pixelActorBounds;
+    delete this.canvas.dataset.pixelProjection;delete this.canvas.dataset.pixelActorBounds;delete this.canvas.dataset.pixelActorAnchors;
     this.dirty=true;
   };
   private readonly exterior: PixelExteriorRenderer;
@@ -54,6 +58,7 @@ export class PixelRenderer {
 
   private constructor(readonly canvas: HTMLCanvasElement, readonly width: number, readonly height: number,
     private readonly packet: PixelPacket) {
+    this.overlays=new PixelOverlays();
     this.effects=new PixelEffects(packet,canvas);
     this.graphicsError.className="pixel-graphics-error";this.graphicsError.setAttribute('role','alert');this.graphicsError.hidden=true;
     canvas.after(this.graphicsError);
@@ -69,6 +74,7 @@ export class PixelRenderer {
     this.resize();
     window.addEventListener("resize",this.resize);
     document.body.dataset.pixelArt = "true";
+    prepareEntryBackdrop(packet.images.get(packet.manifest.exterior.background.file)!);
     document.title = "The Mortal Estate";
     const animate = (now: number) => {
       if (!document.hidden && now + .1 >= this.nextDraw && (this.dirty || this.moving() || this.level==="arrival" || this.level==="temple")) {
@@ -104,9 +110,11 @@ export class PixelRenderer {
     if (sampled.done) sprite.route=null;
   }
   present(snapshot: Snapshot): void {
+    const requested = snapshot.envelope.frame.observation_center.level;
+    if (isDungeon(requested)) throw new Error(`Level ${requested} is presented by the Three renderer.`);
     let level: string;
     try { level = bindPixelSpace(snapshot); } catch (error) { this.clear(); throw error; }
-    if (level !== this.level) { this.clear(); this.level = level; }
+    if (level !== this.level) { this.clear(); this.level = level; this.resize(); }
     const frame = snapshot.envelope.frame;
     const visible = new Set<string>();
     const now = performance.now();
@@ -155,7 +163,7 @@ export class PixelRenderer {
     if(this.level==="temple"||this.level==="arrival") {
       const extent=this.level==="temple" ? {x:512,y:512} : {x:this.packet.manifest.exterior.width,y:this.packet.manifest.exterior.height};
       this.projection=pixelCamera(base,focus,viewport,extent);
-    } else this.projection={origin:{x:Math.round(viewport.x/2-focus.x*32),y:Math.round(viewport.y*.6-focus.y*25)},step:{x:32,y:25}};
+    } else this.projection={origin:{x:Math.round(viewport.x/2-focus.x*base.step.x),y:Math.round(viewport.y*.6-focus.y*base.step.y)},step:base.step};
     this.roomOffset={x:this.projection.origin.x-base.origin.x,y:this.projection.origin.y-base.origin.y};
     this.canvas.dataset.pixelProjection=JSON.stringify(this.projection);
     this.effects.begin(this.level,viewport.x,viewport.y,this.roomOffset,this.viewport.scale);
@@ -176,6 +184,8 @@ export class PixelRenderer {
     sprites.sort((a,b)=>a.at.y-b.at.y || a.at.x-b.at.x);
     const foreground=this.level==="temple" ? this.packet.manifest.temple_foreground.map(r=>({...r,sourceX:r.x,sourceY:r.y,x:r.x+this.roomOffset.x,y:r.y+this.roomOffset.y,depth:r.depth+this.roomOffset.y})).sort((a,b)=>a.depth-b.depth) : [];
     const outside=[...this.exteriorLayers];
+    const anchors=pixelActorAnchors(sprites,frame.observer_actor_id,this.projection);
+    this.canvas.dataset.pixelActorAnchors=JSON.stringify(Object.fromEntries(anchors));
     const revealForeground=(depth:number)=>{
       while (foreground.length && foreground[0]!.depth<=depth) {
         const r=foreground.shift()!;
@@ -191,18 +201,16 @@ export class PixelRenderer {
     const drawables=[...sprites.map(sprite=>({at:sprite.at,sprite})),...contents.map(row=>({at:row.location.position,sprite:null}))]
       .sort((a,b)=>a.at.y-b.at.y||a.at.x-b.at.x);
     for (const {at,sprite} of drawables) {
-      const p=projectPixel(at,this.projection);
+      const p=sprite?anchors.get(sprite.id)!:projectPixel(at,this.projection);
       revealForeground(p.y);
       if(!sprite){c.fill("#d4b87d",Math.round(p.x)-3,Math.round(p.y)-3,6,4);continue;}
-      const sharing = sprites.some(other=>other.id!==sprite.id && other.target.x===sprite.target.x && other.target.y===sprite.target.y);
-      if (sharing) p.x += sprite.id===frame.observer_actor_id ? -11 : 11;
-      c.paint(this.overlays.contact(sprite.id===frame.observer_actor_id,this.viewport.scale),Math.round(p.x)-20,Math.round(p.y)-12,40,20);
+      c.paint(this.overlays.contact(sprite.id===frame.observer_actor_id,this.viewport.scale),Math.round(p.x)-20,Math.round(p.y)-10,40,20);
       if (sprite.figure) {
         const f=sprite.figure, frames=f.walk[sprite.direction]!;
         const asset=sprite.route ? frames[pixelStrideFrame(sprite.distance,frames.length)]! : f.rotations[sprite.direction]!;
         const image=this.packet.images.get(asset.file)!;
         const referenceHeight=sprite.id===frame.observer_actor_id ? f.rotations.south!.body_height : asset.body_height;
-        const {size,x,y}=pixelSpriteRect(p,{...asset,body_height:referenceHeight},f.size,this.level==="temple" ? 96 : this.level==="arrival" ? 72 : 44);
+        const {size,x,y}=pixelSpriteRect(p,{...asset,body_height:referenceHeight},f.size,this.level==="temple" ? 96 : this.level==="arrival" ? PIXEL_WORLD_ACTOR_HEIGHT : 44);
         const detailSize=size*this.viewport.scale;
         const key=`${asset.file}:${detailSize}`;
         let raster=this.spriteRasters.get(key);
@@ -242,11 +250,16 @@ export class PixelRenderer {
     if (!this.snapshot || !this.pointingReady || x<0 || y<0 || x>=this.width || y>=this.height) return null;
     const px=x*this.viewport.width/this.width,py=y*this.viewport.height/this.height;
     const roomX=px-this.roomOffset.x,roomY=py-this.roomOffset.y;
-    return [...this.hits].reverse().find(hit=>hit.id!==this.snapshot!.envelope.frame.observer_actor_id &&
+    const candidates=[...this.hits].reverse().filter(hit=>
       px>=hit.x && px<=hit.x+hit.width && py>=hit.y && py<=hit.y+hit.height &&
       !(this.level==="temple" && this.packet.manifest.temple_foreground.some(r=>r.depth+this.roomOffset.y>hit.depth &&
         roomX>=r.x && roomX<r.x+r.width && roomY>=r.y && roomY<r.y+r.height)) &&
-      !this.exteriorLayers.some(layer=>layer.depth>hit.depth&&exteriorLayerCovers(layer,{x:px,y:py})))?.id ?? null;
+      !this.exteriorLayers.some(layer=>layer.depth>hit.depth&&exteriorLayerCovers(layer,{x:px,y:py})));
+    // Shared-square bodies overlap. Choose the body center nearest the pointer
+    // so adding self interaction cannot steal a resident's presented target.
+    const distance=(hit:Hit)=>((px-hit.x-hit.width/2)/hit.width)**2+((py-hit.y-hit.height/2)/hit.height)**2;
+    candidates.sort((a,b)=>distance(a)-distance(b));
+    return candidates[0]?.id ?? null;
   }
   clear(): void {
     this.snapshot=null;this.level=null;this.walk=null;this.sprites.clear();this.hits=[];this.pointingReady=false;
@@ -257,6 +270,7 @@ export class PixelRenderer {
     delete this.canvas.dataset.pixelMotionRoute; delete this.canvas.dataset.pixelMotionDurationMs;
     delete this.canvas.dataset.pixelProjection;
     delete this.canvas.dataset.pixelActorBounds;
+    delete this.canvas.dataset.pixelActorAnchors;
   }
   dispose(): void { cancelAnimationFrame(this.animation);window.removeEventListener("resize",this.resize);this.clear();this.spriteRasters.clear();this.overlays.dispose();this.effects.dispose();this.graphicsError.remove(); }
 }

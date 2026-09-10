@@ -81,7 +81,7 @@ export class PixelCompositor {
   if(this.width!==width||this.height!==height||this.scale!==scale){
    this.width=width;this.height=height;this.scale=scale;
    for(let i=0;i<3;i++){
-    gl.bindTexture(gl.TEXTURE_2D,this.textures[i]!);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,width*scale,height*scale,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+    gl.bindTexture(gl.TEXTURE_2D,this.textures[i]!);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,Math.round(width*scale),Math.round(height*scale),0,gl.RGBA,gl.UNSIGNED_BYTE,null);
     gl.bindFramebuffer(gl.FRAMEBUFFER,this.targets[i]!);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,this.textures[i]!,0);
     if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Pixel composition framebuffer is incomplete.');
    }
@@ -101,7 +101,7 @@ export class PixelCompositor {
   if(!this.pending)return;this.pending=false;
   const gl=this.gl,u=this.uniforms;gl.useProgram(this.program);
   gl.bindBuffer(gl.ARRAY_BUFFER,this.vertices);gl.enableVertexAttribArray(this.position);gl.vertexAttribPointer(this.position,2,gl.FLOAT,false,0,0);
-  gl.viewport(0,0,this.width*this.scale,this.height*this.scale);
+  gl.viewport(0,0,Math.round(this.width*this.scale),Math.round(this.height*this.scale));
   gl.uniform2f(u.viewport!,this.width,this.height);gl.uniform1i(u.image!,0);gl.uniform1i(u.mask!,1);
   gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   // A complete sampler is required even by solid-colour branches on WebGL 1.

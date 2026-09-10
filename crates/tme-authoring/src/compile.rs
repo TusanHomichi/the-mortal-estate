@@ -42,6 +42,13 @@ pub struct Landmark {
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
+pub struct LocalDoor {
+    pub at: Point,
+    pub open: bool,
+    pub hidden: bool,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct Transition {
     pub id: String,
     pub member: String,
@@ -62,6 +69,7 @@ pub(crate) struct Grid {
     pub(crate) height: usize,
     pub(crate) cells: Vec<Vec<Vec<Option<String>>>>,
     pub(crate) passable: BTreeSet<Point>,
+    pub(crate) doors: Vec<LocalDoor>,
 }
 
 /// One compiled authored member. Only [`crate::promotion::load`] produces one
@@ -116,6 +124,10 @@ impl Member {
 
     pub fn landmarks(&self) -> &BTreeMap<String, Landmark> {
         &self.landmarks
+    }
+
+    pub fn doors(&self) -> &[LocalDoor] {
+        &self.grid.doors
     }
 
     pub fn transitions(&self) -> &BTreeMap<String, Transition> {
@@ -211,7 +223,14 @@ pub fn compile_member(contract: &'static MemberContract, document: &Value) -> Re
             ));
         }
     };
-    require_full_reachability(&grid, root, contract.id)?;
+    let roots = std::iter::once(root)
+        .chain(
+            transitions
+                .values()
+                .flat_map(|entry| [entry.access, entry.landing]),
+        )
+        .collect::<Vec<_>>();
+    require_full_reachability(&grid, &roots, contract.id, &landmarks)?;
 
     for structure in &structures {
         if !grid.passable.contains(&structure.access) {
@@ -390,6 +409,7 @@ fn marked_cells(layers: &TileLayers, name: &str) -> BTreeSet<Point> {
 fn build_grid(layers: &TileLayers) -> Result<Grid> {
     let mut cells = vec![vec![Vec::new(); layers.width]; layers.height];
     let mut passable = BTreeSet::new();
+    let mut doors = Vec::new();
     for index in 0..layers.width * layers.height {
         let point = Point {
             x: index % layers.width,
@@ -400,6 +420,19 @@ fn build_grid(layers: &TileLayers) -> Result<Grid> {
         let route = layers.gid("routes", index);
         let footprint = layers.gid("structure_footprints", index);
         let mark = layers.gid("landmark_marks", index);
+        if let TileRole::Door { open, hidden } = base.role {
+            if route != 0 || footprint != 0 || mark != 0 || (open && hidden) {
+                return Err(format!(
+                    "door at {},{} has conflicting layers or state",
+                    point.x, point.y
+                ));
+            }
+            doors.push(LocalDoor {
+                at: point,
+                open,
+                hidden,
+            });
+        }
 
         // Where a route replaces blocked ground (see `cell_is_passable`), the base
         // terrain does not survive into the stack: a bridge is what the cell
@@ -437,6 +470,7 @@ fn build_grid(layers: &TileLayers) -> Result<Grid> {
         height: layers.height,
         cells,
         passable,
+        doors,
     })
 }
 
@@ -453,23 +487,44 @@ pub(crate) fn cell_is_passable(base_blocked: bool, route: u32, footprint: u32) -
     (!base_blocked || route != 0) && footprint == 0
 }
 
-fn require_full_reachability(grid: &Grid, root: Point, member: &str) -> Result<()> {
-    if !grid.passable.contains(&root) {
+fn require_full_reachability(
+    grid: &Grid,
+    entry_roots: &[Point],
+    member: &str,
+    landmarks: &BTreeMap<String, Landmark>,
+) -> Result<()> {
+    if entry_roots.iter().any(|root| !grid.passable.contains(root)) {
         return Err(format!("the {member} reachability root is blocked"));
     }
-    let mut seen = BTreeSet::from([root]);
-    let mut queue = VecDeque::from([root]);
-    while let Some(current) = queue.pop_front() {
-        for (dx, dy) in [(1_isize, 0_isize), (-1, 0), (0, 1), (0, -1)] {
-            let (Some(x), Some(y)) = (
-                current.x.checked_add_signed(dx),
-                current.y.checked_add_signed(dy),
-            ) else {
+    let mut seen = BTreeSet::new();
+    let roots = entry_roots.iter().map(|root| (*root, false)).chain(
+        landmarks
+            .values()
+            .filter(|landmark| landmark.role == "deferred_access")
+            .map(|landmark| (landmark.at, true)),
+    );
+    for (root, deferred) in roots {
+        if !seen.insert(root) {
+            if !deferred {
                 continue;
-            };
-            let next = Point { x, y };
-            if grid.passable.contains(&next) && seen.insert(next) {
-                queue.push_back(next);
+            }
+            return Err(format!(
+                "the {member} deferred access joins an already reachable component"
+            ));
+        }
+        let mut queue = VecDeque::from([root]);
+        while let Some(current) = queue.pop_front() {
+            for (dx, dy) in [(1_isize, 0_isize), (-1, 0), (0, 1), (0, -1)] {
+                let (Some(x), Some(y)) = (
+                    current.x.checked_add_signed(dx),
+                    current.y.checked_add_signed(dy),
+                ) else {
+                    continue;
+                };
+                let next = Point { x, y };
+                if grid.passable.contains(&next) && seen.insert(next) {
+                    queue.push_back(next);
+                }
             }
         }
     }

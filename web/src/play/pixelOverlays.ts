@@ -12,7 +12,7 @@ export class PixelOverlays {
  private readonly labels=new Map<string,HTMLCanvasElement>();
  prepare(frame:Frame,walk:WalkPresentation|null,projection:PixelProjection,level:string,scale:number):boolean {
   const tiles=frame.tiles;
-  const signature=JSON.stringify([level,scale,projection,tiles.map(t=>[t.position,t.passable,!!t.transition]),walk?.hover,walk?.cursor,walk?.kind,walk?.route]);
+  const signature=JSON.stringify([level,scale,projection,tiles.map(t=>[t.position,t.terrain_id,t.passable,t.transition]),walk?.hover,walk?.cursor,walk?.kind,walk?.route]);
   if(signature===this.signature)return false;this.signature=signature;
   const bounds=tiles.map(t=>pixelCellBounds(t.position,projection));
   const left=Math.floor(bounds.length?Math.min(...bounds.map(b=>b.left)):0)-1,top=Math.floor(bounds.length?Math.min(...bounds.map(b=>b.top)):0)-1;

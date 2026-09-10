@@ -154,9 +154,9 @@ fn validate_world(
             }
             match (level.scene_role, level.staged_viewport) {
                 (super::super::SceneRoleDef::Interior, Some(viewport)) => {
-                    if !viewport.fit_whole_level {
+                    if viewport.frame_size.contains(&0) {
                         errors.push(format!(
-                            "{level_prefix}.staged_viewport.fit_whole_level must be true"
+                            "{level_prefix}.staged_viewport.frame_size values must be positive"
                         ));
                     }
                     let required_width = i64::from(level.width.max(0))
@@ -164,8 +164,9 @@ fn validate_world(
                     let required_height = i64::from(level.height.max(0))
                         * i64::from(level.world_zoom.screen_cell_pitch[1])
                         + 152;
-                    if required_width > i64::from(viewport.frame_size[0])
-                        || required_height > i64::from(viewport.frame_size[1])
+                    if viewport.fit_whole_level
+                        && (required_width > i64::from(viewport.frame_size[0])
+                            || required_height > i64::from(viewport.frame_size[1]))
                     {
                         errors.push(format!(
                             "{level_prefix} whole-level composition requires {required_width}x{required_height} but staged viewport is {}x{}",
@@ -297,6 +298,29 @@ fn validate_world(
                 edge.at.label()
             ));
         }
+        if let super::super::TopologyKindDef::LocalDoor { initial_state } = &edge.kind {
+            match &edge.target {
+                TopologyTargetDef::Position { location } => {
+                    if location != &edge.at {
+                        errors.push(format!(
+                            "{prefix}.kind local_door target must be a position exactly equal to {}; got {}",
+                            edge.at.label(),
+                            location.label()
+                        ));
+                    }
+                }
+                TopologyTargetDef::Arrival { .. } => {
+                    errors.push(format!(
+                        "{prefix}.kind local_door target must be a direct position, never an arrival alias"
+                    ));
+                }
+            }
+            if edge.hidden && *initial_state == super::super::DoorStateDef::Open {
+                errors.push(format!(
+                    "{prefix}.kind local_door cannot be hidden with initial_state open"
+                ));
+            }
+        }
         if let super::super::TopologyKindDef::Door {
             binding_id,
             endpoint_id,
@@ -410,16 +434,6 @@ fn validate_level_doctrine(
         }
     }
 
-    let is_wall = |x: i32, y: i32| -> bool {
-        x >= 0
-            && y >= 0
-            && x < level.width
-            && y < level.height
-            && level.cells[y as usize][x as usize]
-                .iter()
-                .flatten()
-                .any(|terrain_id| wall_ids.contains(terrain_id.as_str()))
-    };
     let is_walkable = |x: i32, y: i32| -> bool {
         if x < 0 || y < 0 || x >= level.width || y >= level.height {
             return false;
@@ -443,16 +457,8 @@ fn validate_level_doctrine(
         passable && !blocked
     };
 
-    for y in 0..level.height {
-        for x in 0..level.width {
-            if is_wall(x, y) && is_walkable(x, y + 1) && !is_wall(x, y - 1) {
-                errors.push(format!(
-                    "{prefix}.wall_run[{x},{y}] projected shadow requires solid mass at [{x},{}]",
-                    y - 1
-                ));
-            }
-        }
-    }
+    // Pixel foregrounds and shadows cannot demand extra collision cells behind
+    // a wall. Wall identity remains validated above; artwork owns occlusion.
 
     let mut actual_max = 0_u32;
     for y in 0..level.height {
@@ -517,6 +523,7 @@ fn explicit_key(kind: &TopologyKindDef) -> Option<String> {
         TopologyKindDef::Stairs { direction } => Some(format!("stairs:{direction:?}")),
         TopologyKindDef::Climb { direction } => Some(format!("climb:{direction:?}")),
         TopologyKindDef::Door { .. }
+        | TopologyKindDef::LocalDoor { .. }
         | TopologyKindDef::Pit
         | TopologyKindDef::Passage
         | TopologyKindDef::Portal => None,

@@ -1,6 +1,11 @@
 //! Explicit offline content cutover. Normal recovery still requires exact identity.
 use super::*;
 
+#[path = "content_relocation.rs"]
+mod content_relocation;
+pub use content_relocation::ContentRelocation;
+use content_relocation::apply_content_relocation;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CheckpointContentMigration {
@@ -10,6 +15,14 @@ pub struct CheckpointContentMigration {
     /// Retire these service instances and transfer every remaining listing to
     /// the named retained provider, keeping capability, price, origin and item ID.
     pub merge_merchants: BTreeMap<String, String>,
+    /// Authored members that keep their identity while their coordinates move.
+    /// Every typed live spatial field in these members is translated by the
+    /// declared offset.
+    pub relocations: Vec<ContentRelocation>,
+    /// Whether authored topology introduced by the destination definition may
+    /// seed absent door and hidden-transition state. Existing mutated state is
+    /// always preserved; new keys are inserted only when this is true.
+    pub initialize_new_topology: bool,
 }
 
 impl Engine {
@@ -25,7 +38,7 @@ impl Engine {
         {
             return Err(CheckpointError::new("content migration identity differs"));
         }
-        let mut engine = Self::hydrate_checkpoint(before, checkpoint)?;
+        let mut engine = Self::hydrate_checkpoint(before.clone(), checkpoint)?;
         for id in &plan.retire_npcs {
             let actor = engine
                 .world
@@ -113,6 +126,10 @@ impl Engine {
             .world
             .service_instances
             .retain(|s| !plan.merge_merchants.contains_key(&s.id));
+        // Translate every typed live spatial field for the authored members
+        // that moved, then reconcile keyed topology state against the
+        // destination definition before the actor passability refusal runs.
+        apply_content_relocation(before.as_ref(), after.as_ref(), plan, &mut engine.world)?;
         // Retained actors and their home positions must remain usable. A layout
         // requiring relocation needs its own explicit migration plan and proof.
         for actor in &engine.world.actors {
@@ -126,6 +143,11 @@ impl Engine {
             }
         }
         engine.definition = after.clone();
+        // `initial_events` are immutable bootstrap history: they are carried
+        // through migration byte-identical and are never rewritten or reseeded.
+        // The binding from a checkpoint to the source definition that produced
+        // that history is recorded outside the checkpoint by the deployment
+        // process.
         let migrated = engine.export_checkpoint()?;
         // Reuse full recovery validation, including all item ownership, balances,
         // references, deadlines and sequence invariants. No mutable state is reseeded.
@@ -135,119 +157,5 @@ impl Engine {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::engine::setup::test_engine;
-
-    #[test]
-    fn merchant_retirement_preserves_stock_prices_and_all_item_instances() {
-        let mut engine = test_engine("town_adventure_loop_gallery");
-        let actor_id = ActorId::new("route_keeper");
-        let mut service = engine.world.service_instances[0].clone();
-        service.id = "retiring_counter".into();
-        service.placement = ServicePlacement::Actor {
-            actor_id: actor_id.clone(),
-        };
-        engine.world.service_instances.push(service);
-        let item = engine.world.item_instances["bright_staff_stock"].clone();
-        engine
-            .world
-            .item_instances
-            .insert("retiring_stock".into(), item);
-        engine.world.merchant_inventories.insert(
-            MerchantInventoryId::new("retiring_counter", "trail_wares"),
-            MerchantInventoryState {
-                listings: vec![MerchantListingState {
-                    item_instance_id: "retiring_stock".into(),
-                    origin: MerchantListingOrigin::PawnPool,
-                    price_gold: 37,
-                }],
-            },
-        );
-        let before = engine.definition().clone();
-        let mut next = before.as_ref().clone();
-        next.content_identity.definition_sha256 = "a".repeat(64);
-        let after = Arc::new(next);
-        let plan = CheckpointContentMigration {
-            from_definition_sha256: before.content_identity().definition_sha256.clone(),
-            to_definition_sha256: after.content_identity().definition_sha256.clone(),
-            retire_npcs: BTreeSet::from([actor_id.clone()]),
-            merge_merchants: BTreeMap::from([(
-                "retiring_counter".into(),
-                "waystation_counter".into(),
-            )]),
-        };
-        let checkpoint = engine.export_checkpoint().unwrap();
-        let migrated =
-            Engine::migrate_content_checkpoint(before.clone(), after.clone(), &checkpoint, &plan)
-                .unwrap();
-        let result = Engine::hydrate_checkpoint(after.clone(), &migrated).unwrap();
-        assert_eq!(result.world.item_instances, engine.world.item_instances);
-        assert_eq!(result.world.banks, engine.world.banks);
-        assert_eq!(result.world.locker_vaults, engine.world.locker_vaults);
-        assert_eq!(result.world.timing, engine.world.timing);
-        assert_eq!(
-            result.world.actors,
-            engine
-                .world
-                .actors
-                .iter()
-                .filter(|a| a.id != actor_id)
-                .cloned()
-                .collect::<Vec<_>>()
-        );
-        let listings = &result.world.merchant_inventories
-            [&MerchantInventoryId::new("waystation_counter", "trail_wares")]
-            .listings;
-        assert!(
-            listings
-                .iter()
-                .any(|l| l.item_instance_id == "retiring_stock"
-                    && l.price_gold == 37
-                    && l.origin == MerchantListingOrigin::PawnPool)
-        );
-        engine
-            .world
-            .actors
-            .iter_mut()
-            .find(|a| a.id == actor_id)
-            .unwrap()
-            .carried
-            .gold
-            .sack = 1;
-        let burdened = engine.export_checkpoint().unwrap();
-        assert!(Engine::migrate_content_checkpoint(before, after, &burdened, &plan).is_err());
-    }
-
-    #[test]
-    fn explicit_rebind_preserves_every_mutable_byte_and_refuses_wrong_identity_and_player_retirement()
-     {
-        let engine = test_engine("first_room");
-        let before = engine.definition().clone();
-        let mut next = before.as_ref().clone();
-        next.content_identity.definition_sha256 = "a".repeat(64);
-        let after = Arc::new(next);
-        let checkpoint = engine.export_checkpoint().unwrap();
-        let mut plan = CheckpointContentMigration {
-            from_definition_sha256: before.content_identity().definition_sha256.clone(),
-            to_definition_sha256: after.content_identity().definition_sha256.clone(),
-            retire_npcs: BTreeSet::new(),
-            merge_merchants: BTreeMap::new(),
-        };
-        let output =
-            Engine::migrate_content_checkpoint(before.clone(), after.clone(), &checkpoint, &plan)
-                .unwrap();
-        let mut expected = checkpoint.decode().unwrap();
-        expected.content = after.content_identity().clone();
-        assert_eq!(output.as_bytes(), serde_json::to_vec(&expected).unwrap());
-        assert!(Engine::hydrate_checkpoint(before.clone(), &output).is_err());
-        plan.retire_npcs
-            .insert(engine.world.controlled_actors().next().unwrap().id.clone());
-        assert!(
-            Engine::migrate_content_checkpoint(before.clone(), after.clone(), &checkpoint, &plan)
-                .is_err()
-        );
-        plan.from_definition_sha256 = "b".repeat(64);
-        assert!(Engine::migrate_content_checkpoint(before, after, &checkpoint, &plan).is_err());
-    }
-}
+#[path = "content_relocation_tests.rs"]
+mod content_relocation_tests;

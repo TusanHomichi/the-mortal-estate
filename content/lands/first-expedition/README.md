@@ -1,16 +1,17 @@
 # First expedition
 
 This land encodes the owner-accepted town surface, seven service interiors and
-bounded first-floor entrance. The [surface brief](../../../docs/plans/2026-09-05-first-land-surface.md#geography-acceptance-and-implementation-2026-09-06)
+four complete dungeon-floor frames. The [surface brief](../../../docs/plans/2026-09-05-first-land-surface.md#geography-acceptance-and-implementation-2026-09-06)
 owns acceptance; the [execution record](../../../docs/plans/2026-09-06-first-expedition.md)
 owns gameplay integration, native expedition proof and remaining limitations.
 
 The arrival member is 27 by 36 with 680 walkable cells and dock arrival `(8,34)`.
-The dungeon entrance is seven by seven with 17 walkable cells. Closed doors and
-the remaining cropped cells bound deferred content. Fourteen ordinary directed
-passages join town to its interiors. Temple `(0,4)` descends to entrance `(5,4)`;
-entrance `(6,4)` returns to temple `(0,5)`. The selected historical correspondence
-remains explicitly provisional as recorded in the surface brief.
+The four floors are 36, 38, 36 and 37 columns wide, each 43 rows high, with
+635, 686, 765 and 585 potentially traversable cells. Their 199 door endpoints
+include four paired grand-door endpoints. The complete land has 46 directed
+graph connections and 241 runtime topology edges.
+Temple `(0,4)` descends to dungeon `(24,7)`; dungeon `(25,7)` returns to temple
+`(0,5)`. Subsequent sections retain earlier encoding receipts as history.
 
 ## September 6 acceptance and encoding
 
@@ -43,7 +44,7 @@ landing cannot preserve the accepted geographic identity.
 
 ## Inputs and outputs
 
-The nine `.tmj` members, `promotion.json`, `catalog.json`, `simulation_seed.json` and `world.json` are
+The twelve `.tmj` members, `promotion.json`, `catalog.json`, `simulation_seed.json` and `world.json` are
 authored inputs. `generated/` is deterministic compiler output; regenerate with
 `cargo run -p tme-authoring`, and check with the same command plus `-- --check`.
 Builds and runtime require no private packet, archive, encoding script or wiki.
@@ -121,3 +122,41 @@ The promotion receipt and reviewed Rust contract pin together:
 This receipt grants no artwork-master, tuning or canon authority. The
 [exterior execution](../../../docs/plans/2026-09-08-pixel-exterior.md#gameplay-integration-and-pixel-effects)
 owns runtime presentation proof. Hosted state has not been migrated or activated.
+
+## September 9 initial first-floor encoding — superseded history
+
+The owner directed copying the selected historical first floor. The
+[execution record](../../../docs/plans/2026-09-09-dungeon-one.md) owns that dispatch,
+source identity, implementation and proof. This supersedes the 7×7 entrance crop.
+All 1,505 cells retain their source-region positions, including solid margins,
+rooms, corridors, ordinary and concealed doors, water, earth, rubble, pit and
+chasm. Original artwork and prose remain outside the checkout.
+
+The floor has 38 initially closed ordinary doors, seven initially open doors and
+ten concealed doors. Its temple-connected component has 598 potentially
+traversable cells. Ten explicitly declared cavern components account for the
+remaining 36 under current corner and vertical-traversal rules; no invented
+corridors connect them. Concealed-door player discovery remains unfinished.
+The second surface stair, three lower-floor stairs and eastern passage are
+retained reserved geography; they have no invented destinations.
+
+The review SHA-256 is
+`94e5c07474b5eee6a281a174150ebdb5d3e9699e992e865ad5e302d4f6906500`;
+the independently derived canonical geography SHA-256 is
+`ada3b68bee963c439a3d07803d88a04e86c7116d6f6f9b8ea283d31bcdc969a3`.
+The eight non-dungeon members, including the town master, retain their prior byte
+identities. The receipt and Rust contract pin the new review and geography.
+The pixel packet is rebound to this geography with byte-identical image assets;
+the dungeon uses observer-driven map rendering, with no new artwork acceptance.
+
+## September 9 four-floor encoding
+
+The expanded [execution record](../../../docs/plans/2026-09-09-dungeon-one.md)
+owns corrected source boundaries, the omitted locker cutout, connected stairs,
+guild corridor and remaining mechanical gaps. The first-floor-only receipt above
+is historical; the selected review SHA-256 is
+`a476f7f0ac5a440c4af65307d46a8e9d882a0e7910a9337a4aebcfbf00dd2c19`,
+and its independently derived canonical geography SHA-256 is
+`56e414e7fdeee374eab714fbae38770b5a8f06a592998f6a57a2690593857d55`.
+The eight other members retain their previous byte identities. Pixel packet
+version 5 binds this review and four provisional generated dungeon tiles.

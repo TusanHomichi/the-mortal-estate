@@ -3,6 +3,8 @@
 //! The review and encoding receipt are documented in the land README.
 use super::*;
 
+mod dungeons;
+
 const MAP_PROPERTIES: &[(&str, PropertyValue)] = &[
     (
         "artifact_status",
@@ -22,8 +24,8 @@ const MAP_PROPERTIES: &[(&str, PropertyValue)] = &[
 
 pub static LAND: LandContract = LandContract {
     reviewed_encoding: Some(ReviewedEncoding {
-        review_manifest_sha256: "c8ddf6d5724e9f53361185c469cadb47f827c539bbb5c32f671844edabd263d0",
-        geography_sha256: "869e33951932dde1d470111c746802ee02cc141213019fe0c049c3da07f039be",
+        review_manifest_sha256: "a476f7f0ac5a440c4af65307d46a8e9d882a0e7910a9337a4aebcfbf00dd2c19",
+        geography_sha256: "56e414e7fdeee374eab714fbae38770b5a8f06a592998f6a57a2690593857d55",
     }),
     id: "first_expedition",
     realm_id: "first_expedition",
@@ -552,67 +554,10 @@ pub static LAND: LandContract = LandContract {
             },
             candidate_entry: false,
         },
-        MemberContract {
-            id: "d1_entry",
-            document: "content/lands/first-expedition/d1_entry.tmj",
-            width: 7,
-            height: 7,
-            classes: &[
-                base("expedition_wall", true),
-                base("expedition_floor", false),
-                base("expedition_closed_door", true),
-                base("expedition_deferred", true),
-                class("expedition_path", TileRole::Route),
-                class("expedition_footprint", TileRole::Footprint),
-                class("expedition_mark", TileRole::Mark),
-                class(
-                    "expedition_blocked",
-                    TileRole::Passability { walkable: false },
-                ),
-                class(
-                    "expedition_walkable",
-                    TileRole::Passability { walkable: true },
-                ),
-            ],
-            tile_layers: &[
-                "base_terrain",
-                "routes",
-                "structure_footprints",
-                "landmark_marks",
-                "passability",
-            ],
-            object_layers: &["structures", "transitions", "landmarks"],
-            map_properties: MAP_PROPERTIES,
-            structures: &[],
-            landmarks: &[],
-            transitions: &[TransitionContract {
-                layout: TransitionLayout::Threshold,
-                id: "d1_entry_to_temple",
-                target_member: "temple",
-                paired_transition: "temple_to_d1_entry",
-                direction: "up",
-                marker_class: "",
-            }],
-            clustered_ground_class: None,
-            wall_terrain_ids: &[
-                "expedition_wall",
-                "expedition_closed_door",
-                "expedition_deferred",
-            ],
-            presentation: LevelPresentation {
-                scene_role: SceneRoleDef::Interior,
-                presentation_mode: PresentationModeDef::OverworldTown,
-                law_zone: LawZoneDef::None,
-                world_zoom: WorldZoomDef {
-                    screen_cell_pitch: [156, 104],
-                },
-                staged_viewport: Some(StagedViewportDef {
-                    frame_size: [1920, 1080],
-                    fit_whole_level: true,
-                }),
-            },
-            candidate_entry: false,
-        },
+        dungeons::D1_ENTRY,
+        dungeons::D2,
+        dungeons::D3,
+        dungeons::D4,
     ],
     receipt_path: "content/lands/first-expedition/promotion.json",
     receipt_kind: "authored_land_promotion",

@@ -38,10 +38,15 @@ it.each(["lost_response", "unavailable"])("retries identical creation after %s w
     await expect(control.createCharacter(draft)).rejects.toThrow();
     await expect(control.createCharacter({ ...draft, display_name: "Another" })).rejects.toThrow("unchanged");
     expect(requests).toHaveLength(1);
+    expect(control.view.creationRetry).toEqual(draft);
+    control.closeCreation();
+    expect(control.view.creationOptions).toEqual(fixture("character_creation_options_v1").options);
+    expect(control.view.creationRetry).toEqual(draft);
     await control.createCharacter(draft);
     expect(requests[1]).toEqual(requests[0]); expect(identities).toBe(1);
     expect(control.view.createdCharacterId).toBe(fixture("character_created_v1").character.character_id);
     expect(control.view.phase).toBe("selecting"); expect(control.view.creationOptions).toEqual([]);
+    expect(control.view.creationRetry).toBeNull();
   } finally { control.dispose(); }
   expect(control.view.createdCharacterId).toBeNull(); expect(control.view.characters).toEqual([]);
 });

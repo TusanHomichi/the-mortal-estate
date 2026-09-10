@@ -14,10 +14,20 @@ export function proposePath(frame: Frame, target: Coord): Cell[] | null {
   const tiles = new Map(frame.tiles.map(tile => [cellKey(asCell(tile.position)), tile]));
   const open = (p: Cell) => tiles.get(cellKey(p))?.passable === true;
   const from = asCell(frame.observation_center.position);
+  const continuesHere = (cell: Cell): boolean => {
+    const transition = tiles.get(cellKey(cell))?.transition as {
+      navigation?: string; door_open?: boolean; target?: {realm:string;level:string;position:Coord}
+    } | undefined;
+    if (transition == null) return true;
+    const target = transition.target, site = frame.observation_center;
+    return transition.navigation === "door" && transition.door_open === true &&
+      target?.realm === site.realm && target.level === site.level &&
+      target.position.x === cell.i && target.position.y === cell.j;
+  };
   // Three is the wire request's bound, not a client movement budget. The Rust
   // codec validates every request and the server assesses the proposed route.
   return shortestRoute(from, asCell(target), 3, (a, b) => {
-    if (!open(b) || (cellKey(a) !== cellKey(from) && tiles.get(cellKey(a))?.transition != null)) return false;
+    if (!open(b) || (cellKey(a) !== cellKey(from) && !continuesHere(a))) return false;
     return a.i === b.i || a.j === b.j || (open({ i:a.i,j:b.j }) && open({ i:b.i,j:a.j }));
   });
 }

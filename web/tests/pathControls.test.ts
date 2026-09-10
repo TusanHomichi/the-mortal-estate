@@ -9,7 +9,7 @@ import type { Frame } from "../src/authoritative/state";
 const frame = (): Frame => ({ observer_actor_id:"player", observation_center:{realm:"land",level:"town",position:{x:0,y:0}},
   logical_time:"0",ready_at:"0",can_act:true, actors:[],corpses:[],ground_items:[],gold_piles:[],
   tiles:Array.from({length:25},(_,i)=>({position:{x:i%5,y:Math.floor(i/5)},passable:true})) });
-const state = (): ControlView => ({phase:"playing",busy:false,pending:false,characters:[],feedback:"",nextSequence:"1",creationOptions:[],createdCharacterId:null,
+const state = (): ControlView => ({phase:"playing",busy:false,pending:false,characters:[],feedback:"",nextSequence:"1",creationOptions:[],creationRetry:null,createdCharacterId:null,
   snapshot:{generation:1,raw:"",envelope:{kind:"state_update",server_sequence:"1",world_revision:"1",static_scene_context:null,
     frame:frame() as Frame & GameplayFields}}});
 const tick = async () => { await Promise.resolve(); await Promise.resolve(); };
@@ -96,6 +96,26 @@ describe("authoritative two-click path controls",()=>{
   });
 });
 describe("observed route proposals",()=>{
+  it("targets a closed local door but refuses to propose continuing through it",()=>{
+    const f=frame();f.tiles=f.tiles.filter(t=>t.position.y===0);
+    const door=f.tiles.find(tile=>tile.position.x===1)!;
+    door.transition={navigation:"door",door_open:false,target:{realm:"land",level:"town",position:{x:1,y:0}}};
+    expect(routeDirections(proposePath(f,{x:1,y:0})!)).toEqual(["east"]);
+    expect(proposePath(f,{x:3,y:0})).toBeNull();
+  });
+  it("continues through an already-open local door while retaining remote-door boundaries",()=>{
+    const f=frame();f.tiles=f.tiles.filter(t=>t.position.y===0);
+    const door=f.tiles.find(tile=>tile.position.x===1)!;
+    door.transition={navigation:"door",door_open:true,target:{realm:"land",level:"town",position:{x:1,y:0}}};
+    expect(routeDirections(proposePath(f,{x:3,y:0})!)).toEqual(["east","east","east"]);
+    for(const target of [
+      {realm:"land",level:"cellar",position:{x:1,y:0}},
+      {realm:"land",level:"town",position:{x:2,y:0}},
+    ]){
+      door.transition={navigation:"door",door_open:true,target};
+      expect(proposePath(f,{x:3,y:0})).toBeNull();
+    }
+  });
   it("uses the previous shortest-step tie breaking, diagonals and three-step allowance",()=>{
     expect(routeDirections(proposePath(frame(),{x:3,y:3})!)).toEqual(["southeast","southeast","southeast"]);
     expect(proposePath(frame(),{x:4,y:0})).toBeNull();

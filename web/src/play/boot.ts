@@ -1,3 +1,6 @@
+import "./style.css";
+import "./entryStyle.css";
+
 // Never consume login credentials from navigation. Clear legacy form URLs before
 // loading the game; the document also blocks native form navigation and referrers.
 const url = new URL(location.href);

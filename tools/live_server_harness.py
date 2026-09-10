@@ -298,6 +298,7 @@ class LiveServer:
     world: World
     keep: bool = False
     public_origin: str | None = None
+    binary_path: Path | None = None
 
     run_directory: Path = field(init=False)
     database_name: str = field(init=False)
@@ -342,7 +343,11 @@ class LiveServer:
     # -- provisioning ------------------------------------------------------
 
     def _provision(self) -> None:
-        server_binary = build_server()
+        # Immutable release proofs explicitly select their already-built binary.
+        # Ordinary source proofs still build this checkout; neither path falls back.
+        server_binary = self.binary_path.resolve(strict=True) if self.binary_path is not None else build_server()
+        if not server_binary.is_file() or not os.access(server_binary, os.X_OK):
+            raise ValueError("proof server binary must be an executable regular file")
         run([
             "psql", self.admin_url, "-v", "ON_ERROR_STOP=1",
             "-c", f'CREATE DATABASE "{self.database_name}"',

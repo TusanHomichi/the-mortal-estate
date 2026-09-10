@@ -27,7 +27,7 @@ fn accepted_geography_projects_exact_passages_stairs_and_dock_arrival() {
         land("first_expedition").unwrap(),
     )
     .unwrap();
-    assert_eq!(land.members().count(), 9);
+    assert_eq!(land.members().count(), 12);
     assert_eq!(land.member("arrival").unwrap().report().passable_cells, 680);
     for retired in ["bakery", "herbalist", "chandler"] {
         assert!(land.member(retired).is_err());
@@ -38,14 +38,22 @@ fn accepted_geography_projects_exact_passages_stairs_and_dock_arrival() {
                 .is_err()
         );
     }
-    assert_eq!(land.member("d1_entry").unwrap().report().passable_cells, 17);
+    let dungeon = land.member("d1_entry").unwrap();
+    assert_eq!((dungeon.width(), dungeon.height()), (36, 43));
+    assert_eq!(dungeon.report().passable_cells, 635);
+    assert_eq!(dungeon.doors().len(), 55);
+    assert_eq!(
+        dungeon.doors().iter().filter(|door| door.hidden).count(),
+        10
+    );
+    assert_eq!(dungeon.doors().iter().filter(|door| door.open).count(), 7);
     assert_eq!(
         land.arrival_member().unwrap().arrival(),
         Some(Point { x: 8, y: 34 })
     );
     let world = serde_json::to_value(project(&land).unwrap()).unwrap();
     let edges = world["topology"].as_object().unwrap();
-    assert_eq!(edges.len(), 16);
+    assert_eq!(edges.len(), 241);
     assert_eq!(edges["route/arrival_to_market"]["kind"]["kind"], "passage");
     assert_eq!(
         edges["route/arrival_to_market"]["target"]["location"]["position"],
@@ -57,7 +65,7 @@ fn accepted_geography_projects_exact_passages_stairs_and_dock_arrival() {
     );
     assert_eq!(
         edges["route/temple_to_d1_entry"]["target"]["location"]["position"],
-        json!({"x":5,"y":4})
+        json!({"x":24,"y":7})
     );
     assert_eq!(
         edges["route/d1_entry_to_temple"]["target"]["location"]["position"],
@@ -121,11 +129,37 @@ fn authored_cast_and_all_five_creation_choices_validate_through_runtime_rules() 
         source.as_object_mut().unwrap().remove(key);
     }
     let seed: WorldSeedDef = serde_json::from_value(source).unwrap();
-    let engine = Engine::new(
+    let mut engine = Engine::new(
         ValidatedWorldSeed::new(definition.clone(), seed).unwrap(),
         7,
     )
     .unwrap();
+    let player = tme_rules::ActorId::from("player");
+    engine
+        .world_mut()
+        .actors
+        .iter_mut()
+        .find(|actor| actor.id == player)
+        .unwrap()
+        .location = tme_rules::WorldPosition::new(
+        "first_expedition",
+        "temple",
+        tme_rules::Coord { x: 0, y: 4 },
+    );
+    engine
+        .apply_actor_intent(
+            &player,
+            tme_rules::PlayerIntent::Traverse(tme_rules::ExplicitTraversalKind::StairsDown),
+        )
+        .unwrap();
+    let projected = engine.observer_projection(&player, &[]).unwrap();
+    assert_eq!(projected.static_scene_context.site.level, "d1_entry");
+    assert!(projected.static_scene_context.tiles.len() <= 195);
+    assert!(projected.static_scene_context.bounds.min.x > 0);
+    assert_eq!(
+        engine.world().actor(&player).unwrap().location.position,
+        tme_rules::Coord { x: 24, y: 7 }
+    );
     assert_eq!(engine.world().service_instances.len(), 11);
     for retired in ["bakery_keeper", "herbalist_keeper", "chandler_keeper"] {
         assert!(

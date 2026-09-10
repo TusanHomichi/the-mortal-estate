@@ -177,7 +177,7 @@ use actors_inventory::*;
 mod secondary;
 use secondary::*;
 mod content_migration;
-pub use content_migration::CheckpointContentMigration;
+pub use content_migration::{CheckpointContentMigration, ContentRelocation};
 
 #[cfg(test)]
 mod tests {

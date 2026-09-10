@@ -35,6 +35,7 @@ fn opposite(direction: &str) -> Option<&'static str> {
         "down" => Some("up"),
         "up" => Some("down"),
         "passage" => Some("passage"),
+        "door" => Some("door"),
         _ => None,
     }
 }
@@ -85,6 +86,27 @@ pub fn link(members: &BTreeMap<String, Member>) -> Result<Connectivity> {
                     transition.id
                 ));
             }
+            let door = member
+                .doors()
+                .iter()
+                .find(|door| door.at == transition.access);
+            if transition.direction == "door" {
+                let other = target.doors().iter().find(|door| door.at == paired.access);
+                if transition.landing != transition.access
+                    || paired.landing != paired.access
+                    || !matches!((door, other), (Some(a), Some(b)) if !a.hidden && !b.hidden && a.open == b.open)
+                {
+                    return Err(format!(
+                        "transition {} requires matching visible door thresholds",
+                        transition.id
+                    ));
+                }
+            } else if door.is_some() {
+                return Err(format!(
+                    "transition {} conflicts with local door topology",
+                    transition.id
+                ));
+            }
             edges.push(Edge {
                 id: format!("route/{}", transition.id),
                 from_member: member_id.clone(),
@@ -117,4 +139,54 @@ pub fn link(members: &BTreeMap<String, Member>) -> Result<Connectivity> {
     }
     edges.sort_by(|left, right| left.id.cmp(&right.id));
     Ok(Connectivity { edges })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::{Value, json};
+
+    #[test]
+    fn grand_door_graph_refuses_a_mismatched_or_concealed_face() {
+        let root = crate::repository_root().unwrap();
+        let contract = crate::land("first_expedition").unwrap();
+        for class in ["expedition_doorway_open", "expedition_masonry"] {
+            let members = contract
+                .members
+                .iter()
+                .map(|member| {
+                    let mut doc: Value =
+                        serde_json::from_slice(&std::fs::read(root.join(member.document)).unwrap())
+                            .unwrap();
+                    if member.id == "d2" {
+                        let gid = doc["tilesets"][0]["tiles"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .find(|tile| tile["class"] == class)
+                            .unwrap()["id"]
+                            .as_u64()
+                            .unwrap()
+                            + 1;
+                        let layer = doc["layers"]
+                            .as_array_mut()
+                            .unwrap()
+                            .iter_mut()
+                            .find(|layer| layer["name"] == "base_terrain")
+                            .unwrap();
+                        layer["data"][34 * 38 + 37] = json!(gid);
+                    }
+                    (
+                        member.id.to_string(),
+                        crate::compile_member(member, &doc).unwrap(),
+                    )
+                })
+                .collect();
+            assert!(
+                link(&members)
+                    .unwrap_err()
+                    .contains("matching visible door thresholds")
+            );
+        }
+    }
 }

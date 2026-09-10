@@ -1473,23 +1473,41 @@
       ],
       "summon_templates": [],
       "terrains": [
-        "terrain/expedition_water",
-        "terrain/expedition_grass",
-        "terrain/expedition_forest",
-        "terrain/expedition_sand",
-        "terrain/expedition_rock",
-        "terrain/expedition_town_ground",
-        "terrain/expedition_path",
+        "terrain/expedition_altar",
         "terrain/expedition_bridge",
-        "terrain/expedition_footprint",
-        "terrain/expedition_mark",
-        "terrain/expedition_prop_occupancy",
-        "terrain/expedition_wall",
+        "terrain/expedition_chasm",
+        "terrain/expedition_dark_floor",
+        "terrain/expedition_dirt",
+        "terrain/expedition_doorway_closed",
+        "terrain/expedition_doorway_open",
+        "terrain/expedition_dungeon_water",
+        "terrain/expedition_fire_floor",
         "terrain/expedition_floor",
-        "terrain/expedition_closed_door",
-        "terrain/expedition_deferred",
+        "terrain/expedition_footprint",
+        "terrain/expedition_forest",
+        "terrain/expedition_frozen_floor",
+        "terrain/expedition_furniture",
+        "terrain/expedition_grass",
+        "terrain/expedition_mark",
+        "terrain/expedition_masonry",
+        "terrain/expedition_path",
+        "terrain/expedition_pillar",
+        "terrain/expedition_pit",
+        "terrain/expedition_portal",
+        "terrain/expedition_portcullis",
+        "terrain/expedition_prop_occupancy",
+        "terrain/expedition_rock",
+        "terrain/expedition_rubble",
+        "terrain/expedition_sand",
+        "terrain/expedition_stairs_down",
+        "terrain/expedition_stairs_up",
+        "terrain/expedition_tiled_floor",
+        "terrain/expedition_town_ground",
+        "terrain/expedition_tree",
         "terrain/expedition_void",
-        "terrain/expedition_furniture"
+        "terrain/expedition_wall",
+        "terrain/expedition_water",
+        "terrain/expedition_wooden_floor"
       ]
     }
   },
@@ -3083,6 +3101,15 @@
   },
   "summon_templates": {},
   "terrains": {
+    "terrain/expedition_altar": {
+      "id": "expedition_altar",
+      "name": "Altar",
+      "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
+      }
+    },
     "terrain/expedition_bridge": {
       "id": "expedition_bridge",
       "name": "Bridge",
@@ -3092,20 +3119,66 @@
         "move_cost": 1
       }
     },
-    "terrain/expedition_closed_door": {
-      "id": "expedition_closed_door",
-      "name": "Closed Door",
+    "terrain/expedition_chasm": {
+      "id": "expedition_chasm",
+      "name": "Chasm",
       "navigation": {
-        "blocks_sight": true,
-        "kind": "blocked"
+        "kind": "blocked",
+        "blocks_sight": false
       }
     },
-    "terrain/expedition_deferred": {
-      "id": "expedition_deferred",
-      "name": "Deferred",
+    "terrain/expedition_dark_floor": {
+      "id": "expedition_dark_floor",
+      "name": "Dark floor",
       "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
+      }
+    },
+    "terrain/expedition_dirt": {
+      "id": "expedition_dirt",
+      "name": "Earth",
+      "navigation": {
+        "kind": "walk",
         "blocks_sight": false,
-        "kind": "blocked"
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_doorway_closed": {
+      "id": "expedition_doorway_closed",
+      "name": "Doorway",
+      "navigation": {
+        "kind": "walk",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_doorway_open": {
+      "id": "expedition_doorway_open",
+      "name": "Doorway",
+      "navigation": {
+        "kind": "walk",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_dungeon_water": {
+      "id": "expedition_dungeon_water",
+      "name": "Cavern water",
+      "navigation": {
+        "kind": "swim",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_fire_floor": {
+      "id": "expedition_fire_floor",
+      "name": "Fire floor",
+      "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
       }
     },
     "terrain/expedition_floor": {
@@ -3134,6 +3207,15 @@
         "move_cost": 1
       }
     },
+    "terrain/expedition_frozen_floor": {
+      "id": "expedition_frozen_floor",
+      "name": "Frozen floor",
+      "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
+      }
+    },
     "terrain/expedition_furniture": {
       "id": "expedition_furniture",
       "name": "Furniture",
@@ -3160,6 +3242,15 @@
         "move_cost": 1
       }
     },
+    "terrain/expedition_masonry": {
+      "id": "expedition_masonry",
+      "name": "Stone",
+      "navigation": {
+        "kind": "walk",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
     "terrain/expedition_path": {
       "id": "expedition_path",
       "name": "Path",
@@ -3167,6 +3258,39 @@
         "blocks_sight": false,
         "kind": "walk",
         "move_cost": 1
+      }
+    },
+    "terrain/expedition_pillar": {
+      "id": "expedition_pillar",
+      "name": "Pillar",
+      "navigation": {
+        "kind": "blocked",
+        "blocks_sight": true
+      }
+    },
+    "terrain/expedition_pit": {
+      "id": "expedition_pit",
+      "name": "Collapsed pit",
+      "navigation": {
+        "kind": "blocked",
+        "blocks_sight": false
+      }
+    },
+    "terrain/expedition_portal": {
+      "id": "expedition_portal",
+      "name": "Portal",
+      "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
+      }
+    },
+    "terrain/expedition_portcullis": {
+      "id": "expedition_portcullis",
+      "name": "Portcullis",
+      "navigation": {
+        "kind": "blocked",
+        "blocks_sight": false
       }
     },
     "terrain/expedition_prop_occupancy": {
@@ -3185,6 +3309,15 @@
         "kind": "blocked"
       }
     },
+    "terrain/expedition_rubble": {
+      "id": "expedition_rubble",
+      "name": "Rubble",
+      "navigation": {
+        "kind": "walk",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
     "terrain/expedition_sand": {
       "id": "expedition_sand",
       "name": "Sand",
@@ -3194,6 +3327,33 @@
         "move_cost": 1
       }
     },
+    "terrain/expedition_stairs_down": {
+      "id": "expedition_stairs_down",
+      "name": "Descending stair",
+      "navigation": {
+        "kind": "walk",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_stairs_up": {
+      "id": "expedition_stairs_up",
+      "name": "Ascending stair",
+      "navigation": {
+        "kind": "walk",
+        "blocks_sight": false,
+        "move_cost": 1
+      }
+    },
+    "terrain/expedition_tiled_floor": {
+      "id": "expedition_tiled_floor",
+      "name": "Tiled floor",
+      "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
+      }
+    },
     "terrain/expedition_town_ground": {
       "id": "expedition_town_ground",
       "name": "Town Ground",
@@ -3201,6 +3361,14 @@
         "blocks_sight": false,
         "kind": "walk",
         "move_cost": 1
+      }
+    },
+    "terrain/expedition_tree": {
+      "id": "expedition_tree",
+      "name": "Tree",
+      "navigation": {
+        "kind": "blocked",
+        "blocks_sight": true
       }
     },
     "terrain/expedition_void": {
@@ -3225,6 +3393,15 @@
       "navigation": {
         "blocks_sight": false,
         "kind": "blocked"
+      }
+    },
+    "terrain/expedition_wooden_floor": {
+      "id": "expedition_wooden_floor",
+      "name": "Wooden floor",
+      "navigation": {
+        "kind": "walk",
+        "move_cost": 1,
+        "blocks_sight": false
       }
     }
   }

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-09
-revision: 18
-status: Owner-authorized GPU pixel composition with Canvas 2D preparation; gameplay authority and diagnostic boundaries unchanged.
+last_updated: 2026-09-10
+revision: 20
+status: Shared shell selects live Three.js dungeons and retained pixel town/interiors.
 public_safe: true
-summary: Browser authority, GPU pixel composition and effect passes, Canvas preparation, shared codec and three-engine proof.
+summary: Browser authority, area-selected rendering, atomic migration obligations and retained pixel implementation.
 routes:
   - web/**
   - crates/tme-protocol/**
@@ -23,12 +23,15 @@ capture. The private play shell implements authoritative control and reconciliat
 through the same renderer seam, now drawing the selected pixel-art temple.
 Contracts below describe obligations, not claims of completed browser features.
 
-The owner's subsequent September 8 ruling selects Canvas 2D pixel art as the
-primary playable presentation and retires the 3D product path. It adds no runtime
+The September 8 ruling selected Canvas 2D pixel art and retired the 3D product
+path; the [September 10 reopening](presentation-direction.md#3d-reopening)
+authorizes developing its 3D replacement. It adds no runtime
 dependency or gameplay authority. The [transition record](plans/2026-09-08-pixel-art-transition.md)
 owns the cutover; [pixel-art production](pixel-art-production.md) owns the art
-method. Three.js remains only for explicit diagnostics and retired reference
-tools, excluded from the default product bundle. The September 9 owner direction
+method for existing assets. The subsequent [live dungeon dispatch](plans/2026-09-10-live-dungeons.md)
+authorizes Three.js for all four dungeon floors in the shared product shell,
+while town, temple and service interiors retain their existing pixel presentation.
+The September 9 owner direction
 adds raw WebGL pixel effects for lighting, atmosphere and foliage to the Canvas
 2D compositor. This adds no third-party runtime or gameplay authority; the
 [presentation ruling](presentation-direction.md#pixel-atmosphere-and-shader-effects)
@@ -37,6 +40,16 @@ The subsequent owner-authorized [GPU composition cutover](plans/2026-09-09-pixel
 retains colour and lighting surfaces in WebGL and composes scenery and figures
 there. Canvas 2D prepares reusable rasters and overlays. This is the same 2D
 pixel-art product and renderer boundary, with no new dependency or game authority.
+
+The original reopened comparison remains a private study. Live dungeon rendering
+now uses the pinned Three.js dependency through the same authoritative seam and
+shared connection adapter. Authored area identity selects the renderer; failures
+clear presentation and cannot fall back to another backend. The cutover migrates
+loaders, build fences, callers and proof under the
+[cutover policy](agent-workflow.md#no-compatibility-adapters). Scripted study
+motion carries no action, health, readiness or observation authority. The
+[live execution record](plans/2026-09-10-live-dungeons.md) separates implemented
+behavior, native evidence and preview installation.
 
 ## Authority
 
@@ -74,7 +87,7 @@ because none of those rules was ever about an engine.
 
 Its baseline:
 
-- TypeScript on Vite, rendering pixel art with WebGL composition/effects and Canvas 2D preparation, on Node 22 for the
+- TypeScript on Vite, Three.js dungeon rendering and retained pixel WebGL composition/effects with Canvas 2D preparation, on Node 22 for the
   toolchain. Dependencies are pinned by the committed lockfile and restored
   with `npm ci`; `web/node_modules/` and `web/dist/` are ignored roots
   ([working-root policy](working-root-policy.md#the-roots)).

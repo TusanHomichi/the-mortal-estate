@@ -62,7 +62,8 @@ export class PixelEffects {
     this.scale=scale;this.scene=scene;this.actors=[];
     this.indoor=level==='temple';this.offset=offset;
     this.sceneSize=this.indoor ? {x:512,y:512} : {x:this.packet.manifest.exterior.width,y:this.packet.manifest.exterior.height};
-    if(this.canvas.width!==width*scale||this.canvas.height!==height*scale){this.canvas.width=width*scale;this.canvas.height=height*scale;}
+    const pixels={width:Math.round(width*scale),height:Math.round(height*scale)};
+    if(this.canvas.width!==pixels.width||this.canvas.height!==pixels.height){this.canvas.width=pixels.width;this.canvas.height=pixels.height;}
     this.compositor.begin(width,height,scale);
     if(scene)for(const [target,file] of [[1,scene.material.file],[2,scene.normals.file]] as const){
       const image=this.packet.images.get(file)!;this.compositor.image(target,image,[offset.x,offset.y,image.width,image.height]);

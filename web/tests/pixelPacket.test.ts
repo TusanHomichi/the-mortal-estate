@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import promotion from "../../content/lands/first-expedition/promotion.json";
 import geography from "../../content/lands/first-expedition/generated/workbench_projection.json";
-import { validatePixelManifest, bindPixelSpace, type PixelManifest } from "../src/play/pixelPacket";
+import { validatePixelManifest, bindPixelSpace, pixelFiles, type PixelManifest } from "../src/play/pixelPacket";
 import { projectPixel, unprojectPixel, TEMPLE_PROJECTION, pixelDirection, pixelCellBounds, pixelGridEdges, pixelSpriteRect } from "../src/play/pixelGeometry";
 import type { Snapshot } from "../src/authoritative/state";
 
@@ -11,7 +11,7 @@ function manifest(): PixelManifest {
   const walk = Object.fromEntries(Object.keys(rotations).map(direction=>[direction,[file]]));
   const projection={origin:{x:0,y:0},step:{x:32,y:24}};
   const entrances=geography.members.find(m=>m.member==="arrival")!.transitions.map(edge=>({transition:edge.id,bounds:{x:edge.access.x*32-8,y:edge.access.y*24-8,width:16,height:16}}));
-  return {schema_version:4,geography_master_sha256:promotion.master.sha256,status:"candidate",geography_review_manifest_sha256:promotion.reviewed_encoding.review_manifest_sha256,
+  return {schema_version:7,geography_master_sha256:promotion.master.sha256,status:"candidate",geography_review_manifest_sha256:promotion.reviewed_encoding.review_manifest_sha256,
     exterior:{background:file,width:1024,height:1024,projection,entrances,foreground:[{...file,id:"temple",x:0,y:0,depth:100}]},
     temple_foreground:[{x:20,y:20,width:50,height:50,depth:70}],
     effects:{scenes:{arrival:{material:file,normals:file,lights:[],shadows:[]},temple:{material:file,normals:file,lights:[],shadows:[]}},
@@ -79,10 +79,11 @@ describe("pixel study boundaries",()=>{
     expect(()=>validatePixelManifest(anchor)).toThrow();
     const padding=manifest();padding.figures.traveler!.rotations.south!.body_height=128;
     expect(()=>validatePixelManifest(padding)).toThrow();
-    const retired=manifest();retired.schema_version=1;
-    expect(()=>validatePixelManifest(retired)).toThrow();
-    retired.schema_version=2;expect(()=>validatePixelManifest(retired)).toThrow();
-    retired.schema_version=3;expect(()=>validatePixelManifest(retired)).toThrow();
+    const retired=manifest();
+    for (const version of [1,2,3,4,5,6]) {
+      retired.schema_version=version;
+      expect(()=>validatePixelManifest(retired)).toThrow(/schema/);
+    }
     const badScenery=manifest();badScenery.exterior.foreground[0]!.x=-1;
     expect(()=>validatePixelManifest(badScenery)).toThrow(/calibration/);
     const shiftedDoor=manifest();shiftedDoor.exterior.entrances[0]!.bounds.x+=100;
@@ -97,6 +98,11 @@ describe("pixel study boundaries",()=>{
     expect(()=>validatePixelManifest(badPatch)).toThrow(/foreground/);
     const traversal=manifest();traversal.background={file:"../art.png",sha256:"a".repeat(64)};
     expect(()=>validatePixelManifest(traversal)).toThrow();
+  });
+  it("refuses retired pixel dungeon payloads",()=>{
+    const retired={...manifest(),dungeon:{}};
+    expect(()=>validatePixelManifest(retired)).toThrow(/retired pixel dungeon/i);
+    expect(pixelFiles(manifest()).length).toBeGreaterThan(0);
   });
   it("uses diagonal artwork only for figures with the complete diagonal gait",()=>{
     expect(pixelDirection({x:1,y:1},{x:2,y:2},true)).toBe("south-east");

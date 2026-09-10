@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-08
-revision: 7
+last_updated: 2026-09-09
+revision: 9
 status: Five authored creation profiles and bounded town instruction are implemented; typed critique delivered; historical numerical reconciliation and later class display naming remain open; Martial Artist is retained for now.
 public_safe: true
-summary: Recovered class bounds, durable creation, instruction, provisional values and retained Martial Artist working name.
+summary: Recovered creation bounds, nationality presentation deferral, durable creation, instruction and provisional values.
 routes:
   - crates/tme-rules/src/engine/training.rs
   - crates/tme-rules/src/engine/training/**
@@ -58,14 +58,38 @@ new town's internal placement is authored anew under the
 [surface brief](plans/2026-09-05-first-land-surface.md). Final NPC names, room
 coordinates and numeric ceilings remain unassigned here.
 
+## Thief guild continuation — September 9
+
+The owner explicitly requires the guild to house the Thief trainer, skill
+instruction and Thief spell access, together with the separate dungeon routes.
+This is the next authored class venue; its surface entrance and service migration
+are not implemented by the four-floor geography slice. Preserve existing teacher
+identity and progression state when relocating services. Do not retain a second
+mutable copy of guild instruction in the public practice court.
+
+The recovered period Thief guide describes upper-floor magic instruction and
+lower-floor weapons instruction, including crossbow, hand combat and dagger,
+with secret exits to the first two dungeon depths. The standing class/track
+eligibility rules above remain authoritative; precise teacher ceilings, fees and
+spell inventory still need their own selected evidence. The guide describes
+initial guild entry before learning the secret-door discovery spell, so first
+access must not silently require that later spell. Exact discovery versus
+physical-door behavior remains a rules fidelity question.
+
+The [gameplay baseline](gameplay-baseline.md) owns sheriff/disguise evidence and
+the separate-access direction. The [dungeon execution](plans/2026-09-09-dungeon-one.md)
+owns the already encoded basement corridor and reserved surface connection.
+
 ## Character creation
 
 Creation profiles are immutable catalog entries selected by the active catalog
 profile. Empty selections intentionally offer no creation choices. Required
 registry/selection fields replace the previous catalog shape atomically. Each
-entry owns its class/nationality sheet, suggested allocation, attribute bounds
+entry owns its class/nationality baseline sheet, attribute bounds
 and point pool, initial resources/skills, equipment, evidence gaps and arrival.
 Only the five starting classes are eligible; promotion is not creation.
+The September 9 entry direction defers nationality choices in the browser.
+It does not remove the existing profile identity or change its mechanical sheet.
 
 The rules validate the whole allocated sheet and loadout against the selected
 catalog and world, including bounds and exact point spend. The client submits

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-09
-revision: 8
-status: Connected scenes, revised Martial Artist preparation, preserved character sampling and pixel-effect maps recorded.
+last_updated: 2026-09-10
+revision: 17
+status: Pixel production tools retired; retained methods document existing assets and renderer obligations.
 public_safe: true
-summary: Source/style correction, standard sampling limits, fine character rasters, scene masks and lighting data.
+summary: Historical pixel asset preparation and proof, with current production routed to the 3D reopening.
 routes:
   - web/src/play/pixel*.ts
   - web/src/play/pixel*.json
@@ -20,6 +20,16 @@ rendering parameters and commands; the
 [transition record](plans/2026-09-08-pixel-art-transition.md) owns the cutover and
 next construction slice. Provider receipts, source images and editable candidates
 remain external under the [candidate rule](presentation-direction.md#candidate-assets).
+
+## Production status
+
+The [September 10 ruling](presentation-direction.md#3d-reopening) retires new
+pixel-art production and reopens 3D. PixelLab and the installed pixel-fixer tools
+have been removed. The methods below remain a record for existing assets and
+the still-installed pixel renderer; they do not authorize reconnecting providers,
+reinstalling correction tools or generating more directional sprite sets.
+Existing source art and receipts remain external. General raster inspection,
+packing and image-generation capabilities are not retired by this decision.
 
 ## Selected benchmark and its limits
 
@@ -45,6 +55,9 @@ the [exterior execution record](plans/2026-09-08-pixel-exterior.md#gameplay-inte
 owns their selection and evidence.
 
 ## Tool roles and model preference
+
+These are the historical pixel workflow roles, superseded for new production by
+the [current status](#production-status).
 
 1. **Built-in GPT image generation:** concept design, rich scene plates, focused
    appearance revisions and isolated source illustrations. Supply the selected
@@ -338,3 +351,87 @@ owns the bounded map amendment, prepared layer packet and real-game proof. Keep
 subsequent room and island work tied to their authoritative geometry and compare
 characters, material scale, entrances and atmosphere in native gameplay views.
 Unillustrated rooms remain explicitly labelled maps during construction.
+
+## Provisional dungeon tiles — September 9
+
+The owner permits temporary generated floors, walls and doors for the four-floor
+layout. The current packet contains four original material sources: floor, wall
+face, wall cap and a single wooden door leaf. The built-in image tool produced
+the cap and leaf using the earlier generated wall/door as references. No archived
+game art was an image input. Exact prompts, untouched outputs, hashes, rejected
+states and review images stay in the private production packet. This remains
+permission for provisional use, not final visual acceptance.
+
+The owner rejected independently proportioned side-door images. Both broad views
+now use the same 36-by-80 prepared leaf: the front-wall closed door and side-wall
+open door retain identical planks, ironwork and proportions. The two edge-on views
+show its four-unit thickness and top. Fixed posts and lintel are built separately;
+opening performs an exact quarter turn about the existing hinge, without moving
+the frame. Frame openings and the leaf's clearance are proven in pure geometry.
+The side pin sits at the post edge so a closed leaf remains visible beside it.
+These cardinal sprite views retain upright height edges and no horizontal shear;
+they are 2D preparations, not a revived 3D client.
+
+The square-ground comparison supersedes the held 72-by-48 experiment with
+96-by-96 dungeon cells. Front wall elevation plus coping occupies exactly one
+row after native-grid correction; side runs remain narrow strips whose vertical
+extrusion is also less than one row. Door frames span the cell while leaves retain their human scale.
+The subsequent fixed 7-by-7 direction uses 32 native scenery pixels per cell:
+three construction units become one prepared pixel. Wall corners snap to this
+lattice, and floor, structure and grid preparations share it. The complete
+224-by-224 native playfield has 16-pixel caption bands above and below. It
+enlarges in whole steps against the available width and height: 4x at 1080p and
+8x at 4K, giving 896- and 1792-pixel playfield widths. Town retains its existing
+enlargement. Subject proportions and the finer character raster remain intact.
+This explicit sampling is provisional pixel correction, not automatic grid
+recovery or new angled character art.
+The owner rejected the smaller
+dungeon player relative to town. Town and dungeon share one adult-height
+reference of 72 construction units; dungeon walls and frames are 88 units high,
+with an 80-unit clear opening, before native-grid correction and display zoom. The former 44-pixel actor / 56-pixel leaf calibration is retired.
+The leaf source was edited through the built-in image tool to the taller aspect,
+preserving round hardware and adding plank length instead of stretching it. The 48-by-48 prepared wall-face source
+supplies repeatable masonry courses across both axes without stretching. A separate top
+material covers narrow coping: eight world units thick, projecting to eight
+construction units on front walls and side runs before snapping to the native
+three-unit raster. These are narrow strips, at most three native pixels thick. The owner rejected
+full-cell caps because they read as platforms. Front elevations and door frames
+share the same near edge; corners meet without overlapping coping, and a wall
+between two floors emits one frontal elevation. Solid wall cells have no floor
+fill beneath them. Upward-facing coping has a lighter value and an edge contained
+inside its footprint, separating it from the upright masonry. Filtered material
+preparation is followed by explicit native-grid correction; later integer-scale
+display disables smoothing. The generated
+sources are larger raster candidates; no native pixel master is claimed.
+The [browser owner](browser-client.md) owns loading, ordering, cutaway and refusal.
+
+The owner requests 40% opacity for walls obstructing a visible player or monster.
+The current treatment fades an observed contiguous horizontal wall section rather
+than one isolated tile stripe. The browser also applies this treatment where
+foreground sections cover observed walkable floor, keeping empty routes legible.
+It does not reveal unobserved cells or alter copied
+passability. Closed-door thresholds keep floor art beneath the structural opening.
+
+The generated whole-room studies exposed changing door widths, invented wall
+openings and converging grid lines. They remain visual studies, not extraction
+masters. Follow the current comparison and separate-angle permission under the
+[projection ruling](presentation-direction.md#projection-and-surface-ruling).
+The new construction sheet uses the actual renderer for all four door states and
+the existing character. It supplies exact assembly reference for subsequent art;
+real dungeon captures check the joins, depth, cutaway and travel. A separate
+dungeon camera and more overhead subjects are explicitly permitted by the owner.
+The built-in image tool produced a two-angle guide using only the current
+original-game screenshot as its visual input. The owner prefers the 60-degree
+side for further work. The guide is illustrative: perspective, exact cell count,
+door geometry and anchors must be reconstructed and proven in the renderer,
+rather than extracted as authoritative geometry. No physical camera pitch is
+inferred from the ground-cell ratio.
+
+After the owner rejected the upright dungeon sprites, the built-in image tool
+made a matching overhead character/architecture study from the current original
+character and the angle guide. A targeted follow-up improved the open door's
+broad-face presentation. The images still do not establish a precise foot anchor
+or fixed-jamb geometry; the follow-up did not reliably preserve those constraints.
+They are appearance references only. Separate directional sprites and assembled
+wall/door parts require native review against the existing anchor and hinge proofs.
+The upright runtime candidate is held; these studies have not entered its packet.

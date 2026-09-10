@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-09
-revision: 68
-status: GPU pixel composition complete; repository, three-engine native and continuous ten-figure proof passed; hosted preview unchanged.
+last_updated: 2026-09-10
+revision: 91
+status: All four dungeon floors playable in 3D on the private preview; art and motion refinement remain.
 public_safe: true
-summary: Pixel integration and the owner-directed renderer performance repair routed to their fact owners.
+summary: Live four-floor renderer checkpoint and links to its verification, remaining presentation work and earlier studies.
 ---
 
 # The genesis ledger
@@ -28,9 +28,72 @@ owner's and are numbered by the phase they guard.
 
 ## Current checkpoint
 
-Updated 2026-09-09.
+Updated 2026-09-10.
 
-**Current dispatch:** the owner selected the final pixel temple and directed a
+**Live dungeon continuation:** all four existing dungeon floors now have a
+playable 3D view on the private preview, retaining town/temple presentation. The
+[live execution record](2026-09-10-live-dungeons.md) owns the area renderer
+cutover, authoritative movement/door/stair proof and preview refresh. Earlier
+standalone-study claims below are historical scope, not current integration.
+Art and motion remain provisional; the execution record owns the passed proof,
+preserved-save evidence and remaining findings.
+
+**Earlier presentation study:** the owner explicitly reopened 3D and
+retired the PixelLab MCP and pixel-treatment production tools. An external adjustable-camera 7-by-7 dungeon and custom-rig motion study now
+passes technical playback proof in all three browsers. The existing walk/jog/run
+quality is not accepted; improved contact, hand poses and coherent product
+integration remain the next work. The retained temple remains a visual benchmark. The subsequent wall-edge
+follow-up aligns walls and doorways to the room-facing edges, with the bottom
+wall on the far edge of its still-blocked row; the external study carries this
+placement without changing authored passability. Its height follow-up hides
+the bottom blocked strip at 60 degrees and aligns the north wall to the existing
+north doorway top. A subsequent visual correction replaces separate
+cap pieces with a continuous wall/door cap and removes the closed-door floor
+reveal that looked like a raised doorway top. Perspective comparisons now expose
+both side-wall faces. The owner clarified that adjacent-room traversal keeps
+the camera direction fixed and that existing wall placement works. The agent
+withdrew the footprint-overhaul finding, which came from an irrelevant reverse
+camera test. The owner rejected the subsequent taller-wall preset because its height would
+loom from the southern room. Original heights are restored. The owner selected the lower-pitch mild-perspective
+approach in the visual ruling. Eleven authoritative adjoining-room snapshots
+now support the external camera study; open-door body occlusion receives the
+earlier transparency treatment. Responsive and route checks remain bounded
+presentation evidence, with continuous world assembly still pending. The owner
+selected solid black unseen space and limited wall-torch pools after rejecting
+the fog/player-light alternatives. The local-door opening-stop correction is
+verified and installed through an isolated gameplay-only preview refresh; the
+held renderer and 3D studies remain external.
+Read the [current visual ruling](../presentation-direction.md#3d-reopening) and
+[execution record](2026-09-10-3d-reopening.md). At that study checkpoint the pixel
+preview remained installed; the live continuation above supersedes that status.
+The following September 9 checkpoint is historical context.
+
+**Current dungeon continuation:** the owner expanded the [dungeon layout](2026-09-09-dungeon-one.md)
+to all four floors, omitted the fourth-floor locker cutout, permitted provisional
+tiles and directed separate thieves-guild access. Four-floor verification and
+three-browser gameplay passed; the preview now includes the four-floor layout,
+narrow coping and fixed-hinge doors. The subsequent
+centering and town-scale follow-up keeps a lone actor on the tile center and uses
+one adult-height reference across town and dungeon. The current visibility
+candidate retains upright presentation while enlarging floor spacing and fading
+walls over observed empty routes. Native three-browser proof passed, but the
+owner required reference dungeon observation before choosing the presentation.
+The live entrance-room visit is recorded; the planned doorway circuit was cut
+short by character death, followed by owner-authorized release.
+The owner subsequently dispatched square ground and approximately one-row walls,
+then permitted steeper dungeon subjects independent of town. The current
+comparison now fits a fixed player-centred 7-by-7 field using integer zoom from
+a corrected scenery grid. The owner prefers the 60-degree guide for the next
+art pass and rejected the current upright dungeon figures. The framing and
+integer sampling passed all three browsers and the selected runner; this candidate
+remains local while matching artwork is prepared, with the previous preview
+unchanged. Hunting/safe-area timing is a proposal
+in the gameplay baseline, and final visual acceptance remains open.
+That record owns the active
+implementation and proof; the [gameplay baseline](../gameplay-baseline.md) owns
+class and sheriff/disguise follow-up.
+
+**Presentation dispatch:** the owner selected the final pixel temple and directed a
 hard transition to pixel art, with exterior construction next. The
 [transition record](2026-09-08-pixel-art-transition.md) owns implementation,
 verification and the stopping point before the requested Codex update. The owner
@@ -38,12 +101,23 @@ also removed the temporary gameplay HUD: keep direct movement and resident
 interaction while the real UI is designed. Read
 [presentation direction](../presentation-direction.md) and
 [pixel-art production](../pixel-art-production.md) before making more art.
-Do not resume the retired 3D product. The owner now directs pixel atmosphere and
+That restriction is superseded by the reopening above. The prior owner direction added pixel atmosphere and
 lighting through the [standing effects ruling](../presentation-direction.md#pixel-atmosphere-and-shader-effects),
 and explicitly approved the [bounded town geometry amendment](2026-09-05-first-land-surface.md#pixel-town-geography-amendment).
-Gameplay and the non-town island baseline retain their owners. Existing deployed previews are historical
-artifacts until an explicit release activation; this code cutover does not
-silently change running deployments.
+Gameplay and the non-town island baseline retain their owners. The subsequent
+[preview freshness ruling](../server-notes.md#private-development-deployment)
+requires refresh to the latest verified playable build as part of closeout.
+The latest dispatch is [game entry and character creation](2026-09-09-game-entry.md):
+bring sign-in, the roster and recovered class allocation into the game
+presentation, with nationality choices deferred. The new entry is deployed;
+its execution record owns manual allocation, the actor-interaction continuation,
+native/hosted proof and the separately recorded JavaScript-disabled WebKit
+capability limitation. The owner directs sustained gameplay/class parity work
+using the private research, archive, live sources and comparative reference
+client under the [gameplay baseline](../gameplay-baseline.md#owner-direction).
+The latest concrete dispatch is [the complete first dungeon floor](2026-09-09-dungeon-one.md):
+copy the selected historical layout and replace the entrance crop, retaining
+evidence-backed geometry and explicit unfinished traversal boundaries.
 
 The owner has now dispatched [pixel exterior construction](2026-09-08-pixel-exterior.md):
 temple frontage, adjoining street and layered scenery against existing geography.
@@ -65,7 +139,9 @@ The subsequent sustained ten-figure benchmark also exposes Firefox composition
 cost; its results and rendering-capacity limits remain in that same owner record.
 The owner then authorized [GPU-resident pixel composition](2026-09-09-pixel-gpu-composition.md).
 That execution record owns the completed cutover, comparisons, final proof and
-remaining device/capacity limits. The hosted preview has not been redeployed.
+remaining device/capacity limits. PR #52 merged this work. The owner then directed
+keeping the hosted preview current; the [refresh receipt](2026-09-09-preview-refresh.md)
+records its backed-up migration, preserved saves and three-browser public-origin proof.
 
 The following town/3D checkpoint paragraphs are earlier implementation and
 deployment history. Their service facts survive; town-local placement is superseded by the September 9

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the pixel product and serve its temple on a disposable local authority."""
+"""Build the world product and serve its temple on a disposable local authority."""
 from __future__ import annotations
 
 import argparse
@@ -41,8 +41,14 @@ def main():
     parser.add_argument("--proof", action="store_true", help="exercise all browser engines, then stop")
     parser.add_argument("--engine", choices=["chromium", "firefox", "webkit"])
     parser.add_argument("--exterior", action="store_true", help="start at the temple frontage and run exterior proof")
+    parser.add_argument("--entry", action="store_true", help="prove game entry and durable creation on a disposable authority")
+    parser.add_argument("--dungeon", action="store_true", help="inspect raised dungeon scenery on a disposable authority")
     parser.add_argument("--profile", action="store_true", help="measure steady native rendering instead of the walkthrough")
     args = parser.parse_args()
+    if args.dungeon and (not args.proof or args.entry or args.profile or args.exterior):
+        parser.error("--dungeon requires --proof and cannot combine with other proof modes")
+    if args.entry and (not args.proof or args.profile or args.exterior):
+        parser.error("--entry requires --proof and cannot combine with --profile or --exterior")
     if args.profile and not args.proof:
         parser.error("--profile requires --proof")
     if args.profile and args.exterior:
@@ -56,7 +62,7 @@ def main():
     if not assets.is_dir() or not (assets / "pixel-manifest.json").is_file():
         parser.error("assets must name a complete pixel packet")
     output.mkdir(parents=True, exist_ok=True)
-    run(["node", "web/proof/build-play.mjs", str(output / "bundle"), "pixel-art"])
+    run(["node", "web/proof/build-play.mjs", str(output / "bundle"), "world"])
     engines = json.loads((REPOSITORY_ROOT / "web/proof/engines.json").read_text()) if args.proof else [None]
     if args.engine:
         if not args.proof:
@@ -67,17 +73,22 @@ def main():
         receipt.write_text(json.dumps(dict(verdict="INCOMPLETE")) + "\n")
     reports = []
     for engine in engines:
-        server = PixelServer(read_admin_url(args.admin_url_file), temple_world(args.exterior), public_origin=args.public_origin)
+        world = temple_world(args.exterior)
+        if args.dungeon:
+            player = next(actor for actor in world.generated_seed["actors"] if actor["id"] == world.controlled_actor)
+            player["location"] = dict(realm="first_expedition", level="d1_entry", position=dict(x=24, y=7))
+        server = PixelServer(read_admin_url(args.admin_url_file), world, public_origin=args.public_origin)
         server.bundle = output / "bundle"
         server.assets = assets
         with server:
             config = dict(origin=server.origin, local_origin=server.local_origin,
                           authority=str(server.authority), engine=engine,
-                          username=server.username, password=server.password, output=str(output))
+                          username=server.username, password=server.password, output=str(output), scenario="doors" if args.dungeon else None)
             if args.proof:
-                proof = "pixel-performance" if args.profile else "pixel-exterior" if args.exterior else "pixel-temple"
+                proof = "dungeon" if args.dungeon else "entry-creation" if args.entry else "pixel-performance" if args.profile else "pixel-exterior" if args.exterior else "pixel-temple"
                 result = subprocess.run(["node", f"web/proof/{proof}-proof.mjs"], cwd=REPOSITORY_ROOT,
-                                        input=json.dumps(config), text=True, capture_output=True)
+                                        input=json.dumps(config), text=True, capture_output=True,
+                                        env={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)})
                 if result.returncode:
                     raise RuntimeError(f"{engine}: {result.stderr[-5000:]}")
                 reports.append(json.loads((output / f"{engine}-{proof}.json").read_text()))

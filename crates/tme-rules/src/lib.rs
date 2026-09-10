@@ -15,7 +15,7 @@ pub use combat::{
 };
 pub use content::*;
 pub use engine::{
-    CheckpointContentMigration, CheckpointError, ContentIdentityV1, Engine,
+    CheckpointContentMigration, CheckpointError, ContentIdentityV1, ContentRelocation, Engine,
     FACET_CHECKPOINT_SCHEMA_VERSION, FacetCheckpointV5, GameDefinition, PLAYER_OBSERVATION_RADIUS,
     RulesOutcomeV1, StepError, ValidatedWorldSeed,
 };

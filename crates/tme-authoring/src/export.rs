@@ -26,7 +26,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 use crate::Result;
-use crate::compile::{Grid, Landmark, Member, Structure, Transition};
+use crate::compile::{Grid, Landmark, LocalDoor, Member, Structure, Transition};
 use crate::contract::{self, MemberContract};
 use crate::emit;
 use crate::graph::Connectivity;
@@ -68,6 +68,7 @@ struct MemberView<'a> {
     structures: &'a [Structure],
     landmarks: Vec<&'a Landmark>,
     transitions: Vec<&'a Transition>,
+    doors: &'a [LocalDoor],
 }
 
 /// A candidate's logical view: the same member, bound to the candidate's own
@@ -161,6 +162,7 @@ fn member_view(member: &Member) -> MemberView<'_> {
         structures: member.structures(),
         landmarks: member.landmarks().values().collect(),
         transitions: member.transitions().values().collect(),
+        doors: member.doors(),
     }
 }
 

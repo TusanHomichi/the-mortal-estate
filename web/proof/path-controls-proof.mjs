@@ -54,7 +54,7 @@ for(const spec of proofBrowsers()){
   const signedInUrl=page.url();
   assert(![config.username,config.password].some(value=>signedInUrl.includes(value)||signedInUrl.includes(encodeURIComponent(value))),
    'Credentials must not appear in the signed-in URL');
-  await page.locator('#character').selectOption({label:config.character});await page.getByRole('button',{name:'Enter world',exact:true}).click();await ready();
+  await page.getByRole('radio',{name:config.character,exact:true}).check();await page.getByRole('button',{name:'Enter world',exact:true}).click();await ready();
   assert.equal(await canvas.getAttribute('data-presentation'),'pixel-art');
   const initial=here();assert.equal(initial.level,'arrival');
   const start=initial.position;

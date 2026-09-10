@@ -18,3 +18,6 @@ body[data-pixel-art] .legend,
 body[data-pixel-art] #settings,
 body[data-pixel-art][data-phase="playing"] header { display: none; }
 .pixel-graphics-error { position: fixed; top: 5rem; left: 1.5rem; z-index: 3; padding: .75rem; color: #ead5ae; background: #151519; }
+
+#world-surface > canvas[hidden] { display: none; }
+#world-surface > canvas[data-presentation="dungeon-3d"] { image-rendering: auto; background: #000; }
