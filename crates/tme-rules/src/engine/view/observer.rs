@@ -6,7 +6,7 @@ use crate::events::{
     Event, SpellCastFailure, SpellFizzleCause, TransactionCostReceiptV1,
     TransactionRewardReceiptV1, TransactionSourceV1,
 };
-use crate::model::{ActorId, Coord, ItemBindingState, WorldPosition};
+use crate::model::{ActorId, Coord, ItemBindingState, NavigationKind, WorldPosition};
 use crate::view::{
     LootClaimViewV1, MAX_FEEDBACK_TEXT_BYTES, MAX_FEEDBACK_TEXT_SCALARS,
     MAX_FEEDBACK_TRANSACTION_COSTS, MAX_FEEDBACK_TRANSACTION_REWARDS, MAX_OBSERVED_EVENTS,
@@ -374,19 +374,40 @@ impl Engine {
                     to,
                     navigation,
                     ..
+                }
+                | Event::WorldTransition {
+                    actor_id,
+                    from,
+                    to,
+                    navigation,
+                    ..
                 } => {
+                    // A local door commits WorldTransition internally, but its
+                    // adjacent, self-targeting step is ordinary observed travel.
+                    // Paired doors and other transitions retain snap placement.
+                    let local_move = matches!(event, Event::Moved { .. })
+                        || (*navigation == NavigationKind::Door
+                            && from.realm == to.realm
+                            && from.level == to.level
+                            && from.position.chebyshev_distance(to.position) == 1
+                            && self.effective_transition_at(to).is_some_and(|transition| {
+                                transition.kind == NavigationKind::Door && transition.target == *to
+                            })
+                            && (actor_id == observer_actor_id || visible.contains(from)));
                     let actor_is_visible = actor_id == observer_actor_id
                         || self
                             .world
                             .actor(actor_id)
                             .is_some_and(|actor| visible.contains(&actor.location));
-                    (actor_is_visible && (actor_id == observer_actor_id || visible.contains(to)))
-                        .then(|| ObservedEventV1::ActorMoved {
-                            actor_id: actor_id.clone(),
-                            from: from.clone(),
-                            to: to.clone(),
-                            navigation: *navigation,
-                        })
+                    (local_move
+                        && actor_is_visible
+                        && (actor_id == observer_actor_id || visible.contains(to)))
+                    .then(|| ObservedEventV1::ActorMoved {
+                        actor_id: actor_id.clone(),
+                        from: from.clone(),
+                        to: to.clone(),
+                        navigation: *navigation,
+                    })
                 }
                 Event::Inspected {
                     actor_id,

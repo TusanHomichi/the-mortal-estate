@@ -18,7 +18,7 @@ export type ServiceCapability =
       deposit_actions: OfferedAction[]; withdrawal_actions: OfferedAction[] };
 export interface GameplayFields {
   character: {
-    identity: { display_class: string };
+    identity: { display_class: string; base_class_id?: string; current_class_id?: string; sex_or_gender_display?: string | null };
     resources: { hp: number; max_hp: number; stamina: number; max_stamina: number; mp: number; max_mp: number };
     progression: { level: number; experience: string };
     skill_ledger: { track_id: string; track_display: string | null; level: number; critique_rank: number; level_title: string | null }[];

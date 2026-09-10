@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 83
-status: Selected dungeon perspective now used by the four-floor renderer; art and motion remain provisional.
+last_updated: 2026-09-11
+revision: 84
+status: Selected dungeon view remains; shared Martial Artist combat motion accepted for integration, with walking variants requested.
 public_safe: true
-summary: Live dungeon direction uses the selected camera, original wall heights, black unseen areas and limited torches; character work remains.
+summary: Dungeon camera and scenery direction, shared martial motion acceptance and requested male/female walking variants.
 routes:
   - web/**
   - content/test-corpus/**
@@ -109,6 +109,18 @@ The owner suggested generated motion video as a possible reference for Blender
 keyframing. Evaluate short isolated actions with a locked camera, full body and
 visible ground contact. This is a reference experiment, not automatic motion
 capture, approval of generated anatomy or a new video-provider subscription.
+
+**Shared martial motion follow-up:** the owner selected the shared Quaternius
+male/female rig foundation after custom-body deformation trials, then accepted
+the retargeted Meshy flying kick, guard, punches and blocks as good enough to
+wire into play. Reuse shared motions across compatible bodies, with class-specific
+combat clips and separate male/female walking variants where useful. The owner
+requested Meshy walks next and authorized the associated credit spending.
+This accepts the reviewed combat motion for integration; body appearance and
+new walking quality still require review at the live camera. The
+[motion execution record](plans/2026-09-10-martial-motion-integration.md) owns
+delivery and evidence. The [gameplay baseline](gameplay-baseline.md#martial-artist-combat-sequence)
+owns the intended closing attack; clip acceptance does not change its rules.
 
 **Tool retirement:** remove the PixelLab MCP and the installed pixel-fixer
 production tools. Stop new sprite-generation and pixel-treatment work. Preserve

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Prove four-floor drawing and real traversal against an immutable private release."""
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -24,7 +25,22 @@ def cases():
                  returnAt=dict(x=2, y=3), up=location("d2", 5, 3)),
             dict(scenario="stairs-3", start=location("d3", 9, 17), down=location("d4", 7, 17),
                  returnAt=dict(x=8, y=17), up=location("d3", 10, 17)),
-            dict(scenario="actor-actions", start=location("d4", 8, 17))]
+            dict(scenario="actor-actions", start=location("d4", 8, 17)),
+            dict(scenario="martial-male", sex="male", start=location("d1_entry", 23, 9)),
+            dict(scenario="martial-female", sex="female", start=location("d1_entry", 23, 9))]
+
+
+def martial_fixture(seed, player, sex):
+    """Separate stationary targets and identity variants in disposable authority only."""
+    for actor_id, y in [("motion_target", 9), ("motion_fist", 8)]:
+        target = copy.deepcopy(next(a for a in seed["actors"] if a["id"] == "lodge_keeper"))
+        target.update(id=actor_id, location=location("d1_entry", 25, y))
+        seed["actors"].append(target)
+    player["character"]["identity"].update(base_class_id="martial_artist",
+        current_class_id="martial_artist", display_class="Martial Artist", sex_or_gender_display=sex)
+    player["character"]["skill_ledger"] = [s for s in player["character"]["skill_ledger"] if s["track_id"] == "hand"]
+    # Retain the inventory while freeing the attacking hand.
+    next(i for i in player["carried"]["items"] if i["position"] == "right_hand")["position"] = "sack_item_2"
 
 
 def main():
@@ -59,13 +75,16 @@ def main():
             world = temple_world()
             player = next(a for a in world.generated_seed["actors"] if a["id"] == world.controlled_actor)
             player["location"] = case["start"]
+            if "sex" in case:
+                martial_fixture(world.generated_seed, player, case["sex"])
             server = PixelServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
             server.bundle = release / "web"
             server.assets = release / "web/feel-assets"
             with server:
                 config = dict(**case, engine=engine, origin=server.origin, authority=str(server.authority),
                               username=server.username, password=server.password, output=str(output))
-                script = "dungeon-actions-proof.mjs" if case["scenario"] == "actor-actions" else "dungeon-proof.mjs"
+                script = ("dungeon-motion-proof.mjs" if "sex" in case else
+                          "dungeon-actions-proof.mjs" if case["scenario"] == "actor-actions" else "dungeon-proof.mjs")
                 result = subprocess.run(["node", str(REPOSITORY_ROOT / "web/proof" / script)],
                                         input=json.dumps(config), text=True, capture_output=True,
                                         env={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)})

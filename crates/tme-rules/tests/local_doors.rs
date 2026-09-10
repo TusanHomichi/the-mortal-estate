@@ -527,3 +527,92 @@ fn scrolling_interiors_keep_single_cell_walls_without_forcing_shadow_geometry() 
         "frame_size values must be positive",
     );
 }
+
+#[test]
+fn local_door_commits_project_complete_observed_movement_chains() {
+    use tme_rules::{NavigationKind, ObservedEventV1};
+    for (state, steps) in [("closed", 1), ("open", 3)] {
+        let mut parts = wide_local_door_parts(2, state);
+        let mut sheet = ContentParts::tracked("character_sheet", "profile/character_sheet");
+        parts.actors_mut()[0]["character"] = sheet.actors_mut()[0]["character"].clone();
+        parts.actors_mut()[0]["character_id"] = json!("character:door-observer");
+        parts.actor_definition_by_actor_id_mut("player")["social"]["alignment_source"] =
+            json!({"kind": "character"});
+        let mut engine = parts.engine(7).unwrap();
+        let actor = ActorId::from("player");
+        let committed = engine
+            .apply_actor_intent(&actor, PlayerIntent::MovePath(vec![Direction::East; steps]))
+            .unwrap();
+        let door = committed
+            .events
+            .iter()
+            .find(|e| {
+                matches!(
+                    e,
+                    Event::WorldTransition {
+                        navigation: NavigationKind::Door,
+                        ..
+                    }
+                )
+            })
+            .unwrap();
+        let projection = engine
+            .observer_projection(&actor, &committed.events)
+            .unwrap();
+        let moves = projection
+            .events
+            .iter()
+            .filter_map(|e| match e {
+                ObservedEventV1::ActorMoved {
+                    actor_id,
+                    from,
+                    to,
+                    navigation,
+                } if actor_id == &actor => Some((from.position.x, to.position.x, *navigation)),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        let expected = (0..steps)
+            .map(|i| {
+                (
+                    i as i32 + 1,
+                    i as i32 + 2,
+                    if i == 0 {
+                        NavigationKind::Door
+                    } else {
+                        NavigationKind::Walk
+                    },
+                )
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(moves, expected);
+
+        // Changing a real door event into a hidden actor or nonlocal transition
+        // must not authorize a visible local movement cue.
+        for variant in 0..4 {
+            let mut refused = door.clone();
+            if let Event::WorldTransition {
+                actor_id,
+                from,
+                to,
+                navigation,
+                ..
+            } = &mut refused
+            {
+                match variant {
+                    0 => *actor_id = ActorId::from("unobserved"),
+                    1 => from.level = "elsewhere".into(),
+                    2 => to.position.x = 4,
+                    _ => *navigation = NavigationKind::Portal,
+                }
+            }
+            let projection = engine.observer_projection(&actor, &[refused]).unwrap();
+            assert!(
+                !projection
+                    .events
+                    .iter()
+                    .any(|e| matches!(e, ObservedEventV1::ActorMoved { .. }))
+            );
+        }
+    }
+}
