@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-08
-revision: 10
-status: Standing ownership boundaries including offline content migration; historical baseline and individual deadlines apply.
+last_updated: 2026-09-10
+revision: 11
+status: Standing ownership boundaries; server owns private saved-state obligations and external product activation.
 public_safe: true
-summary: Fact ownership, checkpoint migration, resident services, transaction authority and individual timing.
+summary: Fact ownership, checkpoint migration, private and external server boundaries, resident services and individual timing.
 always: true
 ---
 
@@ -766,10 +766,11 @@ approved slice defines the exact boundary and its verification.
 
 # Part 4: The external boundary is not active
 
-No externally distributed client, real persistent player data, released save or
-content format, public API consumer, or deployed service interface exists. Until
-an explicit project decision records one, only the exact current contract is
-supported and internal contracts are replaced atomically with all their callers.
+[Server notes](server-notes.md#the-external-boundary-when-it-activates) owns the
+external activation status and its distinction from private saved-state
+obligations. Until an explicit project decision activates that boundary, only
+the exact current contract is supported and internal contracts are replaced
+atomically with all their callers.
 
 The policy that takes effect **when** that boundary activates — version domains,
 support windows, migration, deployment order, and rollback — is owned by

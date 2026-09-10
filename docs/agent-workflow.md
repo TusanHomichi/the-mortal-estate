@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-06
-revision: 11
-status: Standing workflow; historical gameplay specifications start from recovered evidence under the owner-directed baseline.
+last_updated: 2026-09-10
+revision: 12
+status: Standing workflow; private saved-state preservation coexists with atomic internal cutovers.
 public_safe: true
-summary: Scope, context loading, specification sourcing, ownership, implementation, verification, CI, and closeout.
+summary: Scope, context loading, ownership, atomic internal cutovers, saved-state obligations, verification and closeout.
 always: true
 ---
 
@@ -218,9 +218,12 @@ of oversized files is not the current inventory.
 
 ## No compatibility adapters
 
-This project is **pre-external-boundary**. No externally distributed client, real
-persistent player data, released save or content format, public API consumer, or
-deployed service interface exists.
+This project is **pre-external-boundary** under the
+[server ruling](server-notes.md#the-external-boundary-when-it-activates). The
+private development preview and its saved state do exist; their preservation
+and explicit offline migration obligations belong to
+[server notes](server-notes.md#offline-content-cutover). Neither private deployment
+nor source publication activates an external product boundary.
 
 While that is true, architectural coherence and one clean current contract take
 priority over compatibility with obsolete internal shapes. The default is **no

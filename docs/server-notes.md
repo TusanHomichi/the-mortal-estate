@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-09
-revision: 25
-status: Standing server contract with latest-build private preview refresh and preserved-state content migration.
+last_updated: 2026-09-10
+revision: 26
+status: Standing server contract; private preview saves are preserved while external product-boundary activation remains pending.
 public_safe: true
-summary: Server authority, persistence, offline migration, standing preview refresh authorization, remote study origins and teardown.
+summary: Server authority, private saved-state preservation, offline migration, preview refresh and external activation boundaries.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -443,11 +443,15 @@ owners and invariants; it is not the place for a procedure. The map points here.
 
 ### It is not active
 
-No externally distributed client, real persistent player data, released save or
-content format, public API consumer, or deployed service interface exists.
+The [private development deployment](#private-development-deployment) has a live
+service and persistent saved state, governed by its preservation obligations and
+the [offline content cutover](#offline-content-cutover). No external product
+client, save/content format, public API or outside-player service has been
+released.
 
-Activation is an **explicit project decision that records one of those**. It is not
-implied by an architecture being approved, by a contract having a version number,
+Activation is an **explicit project decision that records an external product
+boundary**. It is not implied by an architecture being approved, by a contract
+having a version number,
 by a deployment existing, or by a slice finishing. Until that decision is on
 record, the default in
 [agent workflow](agent-workflow.md#no-compatibility-adapters) governs: only the
