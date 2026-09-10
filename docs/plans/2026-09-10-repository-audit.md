@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-10
-revision: 2
-status: Audit complete against merged PR 53; owner authorized commit, PR and merge after verification.
+revision: 3
+status: Audit and full local proof complete; PR review correction routes activation status solely to server notes.
 public_safe: true
-summary: Completed bounded code review, shortened checkpoint, corrected private-state guidance and local proof limits.
+summary: Bounded code review, shortened checkpoint, private-state guidance, activation ownership and verification receipts.
 ---
 
 # Post-merge repository audit
@@ -28,7 +28,9 @@ documentation cleanup, opening a PR and merging after required verification.
   persistent player data or deployed interface existed. The server owner now
   distinguishes private saved-state obligations from external activation; the
   workflow and boundary map link there. No compatibility policy or owner ruling
-  changes.
+  changes. The PR review caught remaining status assertions in the root guide,
+  workflow and boundary heading; those are now conditional or status-neutral.
+  Current activation status remains solely in the server owner.
 - The [existing migration finding](https://github.com/TusanHomichi/the-mortal-estate/issues/54)
   remains owned by rules checkpoint migration and the offline server workflow.
   Its required proof precedes a future terrain-changing migration; this audit
@@ -81,3 +83,20 @@ the delivery PR owns the resulting commit, full local verification, CI and merge
 receipts. Machine-specific commands and logs remain in the local handoff. Resume
 from this record and the current checkpoint; the next presentation objective
 remains in its existing continuation record.
+
+
+## Delivery verification
+
+At `89512e6`, the complete local runner with the existing PostgreSQL capability
+passed in 899.257 seconds, including all seven gated database checks, live TLS
+and control proof, Chromium/Firefox/WebKit authoritative capture, and the isolated
+clean-copy build/tests. Both initial PR CI jobs also passed. The subsequent PR
+review correction changes only agent/document navigation and conditional policy
+wording; its affected surfaces receive the fast docs/boundary lane and both CI
+jobs run again. The PR owns those final-commit receipts.
+
+Dependency installation reported two moderate package entries for one Vitest
+advisory. [Issue #56](https://github.com/TusanHomichi/the-mortal-estate/issues/56)
+records the observed versions, upstream advisory, scoped exposure assessment,
+test-toolchain owner and required upgrade proof. No dependency upgrade is included
+in this documentation slice.
