@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 92
-status: Merged four-floor baseline with a bounded maintenance audit and separate presentation continuation.
+last_updated: 2026-09-11
+revision: 93
+status: Four-floor baseline with verified shared martial motion integration and authorized Git delivery.
 public_safe: true
-summary: Current delivery, bounded continuation, maintenance audit and owner gates; earlier checkpoints are linked history.
+summary: Current delivery, martial motion integration, maintenance audit and owner gates; earlier checkpoints are linked history.
 ---
 
 # The genesis ledger
@@ -43,9 +43,12 @@ merged as `0ca9156`. The [live-dungeon execution record](2026-09-10-live-dungeon
 owns implementation and preview evidence; the PR carries full local verification
 and both CI receipts. Recheck checkout and remote state when resuming.
 
-**Next presentation objective:** follow the
-[fresh-session continuation](2026-09-10-live-dungeons.md#fresh-session-continuation).
-That record owns the bounded next work and unfinished presentation findings.
+**Current presentation delivery:** the owner-approved shared martial combat study
+and requested male/female Meshy walks are integrated and natively verified. The
+[motion record](2026-09-10-martial-motion-integration.md) owns this bounded slice,
+proof and preview refresh. The earlier
+[fresh-session continuation](2026-09-10-live-dungeons.md#fresh-session-continuation)
+retains the broader unfinished presentation findings.
 Read [browser client](../browser-client.md) for implemented behavior and
 [presentation direction](../presentation-direction.md#3d-reopening) for the owner
 ruling before changing the renderer. Technical proof does not accept artwork.

@@ -32,7 +32,7 @@ export class DungeonRenderer {
     const width=Math.max(1,window.innerWidth),height=Math.max(1,window.innerHeight);
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.setSize(width,height);
     this.canvas.style.imageRendering='auto';
-    if(this.frame){fitDungeonCamera(this.camera,this.frame.observation_center.position,width,height);this.draw();}
+    if(this.frame)this.draw();
   };
   private constructor(readonly canvas:HTMLCanvasElement,private readonly actors:DungeonActors){
     this.renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
@@ -59,9 +59,8 @@ export class DungeonRenderer {
     const changed=this.scenery.present(frame);
     this.occlusion.bind(this.scenery.occluders);
     this.frame=frame;this.targets=frameTargets(frame,768,768).targets;
-    this.actors.present(frame);this.presentLoot(frame);
+    this.actors.present(frame,snapshot);this.presentLoot(frame);
     if(changed)this.renderer.shadowMap.needsUpdate=true;
-    fitDungeonCamera(this.camera,frame.observation_center.position,this.canvas.clientWidth||innerWidth,this.canvas.clientHeight||innerHeight);
     this.canvas.dataset.studyLevel=level;this.canvas.dataset.studyActorCount=String(frame.actors.length);
     this.canvas.dataset.dungeonView=JSON.stringify({cells:7,center:frame.observation_center.position,level,elevation:55,fieldOfView:20,
       tiles:frame.tiles.map(t=>({position:t.position,terrain:t.terrain_id,passable:t.passable,transition:t.transition})),
@@ -85,9 +84,12 @@ export class DungeonRenderer {
     this.draw();
   }
   private draw():void {
+    if(this.frame)fitDungeonCamera(this.camera,this.actors.anchor(this.frame.observer_actor_id)??this.frame.observation_center.position,
+      this.canvas.clientWidth||innerWidth,this.canvas.clientHeight||innerHeight);
     this.scene.updateMatrixWorld(true);this.occlusion.update(this.camera,this.actors.bodies());this.renderer.render(this.scene,this.camera);
     if(!this.frame)return;
     this.canvas.dataset.dungeonOcclusion=String(this.occlusion.count);
+    this.canvas.dataset.dungeonMotions=JSON.stringify(this.actors.diagnostics());
     this.canvas.dataset.dungeonDrawCalls=String(this.renderer.info.render.calls);
     // Actual camera projection for proof and diagnosis, not a competing hit grid.
     this.canvas.dataset.dungeonPoints=JSON.stringify(this.frame.tiles.map(t=>{
@@ -111,7 +113,7 @@ export class DungeonRenderer {
   private clearLoot():void {this.loot.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();(o.material as T.Material).dispose();}});this.loot.clear();}
   clear():void {
     this.frame=null;this.targets=[];this.occlusion.clear();this.scenery.clear();this.actors.clear();this.overlay.clear();this.clearLoot();this.renderer.clear();
-    for(const key of ['studyLevel','dungeonView','dungeonPoints','dungeonActorAnchors','dungeonActorPoints','dungeonContents','dungeonOcclusion','dungeonDrawCalls'])delete this.canvas.dataset[key];
+    for(const key of ['studyLevel','dungeonView','dungeonPoints','dungeonActorAnchors','dungeonActorPoints','dungeonContents','dungeonOcclusion','dungeonDrawCalls','dungeonMotions'])delete this.canvas.dataset[key];
     this.canvas.dataset.studyActorCount='0';
   }
   dispose():void {cancelAnimationFrame(this.animation);window.removeEventListener('resize',this.resize);this.canvas.removeEventListener('webglcontextlost',this.lost);this.clear();this.scenery.dispose();this.actors.dispose();this.overlay.dispose();this.renderer.dispose();this.graphicsError.remove();}

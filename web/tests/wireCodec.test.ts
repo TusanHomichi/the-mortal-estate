@@ -34,13 +34,21 @@ describe("atomic authoritative frame replacement", () => {
     state.accept(JSON.stringify(welcome));
     const first = state.snapshot;
     expect(state.accept(JSON.stringify({ ...sample, server_sequence: welcome.server_sequence,
-      world_revision: welcome.world_revision, frame: welcome.frame, static_scene_context: welcome.static_scene_context }))).toBe(false);
+      world_revision: welcome.world_revision, frame: welcome.frame, static_scene_context: welcome.static_scene_context,
+      events: [], events_truncated: false }))).toBe(false);
     expect(state.accept(JSON.stringify({ ...sample, server_sequence: (BigInt(welcome.server_sequence) + 7n).toString(), world_revision: welcome.world_revision }))).toBe(true);
     const newer = state.snapshot;
     expect(newer).not.toBe(first);
     expect(() => state.accept(JSON.stringify(sample))).toThrow();
     expect(state.snapshot).toBe(newer);
     expect(state.accept(newer!.raw)).toBe(false);
+    expect(() => state.accept(JSON.stringify({ ...newer!.envelope,
+      events_truncated: !newer!.envelope.events_truncated }))).toThrow("conflicting");
+    const moved = { kind: "actor_moved", actor_id: newer!.envelope.frame.observer_actor_id,
+      from: newer!.envelope.frame.observation_center, to: newer!.envelope.frame.observation_center, navigation: "walk" };
+    expect(() => state.accept(JSON.stringify({ ...newer!.envelope,
+      events: [...(newer!.envelope.events ?? []), moved] }))).toThrow("conflicting");
+    expect(state.snapshot).toBe(newer);
     expect(() => state.accept(JSON.stringify({ ...newer!.envelope, world_revision: (BigInt(welcome.world_revision) + 1n).toString() }))).toThrow("conflicting");
     expect(Object.isFrozen(newer!.envelope.frame)).toBe(true);
     state.reset();

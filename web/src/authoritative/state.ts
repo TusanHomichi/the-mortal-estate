@@ -21,6 +21,9 @@ export interface Envelope {
   control_epoch?: string;
   frame: Frame & GameplayFields;
   static_scene_context: unknown;
+  /** Rust-decoded, visibility-filtered cues on state updates; welcome has none. */
+  events?: readonly unknown[];
+  events_truncated?: boolean;
 }
 export interface Snapshot {
   readonly generation: number;
@@ -55,7 +58,8 @@ export class AuthoritativeState {
       if (sequence < before) throw new Error("server sequence regressed");
       if (sequence === before) {
         const stateBytes = (value: Envelope) => JSON.stringify({ world_revision: value.world_revision,
-          frame: value.frame, static_scene_context: value.static_scene_context });
+          frame: value.frame, static_scene_context: value.static_scene_context,
+          events: value.events ?? [], events_truncated: value.events_truncated ?? false });
         if (stateBytes(envelope) === stateBytes(previous.envelope)) return false;
         throw new Error("conflicting state at the same sequence");
       }

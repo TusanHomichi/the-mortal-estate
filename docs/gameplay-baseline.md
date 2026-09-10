@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-10
-revision: 10
-status: Historical gameplay baseline with four-floor reconstruction, remaining traversal gaps and a hunting/safe-area timing proposal.
+revision: 11
+status: Historical gameplay baseline with four-floor reconstruction, Martial Artist combat-sequence direction, remaining traversal gaps and a hunting/safe-area timing proposal.
 public_safe: true
-summary: Historical gameplay target, local-door movement ruling, geography, fidelity accounting and remaining proposals.
+summary: Historical gameplay target, local-door movement, Martial Artist jump-kick entry and fist attacks, fidelity accounting and remaining proposals.
 routes:
   - crates/tme-rules/**
   - content/**
@@ -86,6 +86,33 @@ The shared rules evaluator owns both preview and commit. Browser proposals may
 target a closed doorway but may continue through a local doorway only when its
 observed state is open. Paired transitions between distinct endpoints retain
 their existing behavior; this clarification concerns local corridor doors.
+
+## Martial Artist combat sequence
+
+**Owner clarification, September 10:** a Martial Artist can open combat with a
+jump kick that closes distance to the target, travelling up to three tiles, and
+lands the kick within one round. Approach and attack belong to that single
+action; do not require a separate movement action before the kick. Once engaged
+in combat, the selected attack sequence uses punches, with varied fist-attack
+animations. The jump kick is an available opener, not a compulsory entry into
+every fight.
+
+This is an explicit owner-selected future gameplay requirement, informed by
+the owner's historical account. It is not an independently verified release
+comparison or a claim that the current rules/client implement the sequence.
+The [class contract](class-training-contract.md#class-and-teacher-relationships)
+owns class capabilities and teaching relationships.
+
+The animation work must support takeoff, airborne kick, impact, landing and a
+transition into the punching guard across the supported approach distances.
+Animation does not grant movement, decide hit outcomes or introduce extra
+attacks. Rules own travel legality, the landing position, attack resolution and
+action deadlines; the client presents their authoritative result. Exact impact
+placement within the action and obstacle/target-change cases require the later
+combat slice's specification and proof. The owner's one-round requirement does
+not restore a shared pulse or settle a new duration in seconds; the current
+[individual-deadline ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
+continues to own timing architecture.
 
 ## Hunting and safe-area proposal
 

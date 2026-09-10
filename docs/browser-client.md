@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 57
-status: Four-floor Three.js integration verified and installed on the private preview.
+last_updated: 2026-09-11
+revision: 58
+status: Controlled Martial Artist bodies, shared combat and walking variants verified in all three native browsers.
 public_safe: true
-summary: Installed shared world shell, area-selected dungeon rendering, retained pixel interiors and release-bound browser proof.
+summary: Shared world shell, dungeon martial bodies and motion, retained pixel interiors and release-bound browser proof.
 routes:
   - web/**
   - tools/run_pixel_temple.py
@@ -34,6 +34,7 @@ for deployment and work status.
 | Town and interior pixel art | `web/src/play/pixelRenderer.ts`, `pixelOverlays.ts`, `pixelPacket.ts`, `pixelGeometry.ts`, `pixelMotion.ts` | `web/tests/pixelPacket.test.ts`, `web/tests/pixelMotion.test.ts`, `web/proof/pixel-temple-proof.mjs` |
 | Pixel composition and atmosphere | `web/src/play/pixelCompositor.ts`, `pixelEffects.ts`, `pixelEffectsShader.ts`, `pixelEffectsConfig.ts` | `web/proof/pixel-effects-proof.mjs`, native exterior/temple walks, sustained crowd proof |
 | Live dungeon rendering | `web/src/play/worldRenderer.ts`, `dungeon/` | `web/tests/dungeonRenderer.test.ts`, `web/proof/dungeon-proof.mjs` |
+| Dungeon character motion | `web/src/play/dungeon/actors.ts`, `assets.ts`, `motion.ts` | `web/tests/dungeonActors.test.ts`, `web/tests/dungeonMotion.test.ts`, `web/proof/dungeon-motion-proof.mjs` |
 | Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
 | Retired 3D packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
 | Retired local movement | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
@@ -65,7 +66,8 @@ entry/return, resize, reconnect and missing-art proof.
 The existing 3D preview and its output are not launcher inputs.
 `tools/run_dungeon_proof.py --release <immutable-release> --admin-url-file <file>
 --output <external-directory>` checks all four floors, the temple round trip,
-actor-menu traversal and missing/stale dungeon asset refusal in all three browsers.
+actor-menu traversal, male/female martial movement and combat, and missing/stale
+dungeon asset refusal in all three browsers.
 Its release must match its complete file receipt and this checkout's content;
 the harness uses that release's explicit server binary without a rebuild or fallback.
 `--engine` or `--scenario` narrows the evidence.
@@ -111,6 +113,31 @@ floors consume their bounded observer scene window; terrain and door meshes are
 created only for observed frame rows. The live renderer, asset cutover and
 remaining art limitations are detailed in the
 [live dungeon record](plans/2026-09-10-live-dungeons.md).
+
+### Dungeon character motion
+
+The controlled character's `base_class_id` selects the Martial Artist body;
+`sex_or_gender_display` equal to female selects its female variant, otherwise
+the provisional male body is used. Other observed actors retain the previous
+candidate because their rows carry no class/body identity. This adds no creation
+field. `dungeon/receipt.json` binds both self-contained eleven-clip GLBs alongside
+the existing candidate. Missing, stale or unbound required clips refuse loading.
+
+Only new accepted state updates supply motion cues; welcome and command replies
+cannot replay attacks. Confirmed unarmed fight outcomes rotate four punches;
+jumpkick plays the flying kick in place. Blocked melee feedback supplies a cover
+pose without claiming which defense absorbed the blow. No-sight, not-ready and
+ranged block outcomes supply no combat clip. Reactions expire on elapsed local
+time, including hidden-tab time, without granting readiness or creating damage.
+
+Walking uses a complete visible local actor-moved chain beginning at the previous
+cell and ending at the current one. Gait phase follows rendered distance, using
+the body's own walk. Remaining authoritative time bounds visual travel; a ready
+frame ends it. The fixed-direction camera follows the rendered observer anchor.
+Incomplete chains and area transitions snap to supplied placement.
+The intended distance-closing flying kick remains gameplay work; this renderer
+cannot invent its movement. The [motion record](plans/2026-09-10-martial-motion-integration.md)
+owns native evidence and remaining limitations.
 
 The observer can open their own actor menu to use an enabled server-offered stair
 action, including a landing directly on stairs. Observed stair markers and door

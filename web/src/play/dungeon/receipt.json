@@ -7,5 +7,17 @@
   "motion": {
     "file": "dungeon-motion.glb",
     "sha256": "ad0c0fb473ecd1a4e56a7fa967680bf8c095383e6a386e6689d5125b63bff3c1"
+  },
+  "martial": {
+    "male": {
+      "file": "martial-male.glb",
+      "sha256": "7acf32803147c0d7851d60a5de12bac6416b47646d18d0693d8e4752a2f30a11",
+      "stride": 4.422006279230118
+    },
+    "female": {
+      "file": "martial-female.glb",
+      "sha256": "42fb02f9c8c629f791e2cfd6fd9aa692b99869ddfd4b5b3ff3def123d5ac22a4",
+      "stride": 1.4668685793876648
+    }
   }
 }
