@@ -264,6 +264,122 @@ def recorded_fence():
     }
 
 
+#: A PostgreSQL client double that models one coordinated concurrent commit.
+#:
+#: It answers from two instants: the world as the exported snapshot sees it, and the
+#: world after a writer committed while the backup was running. A read carrying
+#: `SET TRANSACTION SNAPSHOT` gets the first; any other read gets the second, which
+#: is exactly how PostgreSQL answers. Its `pg_dump` writes the pinned instant as the
+#: dump, so the receipt and the dump can be compared the way a drill compares them.
+DATABASE_DOUBLE = '''#!/usr/bin/env python3
+import json, pathlib, sys
+
+views = json.loads(pathlib.Path({views!r}).read_text())
+log = pathlib.Path({log!r})
+name = pathlib.Path(sys.argv[0]).name
+
+if name == "pg_dump":
+    arguments = sys.argv[1:]
+    target = pathlib.Path(arguments[arguments.index("--file") + 1])
+    snapshot = arguments[arguments.index("--snapshot") + 1] if "--snapshot" in arguments else ""
+    view = "pinned" if snapshot else "current"
+    target.write_text(json.dumps(views[view]))
+    with log.open("a") as handle:
+        handle.write("dump " + view + "\\n")
+    raise SystemExit(0)
+
+lines = []
+for line in sys.stdin:
+    lines.append(line)
+    if "pg_export_snapshot" in line:
+        print("fake-snapshot-1", flush=True)
+        lines.extend(sys.stdin)
+        break
+script = "".join(lines)
+if "pg_export_snapshot" in script:
+    raise SystemExit(0)
+view = "pinned" if "SET TRANSACTION SNAPSHOT" in script else "current"
+for query, answers in views["queries"].items():
+    if query in script:
+        with log.open("a") as handle:
+            handle.write(view + " " + answers["name"] + "\\n")
+        print(answers[view], flush=True)
+        break
+else:
+    raise SystemExit("the double was asked a query it does not model")
+'''
+
+
+class CoordinatedBackupInstant(unittest.TestCase):
+    """A commit that lands during a backup stays out of the receipt and the dump.
+
+    The double models the instant a backup must be bound to. A backup that reads its
+    expectations outside the exported snapshot -- the order this replaced, dump first
+    and unpinned reads after -- records the later commit and hands the drill a receipt
+    describing a dump it does not have, which the drill then reports as a lost
+    character.
+    """
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="tme-backup-instant-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.site = Installation(self.root / "installation")
+        self.site.settings = json.loads((ROOT / "deploy/development/config.example.json").read_text())
+        self.site.settings["administrator"] = "synthetic"
+        self.writes = self.root / "reads.log"
+        synthetic_release(self.site)
+
+    def database_double(self, views):
+        directory = Path(tempfile.mkdtemp(prefix="tme-database-double-"))
+        self.addCleanup(shutil.rmtree, directory, ignore_errors=True)
+        (self.root / "views.json").write_text(json.dumps(views))
+        script = DATABASE_DOUBLE.format(views=str(self.root / "views.json"), log=str(self.writes))
+        for name in ("psql", "pg_dump"):
+            path = directory / name
+            path.write_text(script, encoding="utf-8")
+            path.chmod(0o755)
+        return directory
+
+    def views(self, pinned, current):
+        """Both instants, and the answer the double gives for every expectation query."""
+        fence, fence_now = recorded_fence(), copy.deepcopy(recorded_fence())
+        fence_now["control_epochs"].append({"character_id": "c-concurrent", "control_epoch": 0})
+        before, after = {**pinned, **fence}, {**current, **fence_now}
+        queries = {query: {"name": section, "pinned": json.dumps(before[section]),
+                           "current": json.dumps(after[section])}
+                   for section, query in {**SNAPSHOT_QUERIES, **FENCE_SNAPSHOT_QUERIES}.items()}
+        return {"pinned": before, "current": after, "queries": queries}
+
+    def test_a_concurrent_commit_stays_out_of_the_receipt_and_the_dump(self):
+        pinned = recorded_state()
+        current = copy.deepcopy(pinned)
+        current["characters"].append({"character_id": "c-concurrent", "account_id": "a-owner",
+                                      "slot": 4, "display_name": "Committed Mid-Backup",
+                                      "actor_id": "player_4"})
+        self.site.settings["postgres_bin"] = self.database_double(self.views(pinned, current))
+
+        directory = backup(self.site)
+        receipt = json.loads((directory / "backup.json").read_text())
+        dumped = json.loads((directory / "database.dump").read_text())
+
+        # Exactly one read per expectation, each pinned to the exported snapshot,
+        # and one dump. An unpinned read would log "current" here.
+        self.assertEqual(self.writes.read_text().splitlines(),
+                         [f"pinned {section}" for section in
+                          (*SNAPSHOT_QUERIES, *FENCE_SNAPSHOT_QUERIES)] + ["dump pinned"])
+        self.assertEqual(receipt["snapshot"], pinned)
+        self.assertEqual(receipt["fence"], recorded_fence())
+        # The dump carries the same instant the receipt describes, which is what the
+        # drill compares; only the fence's intentional mutations differ from it.
+        self.assertEqual({name: dumped[name] for name in SNAPSHOT_QUERIES}, pinned)
+        self.assertEqual({name: dumped[name] for name in FENCE_SNAPSHOT_QUERIES}, recorded_fence())
+        self.assertEqual(state_differences(receipt["snapshot"], dumped), [])
+        # The case is not vacuous: had the reads seen the writer's commit, the
+        # comparison the drill performs would have named the character it cannot find.
+        self.assertTrue(state_differences(receipt["snapshot"], current))
+
+
 class RestoreReceiptShape(unittest.TestCase):
     """A malformed receipt is refused, and never quietly checks less."""
 
