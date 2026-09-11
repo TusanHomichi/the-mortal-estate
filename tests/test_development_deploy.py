@@ -11,7 +11,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "deploy/development"))
 
 from common import Installation, digest, document
-from operations import verify_backup
+from operations import (
+    FENCE_CLEARED_QUERIES,
+    FENCE_SNAPSHOT_QUERIES,
+    SNAPSHOT_QUERIES,
+    fence_differences,
+    restore_drill,
+    state_differences,
+    verify_backup,
+)
 from provision import development_seed, validate_settings
 from services import install_units
 
@@ -170,6 +178,134 @@ class PrivateDeployment(unittest.TestCase):
         document(directory / "backup.json", receipt)
         with self.assertRaises(RuntimeError):
             verify_backup(self.site, directory)
+
+    def test_a_legacy_backup_stays_verifiable_but_cannot_be_drilled(self):
+        """A pre-snapshot backup is still restorable; it just cannot claim preservation."""
+        self.release()
+        directory = self.site.root / "backups/legacy"
+        directory.mkdir(parents=True)
+        dump = directory / "database.dump"
+        dump.write_bytes(b"synthetic dump")
+        document(directory / "backup.json", {"schema_version": 1, "sha256": digest(dump),
+                                             "storage": {"checkpoint": 1}})
+        verify_backup(self.site, directory)
+        with self.assertRaisesRegex(RuntimeError, "records no snapshot"):
+            restore_drill(self.site, directory)
+
+
+class RecordedDatabase:
+    """Answers the drill's projections from canned rows, without a database."""
+
+    def __init__(self, state=None, fence=None, cleared=None):
+        self.state = state or {}
+        self.fence = fence or {}
+        self.cleared = cleared or {}
+
+    def sql(self, text, database="tme"):
+        for queries, source in ((SNAPSHOT_QUERIES, self.state),
+                                (FENCE_SNAPSHOT_QUERIES, self.fence)):
+            for name, query in queries.items():
+                if text == query:
+                    return "\n".join(json.dumps(row) for row in source.get(name) or [])
+        for name, query in FENCE_CLEARED_QUERIES.items():
+            if text == query:
+                return str(self.cleared.get(name, 0))
+        raise AssertionError(f"unexpected query: {text}")
+
+
+def recorded_state():
+    """One world, two seeded characters, and one created through the normal flow."""
+    characters = [
+        {"character_id": "c-seeded-1", "account_id": "a-owner", "slot": 1,
+         "display_name": "Wayfarer", "actor_id": "player"},
+        {"character_id": "c-seeded-2", "account_id": "a-owner", "slot": 2,
+         "display_name": "Second", "actor_id": "player_2"},
+        {"character_id": "c-created-3", "account_id": "a-owner", "slot": 3,
+         "display_name": "Newly Made", "actor_id": "player_3"},
+    ]
+    return {
+        "accounts": [{"account_id": "a-owner", "username": "operator",
+                      "display_name": "Operator", "status": "active"}],
+        "characters": characters,
+        "facets": [{"facet_id": "f-world", "facet_key": "first_expedition",
+                    "catalog_id": "catalog", "profile_id": "profile/first_expedition",
+                    "template_id": "template", "content_digest": "ab" * 32,
+                    "checkpoint_schema": 3, "facet_revision": 41,
+                    "last_server_sequence": 97, "checkpoint_sha256": "cd" * 32}],
+    }
+
+
+class RestorePreservation(unittest.TestCase):
+    """The drill compares identities and durable state, not a count."""
+
+    def test_an_unchanged_restore_is_accepted(self):
+        state = recorded_state()
+        self.assertEqual(state_differences(state, copy.deepcopy(state)), [])
+
+    def test_a_same_count_substitution_is_rejected(self):
+        """The count this replaced could not see a swapped identity at all."""
+        expected, actual = recorded_state(), recorded_state()
+        actual["characters"][2]["character_id"] = "c-impostor"
+        actual["characters"][2]["display_name"] = "Impostor"
+        self.assertEqual(len(actual["characters"]), len(expected["characters"]))
+        differences = state_differences(expected, actual)
+        self.assertTrue(any("c-created-3" in row and "lost" in row for row in differences), differences)
+        self.assertTrue(any("c-impostor" in row and "gained" in row for row in differences), differences)
+
+    def test_altered_durable_state_is_rejected(self):
+        """A facet digest is durable state; a count says nothing about it."""
+        expected, actual = recorded_state(), recorded_state()
+        actual["facets"][0]["checkpoint_sha256"] = "ef" * 32
+        differences = state_differences(expected, actual)
+        self.assertTrue(any("facets" in row for row in differences), differences)
+
+    def test_ownership_and_saved_slot_are_part_of_the_comparison(self):
+        expected, actual = recorded_state(), recorded_state()
+        actual["characters"][2]["account_id"] = "a-somebody-else"
+        actual["characters"][2]["slot"] = 7
+        differences = state_differences(expected, actual)
+        self.assertTrue(any("a-somebody-else" in row for row in differences), differences)
+
+    def test_a_lost_character_is_named_not_counted(self):
+        expected, actual = recorded_state(), recorded_state()
+        actual["characters"].pop()
+        differences = state_differences(expected, actual)
+        self.assertEqual(len(differences), 1, differences)
+        self.assertIn("c-created-3", differences[0])
+
+
+class RestoreFenceExpectations(unittest.TestCase):
+    """Fence changes are asserted deliberately, never mistaken for lost state."""
+
+    def fence(self, epochs, fence_epoch):
+        return {"control_epochs": [{"character_id": key, "control_epoch": value}
+                                   for key, value in sorted(epochs.items())],
+                "fence_epoch": [{"restore_fence_epoch": fence_epoch}]}
+
+    def test_the_recorded_fence_is_accepted(self):
+        expected = self.fence({"c-1": 4, "c-2": 0}, 9)
+        site = RecordedDatabase(fence=self.fence({"c-1": 5, "c-2": 1}, 10))
+        self.assertEqual(fence_differences(expected, site, "scratch"), [])
+
+    def test_a_missing_epoch_increment_is_rejected(self):
+        expected = self.fence({"c-1": 4}, 9)
+        site = RecordedDatabase(fence=self.fence({"c-1": 4}, 10))
+        differences = fence_differences(expected, site, "scratch")
+        self.assertTrue(any("control_epoch is 4, expected 5" in row for row in differences), differences)
+
+    def test_a_surviving_session_or_ticket_is_rejected(self):
+        expected = self.fence({"c-1": 4}, 9)
+        site = RecordedDatabase(fence=self.fence({"c-1": 5}, 10),
+                                cleared={"unrevoked_sessions": 1, "unconsumed_tickets": 2})
+        differences = fence_differences(expected, site, "scratch")
+        self.assertTrue(any("unrevoked_sessions is 1" in row for row in differences), differences)
+        self.assertTrue(any("unconsumed_tickets is 2" in row for row in differences), differences)
+
+    def test_a_character_appearing_across_the_fence_is_rejected(self):
+        expected = self.fence({"c-1": 4}, 9)
+        site = RecordedDatabase(fence=self.fence({"c-1": 5, "c-extra": 1}, 10))
+        differences = fence_differences(expected, site, "scratch")
+        self.assertTrue(any("c-extra appeared" in row for row in differences), differences)
 
 
 if __name__ == "__main__":
