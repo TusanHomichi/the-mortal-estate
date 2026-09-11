@@ -5,7 +5,8 @@ mod support;
 use serde_json::{Value, json};
 use tme_rules::{
     ActorId, BlockSourceKind, CarriedPosition, CheckpointContentMigration, DeterministicRng,
-    Engine, Event, ObservedEventV1, ObserverPhysicalOutcomeV1, PhysicalAttackMode,
+    Engine, Event, ObservedEventV1, ObserverFeedbackCueV1, ObserverPhysicalOutcomeV1,
+    PhysicalAttackMode,
 };
 
 use support::{
@@ -157,9 +158,14 @@ fn passive_block_is_free_for_a_busy_defender_and_projects_a_single_blocked_outco
         .iter()
         .filter(|event| {
             matches!(event,
-                ObservedEventV1::PhysicalCombat {
-                    source: Some(source), target, mode: PhysicalAttackMode::Kick,
-                    outcome: ObserverPhysicalOutcomeV1::Blocked, ..
+                ObservedEventV1::Feedback {
+                    cue: ObserverFeedbackCueV1::PhysicalCombat {
+                        source: Some(source),
+                        target,
+                        mode: PhysicalAttackMode::Kick,
+                        outcome: ObserverPhysicalOutcomeV1::Blocked,
+                        ..
+                    }
                 } if source.actor_id == "player" && target.actor_id == defender_id()
             )
         })

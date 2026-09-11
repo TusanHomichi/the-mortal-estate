@@ -61,13 +61,17 @@ pub fn definition() -> Arc<GameDefinition> {
 
 pub fn armor_definition() -> Arc<GameDefinition> {
     // A labeled fixture addition only. The production expedition has no wearable armor.
+    // Encumbrance is the only armor input the passive hand block reads; the rating
+    // must stay zero so this fixture cannot introduce a second, armor-sourced block
+    // candidate. Minimal crushing reduction satisfies the shared armor validator,
+    // which rejects armor contributing nothing, without reaching the block path.
     let mut source = catalog();
     source["items"]["item/defense_test_armor"] = json!({
         "id": ARMOR, "name": "Defense Test Armor", "kind": "armor",
         "valid_placements": ["hand", "sack", "outer_armor"],
         "armor": {
             "block_rating": 0, "encumbrance": 5,
-            "damage_reduction": {"cutting": 0, "piercing": 0, "crushing": 0}
+            "damage_reduction": {"cutting": 0, "piercing": 0, "crushing": 1}
         },
         "economy": {"unit_burden": 1}
     });
