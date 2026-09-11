@@ -66,6 +66,14 @@ be delivered, or a client that still will not be reaped) is reported too. `backu
 publishes its receipt only after a clean shutdown, and a caller already handling its
 own failure keeps that original failure alongside the cleanup problems.
 
+`restore_drill()` holds the same discipline at its own boundary. It creates exactly one
+scratch database, drops it through `release_scratch()`, and when a preservation or
+fence failure is already propagating, a cleanup that fails is attached to that failure
+rather than allowed to replace it. The message carries the scratch database's exact
+name, because a database that survived the drill is something a person has to find and
+remove. A drill that verified the restore but could not drop its scratch database is
+itself a failure. Every cleanup failure counts, including a timeout.
+
 ### The fence is asserted, not filtered
 
 `restore_fence` (`crates/tme-server/src/operator.rs`) intentionally mutates: every
@@ -112,18 +120,29 @@ correct code from plausible code:
   `close()` and again through `backup()`, where the original failure must survive.
   Both were mutation-checked against the previous `close()`: all four cases error.
 
-### The scratch-installation proof
+### The owned-installation proof
 
-`tools/run_restore_drill_proof.py` is the gated `postgres` step `gated.restore_drill`.
-It drives the deployment helpers themselves — `backup()`, `restore_drill()` and
-`SnapshotSession` — and replaces none of them. It refuses a cluster that already holds
-a `tme` database, so an installed preview is out of reach; everything it creates is
-dropped again.
+`tools/run_restore_drill_proof.py` is the gated `postgres-server` step
+`gated.restore_drill`. It drives the deployment helpers themselves — `backup()`,
+`restore_drill()`, `release_scratch()` and `SnapshotSession` — and replaces none of
+them. It takes no cluster argument: it runs its own `initdb` cluster under a temporary
+root, on a reserved port, with the socket beside it, and provisions the installation
+in the deployment's own order (the production `roles.sql`, a `tme` database owned by
+`tme_owner`, migrations run as that owner, `grants.sql`, two generated accounts, and
+the real `provision.bootstrap` manifest). The one substitution is the service manager:
+the installer runs the cluster under a systemd user unit and this proof starts the
+same cluster with `pg_ctl`, because it installs no host services.
 
-It provisions a scratch installation in the deployment's own order (the production
-`roles.sql`, a `tme` database owned by `tme_owner`, migrations run as that owner,
-`grants.sql`, two generated accounts, and the real `provision.bootstrap` manifest),
-starts the real server on it through `tools/live_server_harness.py`, and then:
+That ownership is the isolation boundary, and it is asserted rather than assumed. The
+fixed names the deployment uses — `tme`, `tme_owner`, `tme_runtime` — exist only inside
+this cluster, so nothing outside the root can be read, renamed, given a password or
+dropped. Before anything destructive the proof asks the *running server* where its data
+directory is and refuses to continue unless it is the directory under its own root.
+There is no cross-cluster cleanup to get wrong: the cluster, its databases, its roles
+and every credential in them live under the temporary root and die with it, and the
+only cleanup step is stopping the server — reported, never raised past a failure.
+
+After starting the real server through `tools/live_server_harness.py`, it:
 
 1. creates one more character **through the control API** — the runtime flow, not SQL
    — walks it one square onto a passable neighbour the server itself reports, and
@@ -135,46 +154,50 @@ starts the real server on it through `tools/live_server_harness.py`, and then:
    `store restore-fence` and `store verify`, serves it with the real server, and reads
    the created character's position from that restored world — the semantic form of a
    claim the byte-level comparison cannot make by itself;
-4. starts a second `backup()` and creates a character on the live server **while it
-   runs**, coordinated on the exported snapshot the backup holds: the new character
-   must be in the live world, absent from both the receipt and the dump, and the drill
-   of that backup must still pass;
+4. runs a second `backup()` whose coordinated writer is **held until the backup has
+   exported its snapshot and started its first pinned read**, so the commit lands
+   inside the window the claim depends on rather than beside it: the character must be
+   live, absent from both the receipt and the dump, the export must have been open
+   before and after the commit, and the drill of that backup must still pass;
 5. rewrites one dump so the character count is unchanged but an identity is
    substituted and the facet revision moved, and requires the real drill to refuse it
    naming the lost, gained and facet rows — then moves only the receipt's fence
-   expectation and requires the drill to refuse that after the fence has run. In both
-   cases no scratch database may survive.
+   expectation and requires the drill to refuse that after the fence has run. Both must
+   still drop their scratch database;
+6. makes a drill's cleanup fail **for a real reason**: a prepared transaction in the
+   drill's own scratch database, which `DROP DATABASE ... WITH (FORCE)` cannot
+   terminate. The hold is placed while the drill is blocked on the exclusive lock its
+   fence takes, so the ordering is enforced rather than raced. The drill must report
+   the preservation failure, the cleanup failure and the database's exact name; the
+   proof then releases the hold, removes the leaked database with the deployment's own
+   helper, and proves none remains.
 
 ### Evidence observed
 
-`python3 tools/run_restore_drill_proof.py --admin-url-file <file>`:
+`python3 tools/run_restore_drill_proof.py`:
 
 ```text
-scratch installation: /tmp/tme-restore-drill-q02s3qjs (database tme, socket <scratch cluster socket>)
+scratch installation: /tmp/tme-restore-drill-r346_gdt (database tme, port 53207, socket /tmp/tme-restore-drill-r346_gdt/socket)
 database: tme (provisioned by the caller)
 server: gameplay_ready=True protocol=1.10
-runtime character: 01a09293-6f87-75f0-be6d-05e6652f28ec slot 2
+runtime character: 01a092d6-653c-7613-97e4-b4ea97fd6e2c slot 2
 runtime character stepped north from (8,34)
 observed position: first_expedition/arrival (8,33)
-backup 20260911T222534Z-0a0604: 3 characters recorded, drill preserved 3, scratch database dropped
-coordinated commit: 01a09293-94a5-7251-9140-581499a358f8 is live and absent from 20260911T222538Z-82ea2b, whose drill still preserved 3 characters
-restored copy served: 01a09293-6f87-75f0-be6d-05e6652f28ec still at first_expedition/arrival (8,33)
-altered backup refused by name: 01a09293-6f87-75f0-be6d-05e6652f28ec lost, bd0cbd73-078a-47d2-b8b6-e8a1d594aa22 gained, scratch database dropped
+backup 20260911T233840Z-2fb907: 3 characters recorded, drill preserved 3, scratch database dropped
+coordinated commit: 01a092d6-7b33-7a41-9568-6985ebb08535 committed inside the exported snapshot and is absent from 20260911T233842Z-06dfe2, whose drill still preserved 3 characters
+restored copy served: 01a092d6-653c-7613-97e4-b4ea97fd6e2c still at first_expedition/arrival (8,33)
+altered backup refused by name: 01a092d6-653c-7613-97e4-b4ea97fd6e2c lost, e3ab0b8f-9e79-459d-ad2c-78132d3c5e7e gained, scratch database dropped
 misfenced receipt refused after the fence ran, scratch database dropped
+cleanup failure reported with its cause: tme_restore_25a7ecffba33 survived a prepared transaction and the drill kept the preservation failure
+recovered: tme_restore_25a7ecffba33 released and dropped
 TME_RESTORE_DRILL_PROOF_OK
 ```
 
-The walk is what makes the position oracle say something: `(8,33)` is a square the
-character reached by playing, which the world document does not declare and only the
-durable checkpoint can explain.
-
-Coordination in stage 4 is with the exported snapshot rather than with a sleep. The
-ordering this replaced exposed no such instant, which is exactly why it was wrong: its
-unpinned reads answered from whatever had been committed by the time they ran.
-
-The run above was made on a cluster holding none of the production roles. The same
-tool created them, and immediately afterwards the cluster held no `tme%` role and only
-its template databases — the create-and-drop path, not just the reuse path.
+The report records `exporting_transactions: [1, 1]` for stage 4: exactly one exported
+snapshot was open before and after the commit, which is what makes the ordering a fact
+rather than an assumption. The walk is what makes the position oracle say something:
+`(8,33)` is a square the character reached by playing, which the world document does
+not declare and only the durable checkpoint can explain.
 
 ### Canonical checks observed
 
@@ -190,8 +213,8 @@ its template databases — the create-and-drop path, not just the reuse path.
   documented behaviour with no private denylist present; the lane's own
   `boundary: banned-terms` step ran against the real denylist and passed.
 - `python3 -m unittest -q tests.test_development_deploy tests.test_live_server_harness
-  tests.test_restore_drill_proof` — 44 + 10 + 14 tests, OK; the runner's harness lane
-  runs 116.
+  tests.test_restore_drill_proof` — 48 + 10 + 18 tests, OK; the runner's harness lane
+  runs 120.
 
 The tool also left the cluster as it found it: after the final run, no `tme` database
 and no `tme%` role remained.
@@ -201,9 +224,11 @@ and no `tme%` role remained.
 - **Where the snapshot lives.** In `backup.json`, beside the dump's checksum, and the
   receipt schema version moved to 2. Version 1 receipts stay readable and verifiable;
   `restore_drill` refuses them explicitly instead of guessing a count.
-- **Which capability runs the proof.** The existing gated `postgres` capability, as a
-  new step in the table (`gated.restore_drill`) beside `gated.postgres`. It needs no
-  new tool input: the cluster comes from `--admin-url-file` and the root is temporary.
+- **Which capability runs the proof.** A new `postgres-server` capability, as a new
+  step in the table (`gated.restore_drill`) beside `gated.postgres`. The proof needs a
+  PostgreSQL *server* installation — `initdb`, `pg_ctl`, `psql`, `pg_dump`,
+  `pg_restore` — because it creates its own cluster; the existing `postgres` capability
+  means a shared cluster's superuser URL, which this proof deliberately does not use.
 
 ## Non-goals, unchanged
 

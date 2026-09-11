@@ -191,10 +191,11 @@ snapshots existed remains restorable but is refused for drilling, because it can
 support a preservation claim.
 
 What the drill preserved is reported by identity, not by count. Its portable
-coverage is `tests/test_development_deploy.py`; the end-to-end proof against a
-scratch installation, including a character created through the runtime flow and a
-commit landing while a backup runs, is `tools/run_restore_drill_proof.py` under the
-gated `postgres` capability. The [execution record](../../docs/plans/2026-09-11-restore-drill-preservation.md)
+coverage is `tests/test_development_deploy.py`; the end-to-end proof against an
+installation the proof creates and owns, including a character created through the
+runtime flow and a commit landing while a backup runs, is
+`tools/run_restore_drill_proof.py` under the gated `postgres-server` capability. The
+[execution record](../../docs/plans/2026-09-11-restore-drill-preservation.md)
 owns the observed evidence. Installing a new world, or resetting one, is still not
 authorized by any of this.
 
