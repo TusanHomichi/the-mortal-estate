@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-10
-revision: 11
-status: Historical gameplay baseline with four-floor reconstruction, Martial Artist combat-sequence direction, remaining traversal gaps and a hunting/safe-area timing proposal.
+revision: 12
+status: Historical gameplay baseline with a source-patch closing jumpkick specification; configured proof and acceptance remain pending.
 public_safe: true
-summary: Historical gameplay target, local-door movement, Martial Artist jump-kick entry and fist attacks, fidelity accounting and remaining proposals.
+summary: Historical gameplay target, local-door movement, provisional closing-jumpkick rules and remaining fidelity work.
 routes:
   - crates/tme-rules/**
   - content/**
@@ -97,22 +97,61 @@ in combat, the selected attack sequence uses punches, with varied fist-attack
 animations. The jump kick is an available opener, not a compulsory entry into
 every fight.
 
-This is an explicit owner-selected future gameplay requirement, informed by
-the owner's historical account. It is not an independently verified release
-comparison or a claim that the current rules/client implement the sequence.
-The [class contract](class-training-contract.md#class-and-teacher-relationships)
-owns class capabilities and teaching relationships.
+This is an explicit owner-selected gameplay requirement, informed by the owner's
+historical account. It does not establish an independently verified release
+comparison. The [class contract](class-training-contract.md#class-and-teacher-relationships)
+owns class capabilities and teaching relationships. The
+[closing-jumpkick slice](plans/2026-09-10-closing-jumpkick.md) implements the source
+patch below; configured rules/browser proof and native acceptance remain pending.
 
 The animation work must support takeoff, airborne kick, impact, landing and a
 transition into the punching guard across the supported approach distances.
 Animation does not grant movement, decide hit outcomes or introduce extra
 attacks. Rules own travel legality, the landing position, attack resolution and
 action deadlines; the client presents their authoritative result. Exact impact
-placement within the action and obstacle/target-change cases require the later
-combat slice's specification and proof. The owner's one-round requirement does
+placement in the visual clip still requires native proof. The rules resolve the
+accepted action immediately, as specified below; there is no pending mid-flight
+attack or animation-completion callback into gameplay. The owner's one-round requirement does
 not restore a shared pulse or settle a new duration in seconds; the current
 [individual-deadline ruling](boundary-map.md#21-authoritative-individual-deadlines-d5)
 continues to own timing architecture.
+
+
+### Closing-jumpkick implementation specification
+
+These are provisional engineering choices for the dispatched slice, not additional
+historical findings or a claim of accepted visual quality:
+
+A jumpkick uses its existing skill-limited reach, capped at three tiles, and its
+existing physical stamina, damage and cooldown tuning. Movement-point costs and
+diagonal corner rules still constrain the approach. The destination is the target's
+occupied tile: ordinary Fight already requires that shared tile. Co-occupancy
+remains permitted. At distance zero, jumpkick is unavailable and an unarmed Fight
+uses punches; no automatic follow-up, forced opener or equipment change is added.
+
+The route is deterministic: step diagonally toward the target until one coordinate
+matches, then straight along the remaining axis. It does not detour. Takeoff and
+every step require walkable ground. Walls, blocked corners, closed local doors,
+water and automatic passages, pits, portals or paired-door relocation cannot be
+bypassed. An already-open self-targeting local door permits passage under ordinary
+movement legality. No partial approach or door opening is committed by a refused
+kick. These restrictions deliberately grant no new air-traversal capability.
+
+Preview and execution use the same complete approach plan. Resolve the named
+actor's current location when the server accepts the command; recheck the captured
+route and social authority immediately before committing. A moved target may still
+be attacked at its new legal location; a missing, dead or invalid target cannot
+leave a partial approach. Position steps commit before hit/miss/block resolution.
+Misses and blocks still land on the target tile. Approach plus attack consumes one
+existing action deadline and one physical stamina cost, without a separate walking
+charge. Ordinary movement side effects, including movement-sensitive bow unloading,
+remain owned by movement. Errors in later resolution roll back the action through
+the existing engine transaction, including RNG and pending durable effects.
+
+Existing suppressed, no-sight and not-ready feedback paths remain distinct from
+transactional errors: they do not move the attacker or spend kick stamina but may
+still schedule the existing action deadline. Nothing waits for a rendered impact,
+and subsequent target movement cannot retarget an already-resolved attack.
 
 ## Hunting and safe-area proposal
 

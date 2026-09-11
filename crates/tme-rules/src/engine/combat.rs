@@ -468,6 +468,9 @@ impl Engine {
         }
 
         self.commit_physical_attack_social_plan(&plan, events)?;
+        if let Some(approach) = &plan.approach {
+            self.commit_jumpkick_approach(attacker_index, defender_index, approach, events)?;
+        }
         self.commit_physical_stamina(attacker_index, mode, plan.jumpkick_stamina_cost, events)?;
         if plan.consumes_bow_nock {
             let item_instance_id = plan

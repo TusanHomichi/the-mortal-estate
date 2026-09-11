@@ -30,18 +30,27 @@ try{
   const point=await canvas().evaluate((n,id)=>{const p=JSON.parse(n.dataset.dungeonActorPoints).find(p=>p.id===id),b=n.getBoundingClientRect();return {x:b.left+p.px*b.width,y:b.top+p.py*b.height};},target);
   await page.mouse.click(point.x,point.y,{button:'right'});const dialog=page.locator('.resident-dialog[open]');await dialog.waitFor();
   const before=commands.length,first=updates.length,position=structuredClone(frame.observation_center);
+  const destination=structuredClone(frame.actors.find(a=>a.actor_id===target).position);
   await dialog.locator(`button[data-action=${JSON.stringify(`character/${offer.id}`)}]`).click();
-  await pose(clips);await dialog.getByRole('button',{name:'Close',exact:true}).click();await page.waitForTimeout(400);await capture(mode);
+  await pose(clips);if(mode==='jumpkick')assert.equal((await motion()).moving,true);
+  await dialog.getByRole('button',{name:'Close',exact:true}).click();await page.waitForTimeout(400);await capture(mode);
   await accepted(before);assert.deepEqual(commands.at(-1).intent,offer.intent);
   const cues=updates.slice(first).flatMap(u=>u.events).filter(e=>e.kind==='feedback'&&e.cue.kind==='physical_combat'&&e.cue.mode===mode&&e.cue.source?.actor_id===frame.observer_actor_id);
   assert(cues.some(e=>['hit','missed','blocked'].includes(e.cue.outcome.kind)),'Animation requires confirmed physical feedback');
-  assert.deepEqual(frame.observation_center,position,'Animation must not fabricate movement');await pose(['guard']);
+  if(mode==='jumpkick'){
+   assert.deepEqual(frame.observation_center,destination,'The server must land the kick on the target tile');
+   const movement=updates.slice(first).flatMap(u=>u.events).filter(e=>e.kind==='actor_moved'&&e.actor_id===frame.observer_actor_id);
+   assert.equal(movement.length,3,'This fixture must exercise all three authoritative approach steps');
+   let at=position;for(const step of movement){assert.deepEqual(step.from,at);assert.equal(step.navigation,'walk');at=step.to;}
+   assert.deepEqual(at,destination,'Complete visible movement must explain the landing');
+  }else assert.deepEqual(frame.observation_center,position,'A punch must not move the attacker');
+  await pose(['guard']);assert.equal((await motion()).moving,false);
  }
  await page.goto(config.origin+'/');await page.waitForFunction(()=>document.body.dataset.playReady==='true');
  await page.locator('#username').fill(config.username);await page.locator('#password').fill(config.password);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Enter world',exact:true}).click();await ready();await waitForWorldPointing(page);
  assert.equal(frame.character.identity.base_class_id,'martial_artist');assert.equal(frame.character.identity.sex_or_gender_display,config.sex);
  assert.deepEqual(await motion(),{id:frame.observer_actor_id,body:config.sex,clip:'guard',moving:false});await capture('guard');
- await move(22,9,'closed-door',true);await move(21,9,'walk');await move(24,9,'open-door-sprint',true);await attack('jumpkick',['flying_kick']);await move(25,8,'engage');await attack('fight',['jab_left','jab_right','uppercut_right','hook_left'],'motion_fist');
+ await move(22,9,'closed-door',true);await move(21,9,'walk');await move(24,9,'open-door-sprint',true);await move(22,9,'kick-origin',true);await attack('jumpkick',['flying_kick']);await attack('fight',['jab_left','jab_right','uppercut_right','hook_left'],'motion_fist');
  await page.getByRole('button',{name:'Reconnect',exact:true}).click();await ready();await pose(['guard']);await capture('reconnected');assert.deepEqual(errors,[]);
  await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForFunction(()=>document.body.dataset.phase==='signed_out');
  assert.equal(await canvas().getAttribute('data-dungeon-motions'),null);

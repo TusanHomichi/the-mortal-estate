@@ -1,5 +1,7 @@
 use std::collections::BTreeSet;
 
+mod jumpkick;
+
 use super::resources::MovementResourcePlan;
 use super::{Engine, StepError};
 use crate::events::Event;
@@ -7,7 +9,7 @@ use crate::model::{
     Direction, MovementPace, MovementStopReason, NavigationKind, TerrainTraversal, WorldPosition,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) enum MovementStepOutcome {
     Moved {
         navigation: NavigationKind,
@@ -27,7 +29,7 @@ pub(super) enum MovementStepOutcome {
     },
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum MovementBlockedReason {
     SuppressedByStatus,
     OutOfBounds,
@@ -35,7 +37,7 @@ pub(super) enum MovementBlockedReason {
     InsufficientMovementPoints,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct MovementStep {
     pub(super) direction: Direction,
     pub(super) from: WorldPosition,
@@ -44,7 +46,7 @@ pub(super) struct MovementStep {
     pub(super) outcome: MovementStepOutcome,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct MovementPlan {
     pub(super) pace: MovementPace,
     pub(super) requested_steps: usize,
@@ -407,6 +409,21 @@ impl Engine {
             stop_reason: plan.stop_reason,
         });
 
+        self.commit_actor_path_steps(actor_index, plan, events)?;
+        self.commit_movement_stamina(actor_index, plan.pace, &plan.resources, events)?;
+        Ok(())
+    }
+
+    // Position changes and movement side effects have one owner. A closing attack
+    // uses these steps but owns its own stamina charge and action deadline.
+    fn commit_actor_path_steps(
+        &mut self,
+        actor_index: usize,
+        plan: &MovementPlan,
+        events: &mut Vec<Event>,
+    ) -> Result<(), StepError> {
+        let actor_id = self.world.actors[actor_index].id.clone();
+        let actor_name = self.world.actors[actor_index].name.clone();
         for step in &plan.steps {
             let (navigation, terrain_name, cost, remaining_after) = match &step.outcome {
                 MovementStepOutcome::Moved {
@@ -483,7 +500,6 @@ impl Engine {
             self.break_spell_hidden_after_uncovered_move(actor_index, events);
             self.unload_actor_bow_after_movement(actor_index, events)?;
         }
-        self.commit_movement_stamina(actor_index, plan.pace, &plan.resources, events)?;
         Ok(())
     }
 

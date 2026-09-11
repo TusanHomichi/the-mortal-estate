@@ -2,6 +2,9 @@ use super::*;
 
 impl Engine {
     pub(super) fn physical_attack_error_reason(error: &StepError) -> ActionBlockedReasonV1 {
+        if let Some(reason) = error.action_blocked_reason() {
+            return reason;
+        }
         let message = error.message();
         if message.contains("not visible") {
             ActionBlockedReasonV1::BlockedBySight
