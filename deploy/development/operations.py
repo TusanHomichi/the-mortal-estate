@@ -95,7 +95,8 @@ def at_snapshot(site, database, snapshot_id, query):
               f"SET TRANSACTION SNAPSHOT '{snapshot_id}';\n"
               f"{statement};\n"
               "COMMIT;")
-    return site.sql(script, database)
+    # Quiet: without it the BEGIN/COMMIT command tags arrive alongside the JSON.
+    return site.sql(script, database, quiet=True)
 
 
 class SnapshotReads:
@@ -122,6 +123,19 @@ def fence_snapshot(site, database="tme"):
     return fence
 
 
+#: `bigint` is the widest column any of these epochs is stored in.
+MAXIMUM_EPOCH = 2 ** 63 - 1
+
+
+def is_epoch(value):
+    """A genuine non-negative integer the storage can hold.
+
+    `type(value) is int` rather than `isinstance`, because `True` is an `int` and a
+    boolean epoch would otherwise pass as one.
+    """
+    return type(value) is int and 0 <= value <= MAXIMUM_EPOCH
+
+
 def validate_expectations(state, fence):
     """Refuse a malformed receipt before any scratch database is created.
 
@@ -133,14 +147,26 @@ def validate_expectations(state, fence):
     problems = []
     if not isinstance(state, dict) or not isinstance(fence, dict):
         return ["receipt does not carry a snapshot and fence section"]
+    sections = {}
     for name in REQUIRED_SNAPSHOT_SECTIONS:
-        rows = state.get(name)
-        if not isinstance(rows, list):
-            problems.append(f"receipt is missing its {name} section")
+        sections[name] = state.get(name)
     for name in REQUIRED_FENCE_SECTIONS:
-        rows = fence.get(name)
+        sections[name] = fence.get(name)
+    for name, rows in sections.items():
         if not isinstance(rows, list):
             problems.append(f"receipt is missing its {name} section")
+        elif any(not isinstance(row, dict) for row in rows):
+            problems.append(f"receipt {name} section contains a row that is not an object")
+    if problems:
+        return problems
+    # Identity counts must be real and unique. A set comparison cannot see a repeated
+    # record, and a duplicate would silently reduce what the drill compares.
+    for name in ("characters", "control_epochs"):
+        identities = [row.get("character_id") for row in sections[name]]
+        if any(not isinstance(value, str) or not value for value in identities):
+            problems.append(f"receipt {name} section has a row without a character identity")
+        elif len(set(identities)) != len(identities):
+            problems.append(f"receipt {name} section repeats a character identity")
     if problems:
         return problems
     if len(state["facets"]) != 1:
@@ -150,16 +176,18 @@ def validate_expectations(state, fence):
     if len(fence["fence_epoch"]) != 1:
         problems.append(
             f"receipt records {len(fence['fence_epoch'])} fence epochs, expected exactly one")
-    elif not isinstance(fence["fence_epoch"][0].get("restore_fence_epoch"), int):
-        problems.append("receipt fence epoch is not an integer")
+    elif not is_epoch(fence["fence_epoch"][0].get("restore_fence_epoch")):
+        problems.append("receipt fence epoch is not a storable non-negative integer")
     preserved = [row.get("character_id") for row in state["characters"]]
     epochs = [row.get("character_id") for row in fence["control_epochs"]]
     if set(preserved) != set(epochs):
         problems.append(
             "receipt character identities disagree between its preserved and epoch sections")
     for row in fence["control_epochs"]:
-        if not isinstance(row.get("control_epoch"), int):
-            problems.append(f"receipt control epoch for {row.get('character_id')} is not an integer")
+        if not is_epoch(row.get("control_epoch")):
+            problems.append(
+                f"receipt control epoch for {row.get('character_id')} is not a storable "
+                "non-negative integer")
             break
     return problems
 

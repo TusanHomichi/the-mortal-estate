@@ -294,7 +294,59 @@ class RestoreReceiptShape(unittest.TestCase):
         fence = recorded_fence()
         fence["control_epochs"][0]["control_epoch"] = "zero"
         problems = validate_expectations(recorded_state(), fence)
-        self.assertTrue(any("not an integer" in problem for problem in problems), problems)
+        self.assertTrue(any("not a storable" in problem for problem in problems), problems)
+
+    def test_a_boolean_epoch_is_refused(self):
+        """`True` is an `int`, so an isinstance check would accept it as one."""
+        for value in (True, False):
+            fence = recorded_fence()
+            fence["control_epochs"][0]["control_epoch"] = value
+            problems = validate_expectations(recorded_state(), fence)
+            self.assertTrue(any("not a storable" in problem for problem in problems),
+                            (value, problems))
+
+    def test_a_negative_or_oversized_epoch_is_refused(self):
+        for value in (-1, 2 ** 63):
+            fence = recorded_fence()
+            fence["control_epochs"][0]["control_epoch"] = value
+            problems = validate_expectations(recorded_state(), fence)
+            self.assertTrue(any("not a storable" in problem for problem in problems),
+                            (value, problems))
+            fence = recorded_fence()
+            fence["fence_epoch"] = [{"restore_fence_epoch": value}]
+            problems = validate_expectations(recorded_state(), fence)
+            self.assertTrue(any("fence epoch" in problem for problem in problems), (value, problems))
+
+    def test_a_row_that_is_not_an_object_is_refused(self):
+        """Rows are inspected as objects only once that has been confirmed."""
+        for section in ("characters", "accounts", "facets"):
+            state = recorded_state()
+            state[section].append("not a row")
+            problems = validate_expectations(state, recorded_fence())
+            self.assertTrue(any(section in problem and "not an object" in problem
+                                for problem in problems), (section, problems))
+
+    def test_a_row_without_an_identity_is_refused(self):
+        state = recorded_state()
+        del state["characters"][0]["character_id"]
+        problems = validate_expectations(state, recorded_fence())
+        self.assertTrue(any("without a character identity" in problem for problem in problems),
+                        problems)
+
+    def test_a_repeated_identity_is_refused(self):
+        """A set comparison cannot see a duplicate, and a duplicate hides a row."""
+        state = recorded_state()
+        state["characters"][1]["character_id"] = state["characters"][0]["character_id"]
+        problems = validate_expectations(state, recorded_fence())
+        self.assertTrue(any("repeats a character identity" in problem for problem in problems),
+                        problems)
+
+    def test_a_repeated_epoch_record_is_refused(self):
+        fence = recorded_fence()
+        fence["control_epochs"][1]["character_id"] = fence["control_epochs"][0]["character_id"]
+        problems = validate_expectations(recorded_state(), fence)
+        self.assertTrue(any("repeats a character identity" in problem for problem in problems),
+                        problems)
 
 
 class RestorePreservation(unittest.TestCase):

@@ -6,6 +6,7 @@ import json
 import os
 import select
 import subprocess
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -43,39 +44,63 @@ class SnapshotSession:
     def __init__(self, site, database, timeout=120):
         self.timeout = timeout
         self.closed = False
+        # Binary pipes: the read loop owns its own buffering, so a byte already read
+        # from the descriptor cannot hide behind a wrapper while `select` reports the
+        # descriptor idle and the deadline expires.
+        self._buffer = b""
         self.process = subprocess.Popen(
             list(map(str, [
                 site.pg_bin / "psql", "-XqAt", "-v", "ON_ERROR_STOP=1",
                 "-h", site.socket, "-p", site.ports["postgres"],
                 "-U", site.settings["administrator"], "-d", database])),
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        # READ ONLY so nothing here can mutate the world it describes, and REPEATABLE
-        # READ because a snapshot can only be exported and imported at that level.
-        self._send("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;")
-        self._send("SELECT pg_export_snapshot();")
-        self.identifier = self._read_line()
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            # READ ONLY so nothing here can mutate the world it describes, and
+            # REPEATABLE READ because a snapshot can only be exported and imported at
+            # that level.
+            self._send("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;")
+            self._send("SELECT pg_export_snapshot();")
+            self.identifier = self._read_line()
+        except BaseException:
+            # The child exists from the moment Popen returns, so a failure to
+            # initialize still has to release it before the error propagates.
+            self.close(failed=True)
+            raise
 
     def _send(self, statement):
         if self.closed:
             raise RuntimeError("snapshot session is closed")
         try:
-            self.process.stdin.write(statement + "\n")
+            self.process.stdin.write(statement.encode("utf-8") + b"\n")
             self.process.stdin.flush()
-        except (BrokenPipeError, ValueError):
+        except (BrokenPipeError, ValueError, OSError):
             raise RuntimeError(f"snapshot session ended early: {self._diagnostics()}")
 
     def _read_line(self):
-        ready, _, _ = select.select([self.process.stdout], [], [], self.timeout)
-        if not ready:
-            raise RuntimeError(f"snapshot session produced no result within {self.timeout}s")
-        line = self.process.stdout.readline()
-        if line == "":
-            raise RuntimeError(f"snapshot session ended early: {self._diagnostics()}")
-        return line.strip()
+        """One line, bounded by the deadline rather than by a blocking read."""
+        deadline = time.monotonic() + self.timeout
+        while b"\n" not in self._buffer:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise RuntimeError(f"snapshot session produced no result within {self.timeout}s")
+            ready, _, _ = select.select([self.process.stdout], [], [], remaining)
+            if not ready:
+                raise RuntimeError(f"snapshot session produced no result within {self.timeout}s")
+            chunk = os.read(self.process.stdout.fileno(), 4096)
+            if not chunk:
+                raise RuntimeError(f"snapshot session ended early: {self._diagnostics()}")
+            self._buffer += chunk
+        line, _, self._buffer = self._buffer.partition(b"\n")
+        return line.decode("utf-8", "replace").strip()
 
-    def _diagnostics(self):
+    def _diagnostics(self, limit=500):
+        """Whatever the child has already said, without waiting on it."""
         try:
-            return (self.process.stderr.read() or "").strip()[-500:] or "no diagnostic output"
+            ready, _, _ = select.select([self.process.stderr], [], [], 1.0)
+            if not ready:
+                return "no diagnostic output"
+            text = os.read(self.process.stderr.fileno(), 4096).decode("utf-8", "replace").strip()
+            return text[:limit] or "no diagnostic output"
         except (ValueError, OSError):
             return "diagnostics unavailable"
 
@@ -85,16 +110,24 @@ class SnapshotSession:
             return
         self.closed = True
         try:
-            self.process.stdin.write(("ROLLBACK;" if failed else "COMMIT;") + "\n")
-            self.process.stdin.flush()
-            self.process.stdin.close()
-            self.process.wait(timeout=self.timeout)
-        except (BrokenPipeError, ValueError, OSError, subprocess.TimeoutExpired):
-            pass
-        finally:
             if self.process.poll() is None:
-                self.process.kill()
-                self.process.wait(timeout=10)
+                self.process.stdin.write(("ROLLBACK;" if failed else "COMMIT;").encode("utf-8") + b"\n")
+                self.process.stdin.flush()
+        except (BrokenPipeError, ValueError, OSError):
+            pass
+        try:
+            # A transaction left running holds the snapshot and its resources, so a
+            # child that will not exit is killed rather than waited on indefinitely.
+            self.process.wait(timeout=self.timeout)
+        except subprocess.TimeoutExpired:
+            self.process.kill()
+            self.process.wait(timeout=10)
+        finally:
+            for stream in (self.process.stdin, self.process.stdout, self.process.stderr):
+                try:
+                    stream.close()
+                except (OSError, ValueError):
+                    pass
 
 
 def write(path: Path, value: str, mode=0o600):
@@ -145,8 +178,15 @@ class Installation:
         return run([self.pg_bin / name, "-h", self.socket, "-p", self.ports["postgres"],
                     "-U", self.settings["administrator"], "-d", database, *arguments], input=input, timeout=timeout)
 
-    def sql(self, text, database="tme"):
-        return self.pg("psql", "-XAt", "-v", "ON_ERROR_STOP=1", input=text, database=database)
+    def sql(self, text, database="tme", quiet=False):
+        """Run SQL and return stdout.
+
+        `quiet` suppresses psql command status. Without it a script containing BEGIN
+        and COMMIT returns those tags alongside the result, which is not a JSON
+        document even though tuples-only formatting hides headers and footers.
+        """
+        flags = ["-XqAt"] if quiet else ["-XAt"]
+        return self.pg("psql", *flags, "-v", "ON_ERROR_STOP=1", input=text, database=database)
 
     def operator(self, *arguments, input=None, database="tme"):
         from urllib.parse import quote
