@@ -62,3 +62,31 @@ expands. The expedition execution record owns this open content finding.
 The geographic receipt grants no gameplay-tuning authority. Numeric reconciliation
 belongs to the gameplay baseline and must retain these unresolved facts until
 replaced by supported behavior and proof.
+
+## Martial defense evidence boundary
+
+The expedition now selects the existing passive hand-block capability. Its exact
+eligibility, original provisional curve and observable threshold semantics have
+one owner: [Martial Artist defense](../../../docs/class-training-contract.md#martial-artist-defense).
+The activation does not complete class fidelity or add production armor items.
+
+Private normalized evidence record `MADEF-20260910-01` has SHA-256
+`3a3ce7c972d9ba9e47566bf93c11d99024bb5603f0df1e4110e13e2d007fbded`.
+This is the digest of an independently written evidence note, **not** of a source
+executable, help file or archived webpage. Its private mapping retains exact
+source locations and limitations without becoming a build dependency.
+
+The read material supports unarmed defense and armor impeding that defense. The
+player-authored account explicitly discusses release 1.11 and distinguishes
+experience from speculation. The help reproduction is attributed to release
+1.21b; it does not independently establish unchanged 1.11 internals. Neither
+read source supplies a verified block equation, a complete class eligibility
+matrix or exact armor/weapon penalties. Advice about exceptional equipment,
+footwear and multiple attackers must not be converted into an invented formula
+and labeled recovered behavior.
+
+The selected curve is an original conservative integration choice. Historical
+numerical reconciliation requires stronger selected-version evidence and actual
+outcome tests, as specified by the class owner. Test-only armor is labeled as
+such and does not add loot, shops or a new player equipment table. Native
+incoming-block presentation and real saved-state cutover remain separate proof.

@@ -1397,7 +1397,20 @@
       ]
     }
   },
-  "profession_actions": {},
+  "profession_actions": {
+    "profession_action/martial_hand_block/first_expedition": {
+      "class_ids": [
+        "martial_artist"
+      ],
+      "id": "martial_hand_block",
+      "kind": "martial_hand_block",
+      "martial_hand_block": {
+        "level_divisor": 20,
+        "max_chance_percent": 95,
+        "min_hand_level": 2
+      }
+    }
+  },
   "profiles": {
     "profile/first_expedition": {
       "actor_definitions": [
@@ -1450,7 +1463,9 @@
       "physical_damage_affinity_profiles": [
         "affinity/ordinary"
       ],
-      "profession_actions": [],
+      "profession_actions": [
+        "profession_action/martial_hand_block/first_expedition"
+      ],
       "quests": [],
       "rules_profile": "rules/area_path_terrain_spells",
       "service_definitions": [

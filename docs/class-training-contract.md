@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-09
-revision: 9
+last_updated: 2026-09-10
+revision: 10
 status: Five authored creation profiles and bounded town instruction are implemented; typed critique delivered; historical numerical reconciliation and later class display naming remain open; Martial Artist is retained for now.
 public_safe: true
-summary: Recovered creation bounds, nationality presentation deferral, durable creation, instruction and provisional values.
+summary: Creation, instruction, provisional martial defense and numerical reconciliation.
 routes:
   - crates/tme-rules/src/engine/training.rs
   - crates/tme-rules/src/engine/training/**
@@ -57,6 +57,65 @@ The reconstructed historical relationships bind these service assignments; the
 new town's internal placement is authored anew under the
 [surface brief](plans/2026-09-05-first-land-surface.md). Final NPC names, room
 coordinates and numeric ceilings remain unassigned here.
+
+## Martial Artist defense
+
+The first-expedition profile selects the existing passive `martial_hand_block`
+profession action for `martial_artist`. A current Martial Artist with no item in
+the right hand and sufficient hand skill is eligible for the existing
+`RightMartialHand` candidate. Starting profiles and saved skill levels are not
+raised to enable it. At the unchanged starting hand level one, this provisional
+configuration provides no block chance; the first positive chance is at level
+two. Other classes do not receive this passive merely by learning hand combat.
+
+### Original provisional block curve
+
+The authored configuration uses minimum hand level **2**, divisor **20**, and
+threshold cap **95**. The existing evaluator computes
+`min(hand_level * 100 / 20, 95)`, then subtracts the shared worn-armor and incoming
+weapon combat-add penalties without going below zero. This is original temporary
+tuning under the [provisional-value ruling](gameplay-baseline.md#first-expedition-provisional-values),
+not a recovered historical formula. The deliberately permissive profession test
+fixture is not the expedition's tuning source.
+
+The existing success test is strictly `d20 * 5 < chance_percent`. Accordingly,
+the threshold field is not an exact probability. With one eligible hand
+candidate, no armor and no incoming combat-add penalty, the actual probabilities
+are:
+
+| Hand level | Threshold | Successful faces out of twenty | Effective chance |
+| --- | --- | --- | --- |
+| 0–1 | No candidate | 0 | 0% |
+| 2 | 10 | 1 | 5% |
+| 8 | 40 | 7 | 35% |
+| 12 | 60 | 11 | 55% |
+| 19 | 95 | 18 | 90% |
+
+The shared block owner retains its worn-armor encumbrance penalty and incoming
+combat-add penetration. Stowing armor removes its worn penalty, not its carried
+burden. Equipment with another block candidate still uses the existing weighted
+single-candidate selection; this activation does not grant a second independent
+block roll or a guaranteed defense. Carrying a weapon or non-weapon item in the
+right hand removes this hand candidate without erasing learned skill. It does
+not prohibit weapons, armor or other classes' existing equipment defenses.
+
+Successful blocking emits the ordinary server-owned blocked-attack event before
+hit/damage resolution. It does not create a defender action, spend defender
+stamina or extend defender readiness. The attacker still pays the normal attack
+cost and cooldown. Clients present that outcome; animation, stance and a new
+Block button cannot grant defense. Current eligibility does not inspect held
+gold or action-suppressing effects. Those are unresolved fidelity findings, not
+newly accepted final semantics.
+
+The [expedition provenance](../content/lands/first-expedition/gameplay.provenance.md#martial-defense-evidence-boundary)
+owns the neutral evidence binding and release qualification. Replace this
+provisional curve only with a supported selected-version formula or an explicit
+new tuning decision, accompanied by threshold, equipment, outcome and replay
+proof. The [implementation record](plans/2026-09-10-martial-defense.md) tracks
+remaining class gaps. Selecting this previously absent action changes the
+content digest; existing saved worlds require the separately authorized
+[offline content cutover](server-notes.md#offline-content-cutover), never a reset
+or an ordinary-hydration identity bypass.
 
 ## Thief guild continuation — September 9
 
