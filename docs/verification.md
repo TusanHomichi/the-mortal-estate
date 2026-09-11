@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-06
-revision: 5
+last_updated: 2026-09-11
+revision: 6
 status: Standing verification usage with the shared three-engine browser capability.
 public_safe: true
 summary: Lane usage, shared browser roster, native capability evidence, gated capture, exit codes and receipts.
@@ -112,6 +112,7 @@ The live server wire proof is part of `gated`, with a scratch PostgreSQL databas
 
 ```bash
 python3 tools/run_server_live_proof.py --admin-url-file <file>
+python3 tools/run_restore_drill_proof.py --admin-url-file <file>
 python3 tools/run_presentation_adoption_recording.py \
   --admin-url-file <file> --output <directory>
 python3 tools/workbench/serve.py
@@ -121,6 +122,15 @@ python3 tools/workbench_demo.py
 The observer recorder consumes the real TLS/WebSocket frame and validates its
 semantic barrier. It does not render a client. Old Godot launch, capture, and
 `--godot` arguments are retired, with no compatibility aliases.
+
+`tools/run_restore_drill_proof.py` provisions a scratch installation in the
+deployment's own order, creates a character through the runtime flow, and drives the
+deployment's real `backup()` and `restore_drill()`. It refuses a cluster that already
+holds a `tme` database, so an installed preview is out of reach. It proves
+preservation including a saved position reached by playing, a commit landing during a
+backup, a same-count substitution refused by name, and that a failing drill drops its
+scratch database. Its evidence is recorded in the
+[restore-drill execution record](plans/2026-09-11-restore-drill-preservation.md).
 
 `tools/run_production_smoke.py` exercises a **deployed** host through public
 HTTPS/WebSocket. It needs a running deployment and is not part of any lane.

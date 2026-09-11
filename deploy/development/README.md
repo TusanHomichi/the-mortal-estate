@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-10
-revision: 7
+last_updated: 2026-09-11
+revision: 8
 status: Private preview refresh follows standing latest-build authorization; matching releases and preserved-state proof remain required.
 public_safe: true
 summary: Isolated services, latest-build preview operation, bound raster and dungeon mesh releases, UI proof and recovery.
@@ -172,19 +172,35 @@ python3 deploy/development/manage.py restore <absolute-backup-directory> \
 
 Backups are consistent PostgreSQL custom-format dumps, stored outside Git with
 their SHA-256 and storage contract. The drill creates its own database, restores
-the dump, applies the server's restore fence, verifies integrity and both retained
-characters, then drops only that drill database. It never serves a second live
-world. A modified dump or incompatible storage contract is refused.
+the dump, applies the server's restore fence, verifies integrity, then compares the
+restored identities and durable state against the snapshot the backup itself
+recorded — every account and character, and the world's identity, revision,
+sequence and checkpoint digest. It never serves a second live world, and it drops
+only that drill database. A modified dump or incompatible storage contract is
+refused.
+
+The comparison is against the backup's own receipt, never today's world: a
+character created after a backup is not expected inside it. A restored database
+that differs in any compared row is refused by naming each lost and gained row, so
+a substitution that keeps the character count cannot pass, and the receipt is shown
+to describe the dump rather than a later instant. Fence changes — every
+`control_epoch` advanced by one, `restore_fence_epoch` advanced by one, no
+unrevoked session or unconsumed ticket left — are asserted separately, so an
+intended change and a lost fact cannot be confused. A backup written before
+snapshots existed remains restorable but is refused for drilling, because it cannot
+support a preservation claim.
+
+What the drill preserved is reported by identity, not by count. Its portable
+coverage is `tests/test_development_deploy.py`; the end-to-end proof against a
+scratch installation, including a character created through the runtime flow and a
+commit landing while a backup runs, is `tools/run_restore_drill_proof.py` under the
+gated `postgres` capability. The [execution record](../../docs/plans/2026-09-11-restore-drill-preservation.md)
+owns the observed evidence. Installing a new world, or resetting one, is still not
+authorized by any of this.
 
 Actual restore replaces this development database. It takes a safety backup and
 stops gameplay first, fences and verifies the restored store, then proves the
 services ready. On failure it restores the safety backup before reopening.
-
-The current restore-drill assertion still expects two characters; it must be
-updated before claiming installed restore-drill coverage for a world with newly
-created characters. The [town execution record](../../docs/plans/2026-09-06-town-buildout.md#temple-patterns-of-daily-use)
-tracks that concrete verification follow-up. This limitation does not change the
-dump format or authorize resetting a world.
 
 Take a backup before manual experiments whose state matters. Activation and
 restore take one automatically. There is no automatic retention deletion or
