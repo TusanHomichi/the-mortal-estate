@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-10
+last_updated: 2026-09-11
 revision: 60
-status: Closing-kick source patch added to previously verified martial motion; new configured and native proof pending.
+status: Closing-kick source patch added to previously verified martial motion; configured proof passes, native motion acceptance pending.
 public_safe: true
 summary: Shared world shell, authoritative closing-kick playback, retained pixel interiors and release-bound browser proof.
 routes:

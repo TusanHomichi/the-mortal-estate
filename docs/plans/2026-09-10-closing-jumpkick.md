@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-10
-revision: 1
-status: Bounded source-snapshot implementation; configured Rust and native proof pending.
+last_updated: 2026-09-11
+revision: 2
+status: Configured full verification passes on the development machine. Exact takeoff/impact visual phase alignment remains an owner acceptance question.
 public_safe: true
 summary: Closing jumpkick scope, implementation choices, regression coverage and receiving-environment limits.
 ---
@@ -132,3 +132,55 @@ configured browser test/typecheck/build lane or Three.js/native playback proof.
 The hand-back includes complete logs, baseline/changed-file hashes, a patch-apply
 receipt and instructions for the required development-machine proof. Do not merge
 or refresh the private preview on the strength of the earlier PR's green results.
+
+## Development-machine receipt
+
+The section above records the source-only publication phase and is preserved as
+history. The following was observed later on the development machine, at revision
+`44a0b21` (branch `chat/closing-jumpkick`, based on `1ab656d`). It supersedes
+nothing above; it adds what that environment could not run.
+
+Defects found and fixed, none in the rule path:
+
+- `cargo fmt --all` had never run, so `rust: formatting` failed in both CI jobs and
+  cascaded every later step to UNAVAILABLE. Formatting is applied in two
+  formatting-only commits so it stays distinguishable from the fixes below; every
+  non-whitespace hunk there is rustfmt line reflow.
+- **None of the 21 new case functions had ever executed.** They compiled once
+  formatted, and then all 21 failed in the shared fixture rather than in the
+  behaviour under test. Three setup defects: `profile/skill_progression` resolves
+  to a rules base authoring only the fighter growth profile, so a case playing
+  `martial_artist` failed content validation before any assertion (the canonical
+  martial_artist profile is now taken from `rules/first_room`, as the shared
+  action-context helper does); terrain `move_cost` is owned by `navigation`, so two
+  cases writing it at the terrain root failed to deserialize; and the swim case
+  wrote the removed `traversal` key and then used the real water cost of 2, which
+  exhausted the three-point budget before the walkability check and rejected for
+  `InsufficientMovementPoints` instead of the traversal kind under test. No
+  assertion, expectation, rule, threshold or reach was changed to obtain green.
+
+Commands and results actually observed:
+
+- `cargo fmt --all -- --check` and `git diff --check`: clean.
+- `cargo test --locked -p tme-rules --test combat`: **70 passed, 0 failed**,
+  including all 21 closing-jumpkick cases.
+- `python3 tools/run_verification.py --scope full --report-disk`: **COMPLETE —
+  every selected step ran and passed**, including `rust: clippy` under
+  `-D warnings`, `gated: PostgreSQL suite, one fresh migrated database per test`,
+  `server: trusted TLS sign-in, admission, individual cooldowns, reconnect, and
+  logout`, `browser: authoritative Workbench capture, native WSS, replay and
+  pointer correspondence`, and `clean clone: builds and tests with no private
+  root`. The banned-terms lane ran against the real private denylist.
+
+Remaining limits, stated plainly:
+
+- The native three-engine motion proof and its visual review were **not** run. It
+  requires an immutable private release built from this revision, and building one
+  is a staging action against the shared development installation. Finding 2 above
+  therefore remains open as an owner acceptance question: exact takeoff, impact and
+  landing phase alignment in the stock clip is still unproven, and the
+  configured lanes grant no visual acceptance.
+- The behavior is proven by rules-level and browser-unit tests, not by a captured
+  native session. Nothing here should be read as recorded native playback.
+- The installed preview, its database and its saved characters were not touched,
+  and this slice was not deployed.

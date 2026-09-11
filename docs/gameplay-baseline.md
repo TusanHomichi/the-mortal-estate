@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-10
+last_updated: 2026-09-11
 revision: 12
-status: Historical gameplay baseline with a source-patch closing jumpkick specification; configured proof and acceptance remain pending.
+status: Historical gameplay baseline with a closing jumpkick specification whose configured proof passes; native motion acceptance remains pending.
 public_safe: true
 summary: Historical gameplay target, local-door movement, provisional closing-jumpkick rules and remaining fidelity work.
 routes:
