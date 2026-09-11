@@ -2,12 +2,13 @@
 import copy
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,7 @@ from operations import (
     FENCE_CLEARED_QUERIES,
     FENCE_SNAPSHOT_QUERIES,
     SNAPSHOT_QUERIES,
+    backup,
     fence_differences,
     restore_drill,
     state_differences,
@@ -26,6 +28,19 @@ from operations import (
 )
 from provision import development_seed, validate_settings
 from services import install_units
+
+
+def synthetic_release(site):
+    """A minimal, honestly bound release: one file and its integrity receipt."""
+    release = site.root / "releases/reviewed"
+    release.mkdir(parents=True)
+    binary = release / "server"
+    binary.write_bytes(b"synthetic binary")
+    document(release / "release.json", {"files": {"server": digest(binary)},
+                                        "contracts": {"storage": {"checkpoint": 1}},
+                                        "source_tree": "synthetic-tree"})
+    site.current.symlink_to(release)
+    return release
 
 
 class PrivateDeployment(unittest.TestCase):
@@ -39,13 +54,7 @@ class PrivateDeployment(unittest.TestCase):
         self.site.units = self.root / "units"
 
     def release(self):
-        release = self.site.root / "releases/reviewed"
-        release.mkdir(parents=True)
-        binary = release / "server"
-        binary.write_bytes(b"synthetic binary")
-        document(release / "release.json", {"files": {"server": digest(binary)}, "contracts": {"storage": {"checkpoint": 1}}})
-        self.site.current.symlink_to(release)
-        return release
+        return synthetic_release(self.site)
 
     def test_ports_are_complete_distinct_and_unprivileged(self):
         settings = json.loads((ROOT / "deploy/development/config.example.json").read_text())
@@ -493,6 +502,114 @@ class SnapshotShutdown(unittest.TestCase):
         with self.assertRaises(RuntimeError) as caught:
             self.session(self.DIES)
         self.assertIn("ended early", str(caught.exception))
+
+    def test_a_kill_that_cannot_be_delivered_is_reported_not_raised(self):
+        """A client that died between the timeout and the kill is a cleanup problem.
+
+        Forced termination is the recovery path, so a failure inside it must not
+        escape `close`: the caller is often already handling a failure of its own and
+        keeps that original failure only because this one is returned with it.
+        """
+        session = self.session(self.STUBBORN, timeout=1)
+        self.addCleanup(session.process.kill)
+        with patch.object(session.process, "kill", side_effect=ProcessLookupError("already gone")):
+            problems = session.close()
+        self.assertTrue(any("did not exit" in problem for problem in problems), problems)
+        self.assertTrue(any("killing it failed" in problem for problem in problems), problems)
+
+    def test_a_killed_client_that_still_will_not_exit_is_reported(self):
+        """A second wait that also expires is reported rather than raised."""
+        session = self.session(self.STUBBORN, timeout=1)
+        self.addCleanup(lambda: subprocess.Popen.wait(session.process, timeout=10))
+        self.addCleanup(subprocess.Popen.kill, session.process)
+        with patch.object(session.process, "kill", return_value=None), \
+                patch.object(session.process, "wait",
+                             side_effect=subprocess.TimeoutExpired("psql", 10)):
+            problems = session.close()
+        self.assertTrue(any("did not exit" in problem for problem in problems), problems)
+        self.assertTrue(any("within 10s of being killed" in problem for problem in problems), problems)
+
+    def test_a_failed_initialization_keeps_its_original_failure_when_cleanup_fails(self):
+        """The constructor's own failure survives a forced termination that fails."""
+        with popen_whose_kill_fails(self):
+            with self.assertRaises(RuntimeError) as caught:
+                SnapshotSession(self.double("import time\ntime.sleep(60)\n"), "scratch", timeout=1)
+        self.assertIn("produced no result", str(caught.exception))
+        self.assertIn("killing it failed", str(caught.exception))
+        self.assertIn("releasing the snapshot also failed", str(caught.exception))
+
+
+def popen_whose_kill_fails(case):
+    """Real clients, whose forced termination cannot be delivered.
+
+    The child is a real process, because a shutdown path that only appears to kill
+    something is the defect these cases exist to catch. Only the kill is injected: an
+    unkillable client cannot be produced portably.
+    """
+    real_popen = subprocess.Popen
+    started = []
+
+    def popen(*arguments, **keywords):
+        process = real_popen(*arguments, **keywords)
+        started.append(process)
+        process.kill = Mock(side_effect=ProcessLookupError("already gone"))
+        return process
+
+    case.addCleanup(
+        lambda: [real_popen.kill(process) for process in started if process.poll() is None])
+    return patch("subprocess.Popen", side_effect=popen)
+
+
+class BackupFailureReporting(unittest.TestCase):
+    """A backup reports its own failure first, however cleanup went."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="tme-backup-failure-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.pg_bin = self.root / "bin"
+        self.pg_bin.mkdir()
+        # A `psql` that exports a snapshot, then waits forever without answering.
+        script = self.pg_bin / "psql"
+        script.write_text(
+            "#!/usr/bin/env python3\n"
+            "import sys, time\n"
+            "for line in sys.stdin:\n"
+            "    if 'pg_export_snapshot' in line:\n"
+            "        print('fake-snapshot-1', flush=True)\n"
+            "time.sleep(60)\n",
+            encoding="utf-8")
+        script.chmod(0o755)
+
+        def check_release(directory=None):
+            return {"source_tree": "synthetic-tree", "contracts": {"storage": {"checkpoint": 1}}}
+
+        def failing_read(text, database="tme", quiet=False):
+            raise RuntimeError("the expectation read failed")
+
+        def unexpected_dump(name, *arguments, **keywords):
+            raise AssertionError("the dump must not run once the reads have failed")
+
+        self.site = SimpleNamespace(
+            root=self.root / "installation", pg_bin=self.pg_bin, socket=Path("/tmp"),
+            ports={"postgres": 1}, settings={"administrator": "x"},
+            check_release=check_release, sql=failing_read, pg=unexpected_dump)
+
+    def test_the_original_failure_survives_a_forced_cleanup_that_fails(self):
+        """Losing the cause would turn a real defect into an unexplained crash."""
+        with popen_whose_kill_fails(self), \
+                patch("operations.SnapshotSession",
+                      lambda site, database: SnapshotSession(site, database, timeout=1)):
+            with self.assertRaises(RuntimeError) as caught:
+                backup(self.site)
+        message = str(caught.exception)
+        self.assertIn("the expectation read failed", message)
+        self.assertIn("releasing the snapshot also failed", message)
+        self.assertIn("did not exit", message)
+        self.assertIn("killing it failed", message)
+        self.assertIsInstance(caught.exception.__cause__, RuntimeError)
+        self.assertEqual(list((self.site.root / "backups").rglob("database.dump")), [],
+                         "a backup that failed must publish no dump")
 
 
 if __name__ == "__main__":

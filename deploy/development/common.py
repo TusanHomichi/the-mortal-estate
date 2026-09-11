@@ -112,7 +112,10 @@ class SnapshotSession:
         """End the exporting transaction and finish the child's input.
 
         Returns a list of cleanup problems; it never raises, so a caller already
-        handling an error can report both without losing the original.
+        handling an error can report both without losing the original. That promise
+        covers forced termination too: a kill that cannot be delivered, or a killed
+        client that still will not be reaped, is another reported problem rather
+        than an exception raised past the caller's original failure.
 
         Closing stdin is what ends `psql`'s input loop. COMMIT or ROLLBACK only
         finishes the SQL transaction, so waiting for exit with input still open spends
@@ -137,12 +140,9 @@ class SnapshotSession:
         try:
             self.process.wait(timeout=self.timeout)
         except subprocess.TimeoutExpired:
-            # Forced termination recovers from a hang; it is not how shutdown normally
-            # ends, and it must not pass silently.
-            self.process.kill()
-            self.process.wait(timeout=10)
-            problems.append(
-                f"the client did not exit within {self.timeout}s after its input ended and was killed")
+            problems += self._recover_from_a_hang()
+        except OSError as error:
+            problems.append(f"waiting for the client failed: {error}")
         finally:
             for stream in (self.process.stdout, self.process.stderr):
                 try:
@@ -151,6 +151,31 @@ class SnapshotSession:
                     pass
         if not problems and self.process.returncode != 0:
             problems.append(f"the client exited with status {self.process.returncode}")
+        return problems
+
+    def _recover_from_a_hang(self):
+        """Kill a client that would not exit, and report every part of that.
+
+        Forced termination recovers from a hang; it is not how shutdown normally
+        ends, and it must not pass silently. Neither must a forced termination that
+        itself fails. `close` promised its caller a list of problems rather than an
+        exception, and a caller already handling a failure of its own keeps that
+        original failure only if this failure is reported alongside it.
+        """
+        problems = [f"the client did not exit within {self.timeout}s after its input ended"]
+        try:
+            self.process.kill()
+        except OSError as error:
+            # A client that died between the timeout and the kill, or one this
+            # process may not signal, is exactly the case that used to replace a
+            # backup's real failure with a cleanup traceback.
+            return problems + [f"killing it failed: {error}"]
+        try:
+            self.process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            problems.append("it did not exit within 10s of being killed")
+        except OSError as error:
+            problems.append(f"waiting for the killed client failed: {error}")
         return problems
 
 
