@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-09-10
-revision: 1
-status: Source patch prepared; documentation and supplemental checks passed, but Rust and final acceptance remain pending.
+last_updated: 2026-09-11
+revision: 2
+status: Activated in expedition content; configured full verification passes on the development machine. Native defender-block visual proof and saved-state cutover remain owner/browser work.
 public_safe: true
 summary: Activate existing martial hand defense in expedition content, qualify its original provisional curve, and track remaining class gaps.
 ---
@@ -108,3 +108,56 @@ The two source patches are checked for application in either order in the
 handoff. File-level independence is not combined gameplay or native proof.
 No remote branch, pull request, merge, deployment or saved-state mutation was
 performed for this slice.
+
+## Development-machine receipt
+
+The receipt above records the source-only publication phase and is preserved as
+history. The following was observed later on the development machine, at
+revision `f1f7fc6` (branch `chat/martial-defense`, based on `1ab656d`). It
+supersedes nothing above; it adds what that environment could not run.
+
+Two test-only defects were found and fixed before any of this could run:
+
+- `crates/tme-authoring/tests/martial_defense.rs` matched
+  `ObservedEventV1::PhysicalCombat`, which is not a variant of that enum, and the
+  file therefore did not compile at all. Observed feedback arrives as
+  `ObservedEventV1::Feedback { cue }` with `ObserverFeedbackCueV1::PhysicalCombat`
+  inside it; the case now matches that documented nesting with no assertion change.
+- `armor_definition()` authored an all-zero armor rating, which the shared armor
+  validator rejects, so the definition panicked before any case ran.
+  `block_rating` cannot be raised to satisfy the validator instead, because
+  `crates/tme-rules/src/engine/combat.rs` evaluates an armor-sourced block
+  candidate whenever `block_rating > 0`, which would add a second block event and
+  contradict the single-candidate assertions. The fixture now carries the minimal
+  crushing reduction (the kick damage kind is crushing) and records why the rating
+  stays zero. Encumbrance 5 with a 30 percent threshold is unchanged.
+
+Commands and results actually observed:
+
+- `cargo fmt --all` applied; `cargo fmt --all -- --check` and `git diff --check`
+  are clean.
+- `cargo test --locked -p tme-authoring --test martial_defense`: **8 passed, 0
+  failed**. All eight new integration functions now execute.
+- `python3 tools/run_verification.py --scope full --report-disk`: **COMPLETE —
+  every selected step ran and passed**, including `rust: clippy` under
+  `-D warnings`, `gated: PostgreSQL suite, one fresh migrated database per test`,
+  `server: trusted TLS sign-in, admission, individual cooldowns, reconnect, and
+  logout`, `browser: authoritative Workbench capture, native WSS, replay and
+  pointer correspondence`, and `clean clone: builds and tests with no private
+  root`. The banned-terms lane ran against the real private denylist.
+
+Remaining limits, stated plainly:
+
+- No native incoming-block defender receipt was produced. The finding in the
+  class-work table above still stands: the browser roster receipt for an actual
+  blocked attack, both bodies, has not been recorded. That is a
+  browser/presentation acceptance item, not an activation defect.
+- The blocking curve remains the explicit provisional integration choice recorded
+  above. Nothing here promotes it to recovered historical fidelity.
+- This receipt establishes the rules and content activation only. It is not
+  saved-state preservation proof: a passing disposable migration test does not
+  demonstrate preservation of the owner's actual saved world, and activating this
+  content against existing saves still requires the save-preserving offline
+  cutover owned by the server notes.
+- The installed preview, its database and its saved characters were not touched,
+  and this slice was not deployed.
