@@ -68,6 +68,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_development_deploy",
         "tests.test_live_proof_land",
         "tests.test_live_wire_client",
+        "tests.test_live_server_harness",
         "tests.test_live_proof_cooldowns",
         "tests.test_presentation_adoption_recording",
         "tests.test_run_clean_clone_proof",
