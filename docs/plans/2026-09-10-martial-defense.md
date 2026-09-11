@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-11
-revision: 3
-status: Activated in expedition content; configured full verification and a deterministic native incoming-block scenario both pass on the development machine. Owner visual acceptance and the saved-state cutover remain outstanding.
+revision: 4
+status: Activated in expedition content; configured full verification and a deterministic native incoming-block scenario both pass on the development machine. Owner visual acceptance and the saved-state cutover remain outstanding; the scenario's guarantee is bracketed observation, not frame-level attribution.
 public_safe: true
 summary: Activate existing martial hand defense in expedition content, qualify its original provisional curve, and track remaining class gaps.
 ---
@@ -174,17 +174,31 @@ what makes the existing automatic attack path reachable. No gameplay was retuned
 no monster was taught to chase, and no combat event is manufactured.
 
 **What the scenario asserts.** The controlled character is the defender and
-**no command is sent** — the server's own automatic attack produces the swing. The
-run asserts the monster is present, assesses the observer `open_hostile`, and
-shares the defender's tile; that an incoming `fight` is reported `blocked`; that
-the incoming-block clip is the reported clip **at capture time**; that the defender
-does not travel; and that it returns to the ordinary stance. Captures are written
-outside the checkout.
+**no command is sent** — the server's own automatic attack produces the swing, and
+`commandsSent` is asserted zero again at completion, not only at the start. The run
+asserts the monster is present, assesses the observer `open_hostile`, and shares the
+defender's tile; that at least one **real swing** by that monster at that defender was
+reported `blocked`; that the incoming-block clip is the reported clip **immediately
+before and after** the screenshot; that the defender does not travel; and that it
+returns to the ordinary stance. Captures are written outside the checkout.
+
+A "real swing" is restricted to the configured monster, `mode: fight`, and an outcome
+of `hit`, `missed` or `blocked` — the outcomes the motion owner treats as an attack.
+`no_sight` and `not_ready` mean the actor never attacked and are excluded, so the
+control below cannot be satisfied by absence of combat.
+
+**What the assertions do not establish.** The client's motion diagnostics expose only
+`{id, body, clip, moving}`; no cue-to-clip identity is available. The scenario
+therefore reports **bracketed observations** — authoritative swings, and block
+playback observed with the clip holding either side of the capture — and not
+frame-level attribution of a specific rendered frame to a specific state update. The
+screenshot is still an asynchronous operation, so the bracket narrows the race rather
+than eliminating it. Recorded in the report's `guarantee` field.
 
 **Negative control.** The same fixture with the starting `weathered_staff` left in
-the right hand, so no martial hand candidate exists. Observed: **seven incoming
-swings, all `missed`, zero blocked**. That the attacks still occurred and produced
-non-blocked outcomes is what makes the control non-vacuous.
+the right hand, so no martial hand candidate exists. Observed: **seven real swings by
+the configured monster, all `missed`, zero blocked**. That the attacks still occurred
+and produced non-blocked outcomes is what makes the control non-vacuous.
 
 **Attribution.** The wire `Blocked` outcome deliberately names no block source, and
 the client's cover pose is documented as never claiming one. Attribution therefore
@@ -198,4 +212,6 @@ each PASSed on chromium, firefox and webkit — nine scenario passes, every rend
 reporting hardware GPU execution — against an immutable release staged from this
 line of work. The matrix was run twice to check for flakiness after an initial
 single-engine failure was traced to a proof-side race (an assertion on the starting
-clip that the monster's cadence-1 first swing could beat) and removed.
+clip that the monster's cadence-1 first swing could beat) and removed, and again
+after the assertions above were tightened to bind the swing set and bracket the
+captures.
