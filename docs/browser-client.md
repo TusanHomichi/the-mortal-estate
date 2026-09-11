@@ -66,8 +66,12 @@ entry/return, resize, reconnect and missing-art proof.
 The existing 3D preview and its output are not launcher inputs.
 `tools/run_dungeon_proof.py --release <immutable-release> --admin-url-file <file>
 --output <external-directory>` checks all four floors, the temple round trip,
-actor-menu traversal, male/female martial movement and combat, and missing/stale
-dungeon asset refusal in all three browsers.
+actor-menu traversal, male/female martial movement and combat, the incoming
+martial-hand block with its occupied-hand negative control, and missing/stale
+dungeon asset refusal in all three browsers. The defense scenarios invert the
+attack direction: the controlled character is the defender, an authored
+hold-ground monster shares its tile, and no command is sent. `defense-male`,
+`defense-female` and `defense-occupied-hand` select them directly.
 Its release must match its complete file receipt and this checkout's content;
 the harness uses that release's explicit server binary without a rebuild or fallback.
 `--engine` or `--scenario` narrows the evidence.

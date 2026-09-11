@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-11
-revision: 2
-status: Activated in expedition content; configured full verification passes on the development machine. Native defender-block visual proof and saved-state cutover remain owner/browser work.
+revision: 3
+status: Activated in expedition content; configured full verification and a deterministic native incoming-block scenario both pass on the development machine. Owner visual acceptance and the saved-state cutover remain outstanding.
 public_safe: true
 summary: Activate existing martial hand defense in expedition content, qualify its original provisional curve, and track remaining class gaps.
 ---
@@ -73,7 +73,7 @@ or visual acceptance is part of this source-only slice.
 | Low-skill kick mishaps, gauntlet effects, defensive practice and advanced instruction remain unimplemented or unreconciled. | Class contract and combat/training owners; separate evidence-backed slices. Do not infer formulas from guide advice. |
 | Hand-block eligibility currently ignores held gold and action-suppressing effects. Existing behavior is retained, not endorsed as final historical correspondence. | Profession/weapon owners; recover hand-occupancy and incapacitation semantics, then change eligibility and all callers together. Do not silently extend this content activation into a global blocking rewrite. |
 | The expedition has no wearable armor item; only the underlying worn-armor rule can be exercised here with a labeled fixture. | Authored content owner; original, proven gear authoring is a separate delivery. |
-| Existing motion has unit coverage for incoming blocks but lacks a deterministic native defender-block receipt. | Browser owner; record a real authoritative blocked attack, both bodies and the supported renderer roster before visual acceptance. |
+| Recorded: `defense-male`, `defense-female` and `defense-occupied-hand` PASS on all three rostered engines against an immutable release; see the native incoming-block receipt below. | Owner/browser; Peter supplies visual acceptance of those captures. Passing scenario assertions are not acceptance, and the wire outcome names no block source, so the martial-hand attribution rests on the unarmed, unarmoured, shieldless fixture plus its occupied-hand control. |
 
 Separately, the closing-jumpkick draft's first CI attempt stopped at formatting
 in both jobs. Its build, lint, Rust and browser results remain unobserved. Fix
@@ -148,12 +148,9 @@ Commands and results actually observed:
 
 Remaining limits, stated plainly:
 
-- No native incoming-block defender receipt was produced. The finding in the
-  class-work table above still stands: the browser roster receipt for an actual
-  blocked attack, both bodies, has not been recorded. That is a
-  browser/presentation acceptance item, not an activation defect.
 - The blocking curve remains the explicit provisional integration choice recorded
-  above. Nothing here promotes it to recovered historical fidelity.
+  above. Nothing here promotes it to recovered historical fidelity, and the owner
+  still supplies visual acceptance for the captures below.
 - This receipt establishes the rules and content activation only. It is not
   saved-state preservation proof: a passing disposable migration test does not
   demonstrate preservation of the owner's actual saved world, and activating this
@@ -161,3 +158,44 @@ Remaining limits, stated plainly:
   cutover owned by the server notes.
 - The installed preview, its database and its saved characters were not touched,
   and this slice was not deployed.
+
+## Native incoming-block receipt
+
+The limit recorded in the first version of this section — no deterministic native
+defender-block receipt — is now closed by scenario work in
+`tools/run_dungeon_proof.py` and `web/proof/dungeon-block-proof.mjs`.
+
+**Why the fixture colocates the two actors.** `Fight` is legal only at distance
+zero (`crates/tme-rules/src/engine/physical_attacks.rs`), and the authored
+`cellar_scavenger` is `hold_ground`, so it never closes distance itself. An
+earlier probe placed the monster on an *adjacent* tile and observed no attack; that
+was the range rule, not a hostility or target-selection defect. Colocating them is
+what makes the existing automatic attack path reachable. No gameplay was retuned,
+no monster was taught to chase, and no combat event is manufactured.
+
+**What the scenario asserts.** The controlled character is the defender and
+**no command is sent** — the server's own automatic attack produces the swing. The
+run asserts the monster is present, assesses the observer `open_hostile`, and
+shares the defender's tile; that an incoming `fight` is reported `blocked`; that
+the incoming-block clip is the reported clip **at capture time**; that the defender
+does not travel; and that it returns to the ordinary stance. Captures are written
+outside the checkout.
+
+**Negative control.** The same fixture with the starting `weathered_staff` left in
+the right hand, so no martial hand candidate exists. Observed: **seven incoming
+swings, all `missed`, zero blocked**. That the attacks still occurred and produced
+non-blocked outcomes is what makes the control non-vacuous.
+
+**Attribution.** The wire `Blocked` outcome deliberately names no block source, and
+the client's cover pose is documented as never claiming one. Attribution therefore
+rests on the pair: the defender is an unarmed, unarmoured Martial Artist holding no
+shield or weapon, so the martial hand is the only candidate, and occupying that
+hand removes the block. Whether that pair is *sufficient* is the owner's judgement;
+this record does not award it.
+
+**Observed result.** `defense-male`, `defense-female` and `defense-occupied-hand`
+each PASSed on chromium, firefox and webkit — nine scenario passes, every renderer
+reporting hardware GPU execution — against an immutable release staged from this
+line of work. The matrix was run twice to check for flakiness after an initial
+single-engine failure was traced to a proof-side race (an assertion on the starting
+clip that the monster's cadence-1 first swing could beat) and removed.

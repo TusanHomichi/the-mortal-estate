@@ -27,7 +27,18 @@ def cases():
                  returnAt=dict(x=8, y=17), up=location("d3", 10, 17)),
             dict(scenario="actor-actions", start=location("d4", 8, 17)),
             dict(scenario="martial-male", sex="male", start=location("d1_entry", 23, 9)),
-            dict(scenario="martial-female", sex="female", start=location("d1_entry", 23, 9))]
+            dict(scenario="martial-female", sex="female", start=location("d1_entry", 23, 9)),
+            # The observed character defends. `Fight` is legal only on a shared
+            # tile, and the authored monster holds ground, so the fixture colocates
+            # them rather than asking the monster to chase.
+            dict(scenario="defense-male", sex="male", defense=True, monster="cellar_scavenger",
+                 start=location("d1_entry", 23, 9)),
+            dict(scenario="defense-female", sex="female", defense=True, monster="cellar_scavenger",
+                 start=location("d1_entry", 23, 9)),
+            # Negative control: identical but for an occupied right hand, so no
+            # martial hand candidate exists and the same attack cannot be blocked.
+            dict(scenario="defense-occupied-hand", sex="male", defense=True, occupied=True,
+                 monster="cellar_scavenger", start=location("d1_entry", 23, 9))]
 
 
 def martial_fixture(seed, player, sex):
@@ -42,6 +53,35 @@ def martial_fixture(seed, player, sex):
     next(s for s in player["character"]["skill_ledger"] if s["track_id"] == "hand")["level"] = 6
     # Retain the inventory while freeing the attacking hand.
     next(i for i in player["carried"]["items"] if i["position"] == "right_hand")["position"] = "sack_item_2"
+
+
+def defense_fixture(seed, player, sex, occupied=False):
+    """The observed character is the defender, not the attacker.
+
+    A hold-ground monster never closes distance and `Fight` is legal only on a
+    shared tile, so the authored `cellar_scavenger` is placed on the player's own
+    tile. That exercises the existing automatic attack path without teaching the
+    monster to chase, and without inventing a combat event.
+
+    Hand level 19 against the unchanged authored curve gives the largest available
+    hand-block threshold. Skill, equipment and the resolver curve are the only
+    fixture inputs; the block itself is the production resolver's decision.
+    """
+    player["character"]["identity"].update(base_class_id="martial_artist",
+        current_class_id="martial_artist", display_class="Martial Artist", sex_or_gender_display=sex)
+    player["character"]["skill_ledger"] = [
+        s for s in player["character"]["skill_ledger"] if s["track_id"] == "hand"]
+    next(s for s in player["character"]["skill_ledger"] if s["track_id"] == "hand")["level"] = 19
+    # The starting staff occupies the right hand. Freeing it is what makes the
+    # martial hand candidate exist; the negative control deliberately leaves it.
+    right_hand = next(i for i in player["carried"]["items"] if i["position"] == "right_hand")
+    if occupied:
+        assert right_hand["item_instance_id"] == "weathered_staff", (
+            "the negative control must keep a real item in the right hand")
+    else:
+        right_hand["position"] = "sack_item_2"
+    monster = next(a for a in seed["actors"] if a["id"] == "cellar_scavenger")
+    monster["location"] = copy.deepcopy(player["location"])
 
 
 def main():
@@ -76,7 +116,10 @@ def main():
             world = temple_world()
             player = next(a for a in world.generated_seed["actors"] if a["id"] == world.controlled_actor)
             player["location"] = case["start"]
-            if "sex" in case:
+            if case.get("defense"):
+                defense_fixture(world.generated_seed, player, case["sex"],
+                                occupied=bool(case.get("occupied")))
+            elif "sex" in case:
                 martial_fixture(world.generated_seed, player, case["sex"])
             server = PixelServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
             server.bundle = release / "web"
@@ -84,7 +127,8 @@ def main():
             with server:
                 config = dict(**case, engine=engine, origin=server.origin, authority=str(server.authority),
                               username=server.username, password=server.password, output=str(output))
-                script = ("dungeon-motion-proof.mjs" if "sex" in case else
+                script = ("dungeon-block-proof.mjs" if case.get("defense") else
+                          "dungeon-motion-proof.mjs" if "sex" in case else
                           "dungeon-actions-proof.mjs" if case["scenario"] == "actor-actions" else "dungeon-proof.mjs")
                 result = subprocess.run(["node", str(REPOSITORY_ROOT / "web/proof" / script)],
                                         input=json.dumps(config), text=True, capture_output=True,

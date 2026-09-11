@@ -44,8 +44,31 @@ and webkit for both bodies.
 Two acceptance and activation limits travel with them and are not closed by the
 merges. Exact takeoff/impact/landing phase alignment in the stock kick clip is
 still an owner acceptance question, and no capture is an accepted master. The
-defense curve is explicitly provisional integration tuning, not recovered
-historical fidelity, and no native defender-block receipt exists yet.
+defense curve remains explicitly provisional integration tuning rather than
+recovered historical fidelity, and the captures below are evidence for the owner
+to judge, not an acceptance.
+
+**Deterministic defender block:** [PR #64](https://github.com/TusanHomichi/the-mortal-estate/pull/64)
+adds the missing incoming-block scenario. The observed character is the defender;
+an authored hold-ground `cellar_scavenger` shares its tile, so the server's own
+automatic attack path produces the swing with no command sent. Because `Fight` is
+legal only at distance zero and the monster never chases, colocation is what makes
+the existing path reachable — no gameplay retuning and no fabricated combat event.
+The scenario passes on chromium, firefox and webkit for both bodies, asserting the
+incoming-block clip at capture time and the return to the ordinary stance. Its
+negative control is the same fixture with the starting staff left in the right
+hand: seven incoming swings, all `missed`, zero blocked, which is what attributes
+the positive case's block to the martial hand rather than to the cover pose. The
+[defense record](2026-09-10-martial-defense.md) owns the detail.
+
+**Verification harness:** [PR #61](https://github.com/TusanHomichi/the-mortal-estate/pull/61)
+corrected the proof denylist lookup to the shared worktree-aware resolver and gave
+it to the offline commands as well as the served process, which is also what makes
+the scenario above runnable from a clean worktree. [PR #62](https://github.com/TusanHomichi/the-mortal-estate/pull/62)
+added regression coverage over the environment each provisioned child actually
+receives, and [PR #63](https://github.com/TusanHomichi/the-mortal-estate/pull/63)
+controlled the parent environment in that coverage. These are harness fixes; they
+change no gameplay, protocol or content.
 
 PR #59 changes the authoritative content digest. Synchronizing source did **not**
 activate it: the installed preview, its database and its saved characters were
