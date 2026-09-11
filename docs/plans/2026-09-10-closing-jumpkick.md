@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-11
 revision: 2
-status: Configured full verification passes on the development machine. Exact takeoff/impact visual phase alignment remains an owner acceptance question.
+status: Configured full verification and the native three-engine motion proof both pass on the development machine. Exact takeoff/impact visual phase alignment remains the one open owner acceptance question.
 public_safe: true
 summary: Closing jumpkick scope, implementation choices, regression coverage and receiving-environment limits.
 ---
@@ -171,16 +171,40 @@ Commands and results actually observed:
   logout`, `browser: authoritative Workbench capture, native WSS, replay and
   pointer correspondence`, and `clean clone: builds and tests with no private
   root`. The banned-terms lane ran against the real private denylist.
+- `python3 tools/run_dungeon_proof.py` against an immutable release staged from
+  this revision (`58358f17`), for `martial-male` and `martial-female` on the full
+  chromium, firefox and webkit roster: **six PASS**, every renderer reporting
+  hardware GPU execution. The run is a real signed-in session over native WSS with
+  a freshly migrated scratch database per engine; captures, per-engine reports and
+  `verification.json` (verdict PASS) were written outside the checkout.
+
+What that native run actually established, and what it did not:
+
+- The kick really closes: the harness asserts the server lands the kick on the
+  target's tile and reports **exactly three** `actor_moved` receipts for the
+  attacker, each with contiguous `from`/`to` and `navigation: walk`, the last
+  ending on the destination. Position is server-owned; the client invents no
+  displacement.
+- The follow-up punch is offered and accepted from the landing tile, and the
+  server reports `jab_left` for it. Both bodies (`male` and `female`) were
+  exercised and both required-asset-refusal and reconnect guards passed, with no
+  page errors.
+- Visual review of the captures confirms the airborne flying-kick pose rendered
+  over the approach. **It does not settle Finding 2.** The `fight` capture is taken
+  immediately after the action is accepted, while the mixer is still crossfading
+  from the kick clip, so that frame shows the end of the kick rather than a settled
+  punch pose. Exact takeoff, impact and landing phase alignment in the stock clip
+  remains an owner acceptance question, and this run grants no visual acceptance.
 
 Remaining limits, stated plainly:
 
-- The native three-engine motion proof and its visual review were **not** run. It
-  requires an immutable private release built from this revision, and building one
-  is a staging action against the shared development installation. Finding 2 above
-  therefore remains open as an owner acceptance question: exact takeoff, impact and
-  landing phase alignment in the stock clip is still unproven, and the
-  configured lanes grant no visual acceptance.
-- The behavior is proven by rules-level and browser-unit tests, not by a captured
-  native session. Nothing here should be read as recorded native playback.
-- The installed preview, its database and its saved characters were not touched,
-  and this slice was not deployed.
+- Finding 2 above is still open and is the only outstanding acceptance question:
+  exact takeoff, impact and landing phase alignment. The native run proves
+  authoritative movement, single resolution and kick-to-punch continuity at the
+  rules and receipt level; it does not prove animation phase quality, and no
+  capture in it was reviewed as an accepted master.
+- The native run needed a private release staged from this revision. That release
+  was written to the development installation's `releases/` store; `current` was
+  read before and after and did not change, so nothing was activated and the
+  installed preview, its database and its saved characters were not touched. This
+  slice was not deployed.
