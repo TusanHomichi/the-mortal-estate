@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-11
-revision: 93
-status: Four-floor baseline with verified shared martial motion integration and authorized Git delivery.
+revision: 94
+status: Four-floor baseline with merged closing-jumpkick and martial-defense slices, verified shared martial motion integration, and authorized Git delivery.
 public_safe: true
 summary: Current delivery, martial motion integration, maintenance audit and owner gates; earlier checkpoints are linked history.
 ---
@@ -28,7 +28,29 @@ owner's and are numbered by the phase they guard.
 
 ## Current checkpoint
 
-Updated 2026-09-10.
+Updated 2026-09-11.
+
+**Closing jumpkick and martial defense:** [PR #58](https://github.com/TusanHomichi/the-mortal-estate/pull/58)
+merged as `e7ca8d8`, and [PR #59](https://github.com/TusanHomichi/the-mortal-estate/pull/59)
+merged as `299e2b2`. Each [slice record](2026-09-10-closing-jumpkick.md) owns its
+implementation, verification receipt and open findings: the closing kick now
+closes one to three tiles under the existing skill-limited reach and resolves once
+on the target's tile within one action, and the first-expedition profile now
+selects the existing passive `martial_hand_block` for `martial_artist`. Both
+carry a COMPLETE configured full-verification run and both required CI jobs; the
+kick additionally carries a six-PASS native motion proof across chromium, firefox
+and webkit for both bodies.
+
+Two acceptance and activation limits travel with them and are not closed by the
+merges. Exact takeoff/impact/landing phase alignment in the stock kick clip is
+still an owner acceptance question, and no capture is an accepted master. The
+defense curve is explicitly provisional integration tuning, not recovered
+historical fidelity, and no native defender-block receipt exists yet.
+
+PR #59 changes the authoritative content digest. Synchronizing source did **not**
+activate it: the installed preview, its database and its saved characters were
+left untouched, and a later deployment needs the save-preserving offline cutover
+owned by [server notes](../server-notes.md#offline-content-cutover).
 
 **Live dungeon continuation:** all four existing dungeon floors now have a
 playable 3D view on the private preview, retaining town/temple presentation. The
