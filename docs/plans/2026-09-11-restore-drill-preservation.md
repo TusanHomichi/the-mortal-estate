@@ -202,19 +202,20 @@ not declare and only the durable checkpoint can explain.
 ### Canonical checks observed
 
 - `python3 tools/run_verification.py --scope full` → **COMPLETE — every selected step
-  ran and passed**, 1207s total. The steps that matter here all passed:
-  `gated: real backup and restore drill on a scratch installation` (39.9s),
-  `gated: PostgreSQL suite, one fresh migrated database per test`,
-  `server: trusted TLS sign-in, admission, individual cooldowns, reconnect, and
-  logout` (which serves the harness's default, provisioned path against real
-  PostgreSQL), `browser: authoritative Workbench capture`, and
+  ran and passed**, 994s total. The steps that matter here all passed:
+  `gated: real backup and restore drill on a scratch installation` (31.4s, run on the
+  cluster the proof creates and owns), `gated: PostgreSQL suite, one fresh migrated
+  database per test`, `server: trusted TLS sign-in, admission, individual cooldowns,
+  reconnect, and logout` (which serves the harness's default, provisioned path against
+  real PostgreSQL), `browser: authoritative Workbench capture`, and
   `clean clone: builds and tests with no private root`. The clean-clone step reports
   the boundary check degraded onto the tracked synthetic fixture, which is its
   documented behaviour with no private denylist present; the lane's own
   `boundary: banned-terms` step ran against the real denylist and passed.
+- `python3 tools/run_verification.py --scope fast --changed-path …` → **COMPLETE**.
 - `python3 -m unittest -q tests.test_development_deploy tests.test_live_server_harness
   tests.test_restore_drill_proof` — 48 + 10 + 18 tests, OK; the runner's harness lane
-  runs 120.
+  runs 124.
 
 The tool also left the cluster as it found it: after the final run, no `tme` database
 and no `tme%` role remained.
