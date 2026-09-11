@@ -265,24 +265,34 @@ def backup(site):
     # the receipt describes the same instant the dump does. Reading them through
     # separate transactions would let a change land between the two and be recorded as
     # though the dump had contained it -- a false "lost character" at drill time.
-    session = SnapshotSession(site, "tme")
-    failed = True
+    session = None
     try:
+        session = SnapshotSession(site, "tme")
         state, fence = expectations(SnapshotReads(site, "tme", session.identifier))
         site.pg("pg_dump", "--format=custom", "--snapshot", session.identifier, "--file", path)
         path.chmod(0o600)
-        # Published only once both the dump and the reads succeeded, so a failed
-        # capture cannot leave a receipt presenting the backup as complete.
-        document(directory / "backup.json", {
-            "schema_version": SNAPSHOT_SCHEMA_VERSION, "sha256": digest(path),
-            "release": str(site.current.resolve()), "source_tree": release["source_tree"],
-            "storage": release["contracts"]["storage"],
-            "snapshot_id": session.identifier, "snapshot": state, "fence": fence})
-        failed = False
-    finally:
-        session.close(failed=failed)
-        if failed:
-            path.unlink(missing_ok=True)
+    except BaseException as error:
+        # The original failure is what matters; a cleanup problem is attached to it
+        # rather than replacing it.
+        problems = session.close(failed=True) if session is not None else []
+        path.unlink(missing_ok=True)
+        if problems:
+            raise RuntimeError(f"{error}; releasing the snapshot also failed: "
+                               f"{'; '.join(problems)}") from error
+        raise
+    # The receipt is published only once the exporting snapshot has been released
+    # cleanly, so a shutdown problem cannot disappear behind a backup that otherwise
+    # looks complete.
+    problems = session.close()
+    if problems:
+        path.unlink(missing_ok=True)
+        raise RuntimeError("the backup was not published because the snapshot session did "
+                           "not shut down cleanly: " + "; ".join(problems))
+    document(directory / "backup.json", {
+        "schema_version": SNAPSHOT_SCHEMA_VERSION, "sha256": digest(path),
+        "release": str(site.current.resolve()), "source_tree": release["source_tree"],
+        "storage": release["contracts"]["storage"],
+        "snapshot_id": session.identifier, "snapshot": state, "fence": fence})
     return directory
 
 

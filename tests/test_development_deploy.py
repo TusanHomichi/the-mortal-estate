@@ -1,16 +1,19 @@
 """Private deployment isolation and integrity, without touching host services."""
 import copy
 import json
+import shutil
 import sys
 import tempfile
+import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "deploy/development"))
 
-from common import Installation, digest, document
+from common import Installation, SnapshotSession, digest, document
 from operations import (
     FENCE_CLEARED_QUERIES,
     FENCE_SNAPSHOT_QUERIES,
@@ -420,6 +423,76 @@ class RestoreFenceExpectations(unittest.TestCase):
         site = RecordedDatabase(fence=self.fence({"c-1": 5, "c-extra": 1}, 10))
         differences = fence_differences(expected, site, "scratch")
         self.assertTrue(any("c-extra appeared" in row for row in differences), differences)
+
+
+class SnapshotShutdown(unittest.TestCase):
+    """Ending the transaction must finish the client's input, not kill the client.
+
+    A client double stands in for `psql`. Requiring only that no process survives
+    would let a timeout-then-kill pass, so these cases distinguish an exit the client
+    chose from one that was forced.
+    """
+
+    def double(self, body):
+        directory = Path(tempfile.mkdtemp(prefix="tme-psql-double-"))
+        self.addCleanup(shutil.rmtree, directory, ignore_errors=True)
+        script = directory / "psql"
+        script.write_text("#!/usr/bin/env python3\n" + body, encoding="utf-8")
+        script.chmod(0o755)
+        return SimpleNamespace(pg_bin=directory, socket=Path("/tmp"),
+                               ports={"postgres": 1}, settings={"administrator": "x"})
+
+    def session(self, body, timeout=5):
+        return SnapshotSession(self.double(body), "scratch", timeout=timeout)
+
+    GRACEFUL = (
+        "import sys\n"
+        "for line in sys.stdin:\n"
+        "    if 'pg_export_snapshot' in line:\n"
+        "        print('fake-snapshot-1', flush=True)\n"
+    )
+    STUBBORN = GRACEFUL + "import time\ntime.sleep(60)\n"
+    DIES = "import sys\nsys.exit(0)\n"
+
+    def test_the_client_exits_on_its_own(self):
+        """Closing input is what ends the loop; the transaction command alone does not."""
+        session = self.session(self.GRACEFUL)
+        started = time.monotonic()
+        problems = session.close()
+        self.assertEqual(problems, [])
+        self.assertEqual(session.process.returncode, 0)
+        self.assertLess(time.monotonic() - started, 3.0,
+                        "a healthy client must not be waited on until the timeout")
+
+    def test_cleanup_after_a_failure_is_also_graceful(self):
+        session = self.session(self.GRACEFUL)
+        problems = session.close(failed=True)
+        self.assertEqual(problems, [])
+        self.assertEqual(session.process.returncode, 0)
+
+    def test_a_client_that_will_not_exit_is_reported_not_ignored(self):
+        session = self.session(self.STUBBORN, timeout=1)
+        problems = session.close()
+        self.assertTrue(any("did not exit" in problem for problem in problems), problems)
+        self.assertEqual(session.process.returncode, -9)
+
+    def test_a_client_that_already_died_is_reported(self):
+        session = self.session(self.GRACEFUL)
+        session.process.kill()
+        session.process.wait()
+        problems = session.close(failed=True)
+        self.assertTrue(any("exited with status" in problem for problem in problems), problems)
+
+    def test_closing_twice_is_harmless(self):
+        session = self.session(self.GRACEFUL)
+        self.assertEqual(session.close(), [])
+        self.assertEqual(session.close(), [])
+
+    def test_a_failed_initialization_releases_the_child(self):
+        """The constructor owns the child even when it cannot finish setting up."""
+        with self.assertRaises(RuntimeError) as caught:
+            self.session(self.DIES)
+        self.assertIn("ended early", str(caught.exception))
 
 
 if __name__ == "__main__":

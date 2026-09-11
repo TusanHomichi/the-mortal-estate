@@ -61,10 +61,14 @@ class SnapshotSession:
             self._send("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;")
             self._send("SELECT pg_export_snapshot();")
             self.identifier = self._read_line()
-        except BaseException:
+        except BaseException as error:
             # The child exists from the moment Popen returns, so a failure to
-            # initialize still has to release it before the error propagates.
-            self.close(failed=True)
+            # initialize still has to release it. A cleanup problem is attached to the
+            # original error rather than replacing it.
+            problems = self.close(failed=True)
+            if problems:
+                raise RuntimeError(f"{error}; releasing the snapshot also failed: "
+                                   f"{'; '.join(problems)}") from error
             raise
 
     def _send(self, statement):
@@ -105,29 +109,49 @@ class SnapshotSession:
             return "diagnostics unavailable"
 
     def close(self, *, failed=False):
-        """Release the exporting transaction. Safe to call more than once."""
+        """End the exporting transaction and finish the child's input.
+
+        Returns a list of cleanup problems; it never raises, so a caller already
+        handling an error can report both without losing the original.
+
+        Closing stdin is what ends `psql`'s input loop. COMMIT or ROLLBACK only
+        finishes the SQL transaction, so waiting for exit with input still open spends
+        the whole timeout and then kills a perfectly healthy client -- a forced
+        shutdown that would otherwise be reported as ordinary completion.
+        """
         if self.closed:
-            return
+            return []
         self.closed = True
+        problems = []
         try:
             if self.process.poll() is None:
                 self.process.stdin.write(("ROLLBACK;" if failed else "COMMIT;").encode("utf-8") + b"\n")
                 self.process.stdin.flush()
-        except (BrokenPipeError, ValueError, OSError):
-            pass
+        except (BrokenPipeError, ValueError, OSError) as error:
+            problems.append(f"sending the transaction end failed: {error}")
         try:
-            # A transaction left running holds the snapshot and its resources, so a
-            # child that will not exit is killed rather than waited on indefinitely.
+            # End of file, so the client stops reading input and can exit on its own.
+            self.process.stdin.close()
+        except (OSError, ValueError) as error:
+            problems.append(f"closing the client's input failed: {error}")
+        try:
             self.process.wait(timeout=self.timeout)
         except subprocess.TimeoutExpired:
+            # Forced termination recovers from a hang; it is not how shutdown normally
+            # ends, and it must not pass silently.
             self.process.kill()
             self.process.wait(timeout=10)
+            problems.append(
+                f"the client did not exit within {self.timeout}s after its input ended and was killed")
         finally:
-            for stream in (self.process.stdin, self.process.stdout, self.process.stderr):
+            for stream in (self.process.stdout, self.process.stderr):
                 try:
                     stream.close()
                 except (OSError, ValueError):
                     pass
+        if not problems and self.process.returncode != 0:
+            problems.append(f"the client exited with status {self.process.returncode}")
+        return problems
 
 
 def write(path: Path, value: str, mode=0o600):
