@@ -5,7 +5,9 @@
 use super::{MovementBlockedReason, MovementPlan, MovementStepOutcome};
 use crate::engine::{Engine, StepError};
 use crate::events::Event;
-use crate::model::{Direction, MovementStopReason, NavigationKind, TerrainTraversal, WorldPosition};
+use crate::model::{
+    Direction, MovementStopReason, NavigationKind, TerrainTraversal, WorldPosition,
+};
 use crate::view::ActionBlockedReasonV1;
 
 impl Engine {
@@ -29,9 +31,9 @@ impl Engine {
             ));
         }
         if !self.is_walkable(origin)
-            || !self.effective_tile_at(origin).is_some_and(|tile| {
-                tile.traversal == Some(TerrainTraversal::Walk)
-            })
+            || !self
+                .effective_tile_at(origin)
+                .is_some_and(|tile| tile.traversal == Some(TerrainTraversal::Walk))
         {
             return Err(StepError::blocked(
                 ActionBlockedReasonV1::BlockedTerrain,
@@ -58,7 +60,11 @@ impl Engine {
         let plan = self.evaluate_actor_path(
             actor_index,
             &path,
-            self.definition.catalog.rules.movement.controlled_path_points,
+            self.definition
+                .catalog
+                .rules
+                .movement
+                .controlled_path_points,
         )?;
         if plan.steps.iter().any(|step| step.opens_door) {
             return Err(StepError::blocked(
@@ -83,7 +89,10 @@ impl Engine {
                 },
                 _ => ActionBlockedReasonV1::BlockedTerrain,
             };
-            return Err(StepError::blocked(reason, "jumpkick approach cannot reach the target"));
+            return Err(StepError::blocked(
+                reason,
+                "jumpkick approach cannot reach the target",
+            ));
         }
         for step in &plan.steps {
             let local_walk = match &step.outcome {
@@ -115,11 +124,14 @@ impl Engine {
         expected: &MovementPlan,
         events: &mut Vec<Event>,
     ) -> Result<(), StepError> {
-        let defender = self.world.actors.get(defender_index).ok_or_else(|| {
-            StepError::new("jumpkick target disappeared before approach commit")
-        })?;
+        let defender =
+            self.world.actors.get(defender_index).ok_or_else(|| {
+                StepError::new("jumpkick target disappeared before approach commit")
+            })?;
         if !defender.is_alive() || defender.location != expected.final_position {
-            return Err(StepError::new("jumpkick target changed before approach commit"));
+            return Err(StepError::new(
+                "jumpkick target changed before approach commit",
+            ));
         }
         let current = self.jumpkick_approach_plan(actor_index, &defender.location)?;
         if current != *expected {
@@ -157,11 +169,15 @@ mod tests {
             match change {
                 0 => engine.world.actors[1].location = engine.world.actors[0].location.clone(),
                 1 => engine.world.actors[1].life_state = ActorLifeState::Dead,
-                _ => { engine.world.actors.remove(1); }
+                _ => {
+                    engine.world.actors.remove(1);
+                }
             }
             let before = engine.export_checkpoint().unwrap();
             let mut events = Vec::new();
-            engine.commit_jumpkick_approach(0, 1, &plan, &mut events).unwrap_err();
+            engine
+                .commit_jumpkick_approach(0, 1, &plan, &mut events)
+                .unwrap_err();
             assert!(events.is_empty());
             assert_eq!(engine.export_checkpoint().unwrap(), before);
         }
@@ -173,14 +189,18 @@ mod tests {
         engine.world.actors[0].location = plan.final_position.clone();
         let before = engine.export_checkpoint().unwrap();
         let mut events = Vec::new();
-        engine.commit_jumpkick_approach(0, 1, &plan, &mut events).unwrap_err();
+        engine
+            .commit_jumpkick_approach(0, 1, &plan, &mut events)
+            .unwrap_err();
         assert!(events.is_empty());
         assert_eq!(engine.export_checkpoint().unwrap(), before);
 
         let (mut engine, mut plan) = planned_approach();
         plan.steps[0].from = plan.final_position.clone();
         let before = engine.export_checkpoint().unwrap();
-        let error = engine.commit_jumpkick_approach(0, 1, &plan, &mut events).unwrap_err();
+        let error = engine
+            .commit_jumpkick_approach(0, 1, &plan, &mut events)
+            .unwrap_err();
         assert_eq!(error.message(), "jumpkick approach changed before commit");
         assert!(events.is_empty());
         assert_eq!(engine.export_checkpoint().unwrap(), before);
