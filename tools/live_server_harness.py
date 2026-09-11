@@ -7,6 +7,9 @@ Both consume the authoritative wire through Python; rendering is separate.
 What it provisions, in order: a scratch PostgreSQL database, the schema, one
 enrolled account, one bootstrapped character, the real `tme-server` binary, and
 a loopback TLS front with a throwaway authority the client is told to trust.
+A caller that has already done that provisioning for itself hands over a
+`ServedInstallation` instead, and the harness then serves exactly those facts
+while owning none of them.
 
 Everything it needs lives in this repository except the PostgreSQL superuser
 URL, which is used only to create and drop the scratch database.
@@ -128,6 +131,29 @@ class World:
         if self.generated_seed is not None:
             return self.generated_seed
         return json.loads(self.seed_path(run_directory).read_text(encoding="utf-8"))
+
+
+@dataclass(frozen=True)
+class ServedInstallation:
+    """An installation database the harness serves but does not provision.
+
+    The caller has already migrated it, enrolled its account, and verified its
+    bootstrap manifest — the deployment's own provisioning, not a harness
+    fixture. The harness starts the real server against exactly that database
+    and never creates, migrates, enrols, bootstraps or drops anything; the
+    caller owns provisioning and teardown.
+    """
+
+    database_name: str
+    database_url: str
+    bootstrap_manifest: Path
+    account_id: str
+    character_id: str
+    username: str
+    password: str
+    #: The narrower `tme_auth` credential, when the deployment's provisioning
+    #: split the served process's roles. Absent, the one URL serves both.
+    auth_database_url: str | None = None
 
 
 def reserve_port() -> int:
@@ -281,12 +307,20 @@ def blocklist_path(directory: Path) -> Path:
     return path
 
 
-def write_credential_directory(directory: Path, database_url: str) -> Path:
+def write_credential_directory(
+    directory: Path, database_url: str, auth_database_url: str | None = None
+) -> Path:
     credentials = directory / "credentials"
     credentials.mkdir(mode=0o700, exist_ok=True)
-    for name in ("database-url", "auth-database-url"):
+    # A deployment may split the served process's runtime and authentication
+    # roles; one that never split them gets its single URL in both files, which
+    # is what this harness has always written for a scratch database.
+    for name, url in (
+        ("database-url", database_url),
+        ("auth-database-url", auth_database_url or database_url),
+    ):
         path = credentials / name
-        path.write_text(database_url + "\n", encoding="utf-8")
+        path.write_text(url + "\n", encoding="utf-8")
         path.chmod(0o600)
     return credentials
 
@@ -304,6 +338,10 @@ class LiveServer:
     keep: bool = False
     public_origin: str | None = None
     binary_path: Path | None = None
+    #: An installation the caller provisioned for itself. When set, `world` is
+    #: unused: the served world is the one the installation's own bootstrap
+    #: manifest already names, and this harness neither writes nor verifies it.
+    installation: ServedInstallation | None = None
 
     run_directory: Path = field(init=False)
     database_name: str = field(init=False)
@@ -332,8 +370,12 @@ class LiveServer:
             origin.port
         self.run_directory = Path(tempfile.mkdtemp(prefix="tme-live-"))
         self.server_log = self.run_directory / "server.log"
-        self.database_name = f"tme_live_{secrets.token_hex(4)}"
-        self.database_url = self.admin_url.rsplit("/", 1)[0] + "/" + self.database_name
+        if self.installation is None:
+            self.database_name = f"tme_live_{secrets.token_hex(4)}"
+            self.database_url = self.admin_url.rsplit("/", 1)[0] + "/" + self.database_name
+        else:
+            self.database_name = self.installation.database_name
+            self.database_url = self.installation.database_url
         print(f"run directory: {self.run_directory}")
         try:
             self._provision()
@@ -353,11 +395,19 @@ class LiveServer:
         server_binary = self.binary_path.resolve(strict=True) if self.binary_path is not None else build_server()
         if not server_binary.is_file() or not os.access(server_binary, os.X_OK):
             raise ValueError("proof server binary must be an executable regular file")
-        run([
-            "psql", self.admin_url, "-v", "ON_ERROR_STOP=1",
-            "-c", f'CREATE DATABASE "{self.database_name}"',
-        ])
-        print(f"database: {self.database_name}")
+
+        # An installation is served exactly as it stands: its database, schema,
+        # account and manifest are the deployment's own facts, and recreating any
+        # of them here would prove a database the deployment never ran.
+        installation = self.installation
+        if installation is None:
+            run([
+                "psql", self.admin_url, "-v", "ON_ERROR_STOP=1",
+                "-c", f'CREATE DATABASE "{self.database_name}"',
+            ])
+            print(f"database: {self.database_name}")
+        else:
+            print(f"database: {self.database_name} (provisioned by the caller)")
 
         # Both the offline commands and the served process read the private
         # denylist. Resolve it once, through the shared worktree-aware owner, so a
@@ -369,27 +419,36 @@ class LiveServer:
             "DATABASE_URL": self.database_url,
             "TME_BANNED_TERMS_FILE": banned_terms,
         }
-        run([str(server_binary), "migrate"], env=offline)
-        print("schema: migrated")
+        if installation is None:
+            run([str(server_binary), "migrate"], env=offline)
+            print("schema: migrated")
 
-        self.username = "proof_operator"
-        self.password = "proof-passphrase-" + secrets.token_hex(8)
-        self.account_id = run(
-            [
-                str(server_binary), "account", "create",
-                "--username", self.username,
-                "--display-name", "Proof Operator",
-                "--compromised-passwords", str(blocklist_path(self.run_directory)),
-            ],
-            env=offline,
-            stdin=f"{self.password}\n{self.password}\n",
-        ).strip().splitlines()[-1].strip()
-        print(f"account: {self.account_id}")
+            self.username = "proof_operator"
+            self.password = "proof-passphrase-" + secrets.token_hex(8)
+            self.account_id = run(
+                [
+                    str(server_binary), "account", "create",
+                    "--username", self.username,
+                    "--display-name", "Proof Operator",
+                    "--compromised-passwords", str(blocklist_path(self.run_directory)),
+                ],
+                env=offline,
+                stdin=f"{self.password}\n{self.password}\n",
+            ).strip().splitlines()[-1].strip()
+            print(f"account: {self.account_id}")
 
-        self.character_id = str(uuid.uuid4())
-        manifest = self._write_bootstrap_manifest()
-        run([str(server_binary), "bootstrap", "verify", str(manifest)], env=offline)
-        print(f"character: {self.character_id}")
+            self.character_id = str(uuid.uuid4())
+            manifest = self._write_bootstrap_manifest()
+            run([str(server_binary), "bootstrap", "verify", str(manifest)], env=offline)
+            print(f"character: {self.character_id}")
+        else:
+            self.username = installation.username
+            self.password = installation.password
+            self.account_id = installation.account_id
+            self.character_id = installation.character_id
+            # Absolute, because the served process must not inherit a dependency
+            # on whatever working directory the caller happened to launch from.
+            manifest = installation.bootstrap_manifest.resolve()
 
         public_port = reserve_port()
         operations_port = reserve_port()
@@ -403,7 +462,11 @@ class LiveServer:
         environment = {
             **os.environ,
             "CREDENTIALS_DIRECTORY": str(
-                write_credential_directory(self.run_directory, self.database_url)
+                write_credential_directory(
+                    self.run_directory,
+                    self.database_url,
+                    installation.auth_database_url if installation is not None else None,
+                )
             ),
             "TME_BANNED_TERMS_FILE": banned_terms,
             "TME_PUBLIC_LISTEN": f"127.0.0.1:{public_port}",
@@ -505,13 +568,17 @@ class LiveServer:
         if self.keep:
             print(f"kept: database {self.database_name}, run directory {self.run_directory}")
             return
-        subprocess.run(
-            ["psql", self.admin_url, "-c",
-             f'DROP DATABASE IF EXISTS "{self.database_name}" WITH (FORCE)'],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        # A served installation is the caller's, provisioned for a deployment
+        # that still needs it; dropping it here would destroy live state to tidy
+        # up after a proof.
+        if self.installation is None:
+            subprocess.run(
+                ["psql", self.admin_url, "-c",
+                 f'DROP DATABASE IF EXISTS "{self.database_name}" WITH (FORCE)'],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
         shutil.rmtree(self.run_directory, ignore_errors=True)
 
 

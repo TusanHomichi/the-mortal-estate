@@ -16,17 +16,30 @@ fails here. The resolver itself is not reimplemented or re-tested;
 `tests/test_check_boundary_terms.py` owns its behavior, including checkout-local
 precedence, the linked-worktree fallback, and the fail-closed path when neither
 list exists.
+
+A second seam is pinned the same way: when the caller hands over a
+`ServedInstallation`, the harness serves that database and starts no
+provisioning child at all, and teardown leaves the caller's database alone. The
+default path is asserted alongside it so the two cannot converge unnoticed.
 """
 
+import dataclasses
 import os
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from boundary_common import PRIVATE_TERMS_RELATIVE
-from live_server_harness import LiveServer, World
+# `tools/` holds the harness and the shared boundary owner it resolves. The
+# verification runner reaches it through a sibling module's import; a direct
+# `python3 -m unittest tests.test_live_server_harness` does not, and a module
+# that imports only under one runner hides its own breakage.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+
+from boundary_common import PRIVATE_TERMS_RELATIVE  # noqa: E402
+from live_server_harness import LiveServer, ServedInstallation, World  # noqa: E402
 
 ADMIN_URL = "postgresql://operator@127.0.0.1:5432/postgres"
 
@@ -49,6 +62,7 @@ class ProvisioningEnvironment(unittest.TestCase):
         self.shared_terms.write_text("zorbelquux\n", encoding="utf-8")
         self.offline_runs: list[tuple[list[str], dict[str, str]]] = []
         self.served_runs: list[tuple[list[str], dict[str, str]]] = []
+        self.served_handles: list[Mock] = []
 
     def recorded_run(self, command, *, env=None, stdin=None):
         self.offline_runs.append((list(command), dict(env or {})))
@@ -61,13 +75,17 @@ class ProvisioningEnvironment(unittest.TestCase):
         self.served_runs.append((list(command), dict(kwargs.get("env") or {})))
         handle = Mock()
         handle.poll.return_value = None
+        self.served_handles.append(handle)
         return handle
 
-    def provision(self) -> LiveServer:
+    def provision(self, installation: ServedInstallation | None = None) -> LiveServer:
         """Provision a server with every external boundary stubbed."""
-        # The world is irrelevant here: the manifest is written, never served.
+        # The world is irrelevant here: the manifest is written, never served —
+        # and in installation mode it is not even written.
         server = LiveServer(
-            ADMIN_URL, World(world_template="world.json", generated_seed={"actors": []})
+            ADMIN_URL,
+            World(world_template="world.json", generated_seed={"actors": []}),
+            installation=installation,
         )
         binary = self.worktree / "tme-server"
         binary.write_text("#!/bin/sh\n", encoding="utf-8")
@@ -94,6 +112,21 @@ class ProvisioningEnvironment(unittest.TestCase):
             server.__enter__()
         self.addCleanup(shutil.rmtree, server.run_directory, ignore_errors=True)
         return server
+
+    def installation(self) -> ServedInstallation:
+        """A deployment's own database, as its provisioning would have left it."""
+        manifest = self.worktree / "installation-bootstrap.json"
+        manifest.write_text('{"schema_version": 1}\n', encoding="utf-8")
+        return ServedInstallation(
+            database_name="tme",
+            database_url="postgresql://tme_runtime:secret@localhost:5433/tme",
+            bootstrap_manifest=manifest,
+            account_id="account:installation:one",
+            character_id="character:installation:one",
+            username="development_1",
+            password="installation-passphrase",
+            auth_database_url="postgresql://tme_auth:secret@localhost:5433/tme",
+        )
 
     def children(self) -> dict[str, dict[str, str]]:
         """Key every captured child by its subcommand, not by the order it ran in."""
@@ -191,6 +224,80 @@ class ProvisioningEnvironment(unittest.TestCase):
                 server.database_url,
                 f"{name} must still prefer the scratch database URL",
             )
+
+    def test_an_installation_is_served_without_provisioning_anything(self) -> None:
+        """The caller's database, account and manifest are the ones served.
+
+        Provisioning an installation would be the failure this mode exists to
+        prevent: it would serve a database the deployment never migrated, or
+        overwrite the manifest its own provisioning verified.
+        """
+        installation = self.installation()
+        server = self.provision(installation)
+        self.assertEqual(
+            self.offline_runs,
+            [],
+            "installation mode must start no psql, migrate, account create or bootstrap verify child",
+        )
+        self.assertEqual(sorted(self.children()), ["serve"])
+        self.assertEqual(server.database_name, installation.database_name)
+        self.assertEqual(server.database_url, installation.database_url)
+        self.assertEqual(server.username, installation.username)
+        self.assertEqual(server.password, installation.password)
+        self.assertEqual(server.account_id, installation.account_id)
+        self.assertEqual(server.character_id, installation.character_id)
+        served = self.children()["serve"]
+        self.assertEqual(
+            served.get("TME_BOOTSTRAP_MANIFEST"),
+            str(installation.bootstrap_manifest.resolve()),
+            "the served process must be pointed at the installation's own manifest, absolutely",
+        )
+        credentials = Path(served["CREDENTIALS_DIRECTORY"])
+        self.assertEqual(
+            (credentials / "database-url").read_text(encoding="utf-8"),
+            installation.database_url + "\n",
+            "the served process must read the installation's runtime role",
+        )
+        self.assertEqual(
+            (credentials / "auth-database-url").read_text(encoding="utf-8"),
+            installation.auth_database_url + "\n",
+            "the narrower auth role must not be handed the runtime credential",
+        )
+
+    def test_a_single_role_installation_writes_its_url_to_both_credentials(self) -> None:
+        """A deployment that never split the roles still gets both files filled."""
+        installation = dataclasses.replace(self.installation(), auth_database_url=None)
+        self.provision(installation)
+        credentials = Path(self.children()["serve"]["CREDENTIALS_DIRECTORY"])
+        for name in ("database-url", "auth-database-url"):
+            self.assertEqual(
+                (credentials / name).read_text(encoding="utf-8"),
+                installation.database_url + "\n",
+                f"{name} must fall back to the one URL this installation has",
+            )
+
+    def test_installation_teardown_never_drops_the_callers_database(self) -> None:
+        server = self.provision(self.installation())
+        with patch("live_server_harness.subprocess.run") as teardown:
+            server.close()
+        teardown.assert_not_called()
+        self.served_handles[0].terminate.assert_called_once()
+        self.assertFalse(server.run_directory.exists(), "the run directory is still this run's")
+
+    def test_default_mode_still_creates_migrates_enrols_and_drops(self) -> None:
+        """A short counterweight, so the installation path cannot become the only one."""
+        server = self.provision()
+        self.assertEqual(
+            sorted(self.children()), ["account create", "bootstrap verify", "migrate", "serve"]
+        )
+        created = [command for command, _ in self.offline_runs if Path(command[0]).name == "psql"]
+        self.assertEqual(len(created), 1)
+        self.assertIn(f'CREATE DATABASE "{server.database_name}"', created[0][-1])
+        with patch("live_server_harness.subprocess.run") as teardown:
+            server.close()
+        dropped = [call.args[0] for call in teardown.call_args_list]
+        self.assertEqual(len(dropped), 1)
+        self.assertIn(f'DROP DATABASE IF EXISTS "{server.database_name}"', dropped[0][-1])
 
 
 if __name__ == "__main__":
