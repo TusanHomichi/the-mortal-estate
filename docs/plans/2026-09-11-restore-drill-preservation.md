@@ -172,6 +172,30 @@ Coordination in stage 4 is with the exported snapshot rather than with a sleep. 
 ordering this replaced exposed no such instant, which is exactly why it was wrong: its
 unpinned reads answered from whatever had been committed by the time they ran.
 
+The run above was made on a cluster holding none of the production roles. The same
+tool created them, and immediately afterwards the cluster held no `tme%` role and only
+its template databases — the create-and-drop path, not just the reuse path.
+
+### Canonical checks observed
+
+- `python3 tools/run_verification.py --scope full` → **COMPLETE — every selected step
+  ran and passed**, 1207s total. The steps that matter here all passed:
+  `gated: real backup and restore drill on a scratch installation` (39.9s),
+  `gated: PostgreSQL suite, one fresh migrated database per test`,
+  `server: trusted TLS sign-in, admission, individual cooldowns, reconnect, and
+  logout` (which serves the harness's default, provisioned path against real
+  PostgreSQL), `browser: authoritative Workbench capture`, and
+  `clean clone: builds and tests with no private root`. The clean-clone step reports
+  the boundary check degraded onto the tracked synthetic fixture, which is its
+  documented behaviour with no private denylist present; the lane's own
+  `boundary: banned-terms` step ran against the real denylist and passed.
+- `python3 -m unittest -q tests.test_development_deploy tests.test_live_server_harness
+  tests.test_restore_drill_proof` — 44 + 10 + 14 tests, OK; the runner's harness lane
+  runs 116.
+
+The tool also left the cluster as it found it: after the final run, no `tme` database
+and no `tme%` role remained.
+
 ## Open questions settled
 
 - **Where the snapshot lives.** In `backup.json`, beside the dump's checksum, and the
