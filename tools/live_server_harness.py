@@ -41,6 +41,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+
+sys.path.insert(0, str(REPOSITORY_ROOT / "tools"))
+
+from boundary_common import private_terms_path  # noqa: E402
+
 READY_TIMEOUT_SECONDS = 120.0
 PROXY_HOST = "localhost"
 
@@ -354,7 +359,16 @@ class LiveServer:
         ])
         print(f"database: {self.database_name}")
 
-        offline = {**os.environ, "DATABASE_URL": self.database_url}
+        # Both the offline commands and the served process read the private
+        # denylist. Resolve it once, through the shared worktree-aware owner, so a
+        # linked worktree proves the same terms the boundary check does instead of
+        # failing on a checkout-local path it is not supposed to carry.
+        banned_terms = str(private_terms_path(REPOSITORY_ROOT))
+        offline = {
+            **os.environ,
+            "DATABASE_URL": self.database_url,
+            "TME_BANNED_TERMS_FILE": banned_terms,
+        }
         run([str(server_binary), "migrate"], env=offline)
         print("schema: migrated")
 
@@ -391,7 +405,7 @@ class LiveServer:
             "CREDENTIALS_DIRECTORY": str(
                 write_credential_directory(self.run_directory, self.database_url)
             ),
-            "TME_BANNED_TERMS_FILE": str(REPOSITORY_ROOT / ".boundary" / "banned-terms.txt"),
+            "TME_BANNED_TERMS_FILE": banned_terms,
             "TME_PUBLIC_LISTEN": f"127.0.0.1:{public_port}",
             "TME_OPS_LISTEN": f"127.0.0.1:{operations_port}",
             "TME_PUBLIC_HOST": urlsplit(self.origin).netloc,
