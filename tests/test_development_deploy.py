@@ -18,6 +18,7 @@ from operations import (
     fence_differences,
     restore_drill,
     state_differences,
+    validate_expectations,
     verify_backup,
 )
 from provision import development_seed, validate_settings
@@ -206,7 +207,8 @@ class RecordedDatabase:
                                 (FENCE_SNAPSHOT_QUERIES, self.fence)):
             for name, query in queries.items():
                 if text == query:
-                    return "\n".join(json.dumps(row) for row in source.get(name) or [])
+                    # One aggregate line, exactly as the real query returns.
+                    return json.dumps(source.get(name) or [])
         for name, query in FENCE_CLEARED_QUERIES.items():
             if text == query:
                 return str(self.cleared.get(name, 0))
@@ -214,7 +216,12 @@ class RecordedDatabase:
 
 
 def recorded_state():
-    """One world, two seeded characters, and one created through the normal flow."""
+    """Representative synthetic rows.
+
+    These stand in for a world holding two seeded characters and one created through
+    the normal flow. They are canned rows for comparison coverage only; nothing here
+    exercises a real backup or restore.
+    """
     characters = [
         {"character_id": "c-seeded-1", "account_id": "a-owner", "slot": 1,
          "display_name": "Wayfarer", "actor_id": "player"},
@@ -233,6 +240,61 @@ def recorded_state():
                     "checkpoint_schema": 3, "facet_revision": 41,
                     "last_server_sequence": 97, "checkpoint_sha256": "cd" * 32}],
     }
+
+
+def recorded_fence():
+    """Pre-fence epochs for the same three characters."""
+    return {
+        "control_epochs": [{"character_id": "c-created-3", "control_epoch": 0},
+                           {"character_id": "c-seeded-1", "control_epoch": 4},
+                           {"character_id": "c-seeded-2", "control_epoch": 0}],
+        "fence_epoch": [{"restore_fence_epoch": 9}],
+    }
+
+
+class RestoreReceiptShape(unittest.TestCase):
+    """A malformed receipt is refused, and never quietly checks less."""
+
+    def test_a_complete_receipt_is_usable(self):
+        self.assertEqual(validate_expectations(recorded_state(), recorded_fence()), [])
+
+    def test_a_missing_fence_epoch_is_refused(self):
+        """The increment must not become optional just because the section is gone."""
+        fence = recorded_fence()
+        del fence["fence_epoch"]
+        problems = validate_expectations(recorded_state(), fence)
+        self.assertTrue(any("fence_epoch" in problem for problem in problems), problems)
+
+    def test_an_empty_fence_epoch_is_refused(self):
+        fence = recorded_fence()
+        fence["fence_epoch"] = []
+        problems = validate_expectations(recorded_state(), fence)
+        self.assertTrue(any("fence epochs" in problem for problem in problems), problems)
+
+    def test_a_missing_preservation_section_is_refused(self):
+        state = recorded_state()
+        del state["characters"]
+        problems = validate_expectations(state, recorded_fence())
+        self.assertTrue(any("characters" in problem for problem in problems), problems)
+
+    def test_more_than_one_world_is_refused(self):
+        state = recorded_state()
+        state["facets"].append(dict(state["facets"][0], facet_id="f-second"))
+        problems = validate_expectations(state, recorded_fence())
+        self.assertTrue(any("2 worlds" in problem for problem in problems), problems)
+
+    def test_disagreeing_character_identities_are_refused(self):
+        """Preserved and epoch sections must describe the same characters."""
+        fence = recorded_fence()
+        fence["control_epochs"].append({"character_id": "c-ghost", "control_epoch": 0})
+        problems = validate_expectations(recorded_state(), fence)
+        self.assertTrue(any("disagree" in problem for problem in problems), problems)
+
+    def test_a_non_integer_epoch_is_refused(self):
+        fence = recorded_fence()
+        fence["control_epochs"][0]["control_epoch"] = "zero"
+        problems = validate_expectations(recorded_state(), fence)
+        self.assertTrue(any("not an integer" in problem for problem in problems), problems)
 
 
 class RestorePreservation(unittest.TestCase):

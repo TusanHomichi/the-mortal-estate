@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import select
 import subprocess
 from pathlib import Path
 
@@ -18,6 +19,82 @@ def run(arguments, *, input=None, env=None, timeout=120, cwd=None):
         # Never echo arguments or stdin: either can carry an operator credential.
         raise RuntimeError(f"{Path(arguments[0]).name} exited {result.returncode}: {result.stderr[-1500:]}")
     return result.stdout.strip()
+
+
+class SnapshotSession:
+    """Holds one exported snapshot open for the lifetime of a backup.
+
+    A backup must describe the same instant it dumps. Reading expectations through
+    separate transactions does not do that: a change landing between the dump and the
+    reads is recorded as though the dump had contained it, and the drill later reports
+    a perfectly good backup as having lost a character.
+
+    PostgreSQL's own mechanism closes the gap. This opens one repeatable-read
+    read-only transaction and exports its snapshot; `pg_dump --snapshot` imports it,
+    and so does every expectation read (see `operations.at_snapshot`). All of them
+    therefore see the one instant.
+
+    The session deliberately does no further work: it exists only to keep the
+    exporting transaction open, because the snapshot is released when that
+    transaction ends. Reads go through their own bounded `psql` invocations, which is
+    more robust than framing a long interactive conversation.
+    """
+
+    def __init__(self, site, database, timeout=120):
+        self.timeout = timeout
+        self.closed = False
+        self.process = subprocess.Popen(
+            list(map(str, [
+                site.pg_bin / "psql", "-XqAt", "-v", "ON_ERROR_STOP=1",
+                "-h", site.socket, "-p", site.ports["postgres"],
+                "-U", site.settings["administrator"], "-d", database])),
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # READ ONLY so nothing here can mutate the world it describes, and REPEATABLE
+        # READ because a snapshot can only be exported and imported at that level.
+        self._send("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;")
+        self._send("SELECT pg_export_snapshot();")
+        self.identifier = self._read_line()
+
+    def _send(self, statement):
+        if self.closed:
+            raise RuntimeError("snapshot session is closed")
+        try:
+            self.process.stdin.write(statement + "\n")
+            self.process.stdin.flush()
+        except (BrokenPipeError, ValueError):
+            raise RuntimeError(f"snapshot session ended early: {self._diagnostics()}")
+
+    def _read_line(self):
+        ready, _, _ = select.select([self.process.stdout], [], [], self.timeout)
+        if not ready:
+            raise RuntimeError(f"snapshot session produced no result within {self.timeout}s")
+        line = self.process.stdout.readline()
+        if line == "":
+            raise RuntimeError(f"snapshot session ended early: {self._diagnostics()}")
+        return line.strip()
+
+    def _diagnostics(self):
+        try:
+            return (self.process.stderr.read() or "").strip()[-500:] or "no diagnostic output"
+        except (ValueError, OSError):
+            return "diagnostics unavailable"
+
+    def close(self, *, failed=False):
+        """Release the exporting transaction. Safe to call more than once."""
+        if self.closed:
+            return
+        self.closed = True
+        try:
+            self.process.stdin.write(("ROLLBACK;" if failed else "COMMIT;") + "\n")
+            self.process.stdin.flush()
+            self.process.stdin.close()
+            self.process.wait(timeout=self.timeout)
+        except (BrokenPipeError, ValueError, OSError, subprocess.TimeoutExpired):
+            pass
+        finally:
+            if self.process.poll() is None:
+                self.process.kill()
+                self.process.wait(timeout=10)
 
 
 def write(path: Path, value: str, mode=0o600):
