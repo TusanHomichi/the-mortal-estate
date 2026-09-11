@@ -88,6 +88,7 @@ private denylist. It is a stated limit, not a skip.
 | `browsers` | installed Playwright engines from `web/proof/engines.json`; the actual capture still probes and requires working WebGL2 renderers |
 | `node` | a `node` on `PATH` whose major version is 22 or later, plus `npm` — asked, never assumed. Absent, the `web` lane is `UNAVAILABLE` |
 | `postgres` | `TME_PG_ADMIN_URL_FILE`, naming a readable file holding a superuser URL used only to create and drop scratch databases, plus `psql` |
+| `postgres-server` | a PostgreSQL server installation: `psql` plus `initdb`, `pg_ctl`, `pg_dump` and `pg_restore` in one bin directory (`pg_config --bindir` when available); the restore-drill proof creates its own scratch cluster with it |
 | `private-terms` | the private file resolved by `tools/boundary_common.py` (this checkout first, then its main checkout for a linked worktree). Absent, the banned-terms check **degrades** onto the tracked synthetic fixture: the mechanism still runs and still must pass, and the run says the real denylist was not proven |
 | `feel-assets` | `TME_FEEL_ASSETS`, an absolute candidate-packet directory outside the checkout |
 | `capture-output` | `TME_CAPTURE_OUTPUT`, naming a directory |
@@ -112,7 +113,7 @@ The live server wire proof is part of `gated`, with a scratch PostgreSQL databas
 
 ```bash
 python3 tools/run_server_live_proof.py --admin-url-file <file>
-python3 tools/run_restore_drill_proof.py --admin-url-file <file>
+python3 tools/run_restore_drill_proof.py
 python3 tools/run_presentation_adoption_recording.py \
   --admin-url-file <file> --output <directory>
 python3 tools/workbench/serve.py
@@ -123,13 +124,16 @@ The observer recorder consumes the real TLS/WebSocket frame and validates its
 semantic barrier. It does not render a client. Old Godot launch, capture, and
 `--godot` arguments are retired, with no compatibility aliases.
 
-`tools/run_restore_drill_proof.py` provisions a scratch installation in the
-deployment's own order, creates a character through the runtime flow, and drives the
-deployment's real `backup()` and `restore_drill()`. It refuses a cluster that already
-holds a `tme` database, so an installed preview is out of reach. It proves
-preservation including a saved position reached by playing, a commit landing during a
-backup, a same-count substitution refused by name, and that a failing drill drops its
-scratch database. Its evidence is recorded in the
+`tools/run_restore_drill_proof.py` takes no cluster: it creates and owns its own
+`initdb` cluster under a temporary root, on a reserved port, with the socket beside
+it, and provisions the installation in the deployment's own order. Nothing outside
+that root is contacted, so no existing database or role can be reached or altered.
+It creates a character through the runtime flow and drives the deployment's real
+`backup()` and `restore_drill()`. It proves preservation including a saved position
+reached by playing; a commit landing inside the exported snapshot its writer is held
+until; a same-count substitution refused by name; and a drill whose own scratch
+database cannot be dropped still reporting the preservation failure, the cleanup
+failure and the database's name. Its evidence is recorded in the
 [restore-drill execution record](plans/2026-09-11-restore-drill-preservation.md).
 
 `tools/run_production_smoke.py` exercises a **deployed** host through public

@@ -86,6 +86,48 @@ def _probe_postgres(environ: Mapping[str, str]) -> tuple[bool, str]:
     return True, f"superuser URL from {value}, psql present"
 
 
+def _probe_postgres_server(environ: Mapping[str, str]) -> tuple[bool, str]:
+    """A PostgreSQL installation whose binaries can create and run a cluster."""
+    search_path = environ.get("PATH")
+    psql = shutil.which("psql", path=search_path)
+    if psql is None:
+        return False, "psql is not on PATH"
+    bindir = Path(psql).resolve().parent
+    # pg_config is discovery only: the binaries below are the requirement, so an answer
+    # that is absent, failed or empty falls back to where psql itself lives.
+    pg_config = shutil.which("pg_config", path=search_path)
+    if pg_config is not None:
+        try:
+            configured = subprocess.run(
+                [pg_config, "--bindir"], capture_output=True, text=True, timeout=60
+            )
+        except (OSError, subprocess.SubprocessError):
+            configured = None
+        if configured is not None and configured.returncode == 0:
+            reported = (configured.stdout or "").strip()
+            if reported:
+                bindir = Path(reported)
+    missing = [
+        name for name in ("initdb", "pg_ctl", "pg_dump", "pg_restore")
+        if not (bindir / name).is_file()
+    ]
+    if missing:
+        return (
+            False,
+            f"{bindir} does not hold {', '.join(missing)}; a PostgreSQL server "
+            "installation is required",
+        )
+    try:
+        completed = subprocess.run(
+            [str(bindir / "initdb"), "--version"], capture_output=True, text=True, timeout=60
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        return False, f"{bindir}/initdb could not report its version: {error}"
+    if completed.returncode != 0 or not (completed.stdout or "").strip():
+        return False, f"{bindir}/initdb could not report its version"
+    return True, f"PostgreSQL server binaries in {bindir}"
+
+
 def _probe_private_terms(_environ: Mapping[str, str]) -> tuple[bool, str]:
     path = private_terms_path(ROOT)
     if not path.is_file() or not os.access(path, os.R_OK):
@@ -126,12 +168,17 @@ def _probe_browsers(environ: Mapping[str, str]) -> tuple[bool, str]:
 FEEL_ASSETS = Capability("feel-assets", "an external candidate packet", _probe_feel_assets)
 NODE = Capability("node", "Node 22 or newer and npm", _probe_node)
 POSTGRES = Capability("postgres", "a PostgreSQL superuser URL and psql", _probe_postgres)
+POSTGRES_SERVER = Capability(
+    "postgres-server",
+    "a PostgreSQL server installation: psql plus initdb, pg_ctl, pg_dump and pg_restore in one bin directory",
+    _probe_postgres_server,
+)
 PRIVATE_TERMS_LIST = Capability(
     "private-terms", "the private banned-term denylist", _probe_private_terms
 )
 
 BROWSERS = Capability("browsers", "the complete browser proof roster", _probe_browsers)
-CAPABILITIES: tuple[Capability, ...] = (NODE, POSTGRES, PRIVATE_TERMS_LIST, FEEL_ASSETS, BROWSERS)
+CAPABILITIES: tuple[Capability, ...] = (NODE, POSTGRES, POSTGRES_SERVER, PRIVATE_TERMS_LIST, FEEL_ASSETS, BROWSERS)
 BY_NAME = {capability.name: capability for capability in CAPABILITIES}
 
 

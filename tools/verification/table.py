@@ -238,9 +238,8 @@ _STATIC: tuple[Step, ...] = (
         key="gated.restore_drill",
         owner="gated",
         label="gated: real backup and restore drill on a scratch installation",
-        argv=("python3", "tools/run_restore_drill_proof.py",
-              "--admin-url-file", "$TME_PG_ADMIN_URL_FILE"),
-        requires=("postgres",),
+        argv=("python3", "tools/run_restore_drill_proof.py"),
+        requires=("postgres-server",),
         timeout=1800.0,
     ),
     Step(

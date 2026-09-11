@@ -1,12 +1,14 @@
-"""The restore-drill proof's own refusal and cleanup rules, without a database.
+"""The restore-drill proof's own ownership, ordering and cleanup rules.
 
 `tools/run_restore_drill_proof.py` is driven end to end by the gated PostgreSQL step.
-These cases pin the parts a real run cannot show cheaply: that an installed cluster is
-refused before anything is created, that a restored copy's credentials are re-pointed
-without losing the role, and that teardown reports what it could not remove instead of
-raising past whatever the proof was already reporting.
+These cases pin what a real run cannot show cheaply: that the cluster it touches must
+be the one it created, that a cluster which will not stop is reported rather than
+raised past a failure, that the coordinated writer runs inside the exported snapshot's
+window and only there, and that a restored copy's credentials are re-pointed without
+losing the role.
 """
 
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -17,32 +19,117 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import run_restore_drill_proof as proof  # noqa: E402
-from run_gated_postgres import GatedError  # noqa: E402
 
 
-class Refusal(unittest.TestCase):
-    """A cluster holding the instrument database is never touched."""
+class Ownership(unittest.TestCase):
+    """Only the cluster this proof created is ever touched."""
 
-    class Cluster:
-        def __init__(self, held):
-            self.held = held
-            self.asked = []
+    class Installation(proof.ScratchInstallation):
+        """The ownership check alone, without a cluster or a provisioning run."""
 
-        def psql(self, statement, database=None):
-            self.asked.append(statement)
-            return self.held
+        def __init__(self, root, reported, data=None):
+            self.root = Path(root).resolve()
+            self.site = SimpleNamespace(
+                data=Path(data) if data is not None else Path(root) / "postgres",
+                socket=Path("/tmp/socket"),
+                sql=lambda text, database="postgres": reported)
 
-    def test_an_installed_cluster_is_refused_before_anything_is_created(self):
-        cluster = self.Cluster("1\n")
-        with self.assertRaisesRegex(GatedError, "not a scratch cluster"):
-            proof.refuse_an_installed_cluster(cluster)
-        self.assertEqual(len(cluster.asked), 1)
-        self.assertIn(proof.SCRATCH_DATABASE, cluster.asked[0])
+    def test_the_cluster_that_answers_must_keep_its_data_under_the_root(self):
+        installation = self.Installation("/tmp/scratch", "/tmp/scratch/postgres")
+        installation.assert_ownership()
 
-    def test_an_empty_cluster_is_accepted(self):
-        cluster = self.Cluster("0\n")
-        proof.refuse_an_installed_cluster(cluster)
-        self.assertEqual(len(cluster.asked), 1)
+    def test_a_cluster_answering_with_another_data_directory_is_refused(self):
+        installation = self.Installation("/tmp/scratch", "/var/lib/postgresql/18/main")
+        with self.assertRaisesRegex(proof.ProofError, "only touches the cluster it created"):
+            installation.assert_ownership()
+
+    def test_a_data_directory_outside_the_root_is_refused_before_anything_asks(self):
+        installation = self.Installation("/tmp/scratch", "/tmp/scratch/postgres")
+        installation.site.data = Path("/tmp/somewhere-else/postgres")
+        with self.assertRaisesRegex(proof.ProofError, "outside"):
+            installation.assert_ownership()
+
+
+class StopReporting(unittest.TestCase):
+    """Cleanup returns its problems, so a failed proof keeps its own failure."""
+
+    class Installation(proof.ScratchInstallation):
+        def __init__(self, started=True):
+            self.started = started
+            self.site = SimpleNamespace(data=Path("/tmp/scratch/postgres"))
+            self.pg_bin = Path("/nonexistent")
+
+    def test_a_cluster_that_never_started_is_not_stopped(self):
+        with patch.object(proof, "run") as runner:
+            self.assertEqual(self.Installation(started=False).close(), [])
+        runner.assert_not_called()
+
+    def test_a_cluster_that_will_not_stop_is_reported_not_raised(self):
+        """A timeout is a cleanup problem too, not an exception past the failure."""
+        with patch.object(proof, "run", side_effect=subprocess.TimeoutExpired("pg_ctl", 120)):
+            problems = self.Installation().close()
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("was not stopped", problems[0])
+        self.assertIn("/tmp/scratch/postgres", problems[0])
+        self.assertIn("timed out", problems[0])
+
+
+class PinnedReadWindow(unittest.TestCase):
+    """The coordinated commit is placed, not raced."""
+
+    def site(self, exporter_counts):
+        counts = list(exporter_counts)
+        return SimpleNamespace(sql=lambda text, database=None: str(counts.pop(0)))
+
+    def test_the_writer_runs_once_when_the_first_pinned_read_starts(self):
+        created = {"character_id": "c-committed"}
+        calls = []
+
+        def writer():
+            calls.append("write")
+            return created
+
+        barrier = proof.PinnedReadBarrier(self.site([1, 1]), writer)
+        with patch.object(proof, "exporting_sessions", side_effect=[1, 1]):
+            barrier("BEGIN; SET TRANSACTION SNAPSHOT 'x'; SELECT 1;")
+            barrier("BEGIN; SET TRANSACTION SNAPSHOT 'x'; SELECT 2;")
+        barrier.check()
+        self.assertEqual(calls, ["write"])
+        self.assertEqual(barrier.created, created)
+
+    def test_an_unpinned_read_is_not_a_window(self):
+        barrier = proof.PinnedReadBarrier(self.site([]), lambda: {"character_id": "c"})
+        barrier("SELECT count(*) FROM tme.characters")
+        self.assertIsNone(barrier.created)
+        with self.assertRaisesRegex(proof.ProofError, "without a snapshot to wait for"):
+            barrier.check()
+
+    def test_a_commit_outside_an_open_export_fails_the_check(self):
+        """The claim is that the commit landed inside the exported snapshot."""
+        barrier = proof.PinnedReadBarrier(self.site([]), lambda: {"character_id": "c"})
+        with patch.object(proof, "exporting_sessions", side_effect=[0, 0]):
+            barrier("BEGIN; SET TRANSACTION SNAPSHOT 'x'; SELECT 1;")
+        with self.assertRaisesRegex(proof.ProofError, "inside an exported snapshot"):
+            barrier.check()
+
+
+class BarrierProxy(unittest.TestCase):
+    """The proxy adds a hook; every other fact is the installation's own."""
+
+    def test_sql_is_passed_through_with_its_arguments(self):
+        seen = []
+
+        def sql(text, database="tme", quiet=False):
+            seen.append((text, database, quiet))
+            return "rows"
+
+        site = SimpleNamespace(root="the-root", pg_bin="the-bin", sql=sql)
+        barrier = proof.PinnedReadBarrier(site, lambda: None)
+        proxy = proof.SiteWithBarrier(site, barrier)
+        self.assertEqual(proxy.sql("SELECT 1", database="other", quiet=True), "rows")
+        self.assertEqual(seen, [("SELECT 1", "other", True)])
+        self.assertEqual(proxy.root, "the-root")
+        self.assertEqual(proxy.pg_bin, "the-bin")
 
 
 class CredentialRepointing(unittest.TestCase):
@@ -64,50 +151,8 @@ class CredentialRepointing(unittest.TestCase):
 
     def test_a_credential_that_names_no_installation_database_is_refused(self):
         installation = SimpleNamespace(credentials={"database": "postgresql://host/other"})
-        with self.assertRaises(GatedError):
+        with self.assertRaises(proof.ProofError):
             proof.ScratchInstallation.url_for(installation, "tme_oracle_1", "database")
-
-
-class TeardownReporting(unittest.TestCase):
-    """Cleanup returns its problems, so a failed proof keeps its own failure."""
-
-    def installation(self, site_error=None, role_error=None):
-        installation = SimpleNamespace(
-            created_roles={"tme_owner", "tme_runtime"},
-            site=SimpleNamespace(sql=self.site_sql(site_error)),
-            cluster=SimpleNamespace(psql=self.cluster_psql(role_error)))
-        return installation
-
-    def site_sql(self, error):
-        def sql(statement, database="tme"):
-            if error is not None:
-                raise error
-            return ""
-        return sql
-
-    def cluster_psql(self, error):
-        def psql(statement, database=None):
-            if error is not None:
-                raise error
-            return ""
-        return psql
-
-    def test_a_dropped_database_and_its_roles_report_no_problems(self):
-        problems = proof.ScratchInstallation.close(self.installation())
-        self.assertEqual(problems, [])
-
-    def test_a_role_that_will_not_drop_is_reported_not_raised(self):
-        problems = proof.ScratchInstallation.close(
-            self.installation(role_error=RuntimeError("privileges for function pg_control_system()")))
-        self.assertEqual(len(problems), 2, problems)
-        self.assertTrue(all("dropping role" in problem for problem in problems), problems)
-        self.assertTrue(any("pg_control_system" in problem for problem in problems), problems)
-
-    def test_a_surviving_instrument_database_is_reported_not_raised(self):
-        problems = proof.ScratchInstallation.close(
-            self.installation(site_error=RuntimeError("database is being accessed by other users")))
-        self.assertEqual(len(problems), 1, problems)
-        self.assertIn("dropping tme failed", problems[0])
 
 
 class FailureReporting(unittest.TestCase):
@@ -121,7 +166,7 @@ class FailureReporting(unittest.TestCase):
     def test_an_accepted_action_is_a_proof_failure(self):
         def accepts(site, directory):
             return None
-        with self.assertRaisesRegex(GatedError, "accepted evidence it must refuse"):
+        with self.assertRaisesRegex(proof.ProofError, "accepted evidence it must refuse"):
             proof.expect_failure(accepts, None, None)
 
 
@@ -141,11 +186,11 @@ class PositionReading(unittest.TestCase):
     def test_a_frame_that_names_the_character_twice_is_refused(self):
         position = {"realm": "first_expedition", "level": "arrival",
                     "position": {"x": 8, "y": 33}}
-        with self.assertRaisesRegex(GatedError, "2 times"):
+        with self.assertRaisesRegex(proof.ProofError, "2 times"):
             proof.position_of(self.frame([position, position]), "c-1")
 
     def test_an_absent_character_is_refused(self):
-        with self.assertRaisesRegex(GatedError, "0 times"):
+        with self.assertRaisesRegex(proof.ProofError, "0 times"):
             proof.position_of(self.frame([]), "c-1")
 
 
@@ -190,7 +235,7 @@ class Stepping(unittest.TestCase):
     def test_a_character_with_no_passable_neighbour_is_not_moved(self):
         here = self.frame(8, 34, [])
         gameplay = self.Gameplay([])
-        with self.assertRaisesRegex(GatedError, "no passable square"):
+        with self.assertRaisesRegex(proof.ProofError, "no passable square"):
             proof.take_one_step(gameplay, here, "c-1", timeout=5)
         self.assertEqual(gameplay.commands, [])
 
