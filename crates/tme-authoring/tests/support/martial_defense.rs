@@ -3,10 +3,10 @@ use std::sync::{Arc, OnceLock};
 
 use serde_json::{Value, json};
 use tme_rules::{
-    ActorId, ActorState, BlockSourceKind, CarriedPosition, CatalogProfileKey, CharacterId,
-    Engine, Event, GameDefinition, GroundItem, HostilityAuthorization, ItemBindingState,
-    ItemInstanceState, ItemKnowledgeState, ItemMoveDestination, PhysicalAttackMode,
-    PhysicalBlockCandidateViewV1, PlayerIntent, ValidatedWorldSeed, WorldSeedDef, WorldTemplateV3,
+    ActorId, ActorState, BlockSourceKind, CarriedPosition, CatalogProfileKey, CharacterId, Engine,
+    Event, GameDefinition, GroundItem, HostilityAuthorization, ItemBindingState, ItemInstanceState,
+    ItemKnowledgeState, ItemMoveDestination, PhysicalAttackMode, PhysicalBlockCandidateViewV1,
+    PlayerIntent, ValidatedWorldSeed, WorldSeedDef, WorldTemplateV3,
 };
 
 pub const PROFILE: &str = "profile/first_expedition";
@@ -17,8 +17,8 @@ fn inputs() -> &'static (Value, WorldTemplateV3, WorldSeedDef) {
     static INPUTS: OnceLock<(Value, WorldTemplateV3, WorldSeedDef)> = OnceLock::new();
     INPUTS.get_or_init(|| {
         let root = tme_authoring::repository_root().unwrap();
-        let land = tme_authoring::load(&root, tme_authoring::land("first_expedition").unwrap())
-            .unwrap();
+        let land =
+            tme_authoring::load(&root, tme_authoring::land("first_expedition").unwrap()).unwrap();
         let catalog = serde_json::from_slice(
             &std::fs::read(root.join(land.contract().terrain_registry_catalog)).unwrap(),
         )
@@ -54,7 +54,9 @@ pub fn build_definition(catalog: Value) -> Arc<GameDefinition> {
 
 pub fn definition() -> Arc<GameDefinition> {
     static DEFINITION: OnceLock<Arc<GameDefinition>> = OnceLock::new();
-    DEFINITION.get_or_init(|| build_definition(catalog())).clone()
+    DEFINITION
+        .get_or_init(|| build_definition(catalog()))
+        .clone()
 }
 
 pub fn armor_definition() -> Arc<GameDefinition> {
@@ -219,6 +221,10 @@ pub fn equip(engine: &mut Engine, instance: &str, position: CarriedPosition) {
 pub fn next_block_roll(engine: &Engine) -> u32 {
     let checkpoint = engine.export_checkpoint().unwrap();
     let payload: Value = serde_json::from_slice(checkpoint.as_bytes()).unwrap();
-    let state = payload["rng_state"].as_str().unwrap().parse::<u64>().unwrap();
+    let state = payload["rng_state"]
+        .as_str()
+        .unwrap()
+        .parse::<u64>()
+        .unwrap();
     tme_rules::DeterministicRng::new(state).roll_d20()
 }

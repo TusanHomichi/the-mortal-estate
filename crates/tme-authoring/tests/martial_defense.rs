@@ -16,7 +16,10 @@ use support::{
 #[test]
 fn played_profile_selects_one_class_specific_passive_without_raising_starting_skill() {
     let source = catalog();
-    assert_eq!(source["profiles"][PROFILE]["profession_actions"], json!([ACTION]));
+    assert_eq!(
+        source["profiles"][PROFILE]["profession_actions"],
+        json!([ACTION])
+    );
     assert_eq!(source["profession_actions"].as_object().unwrap().len(), 1);
     assert_eq!(
         source["profession_actions"][ACTION]["class_ids"],
@@ -47,7 +50,13 @@ fn played_profile_selects_one_class_specific_passive_without_raising_starting_sk
 
 #[test]
 fn current_class_and_minimum_skill_gate_the_actual_block_not_only_the_snapshot() {
-    for class in ["fighter", "martial_artist", "thief", "wizard", "thaumaturge"] {
+    for class in [
+        "fighter",
+        "martial_artist",
+        "thief",
+        "wizard",
+        "thaumaturge",
+    ] {
         for level in [0, 1, 2, 19] {
             let mut engine = duel(definition(), &format!("creation/{class}"), level, 17);
             let eligible = class == "martial_artist" && level >= 2;
@@ -74,7 +83,12 @@ fn original_curve_has_exact_effective_odds_across_every_d20_face() {
             let events = attack(&mut engine, PhysicalAttackMode::Kick);
             let blocked = hand_block(&events);
             assert_eq!(blocked.is_some(), roll * 5 < threshold, "{level}, {roll}");
-            if let Some(Event::AttackBlocked { chance_percent, roll: actual, .. }) = blocked {
+            if let Some(Event::AttackBlocked {
+                chance_percent,
+                roll: actual,
+                ..
+            }) = blocked
+            {
                 assert_eq!((*chance_percent, *actual), (threshold, roll));
                 assert_eq!(defender(&engine).hp, hp);
                 successes += 1;
@@ -92,7 +106,10 @@ fn passive_block_is_free_for_a_busy_defender_and_projects_a_single_blocked_outco
     equip(&mut engine, "defense_test/charm", CarriedPosition::LeftHand);
     let before = defender(&engine).clone();
     let now = engine.world().timing.now;
-    assert!(before.timing.ready_at > now, "fixture defender is still busy");
+    assert!(
+        before.timing.ready_at > now,
+        "fixture defender is still busy"
+    );
     let events = attack(&mut engine, PhysicalAttackMode::Kick);
     match hand_block(&events).unwrap() {
         Event::AttackBlocked {
@@ -170,7 +187,13 @@ fn actual_item_moves_remove_right_hand_defense_and_stowing_restores_it() {
             roll * 5 < 40
         );
         let carried = &defender(&engine).carried.items;
-        assert_eq!(carried.values().filter(|id| *id == "defense_test/held").count(), 1);
+        assert_eq!(
+            carried
+                .values()
+                .filter(|id| *id == "defense_test/held")
+                .count(),
+            1
+        );
     }
     let mut left = duel(definition(), "creation/martial_artist", 8, 17);
     place_test_item(&mut left, "weathered_staff", "defense_test/left");
@@ -186,7 +209,11 @@ fn test_only_worn_armor_reduces_blocking_and_stowing_restores_the_same_item() {
     for seed in 0..20 {
         let mut engine = duel(definition.clone(), "creation/martial_artist", 8, seed);
         place_test_item(&mut engine, ARMOR, "defense_test/armor");
-        equip(&mut engine, "defense_test/armor", CarriedPosition::OuterArmor);
+        equip(
+            &mut engine,
+            "defense_test/armor",
+            CarriedPosition::OuterArmor,
+        );
         assert_eq!(candidate(&engine).unwrap().chance_percent, 30);
         let events = attack(&mut engine, PhysicalAttackMode::Kick);
         if let Some(Event::AttackBlocked {
@@ -202,10 +229,18 @@ fn test_only_worn_armor_reduces_blocking_and_stowing_restores_the_same_item() {
     assert_eq!(successes, 5);
     let mut engine = duel(definition, "creation/martial_artist", 8, 17);
     place_test_item(&mut engine, ARMOR, "defense_test/armor");
-    equip(&mut engine, "defense_test/armor", CarriedPosition::OuterArmor);
+    equip(
+        &mut engine,
+        "defense_test/armor",
+        CarriedPosition::OuterArmor,
+    );
     let ready_at = defender(&engine).timing.ready_at;
     engine.advance_to(ready_at).unwrap();
-    equip(&mut engine, "defense_test/armor", CarriedPosition::SackItem1);
+    equip(
+        &mut engine,
+        "defense_test/armor",
+        CarriedPosition::SackItem1,
+    );
     assert_eq!(candidate(&engine).unwrap().chance_percent, 40);
     let roll = next_block_roll(&engine);
     assert_eq!(
@@ -233,7 +268,10 @@ fn an_actual_incoming_staff_uses_shared_combat_add_penetration() {
             roll,
             ..
         } => {
-            assert_eq!((*chance_percent, *effective_combat_add_rating, *roll), (38, 1, 6));
+            assert_eq!(
+                (*chance_percent, *effective_combat_add_rating, *roll),
+                (38, 1, 6)
+            );
         }
         other => panic!("unexpected outcome: {other:?}"),
     }
@@ -279,7 +317,13 @@ fn explicit_content_cutover_preserves_owned_state_and_replays_new_defense() {
     assert_eq!(candidate(&live).unwrap().chance_percent, 40);
     let before_json: Value = serde_json::from_slice(before.as_bytes()).unwrap();
     let migrated_json: Value = serde_json::from_slice(migrated.as_bytes()).unwrap();
-    for key in ["world", "rng_state", "initial_events", "schema_version", "kind"] {
+    for key in [
+        "world",
+        "rng_state",
+        "initial_events",
+        "schema_version",
+        "kind",
+    ] {
         assert_eq!(before_json[key], migrated_json[key], "preserve {key}");
     }
     assert_ne!(before_json["content"], migrated_json["content"]);
