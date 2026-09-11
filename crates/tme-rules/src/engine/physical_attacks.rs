@@ -4,6 +4,7 @@ use crate::model::{
     PerceivedSocialIdentity, PhysicalAttackMode, PhysicalDamageKind, SocialContactKind, WoundState,
 };
 
+use super::movement::MovementPlan;
 use super::weapons::PhysicalWeaponSelection;
 use super::{Engine, StepError};
 
@@ -17,6 +18,7 @@ pub(super) struct PhysicalAttackPlan {
     pub skill_level: u8,
     pub maximum_range: i32,
     pub distance: i32,
+    pub approach: Option<MovementPlan>,
     pub damage_kind: PhysicalDamageKind,
     pub cooldown_units: u32,
     pub effective_combat_add_rating: i32,
@@ -196,7 +198,8 @@ impl Engine {
                                     .map_err(|_| StepError::new("jumpkick divisor overflow"))?,
                         )
                         .ok_or_else(|| StepError::new("jumpkick range overflow"))?
-                        .min(rules.maximum_range_cap);
+                        .min(rules.maximum_range_cap)
+                        .min(crate::model::MAX_CONTROLLED_PATH_STEPS as i32);
                     (
                         selection,
                         skill_range,
@@ -270,7 +273,7 @@ impl Engine {
         }
         let social =
             self.capture_physical_attack_social_plan(attacker_index, defender_index, authority)?;
-        if attacker.location.level != defender.location.level {
+        if !attacker.location.same_site(&defender.location) {
             return Err(StepError::new(
                 "physical attack target is not in the same room",
             ));
@@ -311,6 +314,18 @@ impl Engine {
             )));
         }
 
+        if jumpkick_stamina_cost > attacker.stamina {
+            return Err(StepError::new("not enough stamina to jumpkick"));
+        }
+
+        // A complete legal route is required before the attack can be offered
+        // or committed. In particular, sight alone never grants displacement.
+        let approach = if mode == PhysicalAttackMode::Jumpkick {
+            Some(self.jumpkick_approach_plan(attacker_index, &defender.location)?)
+        } else {
+            None
+        };
+
         if matches!(
             mode,
             PhysicalAttackMode::Jumpkick | PhysicalAttackMode::Shoot | PhysicalAttackMode::Throw
@@ -329,9 +344,6 @@ impl Engine {
         {
             return Err(StepError::new("bow is not nocked"));
         }
-        if jumpkick_stamina_cost > attacker.stamina {
-            return Err(StepError::new("not enough stamina to jumpkick"));
-        }
 
         Ok(PhysicalAttackPlan {
             attacker_index,
@@ -342,6 +354,7 @@ impl Engine {
             selection,
             maximum_range,
             distance,
+            approach,
             damage_kind,
             cooldown_units,
             effective_combat_add_rating,

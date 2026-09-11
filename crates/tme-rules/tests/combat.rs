@@ -11,6 +11,8 @@ mod combat_add;
 mod combat_labels;
 #[path = "cases/combat_resolution.rs"]
 mod combat_resolution;
+#[path = "cases/jumpkick_approach.rs"]
+mod jumpkick_approach;
 #[path = "cases/physical_attack_modes.rs"]
 mod physical_attack_modes;
 #[path = "cases/physical_rewards.rs"]
