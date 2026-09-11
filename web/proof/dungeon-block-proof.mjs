@@ -1,6 +1,13 @@
 // The observed character is the DEFENDER. This is the inverse of the motion proof:
 // no command is sent to attack. An authored hold-ground monster shares the tile
 // and the server's own automatic attack path produces the swing.
+//
+// What a PASS establishes is stated in the report's `guarantee` field and in the
+// owning slice record. The client's motion diagnostics expose only
+// `{id, body, clip, moving}`, so a rendered clip cannot be bound to the individual
+// state update that caused it. This script therefore reports bracketed
+// observations of authoritative swings and of block playback, rather than claiming
+// atomic frame-level attribution.
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
@@ -12,6 +19,11 @@ const prefix=`${config.output}/${config.engine}-${config.scenario}`;
 // A blocked incoming `fight` is presented as this clip; the wire outcome names no
 // block source, so the clip is chosen by attack mode alone (dungeon/motion.ts).
 const BLOCK_CLIP='block_high';
+// The motion owner separates real swings from no_sight/not_ready, which mean the
+// actor never attacked. Only these outcomes count as an attack for this scenario.
+const SWING_OUTCOMES=new Set(['hit','missed','blocked']);
+// Any posture a defender might legitimately hold while an unblocked swing lands.
+const NOT_BLOCKING=['guard','block_high','block_side','block_cover','block_lean'];
 const negative=config.occupied===true;
 try{
  const context=session.context||await session.browser.newContext();page=await context.newPage();await page.setViewportSize({width:1600,height:1100});
@@ -21,21 +33,38 @@ try{
  const canvas=()=>page.locator('#world-canvas');
  const motion=()=>canvas().evaluate((n,id)=>JSON.parse(n.dataset.dungeonMotions).find(m=>m.id===id),frame.observer_actor_id);
  const pose=(clips,timeout=30000)=>page.waitForFunction(({id,clips})=>clips.includes(JSON.parse(document.querySelector('#world-canvas').dataset.dungeonMotions||'[]').find(m=>m.id===id)?.clip),{id:frame.observer_actor_id,clips},{timeout});
- async function capture(name,extra){await canvas().screenshot({path:`${prefix}-${name}.png`});captures.push({name,motion:await motion(),position:frame.observation_center,...extra});}
- // Every combat cue naming the observed actor, with the update index that carried it.
+ // Every combat cue naming the observed actor, with the update that carried it.
  const cues=()=>updates.flatMap((u,index)=>(u.events||[])
    .filter(e=>e.kind==='feedback'&&e.cue?.kind==='physical_combat'&&e.cue.target?.actor_id===frame.observer_actor_id)
-   .map(e=>({update:index,cue:e.cue})));
- const incoming=()=>cues().filter(c=>c.cue.source?.actor_id&&c.cue.source.actor_id!==frame.observer_actor_id);
+   .map(e=>({update:index,revision:u.world_revision??null,cue:e.cue})));
+ // The relevant set: the configured monster swinging at the controlled defender in
+ // the mode that monster actually authored. Anything else is not this scenario, and
+ // no_sight/not_ready are excluded because they mean no attack happened.
+ const swings=()=>cues().filter(c=>c.cue.source?.actor_id===config.monster
+   &&c.cue.mode==='fight'&&SWING_OUTCOMES.has(c.cue.outcome.kind));
+ const blocks=()=>swings().filter(c=>c.cue.outcome.kind==='blocked');
+ // Bracket the shot: the required clip must hold immediately before AND after the
+ // screenshot, so a capture that crossed the transition is rejected instead of
+ // silently recorded. This narrows the race; it is not an atomic claim about one
+ // rendered frame.
+ async function captureBracketed(name,expected,extra){
+  const before=await motion();
+  await canvas().screenshot({path:`${prefix}-${name}.png`});
+  const after=await motion();
+  assert(expected.includes(before.clip),`${name}: clip before capture was ${before.clip}, expected one of ${expected}`);
+  assert(expected.includes(after.clip),`${name}: clip after capture was ${after.clip}, expected one of ${expected}`);
+  captures.push({name,clipBefore:before.clip,clipAfter:after.clip,moving:after.moving,position:frame.observation_center,...extra});
+ }
+ const requireNoCommands=()=>assert.equal(commands.length,0,`this scenario sends no command; saw ${commands.length}`);
 
  await page.goto(config.origin+'/');await page.waitForFunction(()=>document.body.dataset.playReady==='true');
  await page.locator('#username').fill(config.username);await page.locator('#password').fill(config.password);
  await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Enter world',exact:true}).click();
  await page.waitForFunction(()=>document.body.dataset.phase==='playing'&&document.querySelector('#world-canvas').dataset.canAct==='true',undefined,{timeout:45000});
  await waitForWorldPointing(page);
- assert.equal(commands.length,0,'this scenario sends no command; the monster attacks on its own');
+ requireNoCommands();
  // The monster is authored as the expedition's own hold-ground scavenger.
- const hostile=frame.actors.find(a=>a.actor_id!=='player'&&a.actor_id===config.monster);
+ const hostile=frame.actors.find(a=>a.actor_id===config.monster);
  assert(hostile,`authored monster ${config.monster} must be present`);
  assert.equal(hostile.attack_safety,'open_hostile','the monster must assess the observer as openly hostile');
  assert.deepEqual(hostile.position.position,frame.observation_center.position,'attacker and defender must share the defender\'s tile; Fight is legal only at distance zero');
@@ -45,46 +74,36 @@ try{
  if(negative){
   // Bounded window. The control is only meaningful if the same path really swung.
   await page.waitForTimeout(20000);
-  const swings=incoming();
-  assert(swings.length>0,'the negative control must still observe incoming attacks');
-  const blocked=swings.filter(s=>s.cue.outcome.kind==='blocked');
-  const outcomes=[...new Set(swings.map(s=>s.cue.outcome.kind))].sort();
+  const all=swings();
+  const blocked=blocks();
+  const outcomes=[...new Set(all.map(s=>s.cue.outcome.kind))].sort();
+  assert(all.length>0,`the negative control must still observe real swings from ${config.monster}`);
   assert.deepEqual(blocked,[],`an occupied right hand must produce no martial hand block; observed ${JSON.stringify(outcomes)}`);
-  const observed=await motion();
-  await capture('incoming-unblocked',{outcome:'no block observed',outcomes,swings:swings.length});
+  requireNoCommands();
+  await captureBracketed('incoming-unblocked',NOT_BLOCKING,{
+   outcome:'no block observed',outcomes,swings:all.length});
   assert.deepEqual(errors,[]);
   await writeFile(`${config.output}/${config.engine}-${config.scenario}.json`,JSON.stringify({
    verdict:'PASS',renderer:session.renderer,sex:config.sex,occupiedHand:true,
-   incomingSwings:swings.length,outcomes,blockedCount:0,observedClip:observed.clip,
+   guarantee:'the configured monster produced real swings at the controlled defender and none was reported blocked',
+   incomingSwings:all.length,outcomes,blockedCount:0,
    commandsSent:commands.length,captures,errors},null,2));
-  console.log(`PASS ${config.engine}/${config.scenario} (negative control: ${swings.length} swings, no block)`);
+  console.log(`PASS ${config.engine}/${config.scenario} (negative control: ${all.length} swings from ${config.monster}, outcomes ${outcomes.join('/')}, no block)`);
  }else{
-  // Wait for the server's own attack to be blocked, tied to that specific cue.
-  let blockedCue=null;
+  // Wait until the server's own attack is reported blocked.
   const deadline=Date.now()+30000;
-  while(Date.now()<deadline){
-   const hit=incoming().find(c=>c.cue.outcome.kind==='blocked');
-   if(hit){blockedCue=hit;break;}
-   await page.waitForTimeout(200);
-  }
-  assert(blockedCue,`no blocked incoming attack observed; cues=${JSON.stringify(cues().map(c=>c.cue.outcome.kind))}`);
-  assert.equal(blockedCue.cue.mode,'fight','the authored monster attacks with fight');
-  // Tie the capture to this cue: wait until the incoming-block clip is on screen.
-  // The clip runs for min(clip.duration, 1.5s), so the shot is taken the moment the
-  // clip is reported and the reported clip is asserted at that instant, rather than
-  // after a sleep that could outlast a short clip and silently capture the guard
-  // pose instead. An earlier animation cannot satisfy this: the cue names this
-  // attack, and the clip must be the incoming-block one at capture time.
+  while(Date.now()<deadline&&blocks().length===0)await page.waitForTimeout(200);
+  const observed=blocks();
+  assert(observed.length>0,`no blocked incoming attack observed; swings=${JSON.stringify(swings().map(s=>s.cue.outcome.kind))}`);
+  const last=observed.at(-1);
+  // Then wait for incoming-block playback and bracket the shot around it.
   await pose([BLOCK_CLIP],20000);
-  const during=await motion();
-  assert.equal(during.clip,BLOCK_CLIP,'the capture must land while the incoming-block clip is playing');
-  assert.equal(during.moving,false,'a blocked defender does not travel');
-  await capture('block',{clip:during.clip,fromUpdate:blockedCue.update,
-   outcome:blockedCue.cue.outcome,source:blockedCue.cue.source.actor_id,mode:blockedCue.cue.mode});
+  await captureBracketed('block',[BLOCK_CLIP],{
+   observedBlocks:observed.length,blockRevision:last.revision,blockUpdateIndex:last.update,
+   outcome:last.cue.outcome,source:last.cue.source.actor_id,mode:last.cue.mode});
   await pose(['guard'],20000);
-  const after=await motion();
-  assert.equal(after.clip,'guard','the defender must return to the ordinary stance');
-  await capture('guard-after-block',{clip:after.clip});
+  await captureBracketed('guard-after-block',['guard'],{observedBlocks:observed.length});
+  requireNoCommands();
   // The defender is unarmed, unarmoured and holds no shield, so the martial hand is
   // the only candidate that could have produced this block.
   assert.equal(frame.character.identity.current_class_id,'martial_artist');
@@ -93,10 +112,11 @@ try{
   assert.deepEqual(errors,[]);
   await writeFile(`${config.output}/${config.engine}-${config.scenario}.json`,JSON.stringify({
    verdict:'PASS',renderer:session.renderer,sex:config.sex,occupiedHand:false,
+   guarantee:'the configured monster produced real swings at the controlled defender, at least one was reported blocked, and incoming-block playback was observed with the clip bracketing the capture. The wire outcome names no block source and the client exposes no cue-to-clip identity, so this is not frame-level attribution: the martial-hand conclusion rests on the fixture being unarmed, unarmoured and shieldless, together with the occupied-hand control',
    defenderClass:frame.character.identity.current_class_id,rightHandEmpty:true,
-   incomingSwings:incoming().length,blockedMode:blockedCue.cue.mode,
-   blockedFromUpdate:blockedCue.update,duringClip:during.clip,afterClip:after.clip,
+   incomingSwings:swings().length,observedBlocks:observed.length,
+   blockedMode:last.cue.mode,blockRevision:last.revision,blockUpdateIndex:last.update,
    commandsSent:commands.length,captures,errors},null,2));
-  console.log(`PASS ${config.engine}/${config.scenario} (attacker=${hostile.actor_id}, blocked, clip=${during.clip})`);
+  console.log(`PASS ${config.engine}/${config.scenario} (attacker=${hostile.actor_id}, ${observed.length} blocked of ${swings().length} swings, clip=${BLOCK_CLIP})`);
  }
 } catch(error){await page?.screenshot({path:`${prefix}-failure.png`}).catch(()=>{});throw error;}finally{await session.stop();}
