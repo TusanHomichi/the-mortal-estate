@@ -53,6 +53,22 @@ fn parts(target: Coord) -> ContentParts {
         "track_id": "hand", "level": 6, "critique_rank": 0,
         "practice_points": 0, "learning_rate": 1
     }]);
+    // `profile/skill_progression` resolves to a rules base that only authors the
+    // fighter growth profile. Take the canonical martial_artist one so the class
+    // this case actually plays passes content validation, rather than inventing
+    // progression numbers here.
+    let martial_growth =
+        parts.catalog["rules_profiles"]["rules/first_room"]["progression"]["growth_profiles"]
+            .as_array()
+            .expect("canonical growth profiles")
+            .iter()
+            .find(|profile| profile["class_id"] == "martial_artist")
+            .expect("canonical martial_artist growth profile")
+            .clone();
+    parts.rules_source_mut()["progression"]["growth_profiles"]
+        .as_array_mut()
+        .expect("test progression profiles")
+        .push(martial_growth);
     parts.actors_mut()[1]["location"] = place(target.x, target.y);
     parts.actor_definition_mut(1)["ai"]["behavior"] = json!("hold_ground");
     parts.actor_definition_mut(1)["stats"]["hp"] = json!(1000);
@@ -375,7 +391,9 @@ fn swimming_and_unaffordable_terrain_do_not_acquire_air_traversal() {
         .clone();
     terrain["id"] = json!("approach_water");
     terrain["name"] = json!("Approach Water");
-    terrain["traversal"] = json!("swim");
+    // Deliberately cost 1 so the third step is affordable and the rejection under
+    // test is the swim traversal kind, not an exhausted path-point budget.
+    terrain["navigation"] = json!({"blocks_sight": false, "kind": "swim", "move_cost": 1});
     water.push_selected("terrains", "terrain/approach_water", terrain);
     water.template_levels_source_mut()["room_0"]["cells"][4][6] = json!(["approach_water"]);
     reject_unchanged(
@@ -386,7 +404,8 @@ fn swimming_and_unaffordable_terrain_do_not_acquire_air_traversal() {
     local_door(&mut water, 6, "open");
     reject_unchanged(&mut engine(water), ActionBlockedReasonV1::BlockedTerrain);
     let mut costly = parts(Coord { x: 7, y: 4 });
-    costly.selected_by_runtime_id_mut("terrains", "flagstone")["move_cost"] = json!(2);
+    costly.selected_by_runtime_id_mut("terrains", "flagstone")["navigation"]["move_cost"] =
+        json!(2);
     reject_unchanged(
         &mut engine(costly),
         ActionBlockedReasonV1::InsufficientMovementPoints,
@@ -653,7 +672,8 @@ fn a_late_practice_failure_rolls_back_the_approach_damage_cost_deadline_and_rng(
 #[test]
 fn a_difficult_but_affordable_landing_pays_only_physical_stamina() {
     let mut costly = parts(Coord { x: 5, y: 4 });
-    costly.selected_by_runtime_id_mut("terrains", "flagstone")["move_cost"] = json!(2);
+    costly.selected_by_runtime_id_mut("terrains", "flagstone")["navigation"]["move_cost"] =
+        json!(2);
     let mut engine = engine(costly);
     let result = engine
         .apply_realtime_actor_intent(&actor_id(), intent(PhysicalAttackMode::Jumpkick))
