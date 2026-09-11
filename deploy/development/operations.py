@@ -311,6 +311,23 @@ def verify_backup(site, directory):
     return directory
 
 
+def release_scratch(site, database):
+    """Drop one drill scratch database, and report what went wrong if it survives.
+
+    Returns its problems rather than raising them. A drill that is already failing for
+    its own reason must report that reason, and whoever has to recover a leaked
+    database needs its exact name — so both belong in the message rather than in a
+    traceback that replaced the first failure. Every failure counts as a problem here,
+    including a timeout: this is the last step of a destructive operation, and nothing
+    it can raise is worth losing the failure that brought the caller here.
+    """
+    try:
+        site.sql(f'DROP DATABASE IF EXISTS "{database}" WITH (FORCE)', "postgres")
+    except Exception as error:  # noqa: BLE001 - every cleanup failure is reportable
+        return [f"the drill database {database} was not dropped: {error}"]
+    return []
+
+
 def restore_drill(site, directory):
     directory = verify_backup(site, directory)
     receipt = json.loads((directory / "backup.json").read_text())
@@ -327,6 +344,8 @@ def restore_drill(site, directory):
         raise RuntimeError("backup receipt is not usable for a drill: " + "; ".join(problems))
     database = "tme_restore_" + secrets.token_hex(6)
     site.sql(f"CREATE DATABASE {database} OWNER tme_owner", "postgres")
+    failure = None
+    report = None
     try:
         site.pg("pg_restore", "--exit-on-error", directory / "database.dump", database=database)
         site.operator("store", "restore-fence", "--confirm-restored-database", database=database)
@@ -338,12 +357,24 @@ def restore_drill(site, directory):
         fenced = fence_differences(fence_expected, site, database)
         if fenced:
             raise RuntimeError("restore fence did not behave as recorded: " + "; ".join(fenced))
-        return {"restored_characters": [row["character_id"] for row in restored["characters"]],
-                "restored_accounts": [row["account_id"] for row in restored["accounts"]],
-                "restored_worlds": [row["facet_id"] for row in restored["facets"]],
-                "fenced_and_verified": True}
-    finally:
-        site.sql(f"DROP DATABASE {database} WITH (FORCE)", "postgres")
+        report = {"restored_characters": [row["character_id"] for row in restored["characters"]],
+                  "restored_accounts": [row["account_id"] for row in restored["accounts"]],
+                  "restored_worlds": [row["facet_id"] for row in restored["facets"]],
+                  "fenced_and_verified": True}
+    except BaseException as error:
+        # The original failure is what the caller needs; a cleanup problem is attached
+        # to it rather than allowed to replace it, and the scratch database's name
+        # travels with it so a leak can be found and removed.
+        failure = error
+    problems = release_scratch(site, database)
+    if problems and failure is not None:
+        raise RuntimeError(f"{failure}; releasing the drill database also failed: "
+                           f"{'; '.join(problems)}") from failure
+    if problems:
+        raise RuntimeError("the drill verified the restore but " + "; ".join(problems))
+    if failure is not None:
+        raise failure
+    return report
 
 
 def restore(site, directory):

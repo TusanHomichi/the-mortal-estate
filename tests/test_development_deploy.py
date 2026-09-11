@@ -728,5 +728,132 @@ class BackupFailureReporting(unittest.TestCase):
                          "a backup that failed must publish no dump")
 
 
+class DrillDatabase(RecordedDatabase):
+    """A recorded database that a real drill can run against.
+
+    The restore and fence commands are no-ops: what these cases exercise is the
+    drill's own comparison and its cleanup, not PostgreSQL. The cleanup can be made
+    to fail, which is the boundary a drill's `finally` used to lose.
+    """
+
+    def __init__(self, root, cleanup_error=None, **keywords):
+        super().__init__(**keywords)
+        self.root = root
+        self.settings = {"administrator": "x", "postgres_bin": "/nonexistent"}
+        self.socket = Path("/tmp")
+        self.ports = {"postgres": 1}
+        self.cleanup_error = cleanup_error
+        self.created = []
+        self.dropped = []
+
+    def check_release(self, directory=None):
+        return {"source_tree": "synthetic", "contracts": {"storage": {"checkpoint": 1}}}
+
+    def pg(self, name, *arguments, **keywords):
+        return ""
+
+    def operator(self, *arguments, **keywords):
+        return ""
+
+    def sql(self, text, database="tme", quiet=False):
+        if text.startswith("CREATE DATABASE"):
+            self.created.append(text)
+            return ""
+        if text.startswith("DROP DATABASE"):
+            if self.cleanup_error is not None:
+                raise self.cleanup_error
+            self.dropped.append(text)
+            return ""
+        return super().sql(text, database)
+
+
+class DrillCleanupReporting(unittest.TestCase):
+    """A drill keeps its own failure when dropping its scratch database fails.
+
+    The scratch database is the drill's, and a leak is a real operational problem:
+    whoever has to remove it needs its name, and whoever has to fix the drill needs
+    the comparison failure rather than a cleanup traceback in its place.
+    """
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="tme-drill-cleanup-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.site = DrillDatabase(self.root / "installation", state=recorded_state(),
+                                  fence=recorded_fence())
+
+    def backup(self, state, fence):
+        directory = self.site.root / "backups/drill"
+        directory.mkdir(parents=True)
+        dump = directory / "database.dump"
+        dump.write_bytes(b"synthetic dump")
+        document(directory / "backup.json", {"schema_version": 2, "sha256": digest(dump),
+                                             "storage": {"checkpoint": 1},
+                                             "snapshot": state, "fence": fence})
+        return directory
+
+    def fenced(self, increment=1):
+        fence = recorded_fence()
+        fence["control_epochs"] = [dict(row, control_epoch=row["control_epoch"] + increment)
+                                   for row in fence["control_epochs"]]
+        fence["fence_epoch"] = [{"restore_fence_epoch":
+                                 fence["fence_epoch"][0]["restore_fence_epoch"] + increment}]
+        return fence
+
+    def test_a_failing_comparison_survives_a_cleanup_that_fails(self):
+        """The lost character is the finding; the surviving database is the follow-up."""
+        expected = recorded_state()
+        restored = copy.deepcopy(expected)
+        restored["characters"].pop()
+        self.site.state = restored
+        self.site.cleanup_error = RuntimeError("database is being used by prepared transactions")
+        with self.assertRaises(RuntimeError) as caught:
+            restore_drill(self.site, self.backup(expected, recorded_fence()))
+        message = str(caught.exception)
+        self.assertIn("did not retain its backup", message)
+        self.assertIn("c-created-3", message)
+        self.assertIn("releasing the drill database also failed", message)
+        self.assertIn("database is being used by prepared transactions", message)
+        self.assertTrue(any(name.split()[2] in message for name in self.site.created), message)
+        self.assertIsInstance(caught.exception.__cause__, RuntimeError)
+        self.assertIn("did not retain its backup", str(caught.exception.__cause__))
+
+    def test_a_cleanup_timeout_is_reported_alongside_the_failure(self):
+        """A cleanup can time out; that is still a problem, not a replacement."""
+        expected = recorded_state()
+        restored = copy.deepcopy(expected)
+        restored["facets"][0]["checkpoint_sha256"] = "ef" * 32
+        self.site.state = restored
+        self.site.cleanup_error = subprocess.TimeoutExpired("psql", 120)
+        with self.assertRaises(RuntimeError) as caught:
+            restore_drill(self.site, self.backup(expected, recorded_fence()))
+        message = str(caught.exception)
+        self.assertIn("did not retain its backup", message)
+        self.assertIn("was not dropped", message)
+
+    def test_a_verified_drill_that_cannot_clean_up_fails(self):
+        """A drill that leaves its scratch database behind has not finished."""
+        state = recorded_state()
+        self.site.fence = {"control_epochs": self.fenced()["control_epochs"],
+                           "fence_epoch": self.fenced()["fence_epoch"]}
+        self.site.cleanup_error = RuntimeError("injected DROP failure")
+        with self.assertRaises(RuntimeError) as caught:
+            restore_drill(self.site, self.backup(state, recorded_fence()))
+        self.assertIn("verified the restore but", str(caught.exception))
+        self.assertIn("injected DROP failure", str(caught.exception))
+
+    def test_a_clean_drill_verifies_and_drops_its_scratch_database(self):
+        state = recorded_state()
+        self.site.fence = {"control_epochs": self.fenced()["control_epochs"],
+                           "fence_epoch": self.fenced()["fence_epoch"]}
+        report = restore_drill(self.site, self.backup(state, recorded_fence()))
+        self.assertTrue(report["fenced_and_verified"])
+        self.assertEqual(report["restored_characters"], [row["character_id"]
+                                                         for row in state["characters"]])
+        self.assertEqual(len(self.site.created), 1)
+        self.assertEqual(len(self.site.dropped), 1)
+        self.assertIn(self.site.created[0].split()[2], self.site.dropped[0])
+
+
 if __name__ == "__main__":
     unittest.main()
