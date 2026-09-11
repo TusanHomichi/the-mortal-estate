@@ -137,7 +137,15 @@ fn jumpkick_at_distance_then_fight_on_shared_hex() {
             ..
         }
     ));
-    engine.world_mut().actors[1].location.position = Coord { x: 1, y: 2 };
+    assert_eq!(
+        engine.world().actors[1].location,
+        engine.world().actors[0].location,
+        "the real kick must close before the next automatic decision"
+    );
+    assert!(first.iter().any(|event| matches!(
+        event,
+        Event::Moved { actor_id, .. } if actor_id == "attacker"
+    )));
     let second = wait(&mut engine);
     assert!(matches!(
         decision(&second, "attacker"),

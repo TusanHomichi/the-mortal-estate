@@ -8,7 +8,7 @@ import {combatCues,movementRoute,movementSeconds} from './motion';
 export {loadDungeonBody} from './assets';
 
 type BodyKind='fallback'|'male'|'female';
-interface Travel { points:T.Vector3[]; lengths:number[]; distance:number; started:number; seconds:number }
+interface Travel { points:T.Vector3[]; lengths:number[]; distance:number; started:number; seconds:number; clip:'walk'|'flying_kick' }
 interface Figure {
   root:T.Group;body:T.Object3D;mixer:T.AnimationMixer;label:T.Sprite;asset:FigureAsset;kind:BodyKind;
   action:T.AnimationAction;clip:string;position:Coord;travel:Travel|null;endsAt:number|null;
@@ -57,7 +57,7 @@ export class DungeonActors {
         const points=route.map(p=>new T.Vector3(p.x*TILE,0,p.y*TILE));points[points.length-1]=destination;
         const lengths=points.slice(1).map((p,i)=>p.distanceTo(points[i]!));
         figure.travel={points,lengths,distance:lengths.reduce((a,b)=>a+b,0),started:this.now(),
-          seconds:row.actor_id===self?movementSeconds(frame.logical_time,frame.ready_at):.18};
+          seconds:row.actor_id===self?movementSeconds(frame.logical_time,frame.ready_at):.18,clip:'walk'};
         figure.root.position.copy(points[0]!);figure.endsAt=null;this.play(figure,'walk');
       }else if(created||moved){figure.travel=null;figure.endsAt=null;figure.root.position.copy(destination);this.play(figure,figure.asset.idle);}
       else if(row.actor_id===self&&frame.can_act&&figure.travel){figure.travel=null;figure.root.position.copy(destination);this.play(figure,figure.asset.idle);}
@@ -71,9 +71,16 @@ export class DungeonActors {
       const cues=combatCues(events,self,active,this.punchVariation,unarmed);
       this.punchVariation=(this.punchVariation+cues.filter(c=>['jab_left','jab_right','uppercut_right','hook_left'].includes(c.clip)).length)%4;
       for(const cue of cues){const figure=this.figures.get(cue.actorId);if(!figure)continue;
+        // The accepted closing route owns the approach pose. Later defensive
+        // feedback must not turn the airborne attacker into a walking blocker.
+        if(figure.travel?.clip==='flying_kick'&&cue.clip!=='flying_kick')continue;
         const target=cue.faceActorId?this.figures.get(cue.faceActorId):null;
         if(target)this.face(figure,target.root.position.clone().sub(figure.root.position));
-        this.play(figure,cue.clip,true);
+        if(cue.clip==='flying_kick'&&figure.travel){
+          figure.travel.clip='flying_kick';
+          this.play(figure,cue.clip,true,figure.travel.seconds);
+          figure.endsAt=figure.travel.started+figure.travel.seconds*1000;
+        }else this.play(figure,cue.clip,true);
       }
     }
     this.sequence=snapshot.envelope.server_sequence;
@@ -81,21 +88,20 @@ export class DungeonActors {
   private face(f:Figure,direction:T.Vector3):void {
     if(direction.x*direction.x+direction.z*direction.z>1e-8)f.body.rotation.y=Math.atan2(direction.x,direction.z);
   }
-  private play(f:Figure,name:string,once=false):void {
+  private play(f:Figure,name:string,once=false,onceSeconds?:number):void {
     if(!once&&f.clip===name)return;
     const clip=f.asset.clips.find(c=>c.name===name);if(!clip)throw Error(`Required dungeon clip unavailable: ${name}.`);
     const next=f.mixer.clipAction(clip);const previous=f.action;
     next.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).setLoop(once?T.LoopOnce:T.LoopRepeat,once?1:Infinity);
     next.clampWhenFinished=once;next.play();
     if(previous!==next)next.crossFadeFrom(previous,.12,false);
-    if(once){const seconds=Math.min(clip.duration,1.5);next.setDuration(seconds);f.endsAt=this.now()+seconds*1000;}
+    if(once){const seconds=onceSeconds??Math.min(clip.duration,1.5);next.setDuration(seconds);f.endsAt=this.now()+seconds*1000;}
     else f.endsAt=null;
     f.action=next;f.clip=name;
   }
   update(dt:number):void {
     const now=this.now();
     for(const f of this.figures.values()){
-      if(f.endsAt!==null&&now>=f.endsAt)this.play(f,f.travel?'walk':f.asset.idle);
       const travel=f.travel;
       if(travel){
         const progress=Math.min(1,Math.max(0,(now-travel.started)/(travel.seconds*1000)));let remaining=progress*travel.distance;
@@ -113,6 +119,7 @@ export class DungeonActors {
         }
         if(progress===1){f.root.position.copy(travel.points.at(-1)!);f.travel=null;if(f.endsAt===null)this.play(f,f.asset.idle);}
       }
+      if(f.endsAt!==null&&now>=f.endsAt)this.play(f,f.travel?f.travel.clip:f.asset.idle);
       f.mixer.update(dt);
     }
   }

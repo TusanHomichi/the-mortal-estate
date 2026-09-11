@@ -31,14 +31,15 @@ def cases():
 
 
 def martial_fixture(seed, player, sex):
-    """Separate stationary targets and identity variants in disposable authority only."""
-    for actor_id, y in [("motion_target", 9), ("motion_fist", 8)]:
+    """Colocated stationary targets allow a follow-up punch even after a fatal kick."""
+    for actor_id, y in [("motion_target", 9), ("motion_fist", 9)]:
         target = copy.deepcopy(next(a for a in seed["actors"] if a["id"] == "lodge_keeper"))
         target.update(id=actor_id, location=location("d1_entry", 25, y))
         seed["actors"].append(target)
     player["character"]["identity"].update(base_class_id="martial_artist",
         current_class_id="martial_artist", display_class="Martial Artist", sex_or_gender_display=sex)
     player["character"]["skill_ledger"] = [s for s in player["character"]["skill_ledger"] if s["track_id"] == "hand"]
+    next(s for s in player["character"]["skill_ledger"] if s["track_id"] == "hand")["level"] = 6
     # Retain the inventory while freeing the attacking hand.
     next(i for i in player["carried"]["items"] if i["position"] == "right_hand")["position"] = "sack_item_2"
 

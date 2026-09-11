@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-11
-revision: 59
-status: Controlled Martial Artist bodies, shared combat and walking variants verified in all three native browsers.
+revision: 60
+status: Closing-kick source patch added to previously verified martial motion; configured proof passes, native motion acceptance pending.
 public_safe: true
-summary: Shared world shell, dungeon martial bodies and motion, retained pixel interiors and release-bound browser proof.
+summary: Shared world shell, authoritative closing-kick playback, retained pixel interiors and release-bound browser proof.
 routes:
   - web/**
   - tools/run_pixel_temple.py
@@ -34,7 +34,7 @@ for deployment and work status.
 | Town and interior pixel art | `web/src/play/pixelRenderer.ts`, `pixelOverlays.ts`, `pixelPacket.ts`, `pixelGeometry.ts`, `pixelMotion.ts` | `web/tests/pixelPacket.test.ts`, `web/tests/pixelMotion.test.ts`, `web/proof/pixel-temple-proof.mjs` |
 | Pixel composition and atmosphere | `web/src/play/pixelCompositor.ts`, `pixelEffects.ts`, `pixelEffectsShader.ts`, `pixelEffectsConfig.ts` | `web/proof/pixel-effects-proof.mjs`, native exterior/temple walks, sustained crowd proof |
 | Live dungeon rendering | `web/src/play/worldRenderer.ts`, `dungeon/` | `web/tests/dungeonRenderer.test.ts`, `web/proof/dungeon-proof.mjs` |
-| Dungeon character motion | `web/src/play/dungeon/actors.ts`, `assets.ts`, `motion.ts` | `web/tests/dungeonActors.test.ts`, `web/tests/dungeonMotion.test.ts`, `web/proof/dungeon-motion-proof.mjs` |
+| Dungeon character motion | `web/src/play/dungeon/actors.ts`, `assets.ts`, `motion.ts` | `web/tests/dungeonActors.test.ts`, `web/tests/dungeonMotion.test.ts`, `web/tests/dungeonJumpkick.test.ts`, `web/proof/dungeon-motion-proof.mjs` |
 | Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
 | Retired 3D packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
 | Retired local movement | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
@@ -125,8 +125,11 @@ the existing candidate. Missing, stale or unbound required clips refuse loading.
 
 Only new accepted state updates supply motion cues; welcome and command replies
 cannot replay attacks. Confirmed unarmed fight outcomes rotate four punches;
-jumpkick plays the flying kick in place. Blocked melee feedback supplies a cover
-pose without claiming which defense absorbed the blow. No-sight, not-ready and
+jumpkick selects the flying kick. When that accepted update also supplies a complete
+movement chain, the kick clip spans its bounded approach interval and returns to
+guard at landing. Later cover cues cannot overwrite a still-moving kick. Blocked
+melee feedback otherwise supplies a cover pose without claiming which defense
+absorbed the blow. No-sight, not-ready and
 ranged block outcomes supply no combat clip. Reactions expire on elapsed local
 time, including hidden-tab time, without granting readiness or creating damage.
 
@@ -137,9 +140,14 @@ as movement; paired doors and other transitions retain snap placement. Remaining
 authoritative time bounds visual travel; a ready
 frame ends it. The fixed-direction camera follows the rendered observer anchor.
 Incomplete chains and area transitions snap to supplied placement.
-The intended distance-closing flying kick remains gameplay work; this renderer
-cannot invent its movement. The [motion record](plans/2026-09-10-martial-motion-integration.md)
-owns native evidence and remaining limitations.
+The [gameplay baseline](gameplay-baseline.md#closing-jumpkick-implementation-specification)
+owns closing-kick legality and immediate resolution; the renderer never invents
+displacement or delays damage until its clip completes. A missing or partial chain
+snaps to authoritative placement and permits only the local combat clip. The
+[closing-kick record](plans/2026-09-10-closing-jumpkick.md) tracks pending proof for
+this source patch, including exact takeoff/impact phase alignment. The earlier
+[motion record](plans/2026-09-10-martial-motion-integration.md) is evidence for the
+prior in-place integration, not proof of the new approach.
 
 The observer can open their own actor menu to use an enabled server-offered stair
 action, including a landing directly on stairs. Observed stair markers and door
