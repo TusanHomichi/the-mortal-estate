@@ -144,9 +144,19 @@ class ProvisioningEnvironment(unittest.TestCase):
         self.provision()
         self.assertEqual(dict(os.environ), before)
 
-    def test_the_neighbouring_environment_is_preserved(self) -> None:
-        """The denylist fix must not disturb database or credential wiring."""
-        server = self.provision()
+    def test_provisioning_adds_the_scratch_url_only_to_the_offline_children(self) -> None:
+        """The denylist fix must not disturb database or credential wiring.
+
+        The served environment is built with `**os.environ`, so an inherited
+        `DATABASE_URL` would survive into it and this case would otherwise be
+        asserting a property of the ambient shell rather than of provisioning.
+        Control the parent environment, and state the claim precisely: the
+        harness *adds* the scratch URL to the offline commands and does not add it
+        to the served process, which reads it from its credential directory.
+        """
+        with patch.dict(os.environ):
+            os.environ.pop("DATABASE_URL", None)
+            server = self.provision()
         children = self.children()
         for name in ("migrate", "account create", "bootstrap verify"):
             self.assertEqual(
@@ -155,13 +165,32 @@ class ProvisioningEnvironment(unittest.TestCase):
                 f"{name} must still receive the scratch database URL",
             )
         served = children["serve"]
-        self.assertIsNotNone(served.get("CREDENTIALS_DIRECTORY"))
-        self.assertNotIn(
-            "DATABASE_URL",
-            served,
+        self.assertNotEqual(
+            served.get("DATABASE_URL"),
+            server.database_url,
             "the served process reads its database URL from the credential directory",
         )
+        self.assertIsNotNone(served.get("CREDENTIALS_DIRECTORY"))
         self.assertEqual(served.get("TME_PUBLIC_ORIGIN"), server.origin)
+
+    def test_an_inherited_database_url_is_not_overwritten(self) -> None:
+        """Inheritance is passed through unchanged; only the scratch URL is new.
+
+        Recorded as current behavior rather than endorsed: the harness does not
+        strip an inherited value, and nothing here asks it to. If that becomes a
+        desired behavior it is a separate decision with its own coverage.
+        """
+        inherited = "postgresql://inherited@127.0.0.1:5432/inherited"
+        with patch.dict(os.environ, {"DATABASE_URL": inherited}):
+            server = self.provision()
+        children = self.children()
+        self.assertEqual(children["serve"].get("DATABASE_URL"), inherited)
+        for name in ("migrate", "account create", "bootstrap verify"):
+            self.assertEqual(
+                children[name].get("DATABASE_URL"),
+                server.database_url,
+                f"{name} must still prefer the scratch database URL",
+            )
 
 
 if __name__ == "__main__":
