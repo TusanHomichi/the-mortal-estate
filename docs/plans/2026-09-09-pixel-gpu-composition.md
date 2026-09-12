@@ -11,7 +11,7 @@ summary: GPU-resident colour and lighting composition removes sustained full-fra
 This Planning and Execution record owns the owner-authorized GPU compositor
 cutover following the [sustained crowd measurements](2026-09-09-pixel-performance.md#sustained-crowd-follow-up).
 [Client architecture](../client-architecture.md) owns the standing boundary and
-[browser client](../browser-client.md#pixel-rendering-performance) the implemented
+[browser client](../browser-client.md#pixel-art-presentation) the implemented
 pipeline. Artwork, geography, authoritative movement, resident services and
 atmosphere equations retain their existing owners.
 

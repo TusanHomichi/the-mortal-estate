@@ -11,7 +11,7 @@ function asset(idle='guard'):FigureAsset {
   ]));
   return {scene,clips,idle,stride:1};
 }
-function assets():DungeonAssets{return {fallback:asset('idle'),male:asset(),female:asset()};}
+function assets():DungeonAssets{return {fallback:asset('idle'),male:asset(),female:asset(),tomas:asset('idle'),balm_seller:asset('idle')};}
 const place=(x:number)=>({realm:'test',level:'d1_entry',position:{x,y:0}});
 function move(x:number){return {kind:'actor_moved',actor_id:'self',from:place(x),to:place(x+1),navigation:'walk'};}
 function hit(mode='jumpkick',outcome='hit',source='self',target='target'){

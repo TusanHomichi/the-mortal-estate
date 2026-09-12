@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-12
-revision: 7
+last_updated: 2026-09-13
+revision: 8
 status: Standing verification usage with explicit served-proof prerequisites and observable owned-resource cleanup.
 public_safe: true
-summary: Lane usage, served-proof prerequisites, shared browser roster, owned-resource cleanup, exit codes and receipts.
+summary: Lane usage, served-proof prerequisites, browser roster, owned-resource cleanup and current reference-tool routing.
 routes:
   - tools/run_verification.py
   - tools/verification/**
@@ -163,7 +163,7 @@ roster through native WSS, exact replay, GPU/raycast correspondence, and the
 Workbench HTTP operation. It requires PostgreSQL and every rostered browser;
 missing capabilities are unavailable. Neither lane grants visual acceptance. Candidate-packet
 walk and screenshot commands, and their external inputs, are documented in
-[browser client](browser-client.md#operation-and-proof).
+[browser reference tools](browser-reference-tools.md#operation-and-proof).
 
 ## Process lifetime
 

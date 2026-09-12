@@ -35,8 +35,8 @@ is the
 For what the browser implements now, read
 [browser client](docs/browser-client.md);
 [presentation direction](docs/presentation-direction.md) owns the accepted target.
-[Pixel-art production](docs/pixel-art-production.md) records provenance and
-rendering techniques for the retained town and interior assets.
+[Pixel-art production](docs/pixel-art-production.md) retains historical asset
+provenance; the current presentation direction moves the full world to 3D.
 
 ## Working here
 

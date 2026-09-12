@@ -1,5 +1,5 @@
 // Native entry flow, recovered allocation constraints, and durable creation.
-// Runs only against a disposable authority supplied by the pixel proof harness.
+// Runs only against a disposable authority supplied by the world proof harness.
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
 import { launchProofBrowser, PROOF_ENGINES } from "./serve.mjs";

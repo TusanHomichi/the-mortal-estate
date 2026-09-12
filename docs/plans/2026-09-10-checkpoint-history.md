@@ -221,7 +221,7 @@ Water issue #48 remains open; no artwork master is accepted.
   private lore reconciliation and the expanded candidate: ten enterable service
   interiors, the lodge locker room, central bank and sheriff, trainer spaces and
   the temple descent. The browser owner defines the required
-  [floor openings](../browser-client.md#candidate-ground-verdicts). Native entry/return and final visual review
+  [floor openings](../browser-reference-tools.md#candidate-ground-verdicts). Native entry/return and final visual review
   passed in the shared Chromium, Firefox and WebKit roster. Subsequent service
   mechanics and the dungeon destination belong to the expedition record. The
   owner explicitly designated all current interiors as

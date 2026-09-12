@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-11
-revision: 8
+last_updated: 2026-09-13
+revision: 9
 status: Private preview refresh follows standing latest-build authorization; matching releases and preserved-state proof remain required.
 public_safe: true
-summary: Isolated services, latest-build preview operation, bound raster and dungeon mesh releases, UI proof and recovery.
+summary: Isolated services, bound 3D scenery and figure releases, preserved-state preview refresh, UI proof and recovery.
 ---
 
 # Private development server
@@ -78,15 +78,15 @@ addition to the world and ports. Schema 1 is refused. For a local diagnostic
 installation use the example's localhost origin and null assets. For an
 owner-authorized remote preview, use its canonical HTTPS origin, the first
 expedition world document, and the absolute external candidate-packet directory.
-The `pixel-manifest.json` packet must match the browser's `pixelReceipt.json`. Staging copies only the
-manifest and its verified asset references into the immutable browser release;
-private source files and unrelated packet files are excluded. That raster receipt
-admits only PNGs. The separate `web/src/play/dungeon/receipt.json` binds the
-self-contained dungeon body and motion GLBs, which are copied and verified in
-the same release. The browser is built in fixed `world` mode; retired `pixel-art`
-mode is refused. Root and direct index entries use the same area-selected world
-renderer without a query parameter. The actual server supplies every area,
-resident, service and transition; the preview is not a local movement scene.
+The source-owned `web/src/play/settlementReceipt.json` and
+`web/src/play/dungeon/receipt.json` pin the self-contained scenery, character and
+motion GLBs. `presentation_files` validates both sets before staging, including
+path containment, symlink refusal, duplicate identity and digest checks. Staging
+copies only these pinned GLBs; no raster manifest, PNG, private source file or
+unrelated packet file is copied. The browser uses fixed `world` mode and one 3D
+renderer for every area. Obsolete build modes and query selectors cannot select
+a pixel or diagnostic renderer. Actual server frames supply residents, services,
+movement and transitions.
 
 The operator's existing TLS reverse proxy forwards the public host and WebSocket
 upgrade to the loopback frontend. The sign-in page and its client/artwork assets are reachable at that origin.

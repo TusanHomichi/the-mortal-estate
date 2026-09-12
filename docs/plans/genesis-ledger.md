@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-13
-revision: 96
+revision: 97
 status: Restore and proof lifecycle hardening verified; delivery and saved-state preview activation are bound to the linked PR and private installation receipts.
 public_safe: true
 summary: Verified restore and cleanup continuation, martial gameplay delivery, receipt ownership and remaining owner gates.
@@ -29,6 +29,12 @@ owner's and are numbered by the phase they guard.
 ## Current checkpoint
 
 Updated 2026-09-13.
+
+**Active presentation dispatch:** the owner directed full 3D town and interiors,
+including the character model, using the dungeon and Martial Artist foundation.
+The [world cutover record](2026-09-13-full-world-3d.md) owns the implementation,
+proof, preview refresh and cleanup now in progress. The temporary pixel retention
+in the earlier live-dungeon delivery is superseded by this direction.
 
 **Current delivery:** the owner dispatched the restore-drill continuation, shared
 test-server cleanup, block-capture assertions, Git delivery and save-preserving

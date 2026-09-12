@@ -8,7 +8,7 @@ function asset(idle='guard'):FigureAsset {
  const clips=[...new Set([...COMBAT_CLIPS,idle])].map(name=>new T.AnimationClip(name,1,[new T.NumberKeyframeTrack('root.position[x]',[0,1],[0,.1])]));
  return {scene,clips,idle,stride:1};
 }
-function assets():DungeonAssets{return {fallback:asset('idle'),male:asset(),female:asset()};}
+function assets():DungeonAssets{return {fallback:asset('idle'),male:asset(),female:asset(),tomas:asset('idle'),balm_seller:asset('idle')};}
 function snapshot(sequence='1',o:{x?:number;y?:number;sex?:string|null;events?:unknown[];ready?:boolean;kind?:string}={}):Snapshot {
  const position={realm:'test',level:'d1_entry',position:{x:o.x??0,y:o.y??0}};
  return {generation:Number(sequence),raw:'',envelope:{kind:o.kind??'state_update',server_sequence:sequence,world_revision:sequence,static_scene_context:{},events:o.events??[],frame:{
@@ -21,9 +21,20 @@ function moved(from:{x:number;y:number},to:{x:number;y:number}){return {kind:'ac
 function canvas(){vi.stubGlobal('document',{createElement:()=>({width:0,height:0,getContext:()=>({fillText:()=>{}})})});}
 afterEach(()=>vi.unstubAllGlobals());
 describe('dungeon shared character playback',()=>{
- it('uses actual controlled class/sex and an explicit provisional default',()=>{
+ it('animates existing non-martial characters and residents through the same accepted route seam',()=>{
+ canvas();let now=0;const a=new DungeonActors(assets(),()=>now);let s=snapshot();
+ s.envelope.frame.character.identity.base_class_id='fighter';a.present(s.envelope.frame,s);
+ s=snapshot('2',{x:1,y:1,events:[moved({x:0,y:0},{x:0,y:1}),moved({x:0,y:1},{x:1,y:1})]});
+ s.envelope.frame.character.identity.base_class_id='fighter';a.present(s.envelope.frame,s);now=1500;a.update(.01);
+ expect(a.diagnostics()).toMatchObject([{body:'male',clip:'walk',moving:true}]);
+ expect(a.anchor('self')!.x).toBeCloseTo(0);expect(a.anchor('self')!.y).toBeCloseTo(1);
+ s=snapshot('3',{ready:true});s.envelope.frame.actors.push({...s.envelope.frame.actors[0]!,actor_id:'tomas'});a.present(s.envelope.frame,s);
+ expect(a.diagnostics()).toContainEqual(expect.objectContaining({id:'tomas',body:'tomas',clip:'idle'}));a.dispose();
+ });
+ it('uses selected sex for every player class and an explicit provisional default',()=>{
  expect(observerBody(snapshot())).toBe('male');expect(observerBody(snapshot('1',{sex:'Female'}))).toBe('female');
- const s=snapshot();s.envelope.frame.character.identity.base_class_id='fighter';expect(observerBody(s)).toBe('fallback');
+ const s=snapshot();s.envelope.frame.character.identity.base_class_id='fighter';expect(observerBody(s)).toBe('male');
+ s.envelope.frame.character.identity.sex_or_gender_display='female';expect(observerBody(s)).toBe('female');
  });
  it('refuses missing, duplicate and unbound clips',()=>{
  const a=asset();assertFigureClips(a.scene,a.clips,COMBAT_CLIPS);

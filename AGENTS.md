@@ -41,7 +41,7 @@ operating rules; detailed workflow and verification usage have linked owners.
   before handing off.
 
 **Stack:** Rust for rules, protocol, simulation, authoring, and one
-PostgreSQL-backed server; TypeScript with Three.js dungeon rendering and retained GPU-composited pixel town/interiors, Canvas 2D asset preparation and WebGL effects for the browser client (under the [visual ruling](docs/presentation-direction.md#3d-reopening)); Tauri
+PostgreSQL-backed server; TypeScript with Three.js world and character rendering, Canvas 2D material and label preparation for the browser client (under the [visual ruling](docs/presentation-direction.md#3d-reopening)); Tauri
 for its ruled desktop shell; Python for checks and tools. Widening it needs an
 owner decision. Keep adjustable facts in validated content and each mutation in its
 owning boundary.
@@ -82,8 +82,9 @@ when the task needs their evidence. Keep machine setup and session logs local.
 | [docs/server-notes.md](docs/server-notes.md) | server, persistence, credentials, migrations, the external boundary |
 | [docs/client-architecture.md](docs/client-architecture.md) | the client's standing contract |
 | [docs/browser-client.md](docs/browser-client.md) | browser source map, movement, rendering, packet and proof contracts |
+| [docs/browser-reference-tools.md](docs/browser-reference-tools.md) | retained local 3D study tools and historical packet/capture contracts |
 | [docs/presentation-direction.md](docs/presentation-direction.md) | the visual target |
-| [docs/pixel-art-production.md](docs/pixel-art-production.md) | pixel-art source, sprites, alpha, sampling, motion and native review |
+| [docs/pixel-art-production.md](docs/pixel-art-production.md) | historical pixel-art source, sprites, sampling and native review |
 | [docs/workbench-v0.md](docs/workbench-v0.md) | the owner-agent spatial reference tool — pointing |
 | [docs/workbench-v1.md](docs/workbench-v1.md) | the same tool's editing half — staged operations, candidates, Apply |
 | [docs/test-corpus-provenance.md](docs/test-corpus-provenance.md) | what `content/test-corpus/` is and is not |

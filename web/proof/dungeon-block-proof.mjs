@@ -31,8 +31,8 @@ try{
  page.on('console',m=>{if(/THREE.*(binding|bone|track)|No target node found/i.test(m.text()))errors.push(m.text());});
  page.on('websocket',s=>{s.on('framesent',e=>{const m=JSON.parse(String(e.payload));if(m.kind==='command')commands.push(m);});s.on('framereceived',e=>{const m=JSON.parse(String(e.payload));if(m.frame)frame=m.frame;if(m.kind==='state_update')updates.push(m);});});
  const canvas=()=>page.locator('#world-canvas');
- const motion=()=>canvas().evaluate((n,id)=>JSON.parse(n.dataset.dungeonMotions).find(m=>m.id===id),frame.observer_actor_id);
- const pose=(clips,timeout=30000)=>page.waitForFunction(({id,clips})=>clips.includes(JSON.parse(document.querySelector('#world-canvas').dataset.dungeonMotions||'[]').find(m=>m.id===id)?.clip),{id:frame.observer_actor_id,clips},{timeout});
+ const motion=()=>canvas().evaluate((n,id)=>JSON.parse(n.dataset.worldMotions).find(m=>m.id===id),frame.observer_actor_id);
+ const pose=(clips,timeout=30000)=>page.waitForFunction(({id,clips})=>clips.includes(JSON.parse(document.querySelector('#world-canvas').dataset.worldMotions||'[]').find(m=>m.id===id)?.clip),{id:frame.observer_actor_id,clips},{timeout});
  // Every combat cue naming the observed actor, with the update that carried it.
  const cues=()=>updates.flatMap((u,index)=>(u.events||[])
    .filter(e=>e.kind==='feedback'&&e.cue?.kind==='physical_combat'&&e.cue.target?.actor_id===frame.observer_actor_id)

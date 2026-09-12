@@ -12,7 +12,7 @@ This Planning and Execution record owns the September 9 performance slice.
 The subsequent [GPU composition slice](2026-09-09-pixel-gpu-composition.md) owns
 the owner-authorized follow-up and its current verification state.
 The owner requested improving performance before adding further visual features.
-[Browser client](../browser-client.md#pixel-rendering-performance) owns the
+[Browser client](../browser-client.md#pixel-art-presentation) owns the
 implemented rendering contract; [production](../pixel-art-production.md) retains
 art preparation and [presentation](../presentation-direction.md) the visual target.
 No artwork, geography, gameplay timing, runtime dependency or hosted deployment

@@ -1,21 +1,18 @@
 ---
-last_updated: 2026-09-10
-revision: 17
-status: Pixel production tools retired; retained methods document existing assets and renderer obligations.
+last_updated: 2026-09-13
+revision: 18
+status: Historical pixel production method; the full 3D cutover retires its renderer and proof tools.
 public_safe: true
 summary: Historical pixel asset preparation and proof, with current production routed to the 3D reopening.
 routes:
-  - web/src/play/pixel*.ts
-  - web/src/play/pixel*.json
-  - web/src/play/pixel*.css
-  - tools/run_pixel_temple.py
+  - docs/plans/*pixel*.md
 ---
 
 # Pixel-art production
 
 This Canonical document owns the **art-production method**. The
 [visual target](presentation-direction.md) owns aesthetic direction;
-[browser client](browser-client.md#pixel-art-presentation) owns implemented
+[browser client](browser-client.md) owns implemented
 rendering parameters and commands; the
 [transition record](plans/2026-09-08-pixel-art-transition.md) owns the cutover and
 next construction slice. Provider receipts, source images and editable candidates
@@ -26,7 +23,8 @@ remain external under the [candidate rule](presentation-direction.md#candidate-a
 The [September 10 ruling](presentation-direction.md#3d-reopening) retires new
 pixel-art production and reopens 3D. PixelLab and the installed pixel-fixer tools
 have been removed. The methods below remain a record for existing assets and
-the still-installed pixel renderer; they do not authorize reconnecting providers,
+the retired pixel renderer. The September 13 full-world 3D dispatch removes that
+renderer and its proof tools. These historical methods do not authorize reconnecting providers,
 reinstalling correction tools or generating more directional sprite sets.
 Existing source art and receipts remain external. General raster inspection,
 packing and image-generation capabilities are not retired by this decision.

@@ -1,3 +1,3 @@
 import { WorldRenderer } from './worldRenderer';
-/** One playable shell; authored dungeon areas select their 3D presentation. */
+/** One playable shell and one 3D renderer for every authored area. */
 export function createPlayRenderer(canvas:HTMLCanvasElement){return WorldRenderer.create(canvas);}

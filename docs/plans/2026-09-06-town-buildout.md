@@ -113,7 +113,7 @@ triangles. The geometry audit checks connected-component winding and proves the
 floor lies below the tactical grid. Source Blender files, exact scripts,
 retained texture inputs and audit receipts stay in the external visual lab.
 
-The [browser owner](../browser-client.md#first-expedition-presentation-study)
+The [browser owner](../browser-reference-tools.md#first-expedition-presentation-study)
 owns the separate candidate artwork receipt. This removes the initial coupling
 between a geographic review manifest and a presentation iteration. Geography
 acceptance is unchanged; asset bytes and geographic ancestry each remain
@@ -549,7 +549,7 @@ that animation system.
 The owner then identified the uniformly lit room as the next cause to correct.
 The slice includes an explicit authored interior-lighting profile, fixture-only
 key illumination and bounded practical shadows. Runtime ownership and validation
-live in the [browser contract](../browser-client.md#house-atmosphere); appearance
+live in the [browser contract](../browser-reference-tools.md#house-atmosphere); appearance
 belongs to the [source-lighting ruling](../presentation-direction.md#room-lighting-from-visible-sources).
 The low stair lantern and its hook move about four treads farther down the
 existing well, with its light anchor moved alongside it. This separates its role
@@ -611,7 +611,7 @@ The owner approved a bounded pass on floor wear, evidence of daily work, less
 orderly furnishings and gentler lantern shadows. Ancestry remains
 `ce4ea993d05576f35e99969a2e991504c9d42cd1` on carried dirty `main`. This Planning
 section owns execution evidence; [presentation direction](../presentation-direction.md#temple-material-and-framing-experiment)
-owns appearance and [browser client](../browser-client.md#house-atmosphere) owns
+owns appearance and [browser client](../browser-reference-tools.md#house-atmosphere) owns
 the explicit lighting metadata. No camera, authored geography or service rule
 changes belong to this pass.
 
