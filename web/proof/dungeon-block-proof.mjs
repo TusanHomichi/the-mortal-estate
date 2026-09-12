@@ -53,7 +53,13 @@ try{
   const after=await motion();
   assert(expected.includes(before.clip),`${name}: clip before capture was ${before.clip}, expected one of ${expected}`);
   assert(expected.includes(after.clip),`${name}: clip after capture was ${after.clip}, expected one of ${expected}`);
-  captures.push({name,clipBefore:before.clip,clipAfter:after.clip,moving:after.moving,position:frame.observation_center,...extra});
+  // Moving means the figure is travelling between tiles, so either half of the
+  // bracket would not be a settled observation of the defender's stance.
+  assert.equal(before.moving,false,`${name}: the defender was already travelling before the capture`);
+  assert.equal(after.moving,false,`${name}: the defender was travelling after the capture`);
+  const capture={name,clipBefore:before.clip,clipAfter:after.clip,movingBefore:before.moving,movingAfter:after.moving,position:frame.observation_center,...extra};
+  captures.push(capture);
+  return capture;
  }
  const requireNoCommands=()=>assert.equal(commands.length,0,`this scenario sends no command; saw ${commands.length}`);
 
@@ -74,19 +80,24 @@ try{
  if(negative){
   // Bounded window. The control is only meaningful if the same path really swung.
   await page.waitForTimeout(20000);
+  // The screenshot is asynchronous. Observe the window again after it, so a swing,
+  // block or command delivered during the capture is counted and asserted on
+  // instead of falling into the gap between a pre-capture read and the report.
+  const capture=await captureBracketed('incoming-unblocked',NOT_BLOCKING,{
+   outcome:'no block observed'});
   const all=swings();
   const blocked=blocks();
   const outcomes=[...new Set(all.map(s=>s.cue.outcome.kind))].sort();
   assert(all.length>0,`the negative control must still observe real swings from ${config.monster}`);
   assert.deepEqual(blocked,[],`an occupied right hand must produce no martial hand block; observed ${JSON.stringify(outcomes)}`);
   requireNoCommands();
-  await captureBracketed('incoming-unblocked',NOT_BLOCKING,{
-   outcome:'no block observed',outcomes,swings:all.length});
+  // The capture's counts name the same final window as the report.
+  Object.assign(capture,{outcomes,swings:all.length});
   assert.deepEqual(errors,[]);
   await writeFile(`${config.output}/${config.engine}-${config.scenario}.json`,JSON.stringify({
    verdict:'PASS',renderer:session.renderer,sex:config.sex,occupiedHand:true,
    guarantee:'the configured monster produced real swings at the controlled defender and none was reported blocked',
-   incomingSwings:all.length,outcomes,blockedCount:0,
+   incomingSwings:all.length,outcomes,blockedCount:blocked.length,
    commandsSent:commands.length,captures,errors},null,2));
   console.log(`PASS ${config.engine}/${config.scenario} (negative control: ${all.length} swings from ${config.monster}, outcomes ${outcomes.join('/')}, no block)`);
  }else{

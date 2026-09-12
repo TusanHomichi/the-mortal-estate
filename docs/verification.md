@@ -1,15 +1,18 @@
 ---
-last_updated: 2026-09-06
-revision: 5
-status: Standing verification usage with the shared three-engine browser capability.
+last_updated: 2026-09-12
+revision: 7
+status: Standing verification usage with explicit served-proof prerequisites and observable owned-resource cleanup.
 public_safe: true
-summary: Lane usage, shared browser roster, native capability evidence, gated capture, exit codes and receipts.
+summary: Lane usage, served-proof prerequisites, shared browser roster, owned-resource cleanup, exit codes and receipts.
 routes:
   - tools/run_verification.py
   - tools/verification/**
   - tools/run_rust_tests.py
   - tools/run_clean_clone_proof.py
   - tools/run_server_live_proof.py
+  - tools/run_restore_drill_proof.py
+  - tools/restore_drill_installation.py
+  - tests/test_restore_drill_proof.py
   - tools/live_wire_client.py
   - tools/logout_proof.py
   - tools/run_browser_capture_proof.py
@@ -78,8 +81,9 @@ is the `web` scope. The retired `client` scope is refused.
 **UNAVAILABLE is never PASS.** A step whose capability is absent does not run,
 is reported with the reason, and makes the whole run incomplete. `--allow-unavailable`
 turns 3 into 0 and is how a caller declares out loud that it cannot supply what
-is missing — CI passes it, because CI has no database or
-private denylist. It is a stated limit, not a skip.
+is missing — CI passes it because it has no configured scratch-database
+administrator or private denylist. Installed PostgreSQL binaries alone do not
+supply either input. It is a stated limit, not a skip.
 
 ## Capabilities
 
@@ -88,9 +92,15 @@ private denylist. It is a stated limit, not a skip.
 | `browsers` | installed Playwright engines from `web/proof/engines.json`; the actual capture still probes and requires working WebGL2 renderers |
 | `node` | a `node` on `PATH` whose major version is 22 or later, plus `npm` — asked, never assumed. Absent, the `web` lane is `UNAVAILABLE` |
 | `postgres` | `TME_PG_ADMIN_URL_FILE`, naming a readable file holding a superuser URL used only to create and drop scratch databases, plus `psql` |
+| `postgres-server` | a PostgreSQL server installation: `psql` plus `initdb`, `pg_ctl`, `pg_dump` and `pg_restore` in one bin directory (`pg_config --bindir` when available); the restore-drill proof creates its own scratch cluster with it |
 | `private-terms` | the private file resolved by `tools/boundary_common.py` (this checkout first, then its main checkout for a linked worktree). Absent, the banned-terms check **degrades** onto the tracked synthetic fixture: the mechanism still runs and still must pass, and the run says the real denylist was not proven |
 | `feel-assets` | `TME_FEEL_ASSETS`, an absolute candidate-packet directory outside the checkout |
 | `capture-output` | `TME_CAPTURE_OUTPUT`, naming a directory |
+
+Served-world proofs require `private-terms` as well as their database and browser
+capabilities. Missing private terms make those proofs unavailable before launch;
+the boundary mechanism's separate synthetic-fixture degradation does not satisfy
+the served world's input requirement.
 
 ## Historical baseline, 2026-08-20
 
@@ -112,6 +122,7 @@ The live server wire proof is part of `gated`, with a scratch PostgreSQL databas
 
 ```bash
 python3 tools/run_server_live_proof.py --admin-url-file <file>
+python3 tools/run_restore_drill_proof.py
 python3 tools/run_presentation_adoption_recording.py \
   --admin-url-file <file> --output <directory>
 python3 tools/workbench/serve.py
@@ -121,6 +132,24 @@ python3 tools/workbench_demo.py
 The observer recorder consumes the real TLS/WebSocket frame and validates its
 semantic barrier. It does not render a client. Old Godot launch, capture, and
 `--godot` arguments are retired, with no compatibility aliases.
+
+`tools/run_restore_drill_proof.py` takes no cluster: its
+`tools/restore_drill_installation.py` owner creates and owns its own
+`initdb` cluster under a temporary root, on a reserved port, with the socket beside
+it, and provisions the installation in the deployment's own order. Nothing outside
+that root is contacted, so no existing database or role can be reached or altered.
+It creates a character through the runtime flow and drives the deployment's real
+`backup()` and `restore_drill()`. It proves preservation including a saved position
+reached by playing; a commit landing inside the exported snapshot its writer is held
+until; a same-count substitution refused by name; and a drill whose own scratch
+database cannot be dropped still reporting the preservation failure, the cleanup
+failure and the database's name. Its evidence is recorded in the
+[restore-drill execution record](plans/2026-09-11-restore-drill-preservation.md).
+The installation owner confirms cluster shutdown before the launcher can remove
+its temporary root. An unconfirmed shutdown or failed directory removal is a
+reported proof failure naming the retained location; an earlier proof error stays
+attached. Shared live-server teardown follows the
+[server resource-lifetime contract](server-notes.md#live-proof-resource-lifetime).
 
 `tools/run_production_smoke.py` exercises a **deployed** host through public
 HTTPS/WebSocket. It needs a running deployment and is not part of any lane.

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-11
-revision: 94
-status: Four-floor baseline with merged closing-jumpkick and martial-defense slices, verified shared martial motion integration, and authorized Git delivery.
+last_updated: 2026-09-13
+revision: 96
+status: Restore and proof lifecycle hardening verified; delivery and saved-state preview activation are bound to the linked PR and private installation receipts.
 public_safe: true
-summary: Current delivery, martial motion integration, maintenance audit and owner gates; earlier checkpoints are linked history.
+summary: Verified restore and cleanup continuation, martial gameplay delivery, receipt ownership and remaining owner gates.
 ---
 
 # The genesis ledger
@@ -28,7 +28,14 @@ owner's and are numbered by the phase they guard.
 
 ## Current checkpoint
 
-Updated 2026-09-11.
+Updated 2026-09-13.
+
+**Current delivery:** the owner dispatched the restore-drill continuation, shared
+test-server cleanup, block-capture assertions, Git delivery and save-preserving
+preview refresh end to end. The [closeout record](2026-09-12-proof-preview-closeout.md)
+owns PR #67, issues #49/#60/#66, current proof and activation receipts. The earlier
+repository audit is delivered; Vitest #56 and geometry-migration #54 remain
+separate follow-ups. This delivery changes no gameplay timing or authored geometry.
 
 **Closing jumpkick and martial defense:** [PR #58](https://github.com/TusanHomichi/the-mortal-estate/pull/58)
 merged as `e7ca8d8`, and [PR #59](https://github.com/TusanHomichi/the-mortal-estate/pull/59)
@@ -70,10 +77,11 @@ receives, and [PR #63](https://github.com/TusanHomichi/the-mortal-estate/pull/63
 controlled the parent environment in that coverage. These are harness fixes; they
 change no gameplay, protocol or content.
 
-PR #59 changes the authoritative content digest. Synchronizing source did **not**
-activate it: the installed preview, its database and its saved characters were
-left untouched, and a later deployment needs the save-preserving offline cutover
-owned by [server notes](../server-notes.md#offline-content-cutover).
+PR #59 changes the authoritative content digest. At the September 12 entry
+assessment, source synchronization had left the earlier preview and its saves
+untouched. The current [closeout record](2026-09-12-proof-preview-closeout.md)
+routes the subsequent activation receipts; the required save-preserving offline
+cutover remains owned by [server notes](../server-notes.md#offline-content-cutover).
 
 **Live dungeon continuation:** all four existing dungeon floors now have a
 playable 3D view on the private preview, retaining town/temple presentation. The
@@ -105,10 +113,9 @@ traversal. [Issue #54](https://github.com/TusanHomichi/the-mortal-estate/issues/
 tracks populated spatial-state proof and terrain usability before another
 geometry-changing migration. An open issue does not dispatch that migration.
 
-**Current maintenance slice:** the owner requested a repository, code and
-agent-context audit after the merge. The
-[audit record](2026-09-10-repository-audit.md) owns its scope, findings and proof;
-this request does not resume presentation implementation.
+**Delivered maintenance audit:** the
+[audit record](2026-09-10-repository-audit.md) owns its findings and proof;
+the current bounded continuation is linked above.
 
 **Separate stop line:** the presentation-adoption experiment remains before P1;
 remaining identity-proof slices are undispatched. Active browser work does not

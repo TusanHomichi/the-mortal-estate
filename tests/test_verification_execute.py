@@ -10,14 +10,16 @@ from __future__ import annotations
 
 import io
 import subprocess
+import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
+from pathlib import Path
 from unittest.mock import patch
 
 from verification_test_support import REPO_ROOT  # noqa: F401  (path setup)
 
-from verification import capabilities, execute
+from verification import capabilities, execute, table
 from verification.model import (
     CapabilityState,
     EXIT_FAILED,
@@ -78,6 +80,120 @@ class NodeCapability(unittest.TestCase):
             state = capabilities.BY_NAME["node"].evaluate({"PATH": "/fake"})
         self.assertTrue(state.available, state.reason)
         self.assertIn("npm", state.reason)
+
+
+class PostgresServerCapability(unittest.TestCase):
+    """The installation's own cluster binaries, which a URL file does not imply.
+
+    The restore-drill proof creates and runs its own scratch cluster, so `psql` and
+    a superuser URL are not enough to gate it.
+    """
+
+    #: What a bin directory must hold besides `psql`.
+    BINARIES = ("initdb", "pg_ctl", "pg_dump", "pg_restore")
+
+    def installed(self, directory: str, *names: str) -> Path:
+        """A bin directory holding the named regular files, as an installation does."""
+        for name in names:
+            (Path(directory) / name).write_text("")
+        return Path(directory)
+
+    @contextmanager
+    def probing(self, bindir: Path, version: FakeCompleted | None = None):
+        """The paths a probe finds, and what `initdb --version` answers."""
+        reported = FakeCompleted(stdout="initdb (PostgreSQL) 18.0\n") if version is None else version
+
+        def which(name: str, **_kwargs) -> str:
+            return str(bindir / name)
+
+        def run(argv, **_kwargs):
+            if argv[-1] == "--version":
+                return reported
+            return FakeCompleted(stdout=f"{bindir}\n")
+
+        with (
+            patch.object(capabilities.shutil, "which", side_effect=which),
+            patch.object(capabilities.subprocess, "run", side_effect=run),
+        ):
+            yield
+
+    def test_postgres_server_is_a_reported_capability(self) -> None:
+        self.assertIn("postgres-server", capabilities.BY_NAME)
+
+    def test_a_server_installation_makes_the_capability_available(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            bindir = self.installed(directory, "psql", *self.BINARIES)
+            with self.probing(bindir):
+                state = capabilities.BY_NAME["postgres-server"].evaluate({"PATH": "/fake"})
+        self.assertTrue(state.available, state.reason)
+        self.assertIn(str(bindir), state.reason)
+
+    def test_psql_off_path_makes_the_capability_unavailable(self) -> None:
+        with patch.object(capabilities.shutil, "which", return_value=None):
+            state = capabilities.BY_NAME["postgres-server"].evaluate({"PATH": "/fake"})
+        self.assertFalse(state.available)
+        self.assertIn("psql is not on PATH", state.reason)
+
+    def test_a_missing_server_binary_makes_the_capability_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            bindir = self.installed(directory, "psql", *self.BINARIES)
+            (bindir / "pg_ctl").unlink()
+            with self.probing(bindir):
+                state = capabilities.BY_NAME["postgres-server"].evaluate({"PATH": "/fake"})
+        self.assertFalse(state.available)
+        self.assertIn("pg_ctl", state.reason)
+        self.assertIn("a PostgreSQL server installation is required", state.reason)
+
+    def test_an_initdb_that_cannot_report_its_version_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            bindir = self.installed(directory, "psql", *self.BINARIES)
+            with self.probing(bindir, version=FakeCompleted(returncode=1)):
+                state = capabilities.BY_NAME["postgres-server"].evaluate({"PATH": "/fake"})
+        self.assertFalse(state.available)
+        self.assertIn("could not report its version", state.reason)
+
+
+class ServedProofPrerequisites(unittest.TestCase):
+    """A capable PostgreSQL host can still lack the served world's private input."""
+
+    KEYS = (
+        "gated.restore_drill", "gated.live_wire", "gated.browser_capture",
+        "capture.presentation_adoption",
+    )
+
+    def execute_step(self, key, *, private_terms):
+        states = {
+            name: CapabilityState(name, True, "present")
+            for name in (*capabilities.BY_NAME, "capture-output")
+        }
+        states["private-terms"] = CapabilityState(
+            "private-terms", private_terms, "private denylist is absent")
+        runner = fake_runner({})
+        with redirect_stdout(io.StringIO()):
+            verdict = execute.execute(
+                [table.STEPS[key]], runner=runner, states=states,
+                environ={"PATH": "/usr/bin", "TME_PG_ADMIN_URL_FILE": "/private/admin-url",
+                         "TME_CAPTURE_OUTPUT": "/private/captures"})
+        return verdict, runner.calls
+
+    def test_missing_private_terms_prevent_every_served_proof_from_launching(self):
+        for key in self.KEYS:
+            with self.subTest(step=key):
+                verdict, calls = self.execute_step(key, private_terms=False)
+                self.assertEqual(calls, [])
+                self.assertEqual(verdict.outcomes[0].status, "UNAVAILABLE")
+                self.assertIn("private denylist is absent", verdict.outcomes[0].detail)
+                self.assertFalse(verdict.complete)
+                self.assertEqual(verdict.exit_code(allow_unavailable=False), EXIT_INCOMPLETE)
+                self.assertEqual(verdict.exit_code(allow_unavailable=True), EXIT_OK)
+
+    def test_supplied_private_terms_allow_the_actual_commands_to_run(self):
+        for key in self.KEYS:
+            with self.subTest(step=key):
+                verdict, calls = self.execute_step(key, private_terms=True)
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0][:2], list(table.STEPS[key].argv[:2]))
+                self.assertTrue(verdict.complete)
 
 
 class UnavailableIsNeverPass(unittest.TestCase):
