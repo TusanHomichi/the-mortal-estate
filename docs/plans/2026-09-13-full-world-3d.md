@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-13
 revision: 1
-status: Dispatched; implementation and native proof in progress.
+status: Full-world 3D implementation and regression coverage complete; PR and installation receipts own verification and delivery outcomes.
 public_safe: true
 summary: Atomic full-world Three.js cutover, current-map candidate scenery, shared figures, proof and preview delivery.
 ---
@@ -49,7 +49,47 @@ behavior, then remove only task-owned scratch resources and delivered branches.
 
 ## Evidence and findings
 
-Implementation and proof are pending. No pass or deployment is claimed here yet.
-Existing [town visibility #69](https://github.com/TusanHomichi/the-mortal-estate/issues/69)
-and [dungeon pose overlap #68](https://github.com/TusanHomichi/the-mortal-estate/issues/68)
-require observed resolution or a durable remaining finding at closeout.
+The implementation starts from main `0c72b4ce17557bc92537fdfeb4f52f4ee902beb2`.
+One Three.js renderer now owns all twelve authored areas. Original modeled
+exteriors are rebound to current footprints and entrances; original room models
+and resident rigs are reused. Both martial player bodies retain their bound
+walk and combat clips. The deployment packet contains only the 25 receipt-bound
+GLBs. The server binary and all authored content remain unchanged.
+
+[PR #70](https://github.com/TusanHomichi/the-mortal-estate/pull/70) owns exact
+source-verification, native browser, CI, merge and cleanup outcomes. Immutable
+release and activation receipts in the private installation own the deployed
+file map and save-conservation result. This avoids a changing document becoming
+a competing installation receipt. Source merge alone proves no deployment or
+visual acceptance; private paths, credentials and captures remain outside Git.
+
+The native matrix covers all seven town entrances, all four dungeon floors,
+both bodies walking through temple/town and returning, resident services,
+entry/creation, doors, stairs, real combat, both defender bodies and the
+occupied-hand negative control. Installed inspection admits all three existing
+characters across the browser roster, reconnects at the same position and logs
+out with zero gameplay commands. The linked PR records observed outcomes.
+
+Visual review caught two distinct occlusion causes. Per-mesh opacity compounded
+through overlapping roof pieces; a nearest-surface depth pass makes them blend
+once. The retired soft-shadow alias then changed the renderer's shadow sampler
+mode on refresh, while repeated cached frames could skip that normalization.
+This produced GPU draw errors and missing buildings. The renderer now uses the
+supported settlement shadow mode. Native GPU proof passes in all three engines
+for overlapping geometry, cached lit frames, restored opacity and resource
+cleanup; the retired-mode negative control produces the expected GPU failure.
+Live proof now collects GPU console errors as well as JavaScript errors.
+
+Proof setup retains the fixture's original class when selecting a body variant.
+Walking captures use a complete three-step accepted route and check the pose on
+both sides of capture. Resident-menu proof clicks the actual visible button
+position while the live feed refreshes its rows, then checks the accepted command.
+
+[Town visibility #69](https://github.com/TusanHomichi/the-mortal-estate/issues/69)
+requires the final bank-side native and installed captures. The prior
+[dungeon pose overlap #68](https://github.com/TusanHomichi/the-mortal-estate/issues/68)
+continues to own takeoff, impact, landing and settled-pose review; this cutover
+does not grant motion-phase or asset-master acceptance. The independent staged
+whitespace check caught and removed a trailing blank line before commit; the
+runner's unstaged-only gap is filed as
+[#71](https://github.com/TusanHomichi/the-mortal-estate/issues/71).

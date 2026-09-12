@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
@@ -8,7 +9,7 @@ let page,frame;const commands=[],results=[],updates=[],errors=[],captures=[];
 const prefix=`${config.output}/${config.engine}-${config.scenario}`;
 try{
  const context=session.context||await session.browser.newContext();page=await context.newPage();await page.setViewportSize({width:1600,height:1100});
- page.on('pageerror',e=>errors.push(String(e)));
+ collectGraphicsErrors(page,errors);page.on('pageerror',e=>errors.push(String(e)));
  page.on('console',m=>{if(/THREE.*(binding|bone|track)|No target node found/i.test(m.text()))errors.push(m.text());});
  page.on('websocket',s=>{s.on('framesent',e=>{const m=JSON.parse(String(e.payload));if(m.kind==='command')commands.push(m);});s.on('framereceived',e=>{const m=JSON.parse(String(e.payload));if(m.frame)frame=m.frame;if(m.kind==='command_result')results.push(m);if(m.kind==='state_update')updates.push(m);});});
  const canvas=()=>page.locator('#world-canvas');

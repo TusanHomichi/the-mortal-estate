@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 import assert from "node:assert/strict";
 import {worldCellPoint,waitForWorldPointing} from "./world-pointing.mjs";
 import { readFile, writeFile } from "node:fs/promises";
@@ -13,7 +14,7 @@ const errors=[],commands=[],results=[],captures=[];
 try {
   const context=launched.context || await launched.browser.newContext({viewport:{width:1400,height:1200}});
   page=await context.newPage(); await page.setViewportSize({width:1400,height:1200});
-  page.on("pageerror",error=>errors.push(error.message));
+  collectGraphicsErrors(page,errors);page.on("pageerror",error=>errors.push(error.message));
   page.on("websocket",socket=>{
     socket.on("framesent",event=>{const e=JSON.parse(String(event.payload));if(e.kind==="command")commands.push(e);});
     socket.on("framereceived",event=>{const e=JSON.parse(String(event.payload));if(e.frame)frame=e.frame;if(e.kind==="command_result")results.push(e);});
@@ -129,7 +130,10 @@ try {
   await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
   await walkTo(frame.actors.find(a=>a.actor_id==="balm_seller").position.position);await openActor("balm_seller");
   const purchase=page.locator(".resident-dialog").getByRole("button",{name:/^Buy .*balm/i}).first();assert(await purchase.isEnabled());
-  const purchases=commands.length;await purchase.click();await committed(purchases);
+  // The live resident feed can replace an unchanged menu row between animation
+  // frames. Use its visible pointer target, as a player does, and prove the command.
+  const purchaseBox=await purchase.boundingBox();assert(purchaseBox);
+  const purchases=commands.length;await page.mouse.click(purchaseBox.x+purchaseBox.width/2,purchaseBox.y+purchaseBox.height/2);await committed(purchases);
   assert(frame.carried.items.some(i=>i.item.item_definition_id==="healing_balm"));await mark("maude-purchase");
   await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
   await walkTo({x:0,y:4});await traverse("stairs_down");

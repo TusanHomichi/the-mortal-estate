@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 // The observed character is the DEFENDER. This is the inverse of the motion proof:
 // no command is sent to attack. An authored hold-ground monster shares the tile
 // and the server's own automatic attack path produces the swing.
@@ -27,7 +28,7 @@ const NOT_BLOCKING=['guard','block_high','block_side','block_cover','block_lean'
 const negative=config.occupied===true;
 try{
  const context=session.context||await session.browser.newContext();page=await context.newPage();await page.setViewportSize({width:1600,height:1100});
- page.on('pageerror',e=>errors.push(String(e)));
+ collectGraphicsErrors(page,errors);page.on('pageerror',e=>errors.push(String(e)));
  page.on('console',m=>{if(/THREE.*(binding|bone|track)|No target node found/i.test(m.text()))errors.push(m.text());});
  page.on('websocket',s=>{s.on('framesent',e=>{const m=JSON.parse(String(e.payload));if(m.kind==='command')commands.push(m);});s.on('framereceived',e=>{const m=JSON.parse(String(e.payload));if(m.frame)frame=m.frame;if(m.kind==='state_update')updates.push(m);});});
  const canvas=()=>page.locator('#world-canvas');

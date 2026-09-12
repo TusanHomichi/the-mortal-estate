@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
@@ -7,7 +8,7 @@ const launched=await launchProofBrowser({name:config.engine,engine:PROOF_ENGINES
 let page,frame;const commands=[],results=[],errors=[],captures=[];
 try {
  const context=launched.context||await launched.browser.newContext();page=await context.newPage();await page.setViewportSize({width:1600,height:1100});
- page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',socket=>{
+ collectGraphicsErrors(page,errors);page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',socket=>{
   socket.on('framesent',e=>{const m=JSON.parse(String(e.payload));if(m.kind==='command')commands.push(m);});
   socket.on('framereceived',e=>{const m=JSON.parse(String(e.payload));if(m.frame)frame=m.frame;if(m.kind==='command_result')results.push(m);});
  });

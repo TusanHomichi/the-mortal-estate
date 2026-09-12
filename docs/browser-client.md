@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-13
 revision: 61
-status: Full-world Three.js cutover implemented; native proof and preview delivery in progress.
+status: Full-world Three.js implemented; linked delivery records own native proof and installation outcomes.
 public_safe: true
 summary: One 3D world renderer, shared rigged figures, current-map scenery and authoritative browser proof.
 routes:
@@ -110,6 +110,13 @@ must match their receipts; no binary rebuild or fallback is used.
 surface composition and restoration with synthetic geometry in the browser
 roster. It does not fabricate a gameplay frame. The web verification lane uses
 tracked synthetic data; private asset and native evidence are separate.
+
+The native world proofs collect GPU console failures through
+`web/proof/graphics-errors.mjs`; a successful JavaScript session cannot hide a
+failed draw. `world-occlusion-proof.mjs` proves repeated cached-shadow draws,
+restored opacity and the retired shadow-mode negative control, alongside the
+nearest-surface blending check. Settlement scenery owns its supported shadow
+mode; the renderer retains the ruled basic dungeon shadows.
 
 ## Pixel-art presentation
 

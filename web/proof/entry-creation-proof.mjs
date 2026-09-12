@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 // Native entry flow, recovered allocation constraints, and durable creation.
 // Runs only against a disposable authority supplied by the world proof harness.
 import assert from "node:assert/strict";
@@ -13,7 +14,7 @@ const errors=[],requests=[],captures=[]; let frame,options,created;
 try {
   const context=launched.context || await launched.browser.newContext();
   const page=await context.newPage(); await page.setViewportSize({width:1280,height:800});
-  page.on("pageerror",error=>errors.push(error.message));
+  collectGraphicsErrors(page,errors);page.on("pageerror",error=>errors.push(error.message));
   page.on("request",request=>{if(request.url().endsWith("/characters/create"))requests.push(JSON.parse(request.postData()));});
   page.on("websocket",socket=>socket.on("framereceived",event=>{const row=JSON.parse(String(event.payload));if(row.frame)frame=row.frame;}));
   const wait=(fn)=>page.waitForFunction(fn,undefined,{polling:30,timeout:45000});

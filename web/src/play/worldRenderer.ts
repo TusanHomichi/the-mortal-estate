@@ -4,7 +4,7 @@ import {frameTargets,type Target} from '../authoritative/targets';
 import {PathOverlay} from './pathOverlay';
 import type {WalkPresentation} from './pathControls';
 import {bindWorldSpace} from './worldSpace';
-import {SettlementScenery} from './settlementScenery';
+import {SettlementScenery,SETTLEMENT_SHADOW_MAP} from './settlementScenery';
 import {loadSettlementAssets,disposeSettlementAssets,type SettlementAssets} from './settlementAssets';
 import {fitSettlementCamera} from './worldCamera';
 import {prepareEntryBackdrop} from './entryBackdrop';
@@ -47,7 +47,7 @@ export class WorldRenderer {
   private constructor(readonly canvas:HTMLCanvasElement,private readonly actors:DungeonActors,private readonly assets:SettlementAssets){
     this.settlement=new SettlementScenery(assets);this.scenery=this.settlement;
     this.renderer=new T.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
-    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=T.PCFSoftShadowMap;this.renderer.shadowMap.autoUpdate=false;
+    this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=SETTLEMENT_SHADOW_MAP;this.renderer.shadowMap.autoUpdate=false;
     this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.3;
     this.graphicsError.className='world-graphics-error';this.graphicsError.setAttribute('role','alert');this.graphicsError.textContent='World graphics were lost. Reload to reconnect.';this.graphicsError.hidden=true;canvas.after(this.graphicsError);
     this.scene.background=new T.Color(0);this.scene.add(this.settlement.group,this.actors.group,this.overlay.group,this.loot,this.grid.mesh);
@@ -82,7 +82,7 @@ export class WorldRenderer {
     const frame=isDungeon(level)?observedDungeon(source):{...source,actors:source.actors.filter(a=>a.life_state!=='dead')};
     const next=isDungeon(level)?this.dungeon:this.settlement;
     if(this.scenery!==next){this.scenery.group.removeFromParent();this.scenery=next;this.scene.add(next.group);}
-    this.renderer.shadowMap.type=isDungeon(level)?T.BasicShadowMap:T.PCFSoftShadowMap;
+    this.renderer.shadowMap.type=isDungeon(level)?T.BasicShadowMap:SETTLEMENT_SHADOW_MAP;
     // Clear material references before a changed scene is disposed/rebuilt.
     this.occlusion.clear();
     const changed=this.scenery instanceof DungeonScenery?this.scenery.present(frame):this.scenery.present(snapshot);

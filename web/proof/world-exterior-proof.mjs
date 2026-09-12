@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 import assert from 'node:assert/strict';
 import {worldCellPoint,waitForWorldPointing} from './world-pointing.mjs';
 import {readFile,writeFile} from 'node:fs/promises';
@@ -10,7 +11,7 @@ const geography=JSON.parse(await readFile(new URL('../../content/lands/first-exp
 let page,frame,stage='startup';const commands=[],results=[],errors=[],captures=[];
 try {
  page=await launched.browser.newPage({viewport:{width:1280,height:800}});
- page.on('pageerror',e=>errors.push(e.message));
+ collectGraphicsErrors(page,errors);page.on('pageerror',e=>errors.push(e.message));
  page.on('websocket',socket=>{
   socket.on('framesent',e=>{const v=JSON.parse(String(e.payload));if(v.kind==='command')commands.push(v);});
   socket.on('framereceived',e=>{const v=JSON.parse(String(e.payload));if(v.frame)frame=v.frame;if(v.kind==='command_result')results.push(v);});

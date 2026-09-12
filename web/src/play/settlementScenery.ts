@@ -5,6 +5,10 @@ import {TILE} from './dungeon/view';
 import type {SettlementAssets} from './settlementAssets';
 import {groundTexture} from './groundTexture';
 
+// PCFSoftShadowMap is a retired alias that mutates the renderer's mode on a
+// shadow refresh. Cached frames must keep the same depth-sampler contract.
+export const SETTLEMENT_SHADOW_MAP=T.PCFShadowMap;
+
 type Member=typeof geography.members[number];
 type Bounds={min:Coord;max:Coord};
 const colors:Record<string,number>={expedition_forest:0x5c6941,expedition_grass:0x6a784b,

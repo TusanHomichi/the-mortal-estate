@@ -13,7 +13,12 @@ try {
    const result=await page.evaluate(async()=>{const {measureOcclusion}=await import('/proof/world-occlusion-scene.mjs');return measureOcclusion();});
    assert.deepEqual(result.opaque,[255,0,0,255]);assert.deepEqual(result.restored,result.opaque);assert.deepEqual(result.cleared,result.opaque);
    for(const [i,expected] of [102,153,0,255].entries())assert(Math.abs(result.faded[i]-expected)<=2,`Overlapping surfaces must blend once: ${result.faded}`);
-   reports.push({engine:name,verdict:'PASS',rendering:launched.rendering,...result});console.log(`PASS ${name}/composed-occlusion`);
+   const shadow=await page.evaluate(async()=>{const {measureShadowCycle}=await import('/proof/world-occlusion-scene.mjs');return measureShadowCycle();});
+   assert(shadow.opaque[0]>100&&shadow.opaque[0]>shadow.opaque[1]+50,JSON.stringify(shadow));assert.deepEqual(shadow.cachedOpaque,shadow.opaque);assert.deepEqual(shadow.restored,shadow.opaque);assert.deepEqual(shadow.cleared,shadow.opaque);
+   assert(shadow.faded[0]>0&&shadow.faded[1]>shadow.opaque[1]+50,'Cached shadow fade must retain scenery and the body');assert(shadow.errors.every(e=>e===0),'Cached shadow draws must produce no GPU error');
+   const retired=await page.evaluate(async()=>{const {measureShadowCycle}=await import('/proof/world-occlusion-scene.mjs');return measureShadowCycle(2);});
+   assert(retired.errors.some(e=>e!==0),'Retired shadow mode must fail the negative control');
+   reports.push({engine:name,verdict:'PASS',rendering:launched.rendering,...result,shadow,retired_mode_refused:true});console.log(`PASS ${name}/composed-occlusion`);
   }finally{await launched.stop();}
  }
  await writeFile(`${output}/verification.json`,JSON.stringify({verdict:'PASS',reports},null,2)+'\n');
