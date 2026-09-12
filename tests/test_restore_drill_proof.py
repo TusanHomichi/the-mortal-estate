@@ -15,18 +15,61 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import run_restore_drill_proof as proof  # noqa: E402
+import restore_drill_installation as installation_owner  # noqa: E402
+
+
+class LockHolderCleanup(unittest.TestCase):
+    def test_normal_exit_closes_pipes_and_does_not_kill(self):
+        holder = Mock()
+        self.assertEqual(proof.release_lock_holder(holder), [])
+        holder.wait.assert_called_once_with(timeout=10)
+        holder.kill.assert_not_called()
+        for stream in (holder.stdin, holder.stdout, holder.stderr):
+            stream.close.assert_called_once_with()
+
+    def test_forced_exit_and_failed_reaping_are_reported(self):
+        for second in (0, subprocess.TimeoutExpired("psql", 10)):
+            with self.subTest(second=second):
+                holder = Mock()
+                holder.wait.side_effect = [subprocess.TimeoutExpired("psql", 10), second]
+                problems = proof.release_lock_holder(holder)
+                self.assertIn("did not exit", problems[0])
+                holder.kill.assert_called_once_with()
+                self.assertEqual(holder.wait.call_count, 2)
+                self.assertEqual(len(problems), 2 if isinstance(second, Exception) else 1)
+
+    def test_failed_kill_is_reported(self):
+        holder = Mock()
+        holder.wait.side_effect = subprocess.TimeoutExpired("psql", 10)
+        holder.kill.side_effect = OSError("signal refused")
+        self.assertIn("signal refused", "; ".join(proof.release_lock_holder(holder)))
+
+    def test_primary_failure_survives_cleanup_failure_in_real_holder_flow(self):
+        holder = Mock()
+        holder.stdin.write.side_effect = RuntimeError("primary lock error")
+        holder.wait.side_effect = OSError("wait failed")
+        site = SimpleNamespace(pg_bin=Path("/fake"), socket=Path("/tmp/fake"),
+                               ports={"postgres": 1}, settings={"administrator": "proof"})
+        with patch.object(proof, "scratch_databases", return_value=["tme_restore_owned"]), \
+                patch.object(proof.subprocess, "Popen", return_value=holder):
+            with self.assertRaises(proof.ProofError) as caught:
+                proof.hold_the_drill_database(site, {})
+        self.assertIn("primary lock error", str(caught.exception))
+        self.assertIn("wait failed", str(caught.exception))
+        self.assertIn("tme_restore_owned", str(caught.exception))
+        self.assertIsInstance(caught.exception.__cause__, RuntimeError)
 
 
 class Ownership(unittest.TestCase):
     """Only the cluster this proof created is ever touched."""
 
-    class Installation(proof.ScratchInstallation):
+    class Installation(installation_owner.ScratchInstallation):
         """The ownership check alone, without a cluster or a provisioning run."""
 
         def __init__(self, root, reported, data=None):
@@ -61,10 +104,10 @@ class ShutdownConfirmation(unittest.TestCase):
     classification is what the deletion gate depends on.
     """
 
-    class Installation(proof.ScratchInstallation):
+    class Installation(installation_owner.ScratchInstallation):
         """The real cleanup path, with nothing but the process boundary stubbed."""
 
-        def __init__(self, state=proof.LAUNCH_ATTEMPTED):
+        def __init__(self, state=installation_owner.LAUNCH_ATTEMPTED):
             self.root = Path("/not-adopted")
             self.administrator = "proof-admin"
             self.pg_bin = Path("/fake/bin")
@@ -87,26 +130,26 @@ class ShutdownConfirmation(unittest.TestCase):
             (self.site.config / "bootstrap.json").write_text(
                 '{"characters": [{"character_id": "seeded-character"}]}', encoding="utf-8")
 
-        def served(self, character_id, database=proof.SCRATCH_DATABASE, account=0):
+        def served(self, character_id, database=installation_owner.SCRATCH_DATABASE, account=0):
             return SimpleNamespace(database_name=database, character_id=character_id)
 
     def status(self, returncode, stdout="", stderr=""):
         return subprocess.CompletedProcess(["pg_ctl"], returncode, stdout, stderr)
 
-    def close_with(self, status_result, *, stop_error=None, state=proof.LAUNCH_ATTEMPTED):
+    def close_with(self, status_result, *, stop_error=None, state=installation_owner.LAUNCH_ATTEMPTED):
         """Run the real close() once, with the stop and the status call stubbed."""
         installation = self.Installation(state)
-        boundary = (patch.object(proof.subprocess, "run", side_effect=status_result)
+        boundary = (patch.object(installation_owner.subprocess, "run", side_effect=status_result)
                     if isinstance(status_result, BaseException)
-                    else patch.object(proof.subprocess, "run", return_value=status_result))
-        with patch.object(proof, "run", side_effect=stop_error) as stop, boundary:
+                    else patch.object(installation_owner.subprocess, "run", return_value=status_result))
+        with patch.object(installation_owner, "run", side_effect=stop_error) as stop, boundary:
             problems = installation.close()
         return installation, problems, stop
 
     def test_a_cluster_that_was_never_launched_is_not_stopped(self):
-        with patch.object(proof, "run") as runner, \
-                patch.object(proof.subprocess, "run") as boundary:
-            self.assertEqual(self.Installation(proof.UNLAUNCHED).close(), [])
+        with patch.object(installation_owner, "run") as runner, \
+                patch.object(installation_owner.subprocess, "run") as boundary:
+            self.assertEqual(self.Installation(installation_owner.UNLAUNCHED).close(), [])
         runner.assert_not_called()
         boundary.assert_not_called()
 
@@ -116,9 +159,9 @@ class ShutdownConfirmation(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertIn("is still running", problems[0])
         self.assertIn(str(installation.site.data), problems[0])
-        self.assertEqual(installation.cluster_state, proof.LAUNCH_ATTEMPTED)
-        with patch.object(proof, "run") as again, \
-                patch.object(proof.subprocess, "run", return_value=self.status(0)):
+        self.assertEqual(installation.cluster_state, installation_owner.LAUNCH_ATTEMPTED)
+        with patch.object(installation_owner, "run") as again, \
+                patch.object(installation_owner.subprocess, "run", return_value=self.status(0)):
             self.assertEqual(installation.close(), problems)
         self.assertEqual(again.call_count, 1)
         self.assertEqual(stop.call_count, 1)
@@ -126,9 +169,9 @@ class ShutdownConfirmation(unittest.TestCase):
     def test_status_three_confirms_the_stop_and_permits_removal(self):
         installation, problems, _ = self.close_with(self.status(3))
         self.assertEqual(problems, [])
-        self.assertEqual(installation.cluster_state, proof.STOPPED)
-        with patch.object(proof, "run") as again, \
-                patch.object(proof.subprocess, "run") as boundary:
+        self.assertEqual(installation.cluster_state, installation_owner.STOPPED)
+        with patch.object(installation_owner, "run") as again, \
+                patch.object(installation_owner.subprocess, "run") as boundary:
             self.assertEqual(installation.close(), [])
         again.assert_not_called()
         boundary.assert_not_called()
@@ -143,37 +186,37 @@ class ShutdownConfirmation(unittest.TestCase):
                 self.assertEqual(len(problems), 1, problems)
                 self.assertIn("could not be confirmed stopped", problems[0])
                 self.assertIn(str(result.returncode), problems[0])
-                self.assertEqual(installation.cluster_state, proof.LAUNCH_ATTEMPTED)
+                self.assertEqual(installation.cluster_state, installation_owner.LAUNCH_ATTEMPTED)
 
     def test_a_status_check_that_does_not_finish_is_unconfirmed(self):
         installation, problems, _ = self.close_with(
-            subprocess.TimeoutExpired("pg_ctl", proof.STATUS_TIMEOUT_SECONDS))
+            subprocess.TimeoutExpired("pg_ctl", installation_owner.STATUS_TIMEOUT_SECONDS))
         self.assertIn("could not be confirmed stopped", problems[0])
         self.assertIn("did not finish", problems[0])
-        self.assertEqual(installation.cluster_state, proof.LAUNCH_ATTEMPTED)
+        self.assertEqual(installation.cluster_state, installation_owner.LAUNCH_ATTEMPTED)
 
     def test_a_status_check_that_cannot_run_is_unconfirmed(self):
         installation, problems, _ = self.close_with(OSError("pg_ctl is gone"))
         self.assertIn("could not be confirmed stopped", problems[0])
         self.assertIn("could not run", problems[0])
-        self.assertEqual(installation.cluster_state, proof.LAUNCH_ATTEMPTED)
+        self.assertEqual(installation.cluster_state, installation_owner.LAUNCH_ATTEMPTED)
 
     def test_a_stop_that_failed_but_left_nothing_running_is_resolved(self):
         """The status is the evidence, not the stop command's own exit."""
         installation, problems, _ = self.close_with(
             self.status(3), stop_error=subprocess.TimeoutExpired("pg_ctl", 120))
         self.assertEqual(problems, [])
-        self.assertEqual(installation.cluster_state, proof.STOPPED)
+        self.assertEqual(installation.cluster_state, installation_owner.STOPPED)
 
     def test_the_status_call_is_bounded_and_asks_about_this_cluster(self):
         installation, _, _ = self.close_with(self.status(3))
-        with patch.object(proof.subprocess, "run") as boundary:
+        with patch.object(installation_owner.subprocess, "run") as boundary:
             boundary.return_value = self.status(3)
-            installation.cluster_state = proof.LAUNCH_ATTEMPTED
-            with patch.object(proof, "run"):
+            installation.cluster_state = installation_owner.LAUNCH_ATTEMPTED
+            with patch.object(installation_owner, "run"):
                 installation.close()
         command = boundary.call_args.args[0]
-        self.assertEqual(boundary.call_args.kwargs.get("timeout"), proof.STATUS_TIMEOUT_SECONDS)
+        self.assertEqual(boundary.call_args.kwargs.get("timeout"), installation_owner.STATUS_TIMEOUT_SECONDS)
         self.assertIn("status", command)
         self.assertIn(str(installation.site.data), command)
 
@@ -230,7 +273,7 @@ class ProofLifecycle(unittest.TestCase):
             self.closes += 1
             return list(self.close_problems)
 
-        def served(self, character_id, database=proof.SCRATCH_DATABASE, account=0):
+        def served(self, character_id, database=installation_owner.SCRATCH_DATABASE, account=0):
             return SimpleNamespace(database_name=database, character_id=character_id)
 
     def setUp(self):
@@ -238,7 +281,8 @@ class ProofLifecycle(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
 
-    def run_proof(self, installation, *, keep=False, stages=None, status=None, stop=None):
+    def run_proof(self, installation, *, keep=False, stages=None, status=None, stop=None,
+                  removal_error=None):
         """The root removals the proof requested, and the failure it surfaced.
 
         The stop command and the status inspection are the only process-facing calls
@@ -259,6 +303,11 @@ class ProofLifecycle(unittest.TestCase):
                 return raises
             return lambda *arguments, **keywords: value
 
+        def remove(path, **keywords):
+            removed.append(Path(path))
+            if removal_error is not None and not keywords.get("ignore_errors", False):
+                raise removal_error
+
         arguments = SimpleNamespace(postgres_bin="/fake/bin", world_document="world.json",
                                     keep=keep)
         with patch.object(proof, "postgres_binaries", return_value=Path("/fake/bin")), \
@@ -268,7 +317,7 @@ class ProofLifecycle(unittest.TestCase):
                              side_effect=lambda root, binary, document, pg_bin: installation.adopt(root)), \
                 patch.object(proof, "LiveServer", ServerContext), \
                 patch.object(proof.shutil, "rmtree",
-                             side_effect=lambda path, **keywords: removed.append(Path(path))), \
+                             side_effect=remove), \
                 patch.object(proof, "prove_preservation",
                              side_effect=stage_of("preserve", preserved)), \
                 patch.object(proof, "prove_concurrent_commit",
@@ -279,10 +328,10 @@ class ProofLifecycle(unittest.TestCase):
                              side_effect=stage_of("rejection", Path("/backups/altered"))), \
                 patch.object(proof, "prove_cleanup_failure",
                              side_effect=stage_of("cleanup", None)), \
-                patch.object(proof, "run", side_effect=stop), \
-                (patch.object(proof.subprocess, "run", side_effect=status)
+                patch.object(installation_owner, "run", side_effect=stop), \
+                (patch.object(installation_owner.subprocess, "run", side_effect=status)
                  if isinstance(status, BaseException)
-                 else patch.object(proof.subprocess, "run",
+                 else patch.object(installation_owner.subprocess, "run",
                                    return_value=status if status is not None
                                    else subprocess.CompletedProcess([], 3, "", ""))):
             try:
@@ -367,6 +416,24 @@ class ProofLifecycle(unittest.TestCase):
         self.assertIs(failure.__cause__, primary)
         self.assertIn("the created character was not preserved", str(failure))
         self.assertIn("was retained", str(failure))
+
+    def test_a_directory_removal_failure_is_reported_after_confirmed_shutdown(self):
+        installation = self.Installation()
+        removed, failure = self.run_proof(installation, removal_error=PermissionError("denied"))
+        self.assertEqual(removed, [installation.root])
+        self.assertIsInstance(failure, proof.ProofError)
+        self.assertIn(str(installation.root), str(failure))
+        self.assertIn("could not be removed after shutdown", str(failure))
+        self.assertTrue(installation.root.exists())
+
+    def test_a_directory_removal_failure_preserves_the_primary_proof_error(self):
+        primary = proof.ProofError("the created character was not preserved")
+        installation = self.Installation()
+        _, failure = self.run_proof(installation, stages={"preserve": primary},
+                                    removal_error=PermissionError("denied"))
+        self.assertIs(failure.__cause__, primary)
+        self.assertIn(str(primary), str(failure))
+        self.assertIn(str(installation.root), str(failure))
 
     def test_keep_retains_the_root_without_a_failure(self):
         installation = self.Installation()

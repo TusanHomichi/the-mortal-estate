@@ -123,7 +123,9 @@ class SnapshotSession:
         shutdown that would otherwise be reported as ordinary completion.
         """
         if self.closed:
-            return []
+            # Closing the input does not discharge a child that could not be
+            # killed or reaped. A repeated close must retry that obligation.
+            return self._recover_from_a_hang() if self.process.poll() is None else []
         self.closed = True
         problems = []
         try:

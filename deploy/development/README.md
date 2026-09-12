@@ -179,6 +179,12 @@ sequence and checkpoint digest. It never serves a second live world, and it drop
 only that drill database. A modified dump or incompatible storage contract is
 refused.
 
+An unacknowledged database creation is reported with its generated name for
+operator inspection; the drill does not claim ownership and drop a possibly
+pre-existing database. Confirmed resources remain cleanup obligations after a
+failed teardown. Snapshot-client retries still attempt to kill and reap a child
+whose previous shutdown failed; forced shutdown is reported as a failure.
+
 The comparison is against the backup's own receipt, never today's world: a
 character created after a backup is not expected inside it. A restored database
 that differs in any compared row is refused by naming each lost and gained row, so
@@ -194,7 +200,8 @@ What the drill preserved is reported by identity, not by count. Its portable
 coverage is `tests/test_development_deploy.py`; the end-to-end proof against an
 installation the proof creates and owns, including a character created through the
 runtime flow and a commit landing while a backup runs, is
-`tools/run_restore_drill_proof.py` under the gated `postgres-server` capability. The
+`tools/run_restore_drill_proof.py` under the gated `postgres-server` and
+`private-terms` capabilities. The
 [execution record](../../docs/plans/2026-09-11-restore-drill-preservation.md)
 owns the observed evidence. Installing a new world, or resetting one, is still not
 authorized by any of this.

@@ -1,12 +1,18 @@
 ---
-last_updated: 2026-09-11
-revision: 4
+last_updated: 2026-09-12
+revision: 5
 status: Activated in expedition content; configured full verification and a deterministic native incoming-block scenario both pass on the development machine. Owner visual acceptance and the saved-state cutover remain outstanding; the scenario's guarantee is bracketed observation, not frame-level attribution.
 public_safe: true
 summary: Activate existing martial hand defense in expedition content, qualify its original provisional curve, and track remaining class gaps.
 ---
 
 # First-expedition martial defense
+
+The September 12 [closeout](2026-09-12-proof-preview-closeout.md) continues native
+assertion hardening and the saved-state preview cutover. Both bracketed motion
+observations now require a stationary defender, and the occupied-hand control
+collects its final swings, block count and zero-command assertion after capture.
+The earlier receipts below do not prove these follow-up edits.
 
 ## Dispatch and boundary
 

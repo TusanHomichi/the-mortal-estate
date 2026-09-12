@@ -69,6 +69,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_live_proof_land",
         "tests.test_live_wire_client",
         "tests.test_live_server_harness",
+        "tests.test_live_server_cleanup",
         "tests.test_live_proof_cooldowns",
         "tests.test_presentation_adoption_recording",
         "tests.test_restore_drill_proof",
@@ -239,7 +240,7 @@ _STATIC: tuple[Step, ...] = (
         owner="gated",
         label="gated: real backup and restore drill on a scratch installation",
         argv=("python3", "tools/run_restore_drill_proof.py"),
-        requires=("postgres-server",),
+        requires=("postgres-server", "private-terms"),
         timeout=1800.0,
     ),
     Step(
@@ -269,7 +270,7 @@ _STATIC: tuple[Step, ...] = (
             "--output",
             "$TME_CAPTURE_OUTPUT/presentation-adoption",
         ),
-        requires=("postgres", "capture-output"),
+        requires=("postgres", "private-terms", "capture-output"),
         timeout=1800.0,
     ),
     Step(
@@ -277,7 +278,7 @@ _STATIC: tuple[Step, ...] = (
         owner="gated",
         label="server: trusted TLS sign-in, admission, individual cooldowns, reconnect, and logout",
         argv=("python3", "tools/run_server_live_proof.py", "--admin-url-file", "$TME_PG_ADMIN_URL_FILE"),
-        requires=("postgres",),
+        requires=("postgres", "private-terms"),
         timeout=1800.0,
     ),
     Step(
@@ -285,7 +286,7 @@ _STATIC: tuple[Step, ...] = (
         owner="gated",
         label="browser: authoritative Workbench capture, native WSS, replay and pointer correspondence",
         argv=("python3", "tools/run_browser_capture_proof.py", "--admin-url-file", "$TME_PG_ADMIN_URL_FILE"),
-        requires=("postgres", "node", "browsers"),
+        requires=("postgres", "private-terms", "node", "browsers"),
         timeout=1800.0,
     ),
     Step(

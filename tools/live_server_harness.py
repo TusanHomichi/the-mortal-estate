@@ -37,7 +37,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 import uuid
 from contextlib import closing
 from dataclasses import dataclass, field
@@ -50,6 +50,8 @@ sys.path.insert(0, str(REPOSITORY_ROOT / "tools"))
 from boundary_common import private_terms_path  # noqa: E402
 
 READY_TIMEOUT_SECONDS = 120.0
+CLEANUP_TIMEOUT_SECONDS = 30.0
+SERVER_EXIT_TIMEOUT_SECONDS = 20.0
 PROXY_HOST = "localhost"
 
 #: The one catalog the prototype content corpus carries, and the profile whose
@@ -357,6 +359,7 @@ class LiveServer:
     status: dict = field(init=False, default_factory=dict)
     _server: subprocess.Popen | None = field(init=False, default=None)
     _proxy: TlsProxy | None = field(init=False, default=None)
+    _database_cleanup_due: bool = field(init=False, default=False)
 
     def __enter__(self) -> "LiveServer":
         if self.public_origin is not None:
@@ -379,13 +382,21 @@ class LiveServer:
         print(f"run directory: {self.run_directory}")
         try:
             self._provision()
-        except BaseException:
-            self.close()
+        except BaseException as error:
+            self._finish(error)
             raise
         return self
 
-    def __exit__(self, *_exception) -> None:
-        self.close()
+    def __exit__(self, _type, error, _traceback) -> None:
+        self._finish(error)
+
+    def _finish(self, primary: BaseException | None) -> None:
+        try:
+            self.close()
+        except ProofError as cleanup:
+            if primary is not None:
+                raise ProofError(f"{primary}; {cleanup}") from primary
+            raise
 
     # -- provisioning ------------------------------------------------------
 
@@ -401,6 +412,10 @@ class LiveServer:
         # of them here would prove a database the deployment never ran.
         installation = self.installation
         if installation is None:
+            # The random database name belongs to this run. A failed CREATE can
+            # have committed before its client failed, so cleanup is owed from
+            # the attempt until DROP succeeds, never for a caller's installation.
+            self._database_cleanup_due = True
             run([
                 "psql", self.admin_url, "-v", "ON_ERROR_STOP=1",
                 "-c", f'CREATE DATABASE "{self.database_name}"',
@@ -552,34 +567,85 @@ class LiveServer:
 
     # -- teardown ----------------------------------------------------------
 
+    def _cleanup_detail(self, value) -> str:
+        """Keep useful tool diagnostics while removing this run's credentials."""
+        text = value.decode(errors="replace") if isinstance(value, bytes) else str(value)
+        urls = [self.admin_url, getattr(self, "database_url", "")]
+        if self.installation is not None:
+            urls.append(self.installation.auth_database_url or "")
+        secrets_to_hide = [getattr(self, "password", "")]
+        for url in urls:
+            if url:
+                secrets_to_hide.extend((url, urlsplit(url).password or ""))
+        for secret in sorted(set(secrets_to_hide), key=len, reverse=True):
+            if secret:
+                text = text.replace(secret, "[redacted]")
+                text = text.replace(unquote(secret), "[redacted]")
+        return text.strip()[-2000:]
+
     def close(self) -> None:
-        if self._server is not None and self._server.poll() is None:
-            self._server.terminate()
+        """Release only owned resources; any unresolved cleanup fails the proof.
+
+        Confirm process reaping before dropping the scratch database. Failed
+        obligations remain attached to this instance for a later retry, and the
+        diagnostic directory stays whenever cleanup is incomplete.
+        """
+        problems = []
+        if self._server is not None:
             try:
-                self._server.wait(timeout=20)
-            except subprocess.TimeoutExpired:
-                self._server.kill()
-        self._server = None
+                if self._server.poll() is None:
+                    self._server.terminate()
+                try:
+                    self._server.wait(timeout=SERVER_EXIT_TIMEOUT_SECONDS)
+                except subprocess.TimeoutExpired:
+                    self._server.kill()
+                    self._server.wait(timeout=SERVER_EXIT_TIMEOUT_SECONDS)
+                    problems.append("the server required forced termination and was reaped")
+                self._server = None
+            except (OSError, subprocess.SubprocessError) as error:
+                problems.append(f"the server could not be reaped: {self._cleanup_detail(error)}")
         if self._proxy is not None:
-            self._proxy.close()
-            self._proxy = None
+            try:
+                self._proxy.close()
+                self._proxy = None
+            except Exception as error:  # cleanup must not replace an earlier failure
+                problems.append(f"the proxy could not stop: {self._cleanup_detail(error)}")
         if not hasattr(self, "run_directory"):
             return
         if self.keep:
             print(f"kept: database {self.database_name}, run directory {self.run_directory}")
-            return
-        # A served installation is the caller's, provisioned for a deployment
-        # that still needs it; dropping it here would destroy live state to tidy
-        # up after a proof.
-        if self.installation is None:
-            subprocess.run(
-                ["psql", self.admin_url, "-c",
-                 f'DROP DATABASE IF EXISTS "{self.database_name}" WITH (FORCE)'],
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-        shutil.rmtree(self.run_directory, ignore_errors=True)
+        elif self._server is None and self._proxy is None:
+            if self._database_cleanup_due:
+                try:
+                    result = subprocess.run(
+                        ["psql", self.admin_url, "-v", "ON_ERROR_STOP=1", "-c",
+                         f'DROP DATABASE IF EXISTS "{self.database_name}" WITH (FORCE)'],
+                        capture_output=True, text=True, check=False,
+                        timeout=CLEANUP_TIMEOUT_SECONDS)
+                    if result.returncode == 0:
+                        self._database_cleanup_due = False
+                    else:
+                        detail = self._cleanup_detail(result.stderr or result.stdout or "no diagnostic")
+                        problems.append(f"DROP database {self.database_name} exited "
+                                        f"{result.returncode}: {detail}")
+                except subprocess.TimeoutExpired as error:
+                    detail = self._cleanup_detail(error.stderr or error.stdout or "")
+                    problems.append(f"DROP database {self.database_name} exceeded "
+                                    f"{CLEANUP_TIMEOUT_SECONDS:g}s: {detail}")
+                except OSError as error:
+                    problems.append(f"DROP database {self.database_name} could not run: "
+                                    f"{self._cleanup_detail(error)}")
+            if not problems:
+                try:
+                    shutil.rmtree(self.run_directory)
+                except FileNotFoundError:
+                    pass
+                except OSError as error:
+                    problems.append(f"the run directory could not be removed: "
+                                    f"{self._cleanup_detail(error)}")
+        if problems:
+            raise ProofError(f"cleanup failed; retained run directory {self.run_directory}: "
+                             + "; ".join(problems))
 
 
 def read_admin_url(path: str) -> str:

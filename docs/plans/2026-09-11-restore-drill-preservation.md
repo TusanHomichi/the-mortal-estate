@@ -8,6 +8,11 @@ summary: Replace the restore drill's fixed character count with preservation of 
 
 # Restore drill preservation
 
+The owner dispatched [end-to-end closeout](2026-09-12-proof-preview-closeout.md)
+on September 12, extending delivery to the shared cleanup and block-proof
+follow-ups. That record owns the continuation and final proof; the original
+scope and receipts below remain dated evidence.
+
 Issue [#49](https://github.com/TusanHomichi/the-mortal-estate/issues/49) owns the
 requirement. This is a Planning document and execution record, not a second owner of
 restore, backup or fence behaviour. `deploy/development/README.md` owns operation of

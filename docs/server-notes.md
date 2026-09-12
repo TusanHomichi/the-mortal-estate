@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 26
-status: Standing server contract; private preview saves are preserved while external product-boundary activation remains pending.
+last_updated: 2026-09-12
+revision: 27
+status: Standing server contract; private saves are preserved and failed proof cleanup is reported while external activation remains pending.
 public_safe: true
-summary: Server authority, private saved-state preservation, offline migration, preview refresh and external activation boundaries.
+summary: Server authority, saved-state preservation, offline migration, preview refresh, owned proof resources and external activation boundaries.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -534,6 +534,27 @@ A restore is proven, not assumed: the product's own restore fence requires the
 operator to confirm which database a checkpoint came back into, and the drill that
 exercised the whole path is recorded in
 [the deployment drill](deploy-drill-2026-08-20.md).
+
+## Live proof resource lifetime
+
+`tools/live_server_harness.py::LiveServer` owns only the temporary directory,
+processes and randomly named scratch database it provisions. An explicit
+`ServedInstallation` remains the caller's database throughout cleanup.
+
+Cleanup waits for the server to exit and, after a timed-out graceful stop, kills
+and reaps it with a second bounded wait. Forced termination is reported. A process
+that cannot be reaped or a proxy that cannot stop prevents database removal.
+Scratch DROP has a deadline and its result is checked; failed obligations remain
+on the instance so a later cleanup retries them. Failed teardown makes the proof
+fail, preserves an earlier provisioning or proof error as its cause, names the
+owned resource with sanitized diagnostics, and retains the run directory.
+
+Successful cleanup removes the directory and becomes idempotent. A failed
+directory removal is itself reported. Explicit `keep` retains the directory and
+database but still stops the harness's processes and reports unsuccessful stops.
+`tests/test_live_server_cleanup.py` drives these failure paths through the real
+cleanup and context-manager methods; native server/browser proofs exercise the
+successful lifecycle.
 
 ## Gated-test runner contract (PostgreSQL)
 

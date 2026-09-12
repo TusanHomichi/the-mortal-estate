@@ -278,7 +278,7 @@ class ProvisioningEnvironment(unittest.TestCase):
 
     def test_installation_teardown_never_drops_the_callers_database(self) -> None:
         server = self.provision(self.installation())
-        with patch("live_server_harness.subprocess.run") as teardown:
+        with patch("live_server_harness.subprocess.run", return_value=Mock(returncode=0)) as teardown:
             server.close()
         teardown.assert_not_called()
         self.served_handles[0].terminate.assert_called_once()
@@ -293,7 +293,7 @@ class ProvisioningEnvironment(unittest.TestCase):
         created = [command for command, _ in self.offline_runs if Path(command[0]).name == "psql"]
         self.assertEqual(len(created), 1)
         self.assertIn(f'CREATE DATABASE "{server.database_name}"', created[0][-1])
-        with patch("live_server_harness.subprocess.run") as teardown:
+        with patch("live_server_harness.subprocess.run", return_value=Mock(returncode=0)) as teardown:
             server.close()
         dropped = [call.args[0] for call in teardown.call_args_list]
         self.assertEqual(len(dropped), 1)

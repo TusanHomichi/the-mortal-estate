@@ -632,6 +632,9 @@ class SnapshotShutdown(unittest.TestCase):
             problems = session.close()
         self.assertTrue(any("did not exit" in problem for problem in problems), problems)
         self.assertTrue(any("killing it failed" in problem for problem in problems), problems)
+        self.assertIsNone(session.process.poll())
+        self.assertTrue(session.close())
+        self.assertEqual(session.process.returncode, -9)
 
     def test_a_killed_client_that_still_will_not_exit_is_reported(self):
         """A second wait that also expires is reported rather than raised."""
@@ -853,6 +856,18 @@ class DrillCleanupReporting(unittest.TestCase):
         self.assertEqual(len(self.site.created), 1)
         self.assertEqual(len(self.site.dropped), 1)
         self.assertIn(self.site.created[0].split()[2], self.site.dropped[0])
+
+    def test_unconfirmed_creation_names_the_database_without_claiming_ownership(self):
+        saved = self.backup(recorded_state(), recorded_fence())
+        failure = subprocess.TimeoutExpired("psql", 120)
+        with patch.object(self.site, "sql", side_effect=failure) as sql:
+            with self.assertRaises(RuntimeError) as caught:
+                restore_drill(self.site, saved)
+        self.assertEqual(sql.call_count, 1)
+        database = sql.call_args.args[0].split()[2]
+        self.assertIn(database, str(caught.exception))
+        self.assertIn("inspect its creation state", str(caught.exception))
+        self.assertIs(caught.exception.__cause__, failure)
 
 
 if __name__ == "__main__":

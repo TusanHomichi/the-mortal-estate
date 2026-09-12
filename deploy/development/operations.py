@@ -343,7 +343,14 @@ def restore_drill(site, directory):
         # allowed to skip a comparison it promised to make.
         raise RuntimeError("backup receipt is not usable for a drill: " + "; ".join(problems))
     database = "tme_restore_" + secrets.token_hex(6)
-    site.sql(f"CREATE DATABASE {database} OWNER tme_owner", "postgres")
+    try:
+        site.sql(f"CREATE DATABASE {database} OWNER tme_owner", "postgres")
+    except BaseException as error:
+        # A timeout can lose the acknowledgement after CREATE committed. Name the
+        # unresolved resource, but do not drop a possibly pre-existing database
+        # when creation ownership was never confirmed (for example a collision).
+        raise RuntimeError(f"creating drill database {database} failed: {error}; "
+                           "inspect its creation state before cleanup") from error
     failure = None
     report = None
     try:

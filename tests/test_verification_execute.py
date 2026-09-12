@@ -19,7 +19,7 @@ from unittest.mock import patch
 
 from verification_test_support import REPO_ROOT  # noqa: F401  (path setup)
 
-from verification import capabilities, execute
+from verification import capabilities, execute, table
 from verification.model import (
     CapabilityState,
     EXIT_FAILED,
@@ -151,6 +151,49 @@ class PostgresServerCapability(unittest.TestCase):
                 state = capabilities.BY_NAME["postgres-server"].evaluate({"PATH": "/fake"})
         self.assertFalse(state.available)
         self.assertIn("could not report its version", state.reason)
+
+
+class ServedProofPrerequisites(unittest.TestCase):
+    """A capable PostgreSQL host can still lack the served world's private input."""
+
+    KEYS = (
+        "gated.restore_drill", "gated.live_wire", "gated.browser_capture",
+        "capture.presentation_adoption",
+    )
+
+    def execute_step(self, key, *, private_terms):
+        states = {
+            name: CapabilityState(name, True, "present")
+            for name in (*capabilities.BY_NAME, "capture-output")
+        }
+        states["private-terms"] = CapabilityState(
+            "private-terms", private_terms, "private denylist is absent")
+        runner = fake_runner({})
+        with redirect_stdout(io.StringIO()):
+            verdict = execute.execute(
+                [table.STEPS[key]], runner=runner, states=states,
+                environ={"PATH": "/usr/bin", "TME_PG_ADMIN_URL_FILE": "/private/admin-url",
+                         "TME_CAPTURE_OUTPUT": "/private/captures"})
+        return verdict, runner.calls
+
+    def test_missing_private_terms_prevent_every_served_proof_from_launching(self):
+        for key in self.KEYS:
+            with self.subTest(step=key):
+                verdict, calls = self.execute_step(key, private_terms=False)
+                self.assertEqual(calls, [])
+                self.assertEqual(verdict.outcomes[0].status, "UNAVAILABLE")
+                self.assertIn("private denylist is absent", verdict.outcomes[0].detail)
+                self.assertFalse(verdict.complete)
+                self.assertEqual(verdict.exit_code(allow_unavailable=False), EXIT_INCOMPLETE)
+                self.assertEqual(verdict.exit_code(allow_unavailable=True), EXIT_OK)
+
+    def test_supplied_private_terms_allow_the_actual_commands_to_run(self):
+        for key in self.KEYS:
+            with self.subTest(step=key):
+                verdict, calls = self.execute_step(key, private_terms=True)
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0][:2], list(table.STEPS[key].argv[:2]))
+                self.assertTrue(verdict.complete)
 
 
 class UnavailableIsNeverPass(unittest.TestCase):
