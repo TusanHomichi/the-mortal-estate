@@ -107,6 +107,15 @@ UNLAUNCHED = "unlaunched"
 LAUNCH_ATTEMPTED = "launch-attempted"
 STOPPED = "stopped"
 
+#: `pg_ctl status` distinguishes "running" from "not running" by exit status. Only those
+#: two answers are evidence; every other outcome — another status, a signal, an
+#: executable that cannot be run, a check that does not finish — is an unresolved
+#: inspection, and a check that failed cannot authorize deleting the resource it failed
+#: to inspect.
+SERVER_RUNNING = 0
+SERVER_NOT_RUNNING = 3
+STATUS_TIMEOUT_SECONDS = 30.0
+
 
 def postgres_binaries() -> Path:
     """The directory holding the PostgreSQL installation this proof runs."""
@@ -320,28 +329,43 @@ class ScratchInstallation:
         self.enroll()
         stage_bootstrap(self.site, self.release, self.accounts)
 
-    def server_running(self) -> bool:
-        """Whether a postmaster still holds this cluster's data directory.
+    def server_state(self):
+        """`pg_ctl`'s answer about this cluster: running, stopped, or unconfirmed.
 
         Asked of `pg_ctl status` rather than of SQL, because cleanup has to work for a
         server that is still coming up, or one that never finished accepting
-        connections.
+        connections. The tool's own two answers are the only evidence: exit 0 means a
+        postmaster holds the data directory, exit 3 means none does. Anything else is
+        unconfirmed and says so, with the status and whatever the tool printed, so a
+        failed inspection can never be read as a stopped server.
         """
-        completed = subprocess.run(
-            [str(self.pg_bin / "pg_ctl"), "-D", str(self.site.data), "status"],
-            capture_output=True, text=True, check=False)
-        return completed.returncode == 0
+        try:
+            completed = subprocess.run(
+                [str(self.pg_bin / "pg_ctl"), "-D", str(self.site.data), "status"],
+                capture_output=True, text=True, check=False, timeout=STATUS_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired as error:
+            return "unconfirmed", (f"the status check did not finish within "
+                                   f"{STATUS_TIMEOUT_SECONDS:g}s: {error}")
+        except OSError as error:
+            return "unconfirmed", f"the status check could not run: {error}"
+        if completed.returncode == SERVER_RUNNING:
+            return "running", ""
+        if completed.returncode == SERVER_NOT_RUNNING:
+            return "stopped", ""
+        detail = (completed.stdout or "").strip() or (completed.stderr or "").strip()
+        return "unconfirmed", (f"the status check answered {completed.returncode}"
+                               + (f": {detail[:200]}" if detail else ""))
 
     def close(self) -> list[str]:
         """Stop the cluster this proof started, and report what would not stop.
 
         The obligation is cleared by a *confirmed* shutdown, never by attempting one,
         and it survives a repeated call: while a server may still hold the data
-        directory, every caller is told so and every call tries again. Nothing to drop
-        and no ownership to track — the cluster, its databases, its roles and every
-        credential in them live under the temporary root — but the caller must keep
-        that root until this returns no problems, because the files are what somebody
-        needs to finish or diagnose the job.
+        directory -- or while that cannot be established -- every caller is told so and
+        every call tries again. Nothing to drop and no ownership to track: the cluster,
+        its databases, its roles and every credential in them live under the temporary
+        root. But the caller must keep that root until this returns no problems, because
+        the files are what somebody needs to finish or diagnose the job.
         """
         if self.cluster_state != LAUNCH_ATTEMPTED:
             return []
@@ -351,17 +375,16 @@ class ScratchInstallation:
                  "-w", "-t", "60", "stop"], timeout=120)
         except Exception as error:  # noqa: BLE001 - every cleanup failure is reportable
             attempt = error
-        try:
-            running = self.server_running()
-        except OSError as error:
-            return [f"the scratch cluster in {self.site.data} could not be asked whether "
-                    f"it stopped: {error}"]
-        if running:
-            detail = f": {attempt}" if attempt is not None else ""
-            return [f"the scratch cluster in {self.site.data} is still running{detail}"]
-        # Nothing holds the cluster any more, whatever the stop command reported.
-        self.cluster_state = STOPPED
-        return []
+        state, detail = self.server_state()
+        if state == "stopped":
+            # Nothing holds the cluster any more, whatever the stop command reported.
+            self.cluster_state = STOPPED
+            return []
+        if state == "running":
+            suffix = f": {attempt}" if attempt is not None else ""
+            return [f"the scratch cluster in {self.site.data} is still running{suffix}"]
+        return [f"the scratch cluster in {self.site.data} could not be confirmed stopped: "
+                f"{detail}"]
 
 
 class SiteWithBarrier:

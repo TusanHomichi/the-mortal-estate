@@ -144,13 +144,17 @@ and every credential in them live under the temporary root and die with it.
 The temporary root is removed only once nothing holds it. A launch is remembered
 *before* `pg_ctl` is asked to start, because PostgreSQL documents that a timed-out
 start can continue in the background and succeed — a failed start command is not
-evidence that no server exists — and only a *confirmed* shutdown clears the obligation:
-`pg_ctl status` is asked whether a postmaster still holds the data directory, a failed
-stop leaves the obligation in place so a later call tries again, and a stop that cannot
-be confirmed retains the root and reports where it is instead of submitting the data
-directory, PID file and logs for deletion. A proof that failed for its own reason keeps
-that failure, with the retention attached to it. `--keep` retains the root without a
-failure.
+evidence that no server exists — and only a *confirmed* shutdown clears the obligation.
+Confirmation is `pg_ctl status`, and only its own two answers count: exit 0 means a
+postmaster holds the data directory and exit 3 means none does. Every other outcome —
+another exit status, a signal, an executable that cannot be run, a status call that does
+not finish within its deadline — is an unresolved inspection, reported with the status
+and the tool's own diagnostic, because a check that failed cannot authorize deleting the
+resource it failed to inspect. A failed stop leaves the obligation in place, so a later
+call tries again. An unconfirmed stop retains the root and reports where it is instead of
+submitting the data directory, PID file and logs for deletion; a proof that failed for
+its own reason keeps that failure, with the retention attached to it. `--keep` retains
+the root without a failure.
 
 After starting the real server through `tools/live_server_harness.py`, it:
 
@@ -217,9 +221,17 @@ and the location; a proof failure with an unresolved shutdown keeps the primary 
 *and* the retention; a proof failure with a confirmed shutdown still removes it; a
 failure before any launch removes it, because nothing was started to keep it for; and
 `--keep` retains it without a failure. A repeated cleanup after a confirmed stop does
-nothing, and a repeated cleanup after a failed stop tries again. Mutation-checked
-against the previous lifecycle: both unresolved-shutdown cases request removal of a
-root whose server survived.
+nothing, and a repeated cleanup after a failed stop tries again.
+
+The status classification itself is covered with the real `server_state()`, the real
+`close()` and the real outer `proof()` connected, and only the process boundary stubbed,
+so what is classified is an exit status rather than a boolean handed in: `0` retains the
+root and the obligation, `3` clears both and permits removal, and `1`, `4`, a signal, a
+missing executable and a status call that does not finish all leave the shutdown
+unconfirmed, retain the root and preserve a primary failure. The status call is asserted
+to carry a deadline. Both families were mutation-checked against the lifecycle they
+replace: the unresolved-shutdown cases request removal of a root whose server survived,
+and reading any status but `0` as stopped fails four cases.
 
 ### Canonical checks observed
 
@@ -236,7 +248,7 @@ root whose server survived.
   `boundary: banned-terms` step ran against the real denylist and passed.
 - `python3 tools/run_verification.py --scope fast --changed-path …` → **COMPLETE**.
 - `python3 -m unittest -q tests.test_development_deploy tests.test_live_server_harness
-  tests.test_restore_drill_proof` — 48 + 10 + 27 tests, OK.
+  tests.test_restore_drill_proof` — 48 + 10 + 33 tests, OK.
 
 The tool also left the cluster as it found it: after the final run, no `tme` database
 and no `tme%` role remained.
