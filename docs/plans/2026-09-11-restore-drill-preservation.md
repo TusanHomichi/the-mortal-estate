@@ -224,8 +224,8 @@ root whose server survived.
 ### Canonical checks observed
 
 - `python3 tools/run_verification.py --scope full` → **COMPLETE — every selected step
-  ran and passed**, 994s total. The steps that matter here all passed:
-  `gated: real backup and restore drill on a scratch installation` (31.4s, run on the
+  ran and passed**, 1066s total. The steps that matter here all passed:
+  `gated: real backup and restore drill on a scratch installation` (38.4s, run on the
   cluster the proof creates and owns), `gated: PostgreSQL suite, one fresh migrated
   database per test`, `server: trusted TLS sign-in, admission, individual cooldowns,
   reconnect, and logout` (which serves the harness's default, provisioned path against
