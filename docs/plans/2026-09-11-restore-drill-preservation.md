@@ -139,8 +139,18 @@ this cluster, so nothing outside the root can be read, renamed, given a password
 dropped. Before anything destructive the proof asks the *running server* where its data
 directory is and refuses to continue unless it is the directory under its own root.
 There is no cross-cluster cleanup to get wrong: the cluster, its databases, its roles
-and every credential in them live under the temporary root and die with it, and the
-only cleanup step is stopping the server — reported, never raised past a failure.
+and every credential in them live under the temporary root and die with it.
+
+The temporary root is removed only once nothing holds it. A launch is remembered
+*before* `pg_ctl` is asked to start, because PostgreSQL documents that a timed-out
+start can continue in the background and succeed — a failed start command is not
+evidence that no server exists — and only a *confirmed* shutdown clears the obligation:
+`pg_ctl status` is asked whether a postmaster still holds the data directory, a failed
+stop leaves the obligation in place so a later call tries again, and a stop that cannot
+be confirmed retains the root and reports where it is instead of submitting the data
+directory, PID file and logs for deletion. A proof that failed for its own reason keeps
+that failure, with the retention attached to it. `--keep` retains the root without a
+failure.
 
 After starting the real server through `tools/live_server_harness.py`, it:
 
@@ -177,19 +187,19 @@ After starting the real server through `tools/live_server_harness.py`, it:
 `python3 tools/run_restore_drill_proof.py`:
 
 ```text
-scratch installation: /tmp/tme-restore-drill-r346_gdt (database tme, port 53207, socket /tmp/tme-restore-drill-r346_gdt/socket)
+scratch installation: /tmp/tme-restore-drill-xyooc662 (database tme, port 38797, socket /tmp/tme-restore-drill-xyooc662/socket)
 database: tme (provisioned by the caller)
 server: gameplay_ready=True protocol=1.10
-runtime character: 01a092d6-653c-7613-97e4-b4ea97fd6e2c slot 2
+runtime character: 01a092f4-6c78-7cc3-aa25-1f8125413c54 slot 2
 runtime character stepped north from (8,34)
 observed position: first_expedition/arrival (8,33)
-backup 20260911T233840Z-2fb907: 3 characters recorded, drill preserved 3, scratch database dropped
-coordinated commit: 01a092d6-7b33-7a41-9568-6985ebb08535 committed inside the exported snapshot and is absent from 20260911T233842Z-06dfe2, whose drill still preserved 3 characters
-restored copy served: 01a092d6-653c-7613-97e4-b4ea97fd6e2c still at first_expedition/arrival (8,33)
-altered backup refused by name: 01a092d6-653c-7613-97e4-b4ea97fd6e2c lost, e3ab0b8f-9e79-459d-ad2c-78132d3c5e7e gained, scratch database dropped
+backup 20260912T001131Z-521167: 3 characters recorded, drill preserved 3, scratch database dropped
+coordinated commit: 01a092f4-8c30-7ef0-9a11-538415056f54 committed inside the exported snapshot and is absent from 20260912T001133Z-42ee11, whose drill still preserved 3 characters
+restored copy served: 01a092f4-6c78-7cc3-aa25-1f8125413c54 still at first_expedition/arrival (8,33)
+altered backup refused by name: 01a092f4-6c78-7cc3-aa25-1f8125413c54 lost, b405ac08-b76d-410d-a286-00d99e89820c gained, scratch database dropped
 misfenced receipt refused after the fence ran, scratch database dropped
-cleanup failure reported with its cause: tme_restore_25a7ecffba33 survived a prepared transaction and the drill kept the preservation failure
-recovered: tme_restore_25a7ecffba33 released and dropped
+cleanup failure reported with its cause: tme_restore_2c0911d04eae survived a prepared transaction and the drill kept the preservation failure
+recovered: tme_restore_2c0911d04eae released and dropped
 TME_RESTORE_DRILL_PROOF_OK
 ```
 
@@ -198,6 +208,18 @@ snapshot was open before and after the commit, which is what makes the ordering 
 rather than an assumption. The walk is what makes the position oracle say something:
 `(8,33)` is a square the character reached by playing, which the world document does
 not declare and only the durable checkpoint can explain.
+
+The lifecycle branches a successful run never reaches are driven through the outer
+`proof()` with every collaborator stubbed, and the assertions are about what happens to
+the root rather than about a returned string: a confirmed shutdown removes it; a
+shutdown that could not be confirmed retains it and the failure names both the problem
+and the location; a proof failure with an unresolved shutdown keeps the primary failure
+*and* the retention; a proof failure with a confirmed shutdown still removes it; a
+failure before any launch removes it, because nothing was started to keep it for; and
+`--keep` retains it without a failure. A repeated cleanup after a confirmed stop does
+nothing, and a repeated cleanup after a failed stop tries again. Mutation-checked
+against the previous lifecycle: both unresolved-shutdown cases request removal of a
+root whose server survived.
 
 ### Canonical checks observed
 
@@ -214,8 +236,7 @@ not declare and only the durable checkpoint can explain.
   `boundary: banned-terms` step ran against the real denylist and passed.
 - `python3 tools/run_verification.py --scope fast --changed-path …` → **COMPLETE**.
 - `python3 -m unittest -q tests.test_development_deploy tests.test_live_server_harness
-  tests.test_restore_drill_proof` — 48 + 10 + 18 tests, OK; the runner's harness lane
-  runs 124.
+  tests.test_restore_drill_proof` — 48 + 10 + 27 tests, OK.
 
 The tool also left the cluster as it found it: after the final run, no `tme` database
 and no `tme%` role remained.

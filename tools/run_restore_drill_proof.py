@@ -96,6 +96,17 @@ ALTERED_PREFIX = "tme_altered_"
 ORACLE_PREFIX = "tme_oracle_"
 HELD_TRANSACTION = "tme_drill_cleanup_hold"
 
+#: What this proof still owes the cluster it launched.
+#:
+#: A launch is remembered *before* it is attempted, because `pg_ctl` documents that a
+#: timed-out start can continue in the background and succeed: a failed start command
+#: is not evidence that no server exists. Only a confirmed shutdown clears the
+#: obligation, and a caller that cannot confirm one must keep the root, because those
+#: files are what somebody needs to finish or diagnose the job.
+UNLAUNCHED = "unlaunched"
+LAUNCH_ATTEMPTED = "launch-attempted"
+STOPPED = "stopped"
+
 
 def postgres_binaries() -> Path:
     """The directory holding the PostgreSQL installation this proof runs."""
@@ -130,7 +141,7 @@ class ScratchInstallation:
         self.pg_bin = Path(pg_bin)
         self.administrator = getpass.getuser()
         self.site = Installation(self.root)
-        self.started = False
+        self.cluster_state = UNLAUNCHED
         self.release: Path | None = None
         self.accounts: list[dict] = []
         self.credentials: dict[str, str] = {}
@@ -191,9 +202,12 @@ class ScratchInstallation:
         write(self.site.data / "pg_hba.conf",
               f"local all {self.administrator} peer\nlocal all all scram-sha-256\n"
               "host all all 127.0.0.1/32 scram-sha-256\n")
+        # The obligation is recorded before the command runs, not after it succeeds:
+        # a `pg_ctl` start that times out can still be coming up, and this proof may
+        # not treat a failed command as proof that nothing is running.
+        self.cluster_state = LAUNCH_ATTEMPTED
         run([self.pg_bin / "pg_ctl", "-D", self.site.data, "-l", self.site.root / "postgres.log",
              "-w", "-t", "60", "start"], timeout=120)
-        self.started = True
         for attempt in range(100):
             try:
                 self.site.sql("SELECT 1", "postgres")
@@ -306,23 +320,47 @@ class ScratchInstallation:
         self.enroll()
         stage_bootstrap(self.site, self.release, self.accounts)
 
-    def close(self) -> list[str]:
-        """Stop the cluster this proof started, and report anything that would not stop.
+    def server_running(self) -> bool:
+        """Whether a postmaster still holds this cluster's data directory.
 
-        There is nothing to drop and no ownership to track: the cluster, its databases,
-        its roles and every credential in them live under the temporary root and die
-        with it. The only cleanup that matters is that no server process survives, and
-        problems are returned rather than raised so a proof that already failed keeps
-        its own failure.
+        Asked of `pg_ctl status` rather than of SQL, because cleanup has to work for a
+        server that is still coming up, or one that never finished accepting
+        connections.
         """
-        if not self.started:
+        completed = subprocess.run(
+            [str(self.pg_bin / "pg_ctl"), "-D", str(self.site.data), "status"],
+            capture_output=True, text=True, check=False)
+        return completed.returncode == 0
+
+    def close(self) -> list[str]:
+        """Stop the cluster this proof started, and report what would not stop.
+
+        The obligation is cleared by a *confirmed* shutdown, never by attempting one,
+        and it survives a repeated call: while a server may still hold the data
+        directory, every caller is told so and every call tries again. Nothing to drop
+        and no ownership to track — the cluster, its databases, its roles and every
+        credential in them live under the temporary root — but the caller must keep
+        that root until this returns no problems, because the files are what somebody
+        needs to finish or diagnose the job.
+        """
+        if self.cluster_state != LAUNCH_ATTEMPTED:
             return []
-        self.started = False
+        attempt = None
         try:
             run([self.pg_bin / "pg_ctl", "-D", self.site.data, "-m", "immediate",
                  "-w", "-t", "60", "stop"], timeout=120)
         except Exception as error:  # noqa: BLE001 - every cleanup failure is reportable
-            return [f"the scratch cluster in {self.site.data} was not stopped: {error}"]
+            attempt = error
+        try:
+            running = self.server_running()
+        except OSError as error:
+            return [f"the scratch cluster in {self.site.data} could not be asked whether "
+                    f"it stopped: {error}"]
+        if running:
+            detail = f": {attempt}" if attempt is not None else ""
+            return [f"the scratch cluster in {self.site.data} is still running{detail}"]
+        # Nothing holds the cluster any more, whatever the stop command reported.
+        self.cluster_state = STOPPED
         return []
 
 
@@ -915,17 +953,23 @@ def proof(arguments) -> int:
             raise ProofError("scratch databases survived the proof")
     except BaseException as error:
         failure = error
-    # Teardown never replaces a failure of its own: the proof's real outcome is the
-    # one worth reporting, and a cleanup problem is an extra fact, not a substitute.
+    # Teardown never replaces a failure of its own: the proof's real outcome is the one
+    # worth reporting, and a cleanup problem is an extra fact, not a substitute. The
+    # root is removed only once no server holds it; otherwise it stays, because a
+    # cluster that would not stop is exactly what somebody has to come back to.
     problems = installation.close()
+    if problems:
+        retained = (f"the scratch root {root} was retained because the cluster it holds "
+                    f"was not stopped: {'; '.join(problems)}")
+        if failure is not None:
+            raise ProofError(f"{failure}; {retained}") from failure
+        raise ProofError(retained)
+    # Nothing holds the root, so the proof's own outcome can be reported after it is
+    # gone — or, with --keep, alongside it.
     if arguments.keep:
         print(f"kept: {root}")
     else:
         shutil.rmtree(root, ignore_errors=True)
-    if problems and failure is None:
-        raise ProofError("tearing the proof down failed: " + "; ".join(problems))
-    if problems:
-        print(f"teardown also failed: {'; '.join(problems)}", file=sys.stderr)
     if failure is not None:
         raise failure
     print(json.dumps(report, indent=2, sort_keys=True))

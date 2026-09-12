@@ -8,8 +8,10 @@ window and only there, and that a restored copy's credentials are re-pointed wit
 losing the role.
 """
 
+import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -51,27 +53,213 @@ class Ownership(unittest.TestCase):
 
 
 class StopReporting(unittest.TestCase):
-    """Cleanup returns its problems, so a failed proof keeps its own failure."""
+    """Cleanup returns its problems, and only a confirmed stop clears the obligation."""
 
     class Installation(proof.ScratchInstallation):
-        def __init__(self, started=True):
-            self.started = started
+        def __init__(self, state):
+            self.cluster_state = state
             self.site = SimpleNamespace(data=Path("/tmp/scratch/postgres"))
             self.pg_bin = Path("/nonexistent")
 
-    def test_a_cluster_that_never_started_is_not_stopped(self):
+    def test_a_cluster_that_was_never_launched_is_not_stopped(self):
         with patch.object(proof, "run") as runner:
-            self.assertEqual(self.Installation(started=False).close(), [])
+            self.assertEqual(self.Installation(proof.UNLAUNCHED).close(), [])
         runner.assert_not_called()
 
-    def test_a_cluster_that_will_not_stop_is_reported_not_raised(self):
-        """A timeout is a cleanup problem too, not an exception past the failure."""
-        with patch.object(proof, "run", side_effect=subprocess.TimeoutExpired("pg_ctl", 120)):
-            problems = self.Installation().close()
+    def test_a_launch_that_failed_still_owes_a_stop(self):
+        """`pg_ctl` can time out and come up anyway, so the obligation is not a flag."""
+        with patch.object(proof, "run") as runner, \
+                patch.object(proof.ScratchInstallation, "server_running", return_value=False):
+            problems = self.Installation(proof.LAUNCH_ATTEMPTED).close()
+        self.assertEqual(problems, [])
+        self.assertEqual(runner.call_count, 1)
+        self.assertIn("stop", runner.call_args.args[0])
+
+    def test_a_server_that_survives_the_stop_is_reported_and_still_owed(self):
+        """A timeout is a cleanup problem, and the next attempt must try again."""
+        installation = self.Installation(proof.LAUNCH_ATTEMPTED)
+        with patch.object(proof, "run", side_effect=subprocess.TimeoutExpired("pg_ctl", 120)), \
+                patch.object(proof.ScratchInstallation, "server_running", return_value=True):
+            problems = installation.close()
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("is still running", problems[0])
+            self.assertIn("/tmp/scratch/postgres", problems[0])
+            self.assertIn("timed out", problems[0])
+            self.assertEqual(installation.close(), problems)
+
+    def test_a_confirmed_stop_clears_the_obligation(self):
+        installation = self.Installation(proof.LAUNCH_ATTEMPTED)
+        with patch.object(proof, "run") as runner, \
+                patch.object(proof.ScratchInstallation, "server_running", return_value=False):
+            self.assertEqual(installation.close(), [])
+            self.assertEqual(installation.close(), [])
+        self.assertEqual(runner.call_count, 1)
+
+    def test_a_cluster_that_cannot_be_asked_whether_it_stopped_is_reported(self):
+        with patch.object(proof, "run"), \
+                patch.object(proof.ScratchInstallation, "server_running",
+                             side_effect=OSError("pg_ctl is gone")):
+            problems = self.Installation(proof.LAUNCH_ATTEMPTED).close()
         self.assertEqual(len(problems), 1, problems)
-        self.assertIn("was not stopped", problems[0])
-        self.assertIn("/tmp/scratch/postgres", problems[0])
-        self.assertIn("timed out", problems[0])
+        self.assertIn("could not be asked whether it stopped", problems[0])
+
+
+class ServerContext:
+    """The live-server harness, as a context manager that starts nothing."""
+
+    def __init__(self, *arguments, **keywords):
+        self.arguments = arguments
+
+    def __enter__(self):
+        return SimpleNamespace()
+
+    def __exit__(self, *_exception):
+        return False
+
+
+class ProofLifecycle(unittest.TestCase):
+    """The outer proof removes its root only once no server holds it.
+
+    These cases drive the real `proof()` with every external collaborator stubbed, so
+    what they pin is this tool's own control flow: what it does with the root after a
+    shutdown it could not confirm, and what it reports when the proof failed first.
+    """
+
+    class Installation:
+        """A scratch installation whose lifecycle the outer proof controls."""
+
+        def __init__(self, close_problems=(), provision_error=None):
+            self.close_problems = list(close_problems)
+            self.provision_error = provision_error
+            self.closes = 0
+            self.root = Path("/not-adopted")
+            self.administrator = "proof-admin"
+            self.site = SimpleNamespace(ports={"postgres": 1}, socket=Path("/tmp/socket"),
+                                        config=Path("/tmp/config"))
+
+        def adopt(self, root):
+            """Take the temporary root the real proof just created."""
+            self.root = Path(root)
+            self.site = SimpleNamespace(ports={"postgres": 1}, socket=Path("/tmp/socket"),
+                                        config=self.root / "config",
+                                        sql=lambda text, database="postgres": "")
+            return self
+
+        def provision(self):
+            if self.provision_error is not None:
+                raise self.provision_error
+            self.site.config.mkdir(parents=True, exist_ok=True)
+            (self.site.config / "bootstrap.json").write_text(
+                '{"characters": [{"character_id": "seeded-character"}]}', encoding="utf-8")
+
+        def close(self):
+            self.closes += 1
+            return list(self.close_problems)
+
+        def served(self, character_id, database=proof.SCRATCH_DATABASE, account=0):
+            return SimpleNamespace(database_name=database, character_id=character_id)
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="tme-proof-lifecycle-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+
+    def run_proof(self, installation, *, keep=False, stages=None):
+        """The root removals the proof requested, and the failure it surfaced."""
+        stages = stages or {}
+        removed = []
+        world = SimpleNamespace(world_template="world.json")
+        preserved = {"saved": Path("/backups/one"), "created": {"character_id": "c-1"},
+                     "position": {}}
+
+        def stage_of(name, default):
+            value = stages.get(name, default)
+            if isinstance(value, BaseException):
+                def raises(*arguments, **keywords):
+                    raise value
+                return raises
+            return lambda *arguments, **keywords: value
+
+        arguments = SimpleNamespace(postgres_bin="/fake/bin", world_document="world.json",
+                                    keep=keep)
+        with patch.object(proof, "postgres_binaries", return_value=Path("/fake/bin")), \
+                patch.object(proof, "build_server", return_value=Path("/fake/bin/tme-server")), \
+                patch.object(proof, "World", SimpleNamespace(declared=lambda *a, **k: world)), \
+                patch.object(proof, "ScratchInstallation",
+                             side_effect=lambda root, binary, document, pg_bin: installation.adopt(root)), \
+                patch.object(proof, "LiveServer", ServerContext), \
+                patch.object(proof.shutil, "rmtree",
+                             side_effect=lambda path, **keywords: removed.append(Path(path))), \
+                patch.object(proof, "prove_preservation",
+                             side_effect=stage_of("preserve", preserved)), \
+                patch.object(proof, "prove_concurrent_commit",
+                             side_effect=stage_of("concurrent", None)), \
+                patch.object(proof, "prove_restored_position",
+                             side_effect=stage_of("oracle", None)), \
+                patch.object(proof, "prove_rejection",
+                             side_effect=stage_of("rejection", Path("/backups/altered"))), \
+                patch.object(proof, "prove_cleanup_failure",
+                             side_effect=stage_of("cleanup", None)):
+            try:
+                proof.proof(arguments)
+                failure = None
+            except BaseException as error:
+                failure = error
+        # The real root was created by the real `tempfile`; only its removal was
+        # intercepted, so the test owns deleting it.
+        self.addCleanup(shutil.rmtree, installation.root, ignore_errors=True)
+        return removed, failure
+
+    def test_a_confirmed_shutdown_removes_the_root(self):
+        installation = self.Installation()
+        removed, failure = self.run_proof(installation)
+        self.assertIsNone(failure)
+        self.assertEqual(removed, [installation.root])
+        self.assertEqual(installation.closes, 1)
+
+    def test_an_unresolved_shutdown_retains_the_root(self):
+        """The files are what somebody needs to finish or diagnose the job."""
+        problem = "the scratch cluster in /tmp/x/postgres is still running"
+        installation = self.Installation(close_problems=[problem])
+        removed, failure = self.run_proof(installation)
+        self.assertEqual(removed, [], "a root whose server survived must not be deleted")
+        self.assertIsInstance(failure, proof.ProofError)
+        self.assertIn("was retained", str(failure))
+        self.assertIn(problem, str(failure))
+        self.assertIn(str(installation.root), str(failure))
+
+    def test_a_primary_failure_with_an_unresolved_shutdown_retains_the_root(self):
+        """Both facts survive: what went wrong, and where the cluster still is."""
+        primary = proof.ProofError("the created character was not preserved")
+        problem = "the scratch cluster in /tmp/x/postgres is still running"
+        installation = self.Installation(close_problems=[problem])
+        removed, failure = self.run_proof(installation, stages={"preserve": primary})
+        self.assertEqual(removed, [])
+        self.assertIs(failure.__cause__, primary)
+        self.assertIn("the created character was not preserved", str(failure))
+        self.assertIn("was retained", str(failure))
+        self.assertIn(problem, str(failure))
+
+    def test_a_primary_failure_with_a_confirmed_shutdown_removes_the_root(self):
+        primary = proof.ProofError("the created character was not preserved")
+        installation = self.Installation()
+        removed, failure = self.run_proof(installation, stages={"preserve": primary})
+        self.assertIs(failure, primary)
+        self.assertEqual(removed, [installation.root])
+
+    def test_a_provision_failure_before_any_launch_removes_the_root(self):
+        """Nothing was launched, so there is nothing to keep the files for."""
+        installation = self.Installation(provision_error=RuntimeError("injected initdb failure"))
+        removed, failure = self.run_proof(installation)
+        self.assertIsInstance(failure, RuntimeError)
+        self.assertIn("injected initdb failure", str(failure))
+        self.assertEqual(removed, [installation.root])
+
+    def test_keep_retains_the_root_without_a_failure(self):
+        installation = self.Installation()
+        removed, failure = self.run_proof(installation, keep=True)
+        self.assertIsNone(failure)
+        self.assertEqual(removed, [])
 
 
 class PinnedReadWindow(unittest.TestCase):
