@@ -71,6 +71,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_live_server_harness",
         "tests.test_live_proof_cooldowns",
         "tests.test_presentation_adoption_recording",
+        "tests.test_restore_drill_proof",
         "tests.test_run_clean_clone_proof",
         "tests.test_run_gated_postgres",
     ),
@@ -232,6 +233,14 @@ _STATIC: tuple[Step, ...] = (
         argv=("python3", "tools/run_gated_postgres.py", "--admin-url-file", "$TME_PG_ADMIN_URL_FILE"),
         requires=("postgres",),
         timeout=5400.0,
+    ),
+    Step(
+        key="gated.restore_drill",
+        owner="gated",
+        label="gated: real backup and restore drill on a scratch installation",
+        argv=("python3", "tools/run_restore_drill_proof.py"),
+        requires=("postgres-server",),
+        timeout=1800.0,
     ),
     Step(
         key="cleanclone.build_and_test",
