@@ -90,6 +90,21 @@ export class SettlementScenery {
     this.group.add(sun,sun.target);
   }
   private interior(member:Member):void {
+    // Some original room models contain only walls and furnishings. Supply
+    // ground under current occupied/floor cells, below any modeled floor, never void.
+    const cells=member.cells.filter(c=>c.terrain.some(t=>t.layer==='base_terrain'&&t.class!=='expedition_void'));
+    const stone=member.member==='temple'||member.member==='forge',strips=stone?1:4;
+    const material=new T.MeshStandardMaterial({color:stone?0x827966:0x997348,map:this.texture,roughness:.95});
+    const floor=new T.InstancedMesh(new T.BoxGeometry(TILE-.012,.06,TILE/strips-.012),material,cells.length*strips);
+    floor.name='settlement-floor';floor.receiveShadow=true;this.generated.add(floor);this.group.add(floor);
+    const matrix=new T.Matrix4(),tone=new T.Color();
+    cells.forEach((cell,index)=>{for(let strip=0;strip<strips;strip++){
+      matrix.makeTranslation(cell.x*TILE,-.035,(cell.y-.5+(strip+.5)/strips)*TILE);
+      const instance=index*strips+strip;floor.setMatrixAt(instance,matrix);
+      const variation=((cell.x*73856093^cell.y*19349663^strip*83492791)>>>0)%13;
+      floor.setColorAt(instance,tone.setScalar(.90+variation*.012));
+    }});
+    floor.instanceMatrix.needsUpdate=true;
     const room=this.instance(`room_${member.member}`,0,0);room.updateMatrixWorld(true);
     // Material-batched room meshes remain separate occlusion surfaces, so a
     // foreground furnishing does not fade the entire room and its floor.

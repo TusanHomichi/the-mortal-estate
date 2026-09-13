@@ -35,6 +35,7 @@ export function actorActionGroups(snapshot: Snapshot, actorId: string): ActionGr
 export class ActorInteraction {
   private actorId: string | null = null;
   private generation: number | null = null;
+  private presentationSignature = "";
   private readonly root = document.createElement("dialog");
   private readonly title = document.createElement("h2");
   private readonly content = document.createElement("div");
@@ -51,11 +52,11 @@ export class ActorInteraction {
 
   open(actorId: string, view: ControlView): void {
     if (!view.snapshot?.envelope.frame.actors.some(actor => actor.actor_id === actorId)) return;
-    this.actorId = actorId; this.generation = null; this.present(view);
+    this.actorId = actorId; this.generation = null; this.presentationSignature = ""; this.present(view);
     if (this.actorId && !this.root.open) this.root.show();
   }
 
-  private dismiss(): void { this.actorId = null; this.root.close(); }
+  private dismiss(): void { this.actorId = null; this.generation = null; this.root.close(); }
 
   present(view: ControlView): void {
     if (!this.actorId) return;
@@ -63,43 +64,58 @@ export class ActorInteraction {
     const actor = snapshot?.envelope.frame.actors.find(row => row.actor_id === this.actorId);
     if (!snapshot || !actor || view.phase !== "playing") { this.dismiss(); return; }
     if (snapshot.generation !== this.generation) {
-      const focused = this.content.contains(document.activeElement)
-        ? (document.activeElement as HTMLElement).dataset.action : undefined;
-      this.generation = snapshot.generation; this.title.textContent = actor.name;
-      this.content.replaceChildren(); this.buttons.length = 0;
       const groups = actorActionGroups(snapshot, this.actorId);
-      if (!groups.length) {
-        const hint = document.createElement("p");
-        hint.textContent = "No actions are currently offered for this character. Services require sharing their square.";
-        this.content.append(hint);
-      }
-      for (const group of groups) {
-        for (const fact of group.facts) {
-          const p = document.createElement("p"); p.textContent = fact; this.content.append(p);
+      const labels = groups.flatMap(group => group.actions.map(action => {
+        const listing = snapshot.envelope.frame.services_here
+          .filter(service => group.key === `service:${service.service_id}`)
+          .flatMap(service => service.capabilities.flatMap(capability =>
+            capability.kind === "merchant" ? capability.listings : []))
+          .find(row => row.purchase.id === action.id);
+        return [group.key + "/" + action.id, listing
+          ? `Buy ${listing.item.name} × ${listing.item.quantity} — ${listing.price_gold} gold`
+          : action.label] as const;
+      }));
+      // World refreshes must not replace an unchanged pointer/keyboard target.
+      // The signature includes offers as well as labels, so revocation retires it.
+      const signature = JSON.stringify([groups, labels]);
+      this.generation = snapshot.generation;
+      if (this.title.textContent !== actor.name) this.title.textContent = actor.name;
+      if (signature !== this.presentationSignature) {
+        this.presentationSignature = signature;
+        const labelByAction = new Map(labels);
+        const focused = this.content.contains(document.activeElement)
+          ? (document.activeElement as HTMLElement).dataset.action : undefined;
+        this.content.replaceChildren(); this.buttons.length = 0;
+        if (!groups.length) {
+          const hint = document.createElement("p");
+          hint.textContent = "No actions are currently offered for this character. Services require sharing their square.";
+          this.content.append(hint);
         }
-        for (const action of group.actions) {
-          const button = document.createElement("button"); button.type = "button";
-          const listing = snapshot.envelope.frame.services_here
-            .filter(service => group.key === `service:${service.service_id}`)
-            .flatMap(service => service.capabilities.flatMap(capability =>
-              capability.kind === "merchant" ? capability.listings : []))
-            .find(row => row.purchase.id === action.id);
-          button.textContent = listing
-            ? `Buy ${listing.item.name} × ${listing.item.quantity} — ${listing.price_gold} gold`
-            : action.label;
-          button.dataset.action = `${group.key}/${action.id}`;
-          const unavailable = !action.enabled || !action.intent;
-          button.dataset.unavailable = String(unavailable);
-          if (action.blocked_reason) button.title = action.blocked_reason.replaceAll("_", " ");
-          button.onclick = () => { this.dispatch(snapshot.generation, group.key, action.id); };
-          this.content.append(button); this.buttons.push(button);
-          if (action.blocked_reason) {
-            const reason = document.createElement("small");
-            reason.textContent = action.blocked_reason.replaceAll("_", " "); this.content.append(reason);
+        for (const group of groups) {
+          for (const fact of group.facts) {
+            const p = document.createElement("p"); p.textContent = fact; this.content.append(p);
+          }
+          for (const action of group.actions) {
+            const button = document.createElement("button"); button.type = "button";
+            button.textContent = labelByAction.get(`${group.key}/${action.id}`)!;
+            button.dataset.action = `${group.key}/${action.id}`;
+            const unavailable = !action.enabled || !action.intent;
+            button.dataset.unavailable = String(unavailable);
+            if (action.blocked_reason) button.title = action.blocked_reason.replaceAll("_", " ");
+            button.onclick = () => {
+              if (!this.actorId || this.generation === null || !this.root.open || button.disabled
+                || !button.isConnected || !this.buttons.includes(button)) return;
+              this.dispatch(this.generation, group.key, action.id);
+            };
+            this.content.append(button); this.buttons.push(button);
+            if (action.blocked_reason) {
+              const reason = document.createElement("small");
+              reason.textContent = action.blocked_reason.replaceAll("_", " "); this.content.append(reason);
+            }
           }
         }
+        this.buttons.find(button => button.dataset.action === focused)?.focus({ preventScroll: true });
       }
-      this.buttons.find(button => button.dataset.action === focused)?.focus({ preventScroll: true });
     }
     for (const button of this.buttons) button.disabled = view.busy || view.pending
       || !snapshot.envelope.frame.can_act || button.dataset.unavailable === "true";

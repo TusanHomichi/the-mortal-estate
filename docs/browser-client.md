@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-13
-revision: 61
+revision: 62
 status: Full-world Three.js implemented; linked delivery records own native proof and installation outcomes.
 public_safe: true
 summary: One 3D world renderer, shared rigged figures, current-map scenery and authoritative browser proof.
@@ -83,6 +83,11 @@ The world shell fills the viewport. `worldStyle.css` retains direct movement,
 resident menus, session controls and feedback while hiding temporary diagnostic
 HUD panels. Double-clicking an occupied stair square selects its sole enabled
 server-offered traversal; readiness and ambiguity checks remain in the shell.
+
+For room GLBs with only walls and furnishings, the scenery owner supplies solid
+wood or stone floor instances from current authored non-void cells. Those floors stay
+outside the occlusion set and are disposed with the area, preserving actual room
+coverage without borrowing a pixel layer.
 
 ### Operation and native proof
 
@@ -277,6 +282,12 @@ diagnostic shell, grouping each teacher, merchant, bank, locker and NPC by its
 server identity. It exposes the existing service capabilities and equipment,
 loot, combat and traversal options without calculating their legality. Repeated
 service actions in the general list are presented at their service once.
+
+`play/actorInteraction.ts` likewise retains unchanged actor-menu buttons across
+snapshot generations. Its semantic signature includes current offers and merchant
+labels; revocation retires the old targets. Dispatch uses the latest generation,
+and dismissed or detached controls cannot act. The native panel proof also checks
+actor-menu gestures across refresh, revocation and dismissal.
 
 The panel retains group controls across snapshot refreshes, preserving native mouse
 gestures, keyboard focus and entered quantities. Unchanged summary text nodes also

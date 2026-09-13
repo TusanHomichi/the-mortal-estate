@@ -130,10 +130,8 @@ try {
   await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
   await walkTo(frame.actors.find(a=>a.actor_id==="balm_seller").position.position);await openActor("balm_seller");
   const purchase=page.locator(".resident-dialog").getByRole("button",{name:/^Buy .*balm/i}).first();assert(await purchase.isEnabled());
-  // The live resident feed can replace an unchanged menu row between animation
-  // frames. Use its visible pointer target, as a player does, and prove the command.
-  const purchaseBox=await purchase.boundingBox();assert(purchaseBox);
-  const purchases=commands.length;await page.mouse.click(purchaseBox.x+purchaseBox.width/2,purchaseBox.y+purchaseBox.height/2);await committed(purchases);
+  // Native locator clicks must survive an unchanged authoritative refresh.
+  const purchases=commands.length;await purchase.click();await committed(purchases);
   assert(frame.carried.items.some(i=>i.item.item_definition_id==="healing_balm"));await mark("maude-purchase");
   await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
   await walkTo({x:0,y:4});await traverse("stairs_down");

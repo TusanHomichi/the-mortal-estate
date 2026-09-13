@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-09-13
-revision: 1
+revision: 2
 status: Full-world 3D implementation and regression coverage complete; PR and installation receipts own verification and delivery outcomes.
 public_safe: true
 summary: Atomic full-world Three.js cutover, current-map candidate scenery, shared figures, proof and preview delivery.
@@ -63,6 +63,11 @@ file map and save-conservation result. This avoids a changing document becoming
 a competing installation receipt. Source merge alone proves no deployment or
 visual acceptance; private paths, credentials and captures remain outside Git.
 
+Visual inspection also caught missing room floors: several original room GLBs carried
+walls and furnishings while their prior presenter supplied the floor separately.
+Current non-void authored cells now supply solid 3D wood or stone flooring, with
+coverage and disposal regression proof.
+
 The native matrix covers all seven town entrances, all four dungeon floors,
 both bodies walking through temple/town and returning, resident services,
 entry/creation, doors, stairs, real combat, both defender bodies and the
@@ -83,8 +88,14 @@ Live proof now collects GPU console errors as well as JavaScript errors.
 
 Proof setup retains the fixture's original class when selecting a body variant.
 Walking captures use a complete three-step accepted route and check the pose on
-both sides of capture. Resident-menu proof clicks the actual visible button
-position while the live feed refreshes its rows, then checks the accepted command.
+both sides of a real framebuffer capture during its draw turn. Remote screenshot
+round trips could outlast the action; the capture observer changes no clock,
+pose, rendering or gameplay state.
+Native resident-menu proof exposed buttons being replaced during mouse gestures.
+Unchanged semantic menu contents now retain their controls, resolve dispatch
+against the latest generation, and refuse retired or dismissed controls. The
+native panel proof straddles a refresh with mouse-down/up; the live room proof
+uses normal locator clicks and verifies an accepted purchase.
 
 [Town visibility #69](https://github.com/TusanHomichi/the-mortal-estate/issues/69)
 requires the final bank-side native and installed captures. The prior

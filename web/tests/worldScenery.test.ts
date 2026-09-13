@@ -26,6 +26,26 @@ describe('full 3D settlement geometry',()=>{
     expect(scenery.presentStatic('temple')).toBe(true);expect(scenery.presentStatic('temple')).toBe(false);
     scenery.clear();expect(dispose).not.toHaveBeenCalled();scenery.dispose();mesh.geometry.dispose();mesh.material.dispose();
   });
+  it('grounds every authored interior cell while leaving void open and floors out of occlusion',()=>{
+    const assets=new Map(Object.keys(receipt.models).map(name=>[name,new T.Group()]));
+    const scenery=new SettlementScenery(assets),matrix=new T.Matrix4(),point=new T.Vector3();
+    for(const member of geography.members.filter(m=>assets.has(`room_${m.member}`))){
+      scenery.presentStatic(member.member);
+      const floor=scenery.group.getObjectByName('settlement-floor') as T.InstancedMesh;
+      expect(floor).toBeInstanceOf(T.InstancedMesh);
+      const covered=new Set<string>();
+      for(let i=0;i<floor.count;i++){
+        floor.getMatrixAt(i,matrix);point.setFromMatrixPosition(matrix);
+        covered.add(`${Math.round(point.x/1.65)}:${Math.round(point.z/1.65)}`);
+        expect(point.y).toBeLessThan(0);
+      }
+      const expected=member.cells.filter(c=>c.terrain.some(t=>t.layer==='base_terrain'&&t.class!=='expedition_void'));
+      expect([...covered].sort()).toEqual(expected.map(c=>`${c.x}:${c.y}`).sort());
+      expect(scenery.occluders.some(o=>o.getObjectById(floor.id))).toBe(false);
+      const disposed=vi.spyOn(floor.geometry,'dispose');scenery.clear();expect(disposed).toHaveBeenCalledOnce();
+    }
+    scenery.dispose();
+  });
   it('shares observed grid edges and excludes unknown and blocked squares',()=>{
     const tiles=[{position:{x:0,y:0},terrain_id:'floor',passable:true},{position:{x:1,y:0},terrain_id:'floor',passable:true},
       {position:{x:2,y:0},passable:true},{position:{x:3,y:0},terrain_id:'wall',passable:false}];
