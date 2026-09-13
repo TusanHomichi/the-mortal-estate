@@ -27,7 +27,9 @@ try {
   const canvas=page.locator('#world-canvas');
   const ready=(timeout=45000)=>wait(()=>document.body.dataset.phase==='playing'&&document.querySelector('#world-canvas').dataset.canAct==='true'&&document.querySelector('#world-canvas').dataset.pending==='false',null,timeout);
   const commands=()=>sent.filter(value=>value.kind==='command');
-  const mark=async label=>{await canvas.screenshot({path:`${config.output}/${name}-${label}.png`});captures.push(label);};
+  // Capture the playable viewport, including its speech and death controls.
+  // Element capture adds a scroll/stability wait to the continuously drawn canvas.
+  const mark=async label=>{await page.screenshot({path:`${config.output}/${name}-${label}.png`});captures.push(label);};
   await page.goto(config.origin+'/');await wait(()=>document.body.dataset.playReady==='true');
   await page.locator('#username').fill(config.username);await page.locator('#password').fill(config.password);
   await page.locator('#login').click();await wait(()=>document.body.dataset.phase==='selecting');
