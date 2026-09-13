@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-09-13
 revision: 2
-status: Ordinary control delivered through PR 75; immediate fire return in verification, with further exceptional routes still open.
+status: Ordinary control and immediate fire return are tracked through PRs 75 and 77; further exceptional routes remain open.
 public_safe: true
 summary: Ordinary return delivery, immediate fire continuation, backlog reconciliation and remaining death and lineage work.
 ---
@@ -190,8 +190,9 @@ are retained. A self-target direct-damage fixture was rejected because that targ
 executes as stubbed; the accepted proof uses the existing automatic monster spell
 path. Self-target damage support is tracked in
 [issue #76](https://github.com/TusanHomichi/the-mortal-estate/issues/76), separately
-from the fire route. Final configured verification and saved-preview activation
-receipts must establish delivery before this continuation is marked complete.
+from the fire route. Final configured verification, source delivery and preserved-save preview receipts
+are owned by [PR #77](https://github.com/TusanHomichi/the-mortal-estate/pull/77).
+Native proof alone does not establish those delivery steps.
 
 
 The parent observed all six native fire cases pass on chromium, firefox and
