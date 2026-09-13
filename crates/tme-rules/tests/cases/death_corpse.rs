@@ -1,4 +1,6 @@
 use crate::support::content_parts::ContentParts;
+#[path = "death_corpse/control_tests.rs"]
+mod control_tests;
 use tme_rules::{
     ActionBlockedReasonV1, ActorKind, ActorLifeState, CarriedPosition, CorpseDisposition, CorpseId,
     DeathCause, Engine, Event, GoldRelocationReason, ItemLocation, ItemRelocationReason,

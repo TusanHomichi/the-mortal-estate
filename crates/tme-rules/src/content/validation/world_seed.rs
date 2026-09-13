@@ -13,7 +13,7 @@ use crate::content::{
     ActiveEffectDef, ActorSeedDef, CatalogProfileKey, ItemEconomyDef, ItemInstanceSeedDef,
     NpcInteractionOutcomeDef, ServiceCapabilityDef, SkillCatalogDef, SpellDef, StarterCharacterDef,
     TransactionCostDef, TransactionDef, TransactionRequirementDef, TransactionRewardDef,
-    WorldSeedDef, WorldTemplateV3,
+    WorldSeedDef, WorldTemplateV4,
 };
 use crate::model::{
     ActorKind, CarriedPosition, ItemBindingState, ItemCapability, ItemPlacementKind, SkillEntry,
@@ -134,11 +134,11 @@ pub trait WorldSeedValidationContext {
 
 pub(super) struct SourceWorldSeedValidationContext<'a> {
     catalog: &'a SelectedCatalog,
-    template: &'a WorldTemplateV3,
+    template: &'a WorldTemplateV4,
 }
 
 impl<'a> SourceWorldSeedValidationContext<'a> {
-    pub(super) fn new(catalog: &'a SelectedCatalog, template: &'a WorldTemplateV3) -> Self {
+    pub(super) fn new(catalog: &'a SelectedCatalog, template: &'a WorldTemplateV4) -> Self {
         Self { catalog, template }
     }
 }

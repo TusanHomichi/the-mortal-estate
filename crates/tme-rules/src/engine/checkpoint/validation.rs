@@ -1,6 +1,9 @@
 use super::*;
+#[path = "death_validation.rs"]
+mod death_validation;
 
 pub(super) fn validate_checkpoint_references(engine: &Engine) -> Result<(), CheckpointError> {
+    death_validation::validate(engine)?;
     let definition = engine.definition.as_ref();
     let actor_ids = engine
         .world

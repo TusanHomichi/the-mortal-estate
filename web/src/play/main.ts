@@ -4,6 +4,9 @@ import { ActorInteraction } from "./actorInteraction";
 import { GameplayPanel } from "./gameplayPanel";
 import { CreationPanel } from "./creationPanel";
 import { EntryShell } from "./entryShell";
+import { Communication } from "./communication";
+import { DeathControl } from "./deathControl";
+import { observedLife, physicalControlsAvailable } from "./life";
 import { actions, loadPreferences, savePreferences, type Action } from "./preferences";
 import { PathControls } from "./pathControls";
 import { walkCursorDataUris, WALK_CURSOR_HOTSPOT } from "../walk/cursors";
@@ -33,6 +36,8 @@ const gameplay = new GameplayPanel(element("gameplay"), (generation, group, acti
 const residentInteraction = new ActorInteraction((generation, group, action) => control.offeredAction(generation, group, action));
 const creation = new CreationPanel(element<HTMLFormElement>("creation-form"), draft => control.createCharacter(draft), () => control.closeCreation());
 const entry = new EntryShell();
+const communication = new Communication(element("communication"), text => control.sendSay(text));
+const death = new DeathControl(element("death-status"), (generation, group, action) => control.offeredAction(generation, group, action));
 let shownGeneration: number | null = null;
 let lastPhase = "";
 let current: ControlView;
@@ -42,6 +47,10 @@ function present(state: ControlView): void {
   gameplay.present(state);
   residentInteraction.present(state);
   creation.present(state);
+  communication.present(state);
+  death.present(state);
+  element("communication").hidden = state.phase === "signed_out" || state.phase === "selecting";
+  const life = observedLife(state.snapshot?.envelope.frame);
   element("signin").hidden = state.phase !== "signed_out";
   element("selection").hidden = state.phase !== "selecting";
   element("world").hidden = state.phase === "signed_out" || state.phase === "selecting";
@@ -51,7 +60,7 @@ function present(state: ControlView): void {
   element("feedback").textContent = state.feedback;
   for (const id of ["login", "enter", "reconnect", "logout", "open-creation"]) element<HTMLButtonElement>(id).disabled = state.busy;
   element<HTMLButtonElement>("enter").disabled = state.busy || state.characters.length === 0;
-  for (const button of buttons) button.disabled = state.busy || state.pending || state.phase !== "playing" || !state.snapshot?.envelope.frame.can_act;
+  for (const button of buttons) button.disabled = state.busy || state.pending || state.phase !== "playing" || !physicalControlsAvailable(state.snapshot?.envelope.frame);
   if (state.snapshot?.generation !== shownGeneration) {
     shownGeneration = state.snapshot?.generation ?? null; arrival = performance.now();
     if (state.snapshot) {
@@ -77,6 +86,7 @@ function present(state: ControlView): void {
   view.canvas.dataset.readyAt = state.snapshot?.envelope.frame.ready_at ?? "";
   view.canvas.dataset.logicalTime = state.snapshot?.envelope.frame.logical_time ?? "";
   view.canvas.dataset.canAct = String(state.snapshot?.envelope.frame.can_act ?? false);
+  view.canvas.dataset.lifeState = life ?? "";
   view.canvas.dataset.sequence = state.nextSequence;
   view.canvas.dataset.worldRevision = state.snapshot?.envelope.world_revision ?? "";
   view.canvas.dataset.pending = String(state.pending);
@@ -87,6 +97,7 @@ function present(state: ControlView): void {
   }
 }
 function act(action: Action): void {
+  if (!physicalControlsAvailable(current?.snapshot?.envelope.frame)) return;
   walk.cancel();
   control.command(action === "play.wait" ? { kind: "wait" } : { kind: "move_path", path: [directions[action]] });
 }
@@ -168,7 +179,10 @@ function progress(): void {
   const bounded = remaining > 60_000n ? 60_000 : remaining > 0n ? Number(remaining) : 0;
   const fraction = frame?.can_act ? 1 : bounded ? Math.min(1, elapsed / bounded) : 0;
   element<HTMLProgressElement>("cooldown").value = fraction;
-  element("readiness").textContent = !frame ? "Awaiting the server." : current.pending ? "Awaiting action result…" : frame.can_act ? "Ready" : fraction === 1 ? "Awaiting readiness confirmation…" : "Recovering…";
+  const ghost = observedLife(frame) === "ghost";
+  element("readiness").textContent = !frame ? "Awaiting the server." : current.pending ? "Awaiting action result…"
+    : ghost ? frame.can_act ? "Resurrection request available" : "Awaiting resurrection eligibility…"
+    : frame.can_act ? "Ready" : fraction === 1 ? "Awaiting readiness confirmation…" : "Recovering…";
   requestAnimationFrame(progress);
 }
 progress();

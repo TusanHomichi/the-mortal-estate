@@ -226,7 +226,7 @@ fn command_envelope_serializes_deterministically() {
 
 #[test]
 fn command_26_service_transaction_requires_explicit_nullable_item_selection() {
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27);
     let command = PlayerCommandV1 {
         contract_version: COMMAND_CONTRACT_VERSION,
         actor_id: "player".into(),
@@ -263,7 +263,7 @@ fn command_26_service_transaction_requires_explicit_nullable_item_selection() {
 
 #[test]
 fn command_26_storage_and_offer_payloads_are_exact_strict_and_current() {
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27);
     let payloads = [
         serde_json::json!({
             "move_gold": {
@@ -319,7 +319,7 @@ fn command_26_storage_and_offer_payloads_are_exact_strict_and_current() {
 
     for intent in payloads {
         let value = serde_json::json!({
-            "contract_version": 26,
+            "contract_version": 27,
             "actor_id": "player",
             "intent": intent
         });
@@ -535,9 +535,9 @@ fn validate_rejects_wrong_contract_version() {
 fn eu_contract_versions_are_exact_and_trace_envelopes_remain_current() {
     assert_eq!(tme_rules::EVENT_CONTRACT_VERSION, 41);
     assert_eq!(tme_rules::SNAPSHOT_CONTRACT_VERSION, 31);
-    assert_eq!(tme_rules::OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
-    assert_eq!(tme_rules::ACTION_CONTEXT_CONTRACT_VERSION, 32);
-    assert_eq!(tme_rules::COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(tme_rules::OBSERVED_SNAPSHOT_CONTRACT_VERSION, 31);
+    assert_eq!(tme_rules::ACTION_CONTEXT_CONTRACT_VERSION, 33);
+    assert_eq!(tme_rules::COMMAND_CONTRACT_VERSION, 27);
     assert_eq!(tme_rules::PATH_PREVIEW_CONTRACT_VERSION, 8);
     assert_eq!(tme_rules::TRACE_V2_CONTRACT_VERSION, 2);
     assert_eq!(tme_rules::TRACE_CONTRACT_VERSION, 1);

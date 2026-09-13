@@ -8,7 +8,7 @@ use tme_rules::{
     MerchantInventorySeedDef, RealmDef, ResearchBoundary, SelectedCatalog, ServiceDefinitionDef,
     ServiceInstanceSeedDef, SpellDef, StepError, TransactionCostDef, TransactionDef,
     TransactionRequirementDef, TransactionRewardDef, ValidatedWorldSeed, ValidationError, World,
-    WorldSeedDef, WorldTemplateV3,
+    WorldSeedDef, WorldTemplateV4,
 };
 
 fn assert_type<T>() {}
@@ -20,7 +20,7 @@ fn top_level_exports_name_the_four_contract_and_runtime_seams() {
     assert_type::<CatalogProfileKey>();
     assert_type::<CatalogRegistryKey>();
     assert_type::<SelectedCatalog>();
-    assert_type::<WorldTemplateV3>();
+    assert_type::<WorldTemplateV4>();
     assert_type::<WorldSeedDef>();
     assert_type::<GameDefinition>();
     assert_type::<ValidatedWorldSeed>();
@@ -62,7 +62,7 @@ fn shared_definition_exports_remain_public_without_scenario_ownership() {
 #[test]
 fn content_module_and_domain_modules_expose_current_owner_types() {
     assert_type::<content::CatalogV6>();
-    assert_type::<content::WorldTemplateV3>();
+    assert_type::<content::WorldTemplateV4>();
     assert_type::<content::WorldSeedDef>();
     assert_type::<content::ActorSeedDef>();
     assert_type::<content::GroundItemSeedDef>();
@@ -75,7 +75,7 @@ fn content_module_and_domain_modules_expose_current_owner_types() {
     assert_type::<content::items::ItemInstanceSeedDef>();
     assert_type::<content::services::ServiceDefinitionDef>();
     assert_type::<content::world_seed::WorldSeedDef>();
-    assert_type::<content::world_template::WorldTemplateV3>();
+    assert_type::<content::world_template::WorldTemplateV4>();
 }
 
 #[test]

@@ -25,7 +25,10 @@ impl Engine {
     ) -> Result<CommittedActivity, StepError> {
         if !matches!(
             intent,
-            PlayerIntent::Wait | PlayerIntent::Inspect | PlayerIntent::ShowSack
+            PlayerIntent::Wait
+                | PlayerIntent::Inspect
+                | PlayerIntent::ShowSack
+                | PlayerIntent::RequestResurrection
         ) && let Some(effect) = self.suppressing_effect_for_actor(player_index)
         {
             let actor = &self.world.actors[player_index];
@@ -53,6 +56,9 @@ impl Engine {
         let hide_break_trigger = Self::hide_break_trigger_for_intent(&intent);
         let intent_event_start = events.len();
         let result: Result<bool, StepError> = match intent {
+            PlayerIntent::RequestResurrection => self
+                .request_resurrection(player_index, events)
+                .map(|()| true),
             PlayerIntent::Wait => Ok(false),
             PlayerIntent::Inspect => self.inspect_actor(player_index, events).map(|()| false),
             PlayerIntent::MovePath(path) => self.resolve_player_path(player_index, &path, events),

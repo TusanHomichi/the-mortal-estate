@@ -24,7 +24,7 @@
     {
       "role": "runtime_projection",
       "path": "content/authoring-fixture/generated/world_template.json",
-      "sha256": "a97f0ed944cd46386099edc669b7d7e2a179d25a2c8a8a7e7dc2850aaeea4ff9"
+      "sha256": "2ba2e1bc1852e273cbc6fb9ea85b040425bb4f8722b60804b59fa73971b43a6f"
     }
   ],
   "members": [

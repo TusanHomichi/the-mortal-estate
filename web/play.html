@@ -9,6 +9,8 @@
 <div id="entry-status" hidden aria-hidden="true"><span class="gate-mark">◇</span></div>
 </div></section>
 <section id="world" aria-label="World" hidden><div class="world-grid"><div id="world-surface"><canvas id="world-canvas" aria-label="Observed world. Click to plan a route; click its endpoint again to move." tabindex="0"></canvas><p id="position">Awaiting the server.</p><p class="legend">Squares: observed ground · Markers: observed occupants</p></div><div class="controls"><h2>Your turn</h2><p id="readiness">Awaiting the server.</p><progress id="cooldown" max="1" value="0" aria-label="Action recovery"></progress><div class="directions"><button type="button" data-action="play.north">North</button><button type="button" data-action="play.west">West</button><button type="button" data-action="play.wait">Wait</button><button type="button" data-action="play.east">East</button><button type="button" data-action="play.south">South</button></div><p>Click to lay footprints; click the endpoint again to move. Escape or right-click clears a draft. Movement keys take one step. Hold does not repeat.</p><h2>In view</h2><ul id="occupants"></ul></div></div></section>
+<section id="death-status" aria-label="Death and return" hidden></section>
+<section id="communication" aria-label="Communication" hidden></section>
 <section id="gameplay" aria-label="Equipment and town services"></section>
 <p id="movement-announcement" role="status" class="movement-announcement"></p>
 <p id="feedback" role="status"></p><nav id="session-actions" aria-label="Session" hidden><button id="reconnect" type="button">Reconnect</button><button id="logout" type="button">Sign out</button></nav>

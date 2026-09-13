@@ -241,7 +241,7 @@ fn legacy_python_armor_test_shield_can_remain_a_hand_blocker_without_typed_armor
 
 #[test]
 fn legacy_python_weapons_test_scenario_26_is_the_only_accepted_schema() {
-    for old_or_wrong_version in [0, 26] {
+    for old_or_wrong_version in [0, 3, 26] {
         let mut catalog = weapon_parts();
         catalog.catalog["schema_version"] = json!(old_or_wrong_version);
         assert_rejected_with(
@@ -254,7 +254,7 @@ fn legacy_python_weapons_test_scenario_26_is_the_only_accepted_schema() {
         template.world_template["schema_version"] = json!(old_or_wrong_version);
         assert_rejected_with(
             &template,
-            "world_template.schema_version must be 3",
+            "world_template.schema_version must be 4",
             "World Template 1 rejects a non-current version",
         );
     }

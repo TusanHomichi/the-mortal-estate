@@ -22,12 +22,15 @@ impl Engine {
             .rules
             .resources
             .recovery_interval_units;
-        for actor in &self.world.actors {
+        for (actor_index, actor) in self.world.actors.iter().enumerate() {
             // A defeated summon still owns its expiry and must be cleaned up.
             if let Some(summon) = &actor.summoned {
                 consider(summon.last_ticked_at.saturating_add_rounds(1));
             }
             if !actor.is_alive() {
+                if let Some(at) = self.resurrection_request_at(actor_index) {
+                    consider(at);
+                }
                 continue;
             }
             consider(actor.timing.ready_at);

@@ -37,7 +37,7 @@ pub(super) async fn certify_command_reservation_race(pool: &PgPool) {
         client_sequence: wire::DecimalU64::new(1),
         observed_world_revision: wire::DecimalU64::new(0),
         actor_id: wire::ActorId::new("player").unwrap(),
-        intent: wire::Intent::Wait,
+        intent: wire::Intent::Wait {},
     };
     let store = Arc::new(PostgresStore::new(pool.clone()));
     let coordinator = Arc::new(Coordinator::new(store));

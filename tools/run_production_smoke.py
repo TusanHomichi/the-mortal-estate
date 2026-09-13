@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 
-PROTOCOL_MINOR = 10
+PROTOCOL_MINOR = 11
 CONTROL_API_VERSION = 4
 WEBSOCKET_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 WEBSOCKET_SUBPROTOCOL = "tme.v1"
@@ -242,7 +242,7 @@ class AuthenticatedClient:
         if value.get("protocol_major") != 1 or value.get("supported_minors") != [
             PROTOCOL_MINOR
         ]:
-            raise SmokeError("socket ticket response did not require protocol 1.9")
+            raise SmokeError(f"socket ticket response did not require protocol 1.{PROTOCOL_MINOR}")
         return ticket
 
     def connect(self) -> "GameplaySocket":

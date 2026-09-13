@@ -46,6 +46,18 @@ impl Engine {
         &self,
         actor_id: &crate::model::ActorId,
     ) -> Result<Vec<ActionOptionV1>, StepError> {
+        let actor_index = self.player_actor_index(actor_id)?;
+        if !self.world.actors[actor_index].is_alive() {
+            let mut options = Vec::new();
+            self.push_spell_action_option(
+                &mut options,
+                actor_id,
+                "request_resurrection".into(),
+                "Request resurrection".into(),
+                PlayerIntentPayloadV1::RequestResurrection,
+            )?;
+            return Ok(options);
+        }
         let ctx = self.actor_observed_action_context(actor_id)?;
         let mut options: Vec<ActionOptionV1> = Vec::new();
         let actor_id = ctx.actor_id.clone();

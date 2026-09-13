@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 99
-status: Full-world 3D delivered; the dispatched martial wall-motion follow-up owns current work and its delivery receipts.
+revision: 100
+status: Death-return gameplay resumed after 3D and martial delivery; the separate presentation experiment remains paused.
 public_safe: true
-summary: Martial wall-motion continuation, full-world 3D delivery, prior restore work and remaining owner acceptance gates.
+summary: Resumed death-return programme, delivered 3D and martial motion, and remaining acceptance gates.
 ---
 
 # The genesis ledger
@@ -30,9 +30,15 @@ owner's and are numbered by the phase they guard.
 
 Updated 2026-09-13.
 
-**Current continuation:** the owner continued with the martial pose/wall finding
-after the world delivery. The [wall-motion record](2026-09-13-martial-wall-motion.md)
-owns issue #68's playback, visibility, phase proof and preserved-state delivery.
+**Current continuation:** the owner resumed backlog reconciliation, the
+life–death–return loop, then succession and persistent ancestors. The
+[death-return record](2026-09-13-death-return.md) owns execution and reconciliation
+against current rulings. This releases the corresponding gameplay work from the
+earlier pause; the separate presentation experiment and G10/G11 remain open.
+
+**Delivered martial correction:** the
+[wall-motion record](2026-09-13-martial-wall-motion.md) routes issue #68's playback,
+visibility, phase proof and preserved-state delivery through merged PR #72.
 
 **Current presentation delivery:** the owner directed full 3D town and interiors,
 including the character model, using the dungeon and Martial Artist foundation.
@@ -127,10 +133,9 @@ geometry-changing migration. An open issue does not dispatch that migration.
 [audit record](2026-09-10-repository-audit.md) owns its findings and proof;
 the current bounded continuation is linked above.
 
-**Separate stop line:** the presentation-adoption experiment remains before P1;
-remaining identity-proof slices are undispatched. Active browser work does not
-release that pause, accept a production presenter, or close G10/G11. The standing
-pause and gates below retain their authority.
+**Separate stop line:** the presentation-adoption experiment remains before P1.
+The September 13 dispatch supersedes the earlier pause for its named gameplay
+work only. It does not accept a production presenter or close G10/G11.
 
 Earlier September presentation and deployment checkpoints now live in
 [checkpoint history](2026-09-10-checkpoint-history.md). The phase records below
@@ -157,6 +162,10 @@ are also dated history; open either only when the task needs that evidence.
 
 ## Current owner pause (2026-08-29; target update 2026-08-31)
 
+**September 13 supersession:** the owner resumed the gameplay programme linked
+in the current checkpoint. The August account below is historical for those
+mechanics and continues to bind the separate presentation experiment.
+
 The owner paused before presentation-experiment P1 to consider the overall
 direction. The
 [experiment checkpoint](2026-08-26-nomos-presentation-adoption-experiment.md#current-pre-p1-stop-line-owner-2026-08-29)
@@ -177,7 +186,7 @@ historical digest.
 
 | Gate | Guards | State |
 | --- | --- | --- |
-| G10 | Exit of Phase 10 — the first identity proof accepted as met | Open. Slices S2–S7 and S9 remain; S10 remains parked as Phase 10 implementation. The presentation experiment is paused before P1, brackets the S3-first fallback, and cannot satisfy G10. |
+| G10 | Exit of Phase 10 — the first identity proof accepted as met | Open. Remaining gameplay is resumed through the September 13 plan; implementation and acceptance are not yet complete. S10 and the separate presentation experiment remain parked. |
 | G11 | End of Phase 11 — the first external public release, irreversible | Open. Blocked on G10 and on trademark clearance (charter §15). The completed public-source cut cannot satisfy G11. |
 
 ## Standing orders (owner, 2026-08-21; amended 2026-08-31)
@@ -196,10 +205,10 @@ historical digest.
    candidate and Godot a conditional same-input comparison, but neither has
    begun. S10 remains parked; closing public issue #1 accepted the target, not a
    representative micro-scene or visual implementation.
-4. **Order bracket, not replacement:** during the current owner pause, no
-   experiment phase or S2–S10 slice is dispatched. The pause is neither a final
-   disposition nor an automatic return to S3. Any stop, resumption, or new order
-   requires an explicit owner direction.
+4. **September 13 resumption:** the current checkpoint dispatches death, return
+   and lineage gameplay. Reconcile the August slice contents with later baseline,
+   timing and geography rulings before implementing them. The separate
+   presentation experiment remains paused.
 5. **Dead-layer stop:** the authoritative recording explicitly supplies no dead
    layer, while the accepted production rule requires living/dead
    correspondence. Before P1, the owner must release S2 as an input or narrow

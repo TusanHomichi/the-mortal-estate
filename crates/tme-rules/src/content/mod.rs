@@ -108,9 +108,9 @@ pub use world_seed::{
     MerchantInventorySeedDef, MerchantStockSeedDef, ServiceInstanceSeedDef, WorldSeedDef,
 };
 pub use world_template::{
-    DoorStateDef, LevelDef, PresentationModeDef, RealmDef, SceneRoleDef, StagedViewportDef,
-    StaticPropDef, TopologyEdgeDef, TopologyKindDef, TopologyTargetDef, WORLD_TEMPLATE_KIND,
-    WORLD_TEMPLATE_SCHEMA_VERSION, WorldTemplateV3, WorldZoomDef,
+    DoorStateDef, LevelDef, PresentationModeDef, RealmDef, ResurrectionPolicyDef, SceneRoleDef,
+    StagedViewportDef, StaticPropDef, TopologyEdgeDef, TopologyKindDef, TopologyTargetDef,
+    WORLD_TEMPLATE_KIND, WORLD_TEMPLATE_SCHEMA_VERSION, WorldTemplateV4, WorldZoomDef,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]

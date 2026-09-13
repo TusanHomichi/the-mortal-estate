@@ -3,7 +3,7 @@ use super::*;
 impl SelectedCatalog {
     pub fn validate_with_template(
         &self,
-        template: &WorldTemplateV3,
+        template: &WorldTemplateV4,
     ) -> Result<(), ValidationError> {
         let policy = boundary_policy(self.clean_content, &self.research_boundary)?;
         let template_value = serde_json::to_value(template).map_err(|error| {
@@ -46,7 +46,7 @@ impl SelectedCatalog {
     }
 }
 
-impl WorldTemplateV3 {
+impl WorldTemplateV4 {
     pub fn validate_with(&self, catalog: &SelectedCatalog) -> Result<(), ValidationError> {
         catalog.validate_with_template(self)
     }
@@ -56,7 +56,7 @@ impl WorldSeedDef {
     pub fn validate_with(
         &self,
         catalog: &SelectedCatalog,
-        template: &WorldTemplateV3,
+        template: &WorldTemplateV4,
     ) -> Result<(), ValidationError> {
         catalog.validate_with_template(template)?;
         let context = world_seed::SourceWorldSeedValidationContext::new(catalog, template);

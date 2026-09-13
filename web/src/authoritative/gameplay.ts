@@ -17,6 +17,7 @@ export type ServiceCapability =
   | { kind: "locker"; capacity: number; item_count: number; items: Item[];
       deposit_actions: OfferedAction[]; withdrawal_actions: OfferedAction[] };
 export interface GameplayFields {
+  social: { character_id: string };
   character: {
     identity: { display_class: string; base_class_id?: string; current_class_id?: string; sex_or_gender_display?: string | null };
     resources: { hp: number; max_hp: number; stamina: number; max_stamina: number; mp: number; max_mp: number };
@@ -62,7 +63,8 @@ export function actionGroups(frame: GameplayFields): ActionGroup[] {
       facts: [], actions: npc.interactions.flatMap(row => row.actions) })),
   ];
   const localActions = new Set(local.flatMap(group => group.actions.map(action => JSON.stringify([action.id, action.intent]))));
-  return [...local, { key: "character", title: "Equipment and nearby actions", facts: frame.action_options_truncated
+  const returning = frame.action_options.some(action => action.intent?.kind === "request_resurrection");
+  return [...local, { key: "character", title: returning ? "Death and return" : "Equipment and nearby actions", facts: frame.action_options_truncated
     ? ["The server returned a limited action list."] : [],
     actions: frame.action_options.filter(action => !localActions.has(JSON.stringify([action.id, action.intent]))) }];
 }

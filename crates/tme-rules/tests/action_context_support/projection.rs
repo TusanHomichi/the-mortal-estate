@@ -55,7 +55,7 @@ pub(crate) fn hidden_closed_door_engine() -> Engine {
     let mut parts = ContentParts::tracked("first_room", "profile/first_room");
     let visual_manifest_digest = parts.world_template["visual_manifest_digest"].clone();
     parts.world_template = serde_json::json!({
-        "schema_version": 3,
+        "schema_version": 4,
         "kind": "world_template",
         "id": "hidden_closed_door",
         "visual_manifest_digest": visual_manifest_digest,
@@ -94,6 +94,7 @@ pub(crate) fn hidden_closed_door_engine() -> Engine {
             }
         }}},
         "arrivals": {},
+        "resurrection": {},
         "topology": {
             "edge/start/2/1": {
                 "at": {"realm": "realm_0", "level": "start", "position": {"x": 2, "y": 1}},

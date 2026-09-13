@@ -78,7 +78,7 @@
       }
     ]
   },
-  "world_template_sha256": "a97f0ed944cd46386099edc669b7d7e2a179d25a2c8a8a7e7dc2850aaeea4ff9",
+  "world_template_sha256": "2ba2e1bc1852e273cbc6fb9ea85b040425bb4f8722b60804b59fa73971b43a6f",
   "terrain_registry_catalog": "content/test-corpus/catalogs/prototype_catalog_v6.json",
   "terrain_registry_profile": "profile/first_land_structure"
 }

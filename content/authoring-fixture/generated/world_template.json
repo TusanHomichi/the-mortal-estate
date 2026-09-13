@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "kind": "world_template",
   "id": "authoring_fixture",
   "visual_manifest_digest": "3ffd01beec1db6df3218c0fb5870335dffe42128ec53cbbdfe8fdb832b5925da",
@@ -1555,6 +1555,7 @@
       }
     }
   },
+  "resurrection": {},
   "topology": {
     "route/fixture_ascent": {
       "at": {

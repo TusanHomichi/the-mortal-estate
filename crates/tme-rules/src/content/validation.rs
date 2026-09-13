@@ -195,7 +195,7 @@ pub(super) struct ValidationBundle {
     clean_content: bool,
     rules: RulesDef,
     skill_catalog: Option<SkillCatalogDef>,
-    world_template: WorldTemplateV3,
+    world_template: WorldTemplateV4,
     terrains: Vec<TerrainDef>,
     quests: Vec<QuestDef>,
     actor_definitions: Vec<ActorDefinitionDef>,
@@ -215,7 +215,7 @@ pub(super) struct ValidationBundle {
 }
 
 impl ValidationBundle {
-    fn definition_only(catalog: &SelectedCatalog, template: &WorldTemplateV3) -> Self {
+    fn definition_only(catalog: &SelectedCatalog, template: &WorldTemplateV4) -> Self {
         Self {
             clean_content: catalog.clean_content,
             rules: catalog.rules.clone(),

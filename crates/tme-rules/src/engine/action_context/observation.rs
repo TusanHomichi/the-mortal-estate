@@ -333,7 +333,7 @@ impl Engine {
                     .law_zone,
             ),
             logical_time: self.current_time(),
-            ready_at: player.timing.ready_at,
+            ready_at: self.actor_ready_at(player_index),
             can_act: self.actor_can_act(player_index),
             life_state: ActorLifeStateViewV1::from(&player.life_state),
             controlled_path_points: self
@@ -479,7 +479,7 @@ impl Engine {
                     .law_zone,
             ),
             logical_time: self.current_time(),
-            ready_at: player.timing.ready_at,
+            ready_at: self.actor_ready_at(player_index),
             can_act: self.actor_can_act(player_index),
             life_state: ActorLifeStateViewV1::from(&player.life_state),
             controlled_path_points: self

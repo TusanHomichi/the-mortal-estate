@@ -161,7 +161,7 @@ async fn ev_postgres_certification() {
                 .zip(&command_ids)
                 .map(|(client, command_id)| {
                     let intent = if is_wait {
-                        wire::Intent::Wait
+                        wire::Intent::Wait {}
                     } else {
                         wire::Intent::SetPagesEnabled {
                             enabled: (round / 2) % 2 == 1,
@@ -253,7 +253,7 @@ async fn ev_postgres_certification() {
                 .iter()
                 .zip(&command_ids)
                 .map(|(client, command_id)| {
-                    support::command(client, *command_id, u64::MAX, wire::Intent::Wait)
+                    support::command(client, *command_id, u64::MAX, wire::Intent::Wait {})
                 })
                 .collect();
             record_request_digests(&commands, &mut request_digests);
@@ -383,7 +383,7 @@ async fn ev_postgres_certification() {
         &clients[0],
         replay_id,
         clients[0].facet_revision,
-        wire::Intent::Wait,
+        wire::Intent::Wait {},
     );
     support::send_command(&mut clients[0].socket, &mismatch).await;
     loop {

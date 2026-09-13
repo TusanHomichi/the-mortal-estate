@@ -19,7 +19,7 @@
     {
       "role": "runtime_projection",
       "path": "content/lands/identity-proof/generated/world_template.json",
-      "sha256": "a2932c57dcb381c5b6dbe18d0820b331955e3874fd8447a3f5a97236c31aad64"
+      "sha256": "3f3c4b5283d2c203aa30c63873506c14831daf6aa16a34b77c1c1afb8ac90920"
     }
   ],
   "members": [

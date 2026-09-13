@@ -5,9 +5,9 @@
     "seed": 7,
     "event_contract_version": 41,
     "snapshot_contract_version": 31,
-    "observed_snapshot_contract_version": 30,
-    "action_context_contract_version": 32,
-    "intent_contract_version": 26,
+    "observed_snapshot_contract_version": 31,
+    "action_context_contract_version": 33,
+    "intent_contract_version": 27,
     "initial_debug_snapshot": {
       "contract_version": 31,
       "scope": "omniscient_local",
@@ -1518,7 +1518,7 @@
       "quest_states": []
     },
     "initial_observed_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "logical_time": {
         "milliseconds": 3000
       },
@@ -3016,7 +3016,7 @@
       "tile_effects": []
     },
     "initial_action_context": {
-      "contract_version": 32,
+      "contract_version": 33,
       "actor_id": "player",
       "actor_name": "Delver",
       "actor_kind": "player",
@@ -3380,7 +3380,7 @@
     {
       "step_index": 0,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": {
           "move_path": {
@@ -5208,7 +5208,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 6000
         },
@@ -6708,7 +6708,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Delver",
         "actor_kind": "player",
@@ -6938,7 +6938,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -6964,7 +6964,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -7093,7 +7093,7 @@
     {
       "step_index": 1,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": {
           "physical_attack": {
@@ -8735,7 +8735,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 9000
         },
@@ -10235,7 +10235,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Delver",
         "actor_kind": "player",
@@ -10465,7 +10465,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -10491,7 +10491,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -12132,7 +12132,7 @@
       "quest_states": []
     },
     "final_observed_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "logical_time": {
         "milliseconds": 9000
       },
@@ -13632,7 +13632,7 @@
       "tile_effects": []
     },
     "final_action_context": {
-      "contract_version": 32,
+      "contract_version": 33,
       "actor_id": "player",
       "actor_name": "Delver",
       "actor_kind": "player",
@@ -13862,7 +13862,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -13888,7 +13888,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {

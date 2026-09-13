@@ -90,6 +90,7 @@ pub enum PlayerIntentPayloadV1 {
         direction: Direction,
     },
     ShowSack,
+    RequestResurrection,
     Wait,
     Inspect,
     Train {

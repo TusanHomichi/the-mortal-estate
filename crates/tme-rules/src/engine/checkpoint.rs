@@ -7,7 +7,7 @@ use sha2::{Digest, Sha256};
 
 use crate::content::{
     SeedWorldPositionStatus, SelectedCatalog, ValidationError, WorldSeedValidationContext,
-    WorldTemplateV3,
+    WorldTemplateV4,
 };
 use crate::events::Event;
 use crate::model::*;
@@ -31,7 +31,7 @@ pub struct ContentIdentityV1 {
 impl ContentIdentityV1 {
     pub(crate) fn from_selected(
         selected: &SelectedCatalog,
-        template: &WorldTemplateV3,
+        template: &WorldTemplateV4,
     ) -> Result<Self, ValidationError> {
         let bytes = serde_json::to_vec(&(selected, template)).map_err(|error| {
             ValidationError::new(vec![format!(

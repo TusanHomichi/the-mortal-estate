@@ -360,7 +360,7 @@ fn out_of_bounds_movement_is_reported_as_a_blocked_path() {
     let mut parts = tracked("first_room");
     let visual_manifest_digest = parts.world_template["visual_manifest_digest"].clone();
     parts.world_template = serde_json::json!({
-        "schema_version": 3,
+        "schema_version": 4,
         "kind": "world_template",
         "id": "open_edge",
         "visual_manifest_digest": visual_manifest_digest,
@@ -377,6 +377,7 @@ fn out_of_bounds_movement_is_reported_as_a_blocked_path() {
             }}
         }},
         "arrivals": {},
+        "resurrection": {},
         "topology": {}
     });
     parts.actors_mut()[0]["location"]["position"] = serde_json::json!({"x": 0, "y": 0});

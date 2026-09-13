@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 28
-status: Standing server contract; private saves are preserved and failed proof cleanup is reported while external activation remains pending.
+revision: 29
+status: Offline checkpoint verification checks content binding and recovery invariants before private saved-state installation.
 public_safe: true
-summary: Server authority, saved-state preservation, offline migration, preview refresh, owned proof resources and external activation boundaries.
+summary: Server authority, checkpoint verification, saved-state preservation, offline migration and private preview refresh.
 routes:
   - crates/tme-server/**
   - deploy/**
@@ -136,6 +136,16 @@ identity used when preparing that plan. Deployment must own backup, stopped
 writers, compare-and-swap installation, matching source receipts, restart proof
 and rollback; ordinary activation still rejects changed served content. The
 [town execution record](plans/2026-09-07-horseshoe-town.md) tracks the first use.
+
+`checkpoint verify <bootstrap> <checkpoint>` performs read-only canonical decoding,
+content-identity matching and complete rules recovery validation against the
+specified current definition. It never opens a database. This supports explicit
+offline schema cutovers whose source definition is decoded by the pinned source
+release: source validation, destination validation and conservation proof are
+separate requirements. A changed schema is never accepted by normal recovery as
+an implicit migration. The
+[death-return record](plans/2026-09-13-death-return.md) owns the V3-to-V4 content
+cutover receipt; checkpoint schema and saved character identities remain stable.
 
 ## Transient control authentication
 

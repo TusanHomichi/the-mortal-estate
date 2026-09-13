@@ -4,7 +4,7 @@ use crate::model::WorldPosition;
 
 use super::super::{
     TerrainDef, TerrainNavigationDef, TopologyKindDef, TopologyTargetDef, WORLD_TEMPLATE_KIND,
-    WORLD_TEMPLATE_SCHEMA_VERSION, WorldTemplateV3,
+    WORLD_TEMPLATE_SCHEMA_VERSION, WorldTemplateV4,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -14,7 +14,7 @@ pub(super) enum WorldPositionStatus {
     OutOfBounds,
 }
 
-pub(super) fn validate_envelope(template: &WorldTemplateV3, errors: &mut Vec<String>) {
+pub(super) fn validate_envelope(template: &WorldTemplateV4, errors: &mut Vec<String>) {
     if template.schema_version != WORLD_TEMPLATE_SCHEMA_VERSION {
         errors.push(format!(
             "world_template.schema_version must be {WORLD_TEMPLATE_SCHEMA_VERSION}"
@@ -42,7 +42,7 @@ pub(super) fn validate_envelope(template: &WorldTemplateV3, errors: &mut Vec<Str
 }
 
 pub(super) fn validate_template(
-    template: &WorldTemplateV3,
+    template: &WorldTemplateV4,
     terrains: &[TerrainDef],
     clean_content: bool,
     errors: &mut Vec<String>,
@@ -97,7 +97,7 @@ fn validate_terrains<'a>(
 }
 
 fn validate_world(
-    template: &WorldTemplateV3,
+    template: &WorldTemplateV4,
     terrains: &BTreeMap<&str, &TerrainDef>,
     errors: &mut Vec<String>,
 ) {
@@ -219,6 +219,36 @@ fn validate_world(
                 }
             }
             validate_level_doctrine(level, terrains, &level_prefix, errors);
+        }
+    }
+
+    for (realm_id, policy) in &template.resurrection {
+        let prefix = format!("world_template.resurrection[{realm_id:?}]");
+        if !template.realms.contains_key(realm_id) {
+            errors.push(format!("{prefix} references an unknown realm"));
+        }
+        if policy.request_delay_ms == 0 || policy.request_delay_ms > 86_400_000 {
+            errors.push(format!(
+                "{prefix}.request_delay_ms must be within 1..=86400000"
+            ));
+        }
+        if policy.hit_points_missing <= 0 || policy.stamina_missing <= 0 {
+            errors.push(format!("{prefix} resource deficits must be positive"));
+        }
+        for (name, location) in [
+            ("lawful_destination", &policy.lawful_destination),
+            ("neutral_destination", &policy.neutral_destination),
+        ] {
+            if location.realm != *realm_id {
+                errors.push(format!("{prefix}.{name} must remain within its realm"));
+            }
+            validate_passable_position(
+                template,
+                terrains,
+                location,
+                &format!("{prefix}.{name}"),
+                errors,
+            );
         }
     }
 
@@ -383,7 +413,7 @@ fn validate_world(
 }
 
 fn resolve_target<'a>(
-    template: &'a WorldTemplateV3,
+    template: &'a WorldTemplateV4,
     target: &'a TopologyTargetDef,
 ) -> Option<&'a WorldPosition> {
     match target {
@@ -531,7 +561,7 @@ fn explicit_key(kind: &TopologyKindDef) -> Option<String> {
 }
 
 fn validate_passable_position(
-    template: &WorldTemplateV3,
+    template: &WorldTemplateV4,
     terrains: &BTreeMap<&str, &TerrainDef>,
     location: &WorldPosition,
     label: &str,
@@ -554,7 +584,7 @@ fn validate_passable_position(
 }
 
 pub(super) fn position_status(
-    template: &WorldTemplateV3,
+    template: &WorldTemplateV4,
     terrains: &BTreeMap<&str, &TerrainDef>,
     location: &WorldPosition,
 ) -> Option<WorldPositionStatus> {

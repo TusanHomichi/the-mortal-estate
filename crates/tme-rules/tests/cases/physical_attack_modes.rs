@@ -40,7 +40,7 @@ fn command_26_round_trips_each_explicit_mode_and_rejects_generic_attack() {
             .actor_command_for_intent(&tme_rules::ActorId::from("player"), &intent)
             .expect("command should project");
         let json = serde_json::to_value(&command).expect("command should serialize");
-        assert_eq!(json["contract_version"], 26);
+        assert_eq!(json["contract_version"], 27);
         assert_eq!(json["intent"]["physical_attack"]["mode"], mode.label());
         assert_eq!(
             json["intent"]["physical_attack"]["target_actor_id"],

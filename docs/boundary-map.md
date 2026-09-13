@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 12
-status: Standing ownership boundaries route activation status and private saved-state obligations to the server owner.
+last_updated: 2026-09-13
+revision: 13
+status: Death control derives ordinary return eligibility and content-owned destinations; saved-state obligations stay with the server owner.
 public_safe: true
-summary: Fact ownership, checkpoint migration, server-owned activation status, resident services and individual timing.
+summary: Fact ownership, corpse-bound return control, checkpoint migration, resident services and individual timing.
 always: true
 ---
 
@@ -92,7 +92,7 @@ kind of fact:
 | Contract | Owns | Defined in |
 | --- | --- | --- |
 | Catalog | immutable gameplay definitions: terrain, actors, items, spells, loot, spawn groups, lairs, services, quests, and the rules profile | `crates/tme-rules/src/content/catalog.rs` |
-| World template | immutable realms, levels, layered cells, arrivals, topology, law zones | `crates/tme-rules/src/content/world_template.rs` |
+| World template | immutable realms, levels, layered cells, arrivals, return policies, topology, law zones | `crates/tme-rules/src/content/world_template.rs` |
 | World seed | authored initial *mutable* state: actor instances, item placement, service instances, merchant stock | `crates/tme-rules/src/content/world_seed.rs` |
 | Simulation scenario | harness-owned orchestration: graph references, profile, RNG seed, typed script | `crates/tme-sim/src/fixture/mod.rs` (`SimulationScenarioV1`) |
 | Land contract | which lands exist, which members each carries, their envelopes, vocabularies, programs, receipts, and outputs | `crates/tme-authoring/src/contract/` |
@@ -331,7 +331,10 @@ the precedent the [lineage](#23-lineage) seam builds on.
 passes typed cause and credit to `crates/tme-rules/src/engine/death.rs`. That
 owner alone changes `ActorLifeState`
 (`crates/tme-rules/src/model/death.rs`), allocates corpse and gold identities,
-validates same-square corpse search, and applies a caller-supplied resurrection.
+validates same-square corpse search, and applies validated resurrection transactions.
+`death/control.rs` derives ordinary request eligibility from the death timestamp
+and the realm's authored return policy. The player submits only the request;
+rules select its destination and resources from validated content.
 
 **Rule.** Life state is one enum with one writer. Corpse contents are real item
 locations owned by inventory; death asks inventory to relocate them.
@@ -343,10 +346,13 @@ outside this one may invent a recovery policy.**
 **Proof.** `crates/tme-rules/tests/` death and resurrection coverage. The client
 contract admits life state only as a projected fact.
 
-What this seam does **not** yet contain is the game: today a non-`Alive` actor
-cannot act at all — `crates/tme-rules/src/engine/timing.rs` rejects every intent
-from one with `cannot step after actor death`, and `Ghost` is a bookkeeping
-state, not a place. Reopening that is [2.2](#22-death-as-continued-play).
+Ordinary ghosts retain observer-filtered awareness and speech and can request an
+authored return after the eligibility deadline. Physical intents remain refused.
+The [historical baseline](gameplay-baseline.md#ordinary-death-and-return) owns the
+corpse-bound ruling; [2.2](#22-death-as-continued-play) still owns dead-world,
+custody and further return work. The
+[execution record](plans/2026-09-13-death-return.md) distinguishes implementation,
+verification and delivery from the remaining programme.
 
 ## 1.14 The observer / debug projection split
 
@@ -537,9 +543,11 @@ Life state stays one enum with one writer
 - **Death changes where a character acts. It never changes who adjudicates.**
   A dead character's actions are ordinary typed intents through the ordinary
   command path, resolved by the ordinary owners, under the same server authority.
-- **No automatic recovery.** Return is an achieved, authored transition. Nothing
-  outside this owner may invent a recovery policy, and no timer, disconnect,
-  reconnect, or convenience path may perform one.
+- **Authored recovery only.** The September 13 owner ruling selects historical
+  automatic return and supersedes the older blanket prohibition. The
+  [gameplay baseline](gameplay-baseline.md#ordinary-death-and-return) owns that
+  disposition. This seam applies authored return policies; a disconnect,
+  reconnect or client timer cannot invent one or reset its deadline.
 - **The dead are not omniscient.** Whatever the dead perceive is an observer
   projection with its own rules, produced by the observer path in
   [1.14](#114-the-observer--debug-projection-split) — not the debug snapshot, and
@@ -557,10 +565,12 @@ every in-world name for any of it. The implementation language in this document 
 *dead state*, *return*, *succession*, *departure* — is provisional and
 source-neutral, exactly as the charter says.
 
-**Owed proof.** The seam is not built. When it is, the tests that prove it are
-named here, and the first of them is the one that fails today: an intent from a
-non-`Alive` actor is currently rejected outright by
-`crates/tme-rules/src/engine/timing.rs`.
+**Proof and remaining work.** Ordinary corpse-bound awareness, physical-action
+refusal, request eligibility, return and recovery are covered by
+`crates/tme-rules/tests/cases/death_corpse/control_tests.rs` and checkpoint death
+validation. The [slice record](plans/2026-09-13-death-return.md) owns native and
+delivery evidence. Dead-world entry, exceptional returns, custody and attrition
+remain open in [issue #73](https://github.com/TusanHomichi/the-mortal-estate/issues/73).
 
 ## 2.3 Lineage
 

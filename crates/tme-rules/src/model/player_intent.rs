@@ -61,6 +61,7 @@ pub enum PlayerIntent {
     Open(Direction),
     Close(Direction),
     ShowSack,
+    RequestResurrection,
     Wait,
     Inspect,
     Train {
@@ -231,6 +232,7 @@ impl PlayerIntent {
             Self::Open(direction) => format!("open {}", direction.label()),
             Self::Close(direction) => format!("close {}", direction.label()),
             Self::ShowSack => "show_sack".to_string(),
+            Self::RequestResurrection => "request_resurrection".to_string(),
             Self::Wait => "wait".to_string(),
             Self::Train {
                 service_id,

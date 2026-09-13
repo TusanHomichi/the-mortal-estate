@@ -84,6 +84,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_verification_resolve",
         "tests.test_verification_table",
         "tests.test_verification_targets",
+        "tests.test_verification_whitespace",
         "tests.test_working_root",
     ),
 }
@@ -158,8 +159,8 @@ _STATIC: tuple[Step, ...] = (
     Step(
         key="docs.whitespace",
         owner="docs",
-        label="docs: git diff whitespace",
-        argv=("git", "diff", "--check"),
+        label="docs: git diff whitespace (staged and unstaged)",
+        argv=("python3", "tools/verification/whitespace.py"),
     ),
     Step(
         key="rust.fmt",

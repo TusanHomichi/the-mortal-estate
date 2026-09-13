@@ -231,7 +231,7 @@ fn debug_25_and_observed_25_expose_safe_corpse_and_claim_summaries() {
         .actor_observed_snapshot(&tme_rules::ActorId::from("player"))
         .expect("observed snapshot");
     assert_eq!(debug.contract_version, 31);
-    assert_eq!(observed.contract_version, 30);
+    assert_eq!(observed.contract_version, 31);
     assert_eq!(debug.corpses.len(), 1);
     assert_eq!(observed.corpses, debug.corpses);
     assert_eq!(debug.corpses[0].corpse_id.as_str(), "corpse:1");

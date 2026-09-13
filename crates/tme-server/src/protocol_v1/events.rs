@@ -279,11 +279,14 @@ pub fn intent(value: &wire::Intent) -> RulesIntent {
         wire::Intent::Close { direction } => {
             RulesIntent::Gameplay(rules::PlayerIntent::Close(rules_direction(direction)))
         }
-        wire::Intent::Inspect => RulesIntent::Gameplay(rules::PlayerIntent::Inspect),
-        wire::Intent::Hide => RulesIntent::Gameplay(rules::PlayerIntent::Hide),
-        wire::Intent::ShowSack => RulesIntent::Gameplay(rules::PlayerIntent::ShowSack),
-        wire::Intent::Wait => RulesIntent::Gameplay(rules::PlayerIntent::Wait),
-        wire::Intent::Rest => RulesIntent::Gameplay(rules::PlayerIntent::Rest),
+        wire::Intent::Inspect {} => RulesIntent::Gameplay(rules::PlayerIntent::Inspect),
+        wire::Intent::Hide {} => RulesIntent::Gameplay(rules::PlayerIntent::Hide),
+        wire::Intent::ShowSack {} => RulesIntent::Gameplay(rules::PlayerIntent::ShowSack),
+        wire::Intent::RequestResurrection {} => {
+            RulesIntent::Gameplay(rules::PlayerIntent::RequestResurrection)
+        }
+        wire::Intent::Wait {} => RulesIntent::Gameplay(rules::PlayerIntent::Wait),
+        wire::Intent::Rest {} => RulesIntent::Gameplay(rules::PlayerIntent::Rest),
         wire::Intent::PhysicalAttack {
             mode,
             target_actor_id,
@@ -293,8 +296,8 @@ pub fn intent(value: &wire::Intent) -> RulesIntent {
             target_actor_id: rules_actor_id(target_actor_id),
             authorization: rules_authorization(*authorization),
         }),
-        wire::Intent::Nock => RulesIntent::Gameplay(rules::PlayerIntent::Nock),
-        wire::Intent::UnloadBow => RulesIntent::Gameplay(rules::PlayerIntent::UnloadBow),
+        wire::Intent::Nock {} => RulesIntent::Gameplay(rules::PlayerIntent::Nock),
+        wire::Intent::UnloadBow {} => RulesIntent::Gameplay(rules::PlayerIntent::UnloadBow),
         wire::Intent::WarmSpell { spell_id } => {
             RulesIntent::Gameplay(rules::PlayerIntent::WarmSpell {
                 spell_id: spell_id.as_str().to_string(),
@@ -316,7 +319,7 @@ pub fn intent(value: &wire::Intent) -> RulesIntent {
             target: target.as_ref().map(rules_spell_target),
             authorization: rules_authorization(*authorization),
         }),
-        wire::Intent::FizzleWarmedSpell => {
+        wire::Intent::FizzleWarmedSpell {} => {
             RulesIntent::Gameplay(rules::PlayerIntent::FizzleWarmedSpell)
         }
         wire::Intent::SearchCorpse { corpse_id } => {
@@ -527,13 +530,13 @@ pub fn intent(value: &wire::Intent) -> RulesIntent {
                 invitation_id: rules::GroupInviteId::new(invitation_id.get()),
             })
         }
-        wire::Intent::LeaveGroup => RulesIntent::Social(rules::SocialIntent::LeaveGroup),
+        wire::Intent::LeaveGroup {} => RulesIntent::Social(rules::SocialIntent::LeaveGroup),
         wire::Intent::RemoveMember {
             member_character_id,
         } => RulesIntent::Social(rules::SocialIntent::RemoveMember {
             member_character_id: rules_character_id(*member_character_id),
         }),
-        wire::Intent::DisbandGroup => RulesIntent::Social(rules::SocialIntent::DisbandGroup),
+        wire::Intent::DisbandGroup {} => RulesIntent::Social(rules::SocialIntent::DisbandGroup),
         wire::Intent::TransferLeadership {
             member_character_id,
         } => RulesIntent::Social(rules::SocialIntent::TransferLeadership {
@@ -544,7 +547,7 @@ pub fn intent(value: &wire::Intent) -> RulesIntent {
         } => RulesIntent::Social(rules::SocialIntent::BeginFollow {
             target_character_id: rules_character_id(*target_character_id),
         }),
-        wire::Intent::EndFollow => RulesIntent::Social(rules::SocialIntent::EndFollow),
+        wire::Intent::EndFollow {} => RulesIntent::Social(rules::SocialIntent::EndFollow),
         wire::Intent::SetPagesEnabled { enabled } => {
             RulesIntent::Social(rules::SocialIntent::SetPagesEnabled { enabled: *enabled })
         }

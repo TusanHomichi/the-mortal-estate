@@ -7,9 +7,10 @@ import type { GameplayFields } from "../src/authoritative/gameplay";
 import type { Frame } from "../src/authoritative/state";
 
 const frame = (): Frame => ({ observer_actor_id:"player", observation_center:{realm:"land",level:"town",position:{x:0,y:0}},
-  logical_time:"0",ready_at:"0",can_act:true, actors:[],corpses:[],ground_items:[],gold_piles:[],
+  logical_time:"0",ready_at:"0",can_act:true, actors:[{actor_id:"player",name:"Player",life_state:"alive",position:{realm:"land",level:"town",position:{x:0,y:0}}}],corpses:[],ground_items:[],gold_piles:[],
   tiles:Array.from({length:25},(_,i)=>({position:{x:i%5,y:Math.floor(i/5)},passable:true})) });
 const state = (): ControlView => ({phase:"playing",busy:false,pending:false,characters:[],feedback:"",nextSequence:"1",creationOptions:[],creationRetry:null,createdCharacterId:null,
+  messages:[],
   snapshot:{generation:1,raw:"",envelope:{kind:"state_update",server_sequence:"1",world_revision:"1",static_scene_context:null,
     frame:frame() as Frame & GameplayFields}}});
 const tick = async () => { await Promise.resolve(); await Promise.resolve(); };
@@ -25,6 +26,14 @@ function setup() {
   return {controls,transport,requests,current,accept,shown:()=>shown!};
 }
 describe("authoritative two-click path controls",()=>{
+  it("clears a pending route on death and never previews movement for an eligible ghost",async()=>{
+    const s=setup();s.controls.click({x:2,y:0});s.controls.click({x:2,y:0});
+    s.current.snapshot!.envelope.frame.actors[0]!.life_state="ghost";
+    s.controls.present(s.current);s.accept(0);await tick();
+    s.controls.click({x:2,y:0});
+    expect(s.requests).toHaveLength(1);expect(s.transport.command).not.toHaveBeenCalled();
+    expect(s.shown().route).toBeNull();
+  });
   it("first click draws feet without a command; endpoint confirmation submits exactly one path",async()=>{
     const s=setup();s.controls.click({x:3,y:0});
     expect(s.shown().kind).toBe("draft");expect(s.shown().route).toHaveLength(4);

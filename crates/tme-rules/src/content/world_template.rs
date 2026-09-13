@@ -6,19 +6,31 @@ use crate::model::{Coord, VerticalDirection, WorldPosition};
 
 use super::LawZoneDef;
 
-pub const WORLD_TEMPLATE_SCHEMA_VERSION: u32 = 3;
+pub const WORLD_TEMPLATE_SCHEMA_VERSION: u32 = 4;
 pub const WORLD_TEMPLATE_KIND: &str = "world_template";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct WorldTemplateV3 {
+pub struct WorldTemplateV4 {
     pub schema_version: u32,
     pub kind: String,
     pub id: String,
     pub visual_manifest_digest: String,
     pub realms: BTreeMap<String, RealmDef>,
     pub arrivals: BTreeMap<String, WorldPosition>,
+    pub resurrection: BTreeMap<String, ResurrectionPolicyDef>,
     pub topology: BTreeMap<String, TopologyEdgeDef>,
+}
+
+/// A realm's explicitly authored ordinary return route and provisional resources.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ResurrectionPolicyDef {
+    pub request_delay_ms: u64,
+    pub lawful_destination: WorldPosition,
+    pub neutral_destination: WorldPosition,
+    pub hit_points_missing: i32,
+    pub stamina_missing: i32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

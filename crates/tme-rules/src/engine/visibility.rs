@@ -50,7 +50,7 @@ impl Engine {
         let Some(observer) = self.world.actors.get(observer_index) else {
             return false;
         };
-        if !observer.is_alive()
+        if !observer.life_state.perceives_surroundings()
             || self.actor_is_blind(observer_index)
             || !observer.location.same_site(target)
         {
@@ -78,7 +78,7 @@ impl Engine {
         radius: Option<u32>,
     ) -> BTreeSet<WorldPosition> {
         let observer = &self.world.actors[observer_index];
-        if !observer.is_alive() || self.actor_is_blind(observer_index) {
+        if !observer.life_state.perceives_surroundings() || self.actor_is_blind(observer_index) {
             return BTreeSet::from([observer.location.clone()]);
         }
         let ignores_darkness = self.actor_has_active_tag(observer_index, "night_vision");

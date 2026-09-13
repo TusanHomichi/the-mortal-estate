@@ -112,7 +112,7 @@ async fn postgres_bootstrap_command_and_restart_are_durable() {
         client_sequence: wire::DecimalU64::new(1),
         observed_world_revision: wire::DecimalU64::new(0),
         actor_id: actor_id.clone(),
-        intent: wire::Intent::Wait,
+        intent: wire::Intent::Wait {},
     };
     let request_digest: [u8; 32] = Sha256::digest(serde_json::to_vec(&command).unwrap()).into();
     let reply = grant
@@ -127,7 +127,7 @@ async fn postgres_bootstrap_command_and_restart_are_durable() {
             client_sequence: 1,
             observed_facet_revision: 0,
             actor_id,
-            intent: wire::Intent::Wait,
+            intent: wire::Intent::Wait {},
             request_digest,
         })
         .unwrap()
@@ -458,7 +458,7 @@ async fn fenced_restore_hydrates_and_commits_fresh_authenticated_command() {
         client_sequence: wire::DecimalU64::new(1),
         observed_world_revision: wire::DecimalU64::new(welcome.facet_revision),
         actor_id: actor_id.clone(),
-        intent: wire::Intent::Wait,
+        intent: wire::Intent::Wait {},
     };
     let digest: [u8; 32] = Sha256::digest(serde_json::to_vec(&command).unwrap()).into();
     let reply = grant
@@ -473,7 +473,7 @@ async fn fenced_restore_hydrates_and_commits_fresh_authenticated_command() {
             client_sequence: 1,
             observed_facet_revision: welcome.facet_revision,
             actor_id,
-            intent: wire::Intent::Wait,
+            intent: wire::Intent::Wait {},
             request_digest: digest,
         })
         .unwrap()

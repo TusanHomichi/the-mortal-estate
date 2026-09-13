@@ -942,7 +942,7 @@ fn command_26_restoration_shape_requires_both_nullable_selections() {
     assert_eq!(
         value,
         serde_json::json!({
-            "contract_version": 26,
+            "contract_version": 27,
             "actor_id": "player",
             "intent": {
                 "use_restoration_service": {

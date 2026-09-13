@@ -109,6 +109,18 @@ pub enum ActorLifeState {
     Dead,
 }
 
+impl ActorLifeState {
+    /// Ordinary ghosts retain awareness, but have no physical action authority.
+    pub fn perceives_surroundings(&self) -> bool {
+        matches!(self, Self::Alive | Self::Ghost { .. })
+    }
+
+    /// A corpse represents a defeated character to other observers.
+    pub fn visible_to_observer(&self, is_self: bool) -> bool {
+        matches!(self, Self::Alive) || (is_self && !matches!(self, Self::Dead))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(tag = "kind", content = "id", rename_all = "snake_case")]
 pub enum LootOwnerId {

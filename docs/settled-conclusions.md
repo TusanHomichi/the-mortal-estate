@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 62
-status: Lookup index routes martial motion integration and combat direction to their distinct maintained owners.
+revision: 63
+status: Lookup index routes ordinary death, martial motion and combat direction to their maintained owners.
 public_safe: true
-summary: Lookup links for full-world 3D, player-body selection, motion acceptance, combat direction, geography and preview refresh.
+summary: Lookup links for ordinary corpse-bound death, full-world 3D, martial direction, geography and preview refresh.
 always: true
 ---
 
@@ -73,6 +73,7 @@ the pixel-only restriction. Earlier visual choices remain evidence to reassess.
 | Private denylist | Provisioning, worktrees, and fail-closed behavior. | [boundary checks](boundary-checks.md#the-private-terms-convention) |
 | Public source | Source publication is separate from product release. | [public boundary policy](public-boundary-policy.md#the-clean-public-successor-and-the-two-publication-cuts) |
 | Historical gameplay baseline | Exact reconstruction with evidence and explicit deviations; research restored privately. | [gameplay baseline](gameplay-baseline.md) |
+| Ordinary ghosts | Stay at the corpse, retain awareness and speech, request resurrection after 60 seconds. | [gameplay baseline](gameplay-baseline.md#ordinary-death-and-return) |
 | Martial Artist combat sequence | Owner-selected entry and engaged-attack direction; future implementation. | [gameplay baseline](gameplay-baseline.md#martial-artist-combat-sequence) |
 | Dungeon martial motion | Controlled body selection and presentation of authoritative movement/combat events. | [browser client](browser-client.md#dungeon-character-motion) |
 | First-land map template | Owner-approved geography exception; scope and provenance have one owner. | [public boundary policy](public-boundary-policy.md#first-land-map-template) |

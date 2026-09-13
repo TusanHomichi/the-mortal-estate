@@ -29,7 +29,7 @@ class WireObservation(unittest.TestCase):
     def client(self):
         client = LiveWireClient.__new__(LiveWireClient)
         client.gameplay = SimpleNamespace(
-            latest_state={"frame": {"contract_version": 8, "can_act": False}},
+            latest_state={"frame": {"contract_version": 9, "can_act": False}},
             socket=Mock(), receive_json=Mock(),
         )
         client.gameplay.socket.gettimeout.return_value = 17
@@ -52,6 +52,6 @@ class WireObservation(unittest.TestCase):
 
     def test_obsolete_frame_contract_is_refused(self):
         client = self.client()
-        client.gameplay.latest_state["frame"]["contract_version"] = 7
+        client.gameplay.latest_state["frame"]["contract_version"] = 8
         with self.assertRaises(ProofError):
             client.frame

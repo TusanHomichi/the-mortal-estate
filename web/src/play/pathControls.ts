@@ -3,6 +3,7 @@ import type { Cell } from "../walk/layoutPassability";
 import type { ControlView } from "./control";
 import type { PathPreview } from "./pathPreview";
 import { proposePath, routeDirections } from "./pathPlan";
+import { physicalControlsAvailable } from "./life";
 
 export interface WalkPresentation { route: readonly Cell[] | null; kind: "draft" | "committed"; hover: Coord | null; cursor: "ready" | "waiting" | "refused" }
 interface Transport {
@@ -28,7 +29,7 @@ export class PathControls {
   private refused = false;
   constructor(private readonly transport: Transport, private readonly draw: (view: WalkPresentation) => void) {}
   private get ready(): boolean {
-    return this.state?.phase === "playing" && !this.state.busy && !this.state.pending && !!this.state.snapshot?.envelope.frame.can_act;
+    return this.state?.phase === "playing" && !this.state.busy && !this.state.pending && physicalControlsAvailable(this.state.snapshot?.envelope.frame);
   }
   present(state: ControlView): void {
     this.state = state;

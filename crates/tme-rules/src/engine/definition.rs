@@ -63,6 +63,8 @@ pub struct WorldTemplate {
     pub(in crate::engine) visual_manifest_digest: String,
     pub(in crate::engine) realms: std::collections::HashMap<String, RealmState>,
     pub(in crate::engine) arrivals: std::collections::HashMap<String, WorldPosition>,
+    pub(in crate::engine) resurrection:
+        std::collections::BTreeMap<String, crate::content::ResurrectionPolicyDef>,
     pub(in crate::engine) navigation: std::collections::HashMap<WorldPosition, Vec<NavigationDef>>,
 }
 

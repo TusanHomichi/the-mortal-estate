@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "kind": "world_template",
   "id": "identity_proof",
   "visual_manifest_digest": "320ecf5553a110ca349272db2ddbb3de005021f648b8b397d8d6bbf9f98b0b0a",
@@ -4788,5 +4788,6 @@
       }
     }
   },
+  "resurrection": {},
   "topology": {}
 }

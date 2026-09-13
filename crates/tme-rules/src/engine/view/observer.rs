@@ -233,7 +233,12 @@ impl Engine {
             .actors
             .iter()
             .enumerate()
-            .filter(|(_, actor)| visible.contains(&actor.location))
+            .filter(|(_, actor)| {
+                visible.contains(&actor.location)
+                    && actor
+                        .life_state
+                        .visible_to_observer(&actor.id == observer_actor_id)
+            })
             .collect::<Vec<_>>();
         if visible_actors.len() > MAX_OBSERVER_ACTORS {
             return Err(StepError::new(format!(
@@ -395,10 +400,10 @@ impl Engine {
                             })
                             && (actor_id == observer_actor_id || visible.contains(from)));
                     let actor_is_visible = actor_id == observer_actor_id
-                        || self
-                            .world
-                            .actor(actor_id)
-                            .is_some_and(|actor| visible.contains(&actor.location));
+                        || self.world.actor(actor_id).is_some_and(|actor| {
+                            actor.life_state.visible_to_observer(false)
+                                && visible.contains(&actor.location)
+                        });
                     (local_move
                         && actor_is_visible
                         && (actor_id == observer_actor_id || visible.contains(to)))
@@ -459,7 +464,14 @@ impl Engine {
                         .collect::<Result<Vec<_>, StepError>>()?;
                     let nearby_actors = nearby_actors
                         .iter()
-                        .filter(|actor| visible.contains(&actor.location))
+                        .filter(|actor| {
+                            visible.contains(&actor.location)
+                                && self.world.actor(&actor.actor_id).is_some_and(|current| {
+                                    current
+                                        .life_state
+                                        .visible_to_observer(&current.id == observer_actor_id)
+                                })
+                        })
                         .map(|actor| ObserverInspectActorV1 {
                             direction: actor.direction,
                             actor_id: actor.actor_id.clone(),
@@ -669,7 +681,7 @@ impl Engine {
             frame: ObserverFrameV1 {
                 contract_version: OBSERVER_PROJECTION_CONTRACT_VERSION,
                 logical_time: self.world.timing.now,
-                ready_at: observer.timing.ready_at,
+                ready_at: self.actor_ready_at(observer_index),
                 observer_actor_id: observer_actor_id.clone(),
                 observation_center: center,
                 observation_radius: PLAYER_OBSERVATION_RADIUS,
