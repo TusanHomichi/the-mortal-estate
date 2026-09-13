@@ -259,4 +259,3 @@ Water issue #48 remains open; no artwork master is accepted.
 - **Separate stop line:** the presentation-adoption experiment remains before P1;
   remaining identity-proof slices are undispatched. Active browser work does not
   release that pause, accept a production presenter, or close G10/G11.
-
