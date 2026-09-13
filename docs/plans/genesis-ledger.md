@@ -35,6 +35,9 @@ life–death–return loop, then succession and persistent ancestors. The
 [death-return record](2026-09-13-death-return.md) owns execution and reconciliation
 against current rulings. This releases the corresponding gameplay work from the
 earlier pause; the separate presentation experiment and G10/G11 remain open.
+The ordinary corpse-bound control foundation is tracked through
+[PR #75](https://github.com/TusanHomichi/the-mortal-estate/pull/75); exceptional
+routes and initial combat-value reconciliation remain distinct follow-ups.
 
 **Delivered martial correction:** the
 [wall-motion record](2026-09-13-martial-wall-motion.md) routes issue #68's playback,

@@ -132,8 +132,9 @@ comparison; its changes are mechanical intent shapes, version and digest pins.
 Focused parent-observed results: 27 whitespace/target tests, 15 death/corpse rules
 tests and 38 browser speech, death-control, path and figure tests passed. Authoring
 regenerated all three lands successfully. Final configured verification, native
-matrix, source and saved-preview delivery outcomes belong to the linked pull
-request and installation receipts; initial focused results do not establish them.
+matrix, source and saved-preview delivery outcomes belong to
+[PR #75](https://github.com/TusanHomichi/the-mortal-estate/pull/75) and installation
+receipts; initial focused results do not establish them.
 
 The native runner is `tools/run_death_return_proof.py --release <release>
 --admin-url-file <private-file> --output <private-directory>`. It owns six
