@@ -36,7 +36,6 @@ export class WorldRenderer {
   private animation=0;
   private failed=false;
   private readonly graphicsError=document.createElement('p');
-  private last=performance.now();
   private readonly lost=(event:Event)=>{event.preventDefault();this.failed=true;this.clear();this.canvas.dataset.presentationError='graphics-context-lost';this.graphicsError.hidden=false;};
   private readonly resize=()=>{
     const width=Math.max(1,window.innerWidth),height=Math.max(1,window.innerHeight);
@@ -64,9 +63,8 @@ export class WorldRenderer {
     this.renderer.render(this.scene,this.camera);
     this.disposeBackdrop=prepareEntryBackdrop(this.canvas);this.settlement.clear();
     this.canvas.addEventListener('webglcontextlost',this.lost);window.addEventListener('resize',this.resize);this.resize();
-    const animate=(now:number)=>{
-      const dt=Math.min((now-this.last)/1000,.05);this.last=now;
-      if(this.frame&&!document.hidden&&!this.failed){this.actors.update(dt);this.draw();}
+    const animate=()=>{
+      if(this.frame&&!document.hidden&&!this.failed){this.actors.update();this.draw();}
       this.animation=requestAnimationFrame(animate);
     };this.animation=requestAnimationFrame(animate);
   }
@@ -120,6 +118,7 @@ export class WorldRenderer {
     this.scene.updateMatrixWorld(true);this.occlusion.update(this.camera,this.actors.bodies());this.renderer.render(this.scene,this.camera);
     if(!this.frame)return;
     this.canvas.dataset.worldOcclusion=String(this.occlusion.count);
+    this.canvas.dataset.worldOcclusionActors=JSON.stringify(this.occlusion.actors);
     this.canvas.dataset.worldMotions=JSON.stringify(this.actors.diagnostics());
     this.canvas.dataset.worldDrawCalls=String(this.renderer.info.render.calls);
     this.canvas.dataset.worldGridEdges=String(this.grid.mesh.geometry.getAttribute('position')?.count/2||0);
@@ -145,7 +144,7 @@ export class WorldRenderer {
   private clearLoot():void {this.loot.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();(o.material as T.Material).dispose();}});this.loot.clear();}
   clear():void {
     this.frame=null;this.targets=[];this.occlusion.clear();this.dungeon.clear();this.settlement.clear();this.actors.clear();this.overlay.clear();this.grid.clear();this.clearLoot();this.renderer.clear();
-    for(const key of ['studyLevel','worldView','worldPoints','worldActorAnchors','worldActorPoints','worldContents','worldOcclusion','worldDrawCalls','worldMotions','worldGridEdges'])delete this.canvas.dataset[key];
+    for(const key of ['studyLevel','worldView','worldPoints','worldActorAnchors','worldActorPoints','worldContents','worldOcclusion','worldOcclusionActors','worldDrawCalls','worldMotions','worldGridEdges'])delete this.canvas.dataset[key];
     this.canvas.dataset.studyActorCount='0';
   }
   dispose():void {cancelAnimationFrame(this.animation);window.removeEventListener('resize',this.resize);this.canvas.removeEventListener('webglcontextlost',this.lost);this.clear();this.dungeon.dispose();this.settlement.dispose();this.actors.dispose();disposeSettlementAssets(this.assets);this.disposeBackdrop();this.overlay.dispose();this.grid.dispose();this.renderer.dispose();this.graphicsError.remove();}

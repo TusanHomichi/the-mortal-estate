@@ -1,5 +1,9 @@
 {
   "status": "candidate",
+  "martialPlayback": {
+    "motionRoot": "root",
+    "closingKick": {"contactPhase": 0.25, "landingPhase": 0.45}
+  },
   "body": {
     "file": "dungeon-adventurer.glb",
     "sha256": "7b022a9e35a944105659f0421fe7cdc0bfc849b722edb88752e7dcd84823eb83"

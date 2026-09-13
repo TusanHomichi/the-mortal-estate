@@ -5,13 +5,14 @@ import type {Frame,Snapshot,Coord} from '../../authoritative/state';
 import {occupantAnchors,TILE,cellKey} from './view';
 import {disposeFigureAssets,type DungeonAssets,type FigureAsset} from './assets';
 import {combatCues,movementRoute,movementSeconds} from './motion';
+import {FigurePlayback} from './playback';
 export {loadDungeonBody} from './assets';
 
 type BodyKind=keyof DungeonAssets;
-interface Travel { points:T.Vector3[]; lengths:number[]; distance:number; started:number; seconds:number; clip:'walk'|'flying_kick' }
+interface Travel { points:T.Vector3[]; lengths:number[]; distance:number; started:number; seconds:number; progress:number; clip:'walk'|'flying_kick' }
 interface Figure {
-  root:T.Group;body:T.Object3D;mixer:T.AnimationMixer;label:T.Sprite;asset:FigureAsset;kind:BodyKind;
-  action:T.AnimationAction;clip:string;position:Coord;travel:Travel|null;endsAt:number|null;
+  root:T.Group;body:T.Object3D;playback:FigurePlayback;label:T.Sprite;asset:FigureAsset;kind:BodyKind;
+  position:Coord;travel:Travel|null;
 }
 
 /** The owner-selected martial bodies present every controlled character. */
@@ -28,6 +29,7 @@ export class DungeonActors {
   private punchVariation=0;
   constructor(private readonly assets:DungeonAssets,private readonly now=()=>performance.now()){}
   present(frame:Frame,snapshot:Snapshot):void {
+    this.update();const now=this.now();
     const anchors=occupantAnchors(frame),active=new Set<string>(),self=frame.observer_actor_id;
     const fresh=this.sequence!==snapshot.envelope.server_sequence;
     const events=fresh&&snapshot.envelope.kind==='state_update'?snapshot.envelope.events??[]:[];
@@ -41,12 +43,12 @@ export class DungeonActors {
       if(!figure){
         const root=new T.Group(),asset=this.assets[kind],body=clone(asset.scene);root.add(body);
         body.traverse(o=>{if(o instanceof T.Mesh){o.castShadow=false;o.receiveShadow=true;}});
-        const mixer=new T.AnimationMixer(body),action=mixer.clipAction(asset.clips.find(c=>c.name===asset.idle)!).play();
+        const playback=new FigurePlayback(body,asset,now);
         const raster=document.createElement('canvas');raster.width=256;raster.height=40;
         const ink=raster.getContext('2d')!;ink.font='22px Georgia';ink.textAlign='center';ink.fillStyle='#ead7b0';ink.shadowColor='#000';ink.shadowBlur=4;ink.fillText(row.name,128,28,250);
         const label=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(raster),transparent:true,depthTest:false,toneMapped:false}));
         label.position.y=2;label.scale.set(1.65,.26,1);label.renderOrder=100;root.add(label);
-        figure={root,body,mixer,label,asset,kind,action,clip:asset.idle,position:row.position.position,travel:null,endsAt:null};
+        figure={root,body,playback,label,asset,kind,position:row.position.position,travel:null};
         this.figures.set(row.actor_id,figure);this.group.add(root);root.userData.actorId=row.actor_id;
       }
       const at=anchors.get(row.actor_id)!;const destination=new T.Vector3(at.x*TILE,0,at.y*TILE);
@@ -55,11 +57,11 @@ export class DungeonActors {
       if(route&&cellKey(route[0]!)===cellKey(figure.position)&&(row.actor_id!==self||!frame.can_act)){
         const points=route.map(p=>new T.Vector3(p.x*TILE,0,p.y*TILE));points[points.length-1]=destination;
         const lengths=points.slice(1).map((p,i)=>p.distanceTo(points[i]!));
-        figure.travel={points,lengths,distance:lengths.reduce((a,b)=>a+b,0),started:this.now(),
-          seconds:row.actor_id===self?movementSeconds(frame.logical_time,frame.ready_at):.18,clip:'walk'};
-        figure.root.position.copy(points[0]!);figure.endsAt=null;this.play(figure,'walk');
-      }else if(created||moved){figure.travel=null;figure.endsAt=null;figure.root.position.copy(destination);this.play(figure,figure.asset.idle);}
-      else if(row.actor_id===self&&frame.can_act&&figure.travel){figure.travel=null;figure.root.position.copy(destination);this.play(figure,figure.asset.idle);}
+        figure.travel={points,lengths,distance:lengths.reduce((a,b)=>a+b,0),started:now,
+          seconds:row.actor_id===self?movementSeconds(frame.logical_time,frame.ready_at):.18,progress:0,clip:'walk'};
+        figure.root.position.copy(points[0]!);figure.playback.play('walk',now);
+      }else if(created||moved){figure.travel=null;figure.root.position.copy(destination);figure.playback.play(figure.asset.idle,now);}
+      else if(row.actor_id===self&&frame.can_act&&figure.travel){figure.travel=null;figure.root.position.copy(destination);figure.playback.play(figure.asset.idle,now);}
       else if(!figure.travel)figure.root.position.copy(destination);
       figure.position={...row.position.position};
     }
@@ -76,10 +78,10 @@ export class DungeonActors {
         const target=cue.faceActorId?this.figures.get(cue.faceActorId):null;
         if(target)this.face(figure,target.root.position.clone().sub(figure.root.position));
         if(cue.clip==='flying_kick'&&figure.travel){
+          if(!figure.asset.closingKick)throw Error('Martial closing-kick phases missing.');
           figure.travel.clip='flying_kick';
-          this.play(figure,cue.clip,true,figure.travel.seconds);
-          figure.endsAt=figure.travel.started+figure.travel.seconds*1000;
-        }else this.play(figure,cue.clip,true);
+          figure.playback.play(cue.clip,now,figure.travel.seconds);
+        }else figure.playback.play(cue.clip,now,Math.min(figure.asset.clips.find(c=>c.name===cue.clip)!.duration,1.5));
       }
     }
     this.sequence=snapshot.envelope.server_sequence;
@@ -87,23 +89,16 @@ export class DungeonActors {
   private face(f:Figure,direction:T.Vector3):void {
     if(direction.x*direction.x+direction.z*direction.z>1e-8)f.body.rotation.y=Math.atan2(direction.x,direction.z);
   }
-  private play(f:Figure,name:string,once=false,onceSeconds?:number):void {
-    if(!once&&f.clip===name)return;
-    const clip=f.asset.clips.find(c=>c.name===name);if(!clip)throw Error(`Required dungeon clip unavailable: ${name}.`);
-    const next=f.mixer.clipAction(clip);const previous=f.action;
-    next.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).setLoop(once?T.LoopOnce:T.LoopRepeat,once?1:Infinity);
-    next.clampWhenFinished=once;next.play();
-    if(previous!==next)next.crossFadeFrom(previous,.12,false);
-    if(once){const seconds=onceSeconds??Math.min(clip.duration,1.5);next.setDuration(seconds);f.endsAt=this.now()+seconds*1000;}
-    else f.endsAt=null;
-    f.action=next;f.clip=name;
-  }
-  update(dt:number):void {
+  update():void {
     const now=this.now();
     for(const f of this.figures.values()){
-      const travel=f.travel;
+      const travel=f.travel;let walked:number|undefined;
       if(travel){
-        const progress=Math.min(1,Math.max(0,(now-travel.started)/(travel.seconds*1000)));let remaining=progress*travel.distance;
+        const elapsed=Math.min(1,Math.max(0,(now-travel.started)/(travel.seconds*1000)));
+        // Reach the shared target at the source kick's contact pose, then land
+        // and recover there. Recovery frames must not skate along the route.
+        const progress=Math.min(1,elapsed/(travel.clip==='flying_kick'?f.asset.closingKick!.contactPhase:1));
+        travel.progress=progress;let remaining=progress*travel.distance;
         for(let i=0;i<travel.lengths.length;i++){
           const length=travel.lengths[i]!;
           if(remaining<=length||i===travel.lengths.length-1){
@@ -111,18 +106,14 @@ export class DungeonActors {
             this.face(f,travel.points[i+1]!.clone().sub(travel.points[i]!));break;
           }remaining-=length;
         }
-        if(f.clip==='walk'){
-          // Pose phase follows actual rendered distance, including run/sprint paths.
-          f.action.time=(progress*travel.distance/f.asset.stride*f.action.getClip().duration)%f.action.getClip().duration;
-          f.action.paused=true;
-        }
-        if(progress===1){f.root.position.copy(travel.points.at(-1)!);f.travel=null;if(f.endsAt===null)this.play(f,f.asset.idle);}
+        if(f.playback.clip==='walk')walked=progress*travel.distance;
+        if(elapsed===1){f.root.position.copy(travel.points.at(-1)!);f.travel=null;if(travel.clip==='walk')f.playback.play(f.asset.idle,now);}
       }
-      if(f.endsAt!==null&&now>=f.endsAt)this.play(f,f.travel?f.travel.clip:f.asset.idle);
-      f.mixer.update(dt);
+      f.playback.update(now,walked);
     }
   }
-  diagnostics():unknown[]{return [...this.figures].map(([id,f])=>({id,body:f.kind,clip:f.clip,moving:f.travel!==null,
+  diagnostics():unknown[]{return [...this.figures].map(([id,f])=>({id,body:f.kind,...f.playback.diagnostics(),moving:f.travel!==null&&f.travel.progress<1,
+    routeProgress:f.travel?.progress??null,
     route:f.travel?.points.map(p=>({x:p.x/TILE,y:p.z/TILE}))??null,durationMs:f.travel?f.travel.seconds*1000:null}));}
   anchor(id:string):Coord|null {const f=this.figures.get(id);return f?{x:f.root.position.x/TILE,y:f.root.position.z/TILE}:null;}
   bodies():T.Object3D[]{return [...this.figures.values()].map(f=>f.body);}
@@ -130,7 +121,7 @@ export class DungeonActors {
     const hit=ray.intersectObjects(this.bodies(),true)[0];if(!hit)return null;
     let o:T.Object3D|null=hit.object;while(o&&!o.userData.actorId)o=o.parent;return o?.userData.actorId??null;
   }
-  private remove(f:Figure):void {f.mixer.stopAllAction();f.mixer.uncacheRoot(f.body);disposeSkeletons(f.body);f.root.removeFromParent();f.label.material.map?.dispose();f.label.material.dispose();}
+  private remove(f:Figure):void {f.playback.dispose();disposeSkeletons(f.body);f.root.removeFromParent();f.label.material.map?.dispose();f.label.material.dispose();}
   clear():void {for(const f of this.figures.values())this.remove(f);this.figures.clear();this.sequence=null;this.punchVariation=0;}
   dispose():void {this.clear();disposeFigureAssets(Object.values(this.assets));}
 }

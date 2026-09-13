@@ -28,6 +28,11 @@ def cases():
             dict(scenario="actor-actions", start=location("d4", 8, 17)),
             dict(scenario="martial-male", sex="male", start=location("d1_entry", 23, 9)),
             dict(scenario="martial-female", sex="female", start=location("d1_entry", 23, 9)),
+            *[dict(scenario=f"martial-{sex}-{distance}", sex=sex, approach=distance,
+                   start=location("d1_entry", 23, 9))
+              for sex in ("male", "female") for distance in (1, 2)],
+            *[dict(scenario=f"forge-{sex}", sex=sex, wallPose=True, start=location("forge", 0, 2))
+              for sex in ("male", "female")],
             # The observed character defends. `Fight` is legal only on a shared
             # tile, and the authored monster holds ground, so the fixture colocates
             # them rather than asking the monster to chase.
@@ -114,6 +119,8 @@ def main():
             if case.get("defense"):
                 defense_fixture(world.generated_seed, player, case["sex"],
                                 occupied=bool(case.get("occupied")))
+            elif case.get("wallPose"):
+                player["character"]["identity"]["sex_or_gender_display"] = case["sex"]
             elif "sex" in case:
                 martial_fixture(world.generated_seed, player, case["sex"])
             server = WorldServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
@@ -123,6 +130,7 @@ def main():
                 config = dict(**case, engine=engine, origin=server.origin, authority=str(server.authority),
                               username=server.username, password=server.password, output=str(output))
                 script = ("dungeon-block-proof.mjs" if case.get("defense") else
+                          "world-wall-proof.mjs" if case.get("wallPose") else
                           "dungeon-motion-proof.mjs" if "sex" in case else
                           "dungeon-actions-proof.mjs" if case["scenario"] == "actor-actions" else "dungeon-proof.mjs")
                 result = subprocess.run(["node", str(REPOSITORY_ROOT / "web/proof" / script)],
@@ -132,7 +140,8 @@ def main():
                 if result.returncode:
                     raise RuntimeError(result.stderr[-3500:])
                 reports.append(json.loads((output / f'{engine}-{case["scenario"]}.json').read_text()))
-    report.write_text(json.dumps(dict(verdict="PASS", release=str(release), reports=reports), indent=2) + "\n")
+    report.write_text(json.dumps(dict(verdict="INSPECTION" if args.engine or args.scenario else "PASS",
+                                      release=str(release), reports=reports), indent=2) + "\n")
 
 
 if __name__ == "__main__":

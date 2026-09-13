@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 62
-status: Full-world Three.js implemented; linked delivery records own native proof and installation outcomes.
+revision: 63
+status: Shared martial playback uses elapsed pose time, bound contact phases and complete rig visibility; linked execution records own proof and delivery.
 public_safe: true
-summary: One 3D world renderer, shared rigged figures, current-map scenery and authoritative browser proof.
+summary: Full-world 3D, elapsed shared rig playback, root-motion binding, contact-phase arrival and native pose proof.
 routes:
   - web/**
   - tools/run_world_proof.py
@@ -33,7 +33,7 @@ for deployment and work status.
 | World scenery and binding | `web/src/play/worldRenderer.ts`, `settlementScenery.ts`, `settlementAssets.ts`, `settlementReceipt.json`, `worldSpace.ts`, `worldCamera.ts`, `worldGrid.ts`, `groundTexture.ts` | `web/tests/worldSpace.test.ts`, `worldScenery.test.ts`, `web/proof/world-room-proof.mjs`, `world-exterior-proof.mjs` |
 | Shared foreground visibility | `web/src/play/dungeon/occlusion.ts` | `web/tests/worldScenery.test.ts`, `web/proof/world-occlusion-proof.mjs` |
 | Live dungeon rendering | `web/src/play/worldRenderer.ts`, `dungeon/` | `web/tests/dungeonRenderer.test.ts`, `web/proof/dungeon-proof.mjs` |
-| Shared character motion | `web/src/play/dungeon/actors.ts`, `assets.ts`, `motion.ts` | `web/tests/dungeonActors.test.ts`, `web/tests/dungeonMotion.test.ts`, `web/tests/dungeonJumpkick.test.ts`, `web/proof/dungeon-motion-proof.mjs` |
+| Shared character motion | `web/src/play/dungeon/actors.ts`, `assets.ts`, `playback.ts`, `motion.ts` | `web/tests/dungeonActors.test.ts`, `web/tests/dungeonMotion.test.ts`, `web/tests/dungeonJumpkick.test.ts`, `web/tests/dungeonPlayback.test.ts`, `web/proof/dungeon-motion-proof.mjs`, `dungeon-phase-capture.mjs` |
 | Authoritative capture | `web/src/authoritative/` | shared wire corpus, state/target tests, `tools/run_browser_capture_proof.py` |
 | Retired 3D packet admission | `web/src/main.ts`, `feelScene.ts`, `manifest.ts` | packet and manifest tests |
 | Retired local movement | `web/src/walk/` | route, intent, cursor, pointer, facing tests; `web/proof/walk-proof.mjs` |
@@ -72,7 +72,8 @@ resolution together. `world-pointing.mjs` consumes the actual `worldPoints` and
 edges of observed passable tiles independently of floor artwork. The same world
 coordinates drive ray-plane pointing, path footprints and living actor placement.
 
-Occlusion samples observed bodies, including extended limbs. A transparent depth
+Occlusion samples every joint of observed bodies, including extended limbs,
+without assuming a rig's bone-name convention. A transparent depth
 pass admits only the nearest faded surface before its colour pass, so overlapping
 roof pieces blend once at the directed opacity. Opaque materials and draw order
 return when the body clears. Scene changes release cloned fade/depth materials;
@@ -107,8 +108,13 @@ and reconnect proof.
 `tools/run_dungeon_proof.py --release <immutable-release> --admin-url-file <file>
 --output <external-directory>` proves the existing four-floor, door, stair,
 actor-action, male/female combat and defender-block scenarios against the named
-release. Its occupied-hand control attributes the positive block to the unarmed
-case. Narrowed scenario or engine runs are inspections. Release bytes and content
+release, plus both controlled bodies at the forge wall. Its occupied-hand control attributes the positive block to the unarmed
+case. Martial scenarios cover one-, two- and three-square approaches and capture
+actual framebuffer draws at takeoff, contact, landing, recovery and a settled
+follow-up punch, with current clip weights and route placement. `world-wall-proof.mjs`
+checks the actual player's joint sampling, wall obstruction, reconnect and clearing
+without sending gameplay commands. Narrowed scenario
+or engine runs are inspections. Release bytes and content
 must match their receipts; no binary rebuild or fallback is used.
 
 `node web/proof/world-occlusion-proof.mjs <external-output>` measures overlapping
@@ -145,12 +151,24 @@ the existing candidate. Missing, stale or unbound required clips refuse loading.
 Only new accepted state updates supply motion cues; welcome and command replies
 cannot replay attacks. Confirmed unarmed fight outcomes rotate four punches;
 jumpkick selects the flying kick. When that accepted update also supplies a complete
-movement chain, the kick clip spans its bounded approach interval and returns to
-guard at landing. Later cover cues cannot overwrite a still-moving kick. Blocked
+movement chain, the kick clip spans its bounded presentation interval. Bound
+contact and landing phases identify the source motion: the rendered root follows
+the accepted route to the shared target by contact, then stays there through
+landing and recovery before returning to guard. Later cover cues cannot overwrite
+that closing sequence. Blocked
 melee feedback otherwise supplies a cover pose without claiming which defense
 absorbed the blow. No-sight, not-ready and
 ranged block outcomes supply no combat clip. Reactions expire on elapsed local
 time, including hidden-tab time, without granting readiness or creating damage.
+`playback.ts` owns pose advancement and crossfades on that same elapsed clock;
+render cadence never slows a clip relative to its route or restarts an expired
+reaction's fade. Diagnostics include the sampled phase and effective clip weights.
+
+The bound martial motion root is validated on every clip. Playback clones its
+tracks and holds root translation on the horizontal plane at the bind origin,
+retaining vertical lift and articulated motion. Embedded punch lunges therefore
+cannot add a second relocation beyond the presented actor anchor. Source GLBs,
+body scale and authoritative occupancy are unchanged.
 
 Walking uses a complete visible local actor-moved chain beginning at the previous
 cell and ending at the current one. Gait phase follows rendered distance, using
@@ -163,8 +181,9 @@ The [gameplay baseline](gameplay-baseline.md#closing-jumpkick-implementation-spe
 owns closing-kick legality and immediate resolution; the renderer never invents
 displacement or delays damage until its clip completes. A missing or partial chain
 snaps to authoritative placement and permits only the local combat clip. The
-[closing-kick record](plans/2026-09-10-closing-jumpkick.md) tracks pending proof for
-this source patch, including exact takeoff/impact phase alignment. The earlier
+[wall-motion record](plans/2026-09-13-martial-wall-motion.md) owns the current
+correction, phase evidence and delivery. The [closing-kick record](plans/2026-09-10-closing-jumpkick.md)
+retains its earlier proof and owner visual-acceptance limit. The earlier
 [motion record](plans/2026-09-10-martial-motion-integration.md) is evidence for the
 prior in-place integration, not proof of the new approach.
 

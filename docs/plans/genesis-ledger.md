@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 98
-status: Full-world 3D implementation follows the owner dispatch; proof, delivery and preserved-state activation are bound to their linked receipts.
+revision: 99
+status: Full-world 3D delivered; the dispatched martial wall-motion follow-up owns current work and its delivery receipts.
 public_safe: true
-summary: Full-world 3D and shared martial bodies, prior restore delivery, receipt ownership and remaining owner gates.
+summary: Martial wall-motion continuation, full-world 3D delivery, prior restore work and remaining owner acceptance gates.
 ---
 
 # The genesis ledger
@@ -29,6 +29,10 @@ owner's and are numbered by the phase they guard.
 ## Current checkpoint
 
 Updated 2026-09-13.
+
+**Current continuation:** the owner continued with the martial pose/wall finding
+after the world delivery. The [wall-motion record](2026-09-13-martial-wall-motion.md)
+owns issue #68's playback, visibility, phase proof and preserved-state delivery.
 
 **Current presentation delivery:** the owner directed full 3D town and interiors,
 including the character model, using the dungeon and Martial Artist foundation.

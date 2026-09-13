@@ -56,7 +56,7 @@ describe('full 3D settlement geometry',()=>{
     const building=new T.Group(),original=[new T.MeshBasicMaterial(),new T.MeshBasicMaterial()];
     const mesh=new T.Mesh(new T.BoxGeometry(.5,2,.2),original);mesh.position.set(1,1,1);building.add(mesh);
     mesh.geometry.clearGroups();mesh.geometry.addGroup(0,18,0);mesh.geometry.addGroup(18,18,1);
-    const body=new T.Group(),hand=new T.Bone();hand.name='RightHand';hand.position.set(1,1,0);body.add(hand);
+    const body=new T.Group(),hand=new T.Bone();hand.name='hand_l';hand.position.set(1,1,0);body.add(hand);
     const camera=new T.PerspectiveCamera(40,1,.1,100);camera.position.set(1,1,5);camera.lookAt(1,1,0);camera.updateMatrixWorld(true);
     building.updateMatrixWorld(true);body.updateMatrixWorld(true);
     const occlusion=new DungeonOcclusion();occlusion.bind([building]);occlusion.update(camera,[body]);
