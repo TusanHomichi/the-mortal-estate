@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-12
-revision: 27
+last_updated: 2026-09-13
+revision: 28
 status: Standing server contract; private saves are preserved and failed proof cleanup is reported while external activation remains pending.
 public_safe: true
 summary: Server authority, saved-state preservation, offline migration, preview refresh, owned proof resources and external activation boundaries.
@@ -192,7 +192,7 @@ HTTPS `public_origin`. Its listener stays on loopback; `local_origin` identifies
 that TLS frontend, while server admission validates the actual remote origin
 and host. The operator owns the external TLS proxy and account access. This does
 not activate a persistent release or public enrollment. The separate
-[pixel study](plans/2026-09-08-pixel-temple.md#remote-owner-access) uses this seam.
+[historical pixel study](plans/2026-09-08-pixel-temple.md#remote-owner-access) used this seam.
 
 ## Which world the one process serves
 

@@ -1,0 +1,23 @@
+body[data-world3d] { background: #191919; color: #e3d5bd; }
+body[data-world3d] canvas { image-rendering: auto; border: 0; margin: auto; }
+body[data-world3d] .world-grid { display: block; }
+body[data-world3d][data-phase="playing"] main,
+body[data-world3d][data-phase="connecting"] main,
+body[data-world3d][data-phase="disconnected"] main { max-width: none; padding: 0; margin: 0; }
+body[data-world3d] #world { margin: 0; }
+body[data-world3d] #session-actions { position: fixed; top: .5rem; right: .5rem; z-index: 2; }
+body[data-world3d][data-phase="playing"] #feedback:not(:empty),
+body[data-world3d][data-phase="disconnected"] #feedback:not(:empty) {
+  position: fixed; bottom: .5rem; left: .5rem; background: #191919; padding: .4rem .7rem; z-index: 2;
+}
+/* The diagnostic controls remain available in explicit inspection builds only. */
+body[data-world3d] .controls,
+body[data-world3d] #gameplay,
+body[data-world3d] #position,
+body[data-world3d] .legend,
+body[data-world3d] #settings,
+body[data-world3d][data-phase="playing"] header { display: none; }
+.world-graphics-error { position: fixed; top: 5rem; left: 1.5rem; z-index: 3; padding: .75rem; color: #ead5ae; background: #151519; }
+
+#world-surface > canvas[hidden] { display: none; }
+#world-surface > canvas[data-presentation="world-3d"] { image-rendering: auto; background: #000; }

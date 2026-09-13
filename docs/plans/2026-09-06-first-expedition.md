@@ -203,7 +203,7 @@ The explicit private presentation study verifies the external accepted packet
 against the geography receipt and server context. It draws observed actors at
 server positions, with interpolation only after committed movement and small
 within-square offsets for shared service squares. Static candidate residents
-never become authoritative actors. The [browser owner](../browser-client.md#first-expedition-presentation-study)
+never become authoritative actors. The [browser owner](../browser-reference-tools.md#first-expedition-presentation-study)
 owns this adapter and the native proof entry point. It does not select local
 movement, replace server content or grant artwork acceptance.
 

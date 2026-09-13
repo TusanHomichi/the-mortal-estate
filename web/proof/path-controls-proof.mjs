@@ -1,3 +1,4 @@
+import {worldCellPoint} from "./world-pointing.mjs";
 import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { launchProofBrowser, proofBrowsers } from './serve.mjs';
@@ -19,12 +20,7 @@ for(const spec of proofBrowsers()){
   const canvas=page.locator('#world-canvas');
   const ready=()=>wait(()=>document.body.dataset.phase==='playing'&&document.querySelector('#world-canvas').dataset.canAct==='true'&&document.querySelector('#world-canvas').dataset.pending==='false');
   const here=()=>structuredClone(frame.observation_center);
-  const point=async target=>{
-   const box=await canvas.boundingBox();assert(box);
-   const projection=JSON.parse(await canvas.getAttribute('data-pixel-projection'));
-   const p={x:projection.origin.x+target.x*projection.step.x,y:projection.origin.y+target.y*projection.step.y};
-   return {x:box.x+p.x*box.width/512,y:box.y+p.y*box.height/512};
-  };
+  const point=target=>worldCellPoint(page,target);
   const click=async(target,options)=>{await canvas.scrollIntoViewIfNeeded();const p=await point(target);await page.mouse.click(p.x,p.y,options);};
   const draft=async target=>{await ready();await click(target);await wait(()=>document.querySelector('#world-canvas').dataset.walkState==='draft');
    const route=JSON.parse(await canvas.getAttribute('data-walk-route'));assert.deepEqual(route.at(-1),{i:target.x,j:target.y});return route;};
@@ -55,7 +51,7 @@ for(const spec of proofBrowsers()){
   assert(![config.username,config.password].some(value=>signedInUrl.includes(value)||signedInUrl.includes(encodeURIComponent(value))),
    'Credentials must not appear in the signed-in URL');
   await page.getByRole('radio',{name:config.character,exact:true}).check();await page.getByRole('button',{name:'Enter world',exact:true}).click();await ready();
-  assert.equal(await canvas.getAttribute('data-presentation'),'pixel-art');
+  assert.equal(await canvas.getAttribute('data-presentation'),'world-3d');
   const initial=here();assert.equal(initial.level,'arrival');
   const start=initial.position;
   const open=new Set(frame.tiles.filter(t=>t.passable===true&&!t.transition).map(t=>`${t.position.x},${t.position.y}`));

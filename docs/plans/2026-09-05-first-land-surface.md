@@ -405,7 +405,7 @@ been compiled by this arrival slice.
 
 The initial native-size walking review found complete player occlusion beside
 the lodge. The candidate presenter now offers a muted silhouette where roofs
-or foliage hide the figure. The [browser owner](../browser-client.md#candidate-ground-verdicts)
+or foliage hide the figure. The [browser owner](../browser-reference-tools.md#candidate-ground-verdicts)
 owns that behavior and its proof; it remains subject to visual review.
 
 ### Arrival verification receipt
@@ -505,7 +505,7 @@ openings; deeper eaves, shutters, thresholds, attached planting boxes and log
 racks give the new construction more depth. New original limewash and foliage
 textures have external prompts and digest records.
 
-The [browser implementation](../browser-client.md#candidate-ground-verdicts)
+The [browser implementation](../browser-reference-tools.md#candidate-ground-verdicts)
 owns the shared visual terrain field, sloped banks, material transitions, mowing
 zones and interactive grass. The local tree comparison uses geometric trunks
 and branches with alpha-tested foliage clusters distributed through a canopy;
@@ -789,7 +789,7 @@ is narrowed for facade clearance. Existing bare-tree placements remain bare.
 These static models do not add tree wind motion.
 
 Two new generated albedo swatches provide quieter turf and worn earth. The
-[browser implementation owner](../browser-client.md#coastal-ground-cover) owns
+[browser implementation owner](../browser-reference-tools.md#coastal-ground-cover) owns
 shared visual path margins, finer curved grass and sparse flowers. Terrain
 heights, shore geography, all compiler cells, structure footprints and entrances
 remain the preceding candidate's inputs. The new detail adds no collision or
@@ -828,7 +828,7 @@ remain part of master review; successful movement does not accept composition.
 **Dispatched.** The owner requested that blocking walls and leaves remain
 recognizable while allowing the actual player to show through. The
 [presentation ruling](../presentation-direction.md#projection-and-surface-ruling)
-owns the target; the [browser contract](../browser-client.md#foreground-surface-fading)
+owns the target; the [browser contract](../browser-reference-tools.md#foreground-surface-fading)
 owns its implementation. This deliberately retires the earlier figure silhouette,
 wall-run fade selector, diagnostic hook and their tests together. Search scope:
 `figureOcclusion`, `wallOcclusion`, `updateWallFade`, `wallRunPlasterOpacity`,

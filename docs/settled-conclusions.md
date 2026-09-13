@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-11
-revision: 61
+last_updated: 2026-09-13
+revision: 62
 status: Lookup index routes martial motion integration and combat direction to their distinct maintained owners.
 public_safe: true
-summary: Lookup links for client motion, presentation acceptance, Martial Artist combat direction, geography and preview refresh.
+summary: Lookup links for full-world 3D, player-body selection, motion acceptance, combat direction, geography and preview refresh.
 always: true
 ---
 
@@ -80,7 +80,7 @@ the pixel-only restriction. Earlier visual choices remain evidence to reassess.
 | Internal migrations | Atomic cutover; no compatibility adapters. | [agent workflow](agent-workflow.md#no-compatibility-adapters) |
 | Proof method | Exercise and identify the real path. | [agent workflow](agent-workflow.md#verification) |
 | Pixel-art product and production method | Existing pixel assets retain their recorded provenance and proof; new production is retired. | [visual ruling](presentation-direction.md#pixel-art-decision), [production method](pixel-art-production.md) |
-| Reopened 3D presentation | Adjustable dungeon camera, better character motion and retirement of pixel production tools. | [visual ruling](presentation-direction.md#3d-reopening) |
+| Reopened 3D presentation | Full 3D world, including town, interiors and character models; shared dungeon and Martial Artist foundation. | [visual ruling](presentation-direction.md#3d-reopening) |
 | Verification source and lanes | Runner owns steps; inspect its resolved plan. | [verification](verification.md#the-four-lanes) |
 | Unavailable proof | Missing capability cannot become a pass. | [verification](verification.md#what-the-exit-code-means) |
 | Working roots | Disposable files, retention, and promotion. | [working-root policy](working-root-policy.md) |

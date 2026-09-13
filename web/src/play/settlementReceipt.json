@@ -1,0 +1,74 @@
+{
+  "status": "candidate",
+  "geography_master_sha256": "0b6cd1149004780dbab45ec52ef9853751ed02e1962efba25317fdc6de09f6ee",
+  "models": {
+    "managed_tree": {
+      "file": "managed_tree.glb",
+      "sha256": "6062a2de82a2a5095728c06051d9881d7d10d6c8f0f917da395f707ad147a7fe"
+    },
+    "managed_tree_broad": {
+      "file": "managed_tree_broad.glb",
+      "sha256": "761d70c200e5019f4e66eb3609c4e6fafa2d537ffc7e9ee40c9b4c7e58e3faaf"
+    },
+    "managed_tree_slim": {
+      "file": "managed_tree_slim.glb",
+      "sha256": "39e250581df0fa45945c6f9cab6e6d8be177d8998c86f95aea8f58f5ae5e8804"
+    },
+    "room_bank": {
+      "file": "room_bank.glb",
+      "sha256": "1e42a39471fbdd29e00df70437c02fdba86088cadb528a9cad776c227e256c90"
+    },
+    "room_forge": {
+      "file": "room_forge.glb",
+      "sha256": "cc70aea4a2789a02d89b0e2d34d4d75e1fc7961d9620035fea0560982a6b1ea1"
+    },
+    "room_lodge": {
+      "file": "room_lodge.glb",
+      "sha256": "15c13be8855edf8127963b3191672393d6dd31000fee21bfdcd767881b166a7b"
+    },
+    "room_market": {
+      "file": "room_market.glb",
+      "sha256": "bc22950548d1adb5215ec16ade2d8cce53999931368600e869395167bebc6aee"
+    },
+    "room_outfitter": {
+      "file": "room_outfitter.glb",
+      "sha256": "2b2327666bebded06783abc64f62e6f3240f3e0cee53d65ad39315351c3cba9f"
+    },
+    "room_temple": {
+      "file": "room_temple.glb",
+      "sha256": "8e1453387f235ad4022309e3d1c7aea67c8f3ffdb37211c3ff37aa4ce0c88e3f"
+    },
+    "room_trainers": {
+      "file": "room_trainers.glb",
+      "sha256": "485f967b4c9b518c3786c86d217a40e88e4238b5d1c49d7485a6ad706f4012b0"
+    },
+    "town_bank": {
+      "file": "town_bank.glb",
+      "sha256": "d3d235f65ca9fcb7fc32f4e11432f3e76d77b368ca6365e639cd41f8e3faad0f"
+    },
+    "town_forge": {
+      "file": "town_forge.glb",
+      "sha256": "ac2023377ac29b795be308ce7064a2044a6378d11eb6d930ee96a1c5eb61baa4"
+    },
+    "town_lodge": {
+      "file": "town_lodge.glb",
+      "sha256": "24191ea7488ab95bced66b824af03d3f30e6fb3bfb7b6d6c88f3ee416eb06b51"
+    },
+    "town_market": {
+      "file": "town_market.glb",
+      "sha256": "ae6c9f0daf168549d11934828550fecdede125867218a3b175f563bfe982aae4"
+    },
+    "town_outfitter": {
+      "file": "town_outfitter.glb",
+      "sha256": "23289fad2265b0f639f503814dd8b30f3d3abd495e0f243737afcf467c8c4795"
+    },
+    "town_temple": {
+      "file": "town_temple.glb",
+      "sha256": "4bcbbaddfa01cf61b6c7de879ddd871f40ef4beb23013e17fc7cc435f065491c"
+    },
+    "town_trainers": {
+      "file": "town_trainers.glb",
+      "sha256": "70489c3d0eedff747e7066365d0434319441cbf98688da2cf69b0c1f9fe5c52d"
+    }
+  }
+}

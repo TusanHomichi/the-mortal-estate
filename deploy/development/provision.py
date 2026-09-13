@@ -62,11 +62,13 @@ def stage_release(site):
     if run(["git", "-C", REPO, "diff", "--name-only"]) or run(["git", "-C", REPO, "ls-files", "--others", "--exclude-standard"]):
         raise RuntimeError("stage source changes in Git before building a development release")
     tree = run(["git", "-C", REPO, "write-tree"])
-    # The pixel packet digest is bound by this source tree's presentation receipt.
+    # The configured packet must carry this source tree's pinned presentation models.
     if site.settings["presentation_assets"]:
-        packet = Path(site.settings["presentation_assets"])
-        if digest(packet / "pixel-manifest.json") != json.loads((REPO / "web/src/play/pixelReceipt.json").read_text())["manifest_sha256"]:
-            raise RuntimeError("configured presentation packet does not match the browser")
+        from artwork import presentation_files
+        try:
+            presentation_files(Path(site.settings["presentation_assets"]))
+        except ValueError as error:
+            raise RuntimeError(f"configured presentation packet does not match the browser: {error}") from error
     revision = run(["git", "-C", REPO, "rev-parse", "HEAD"])
     destination = site.root / "releases" / tree
     if destination.exists():

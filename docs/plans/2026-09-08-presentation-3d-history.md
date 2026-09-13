@@ -316,7 +316,7 @@ of the placed object; unrelated instances stay opaque. Layered leaves must not
 accumulate opacity until they hide the character again. This supersedes the
 candidate figure silhouette and wall-only fade. It changes no occupancy,
 collision, targeting or authoritative visibility. The
-[browser client](../browser-client.md#foreground-surface-fading) owns implementation
+[browser client](../browser-reference-tools.md#foreground-surface-fading) owns implementation
 and proof; final visual acceptance remains the owner's.
 
 **Visible grid experiment (owner, 2026-09-05).** The owner explicitly
@@ -894,7 +894,7 @@ inputs and digest mismatches are refused. A missing packet is shown as absence
 inside the picture, never replaced with a private default. Tracked synthetic
 fixtures prove the loader and geometry without granting content authority.
 
-[Browser client](../browser-client.md#operation-and-proof) owns the browser
+[Browser client](../browser-reference-tools.md#operation-and-proof) owns the browser
 commands, packet-serving boundary, presets, comparison zoom, and proof inputs.
 Retired experiment environment controls do not configure the browser.
 
@@ -977,7 +977,7 @@ to preserve faces, movement feedback and grid readability. Corners and the
 dungeon threshold may recede into darkness. A room-wide directional key must
 not flatten the temple. The stair lantern belongs farther down the flight so
 it guides the eye toward the dungeon while the west-wall lantern lights the room.
-The [browser contract](../browser-client.md#house-atmosphere) owns implementation;
+The [browser contract](../browser-reference-tools.md#house-atmosphere) owns implementation;
 source strength, shadow tuning and visual acceptance remain candidate.
 
 ### Coastal water by depth and exposure

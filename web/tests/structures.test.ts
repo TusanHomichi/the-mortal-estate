@@ -1,5 +1,6 @@
+import {assertEmbeddedStructure} from "../src/embeddedStructure";
 import { describe, expect, it } from "vitest";
-import { assertEmbeddedStructure, parseStructures } from "../src/space/structures";
+import { parseStructures } from "../src/space/structures";
 
 const row = { file: "cottage.glb", sha256: "a".repeat(64), cell_anchor: [3, 3], yaw: 270,
   footprint: { i0: 2, j0: 2, i1: 4, j1: 4 } };

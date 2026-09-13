@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 10
+last_updated: 2026-09-13
+revision: 11
 status: Five authored creation profiles and bounded town instruction are implemented; typed critique delivered; historical numerical reconciliation and later class display naming remain open; Martial Artist is retained for now.
 public_safe: true
-summary: Creation, instruction, provisional martial defense and numerical reconciliation.
+summary: Creation, instruction, provisional martial defense and numerical reconciliation, with current browser critique routing.
 routes:
   - crates/tme-rules/src/engine/training.rs
   - crates/tme-rules/src/engine/training/**
@@ -253,5 +253,5 @@ rank stays absent. The protocol transports those bounded fields directly and
 the private client displays the response without computing skill or rank.
 Feedback projection and transaction-receipt conversion are separate children of
 the observer owner; adding critique does not enlarge its frame-construction
-implementation. The [browser contract](browser-client.md#first-expedition-presentation-study)
+implementation. The [browser contract](browser-client.md#skill-critique-feedback)
 owns the current integration and protocol cutover.

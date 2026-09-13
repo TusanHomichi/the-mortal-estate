@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "deploy/development"))
+sys.path.insert(0, str(ROOT / "tools"))
 
 from common import Installation, SnapshotSession, digest, document
 from operations import (
@@ -28,6 +29,7 @@ from operations import (
 )
 from provision import development_seed, validate_settings
 from services import install_units
+from presentation_release import checked_release
 
 
 def synthetic_release(site):
@@ -43,7 +45,66 @@ def synthetic_release(site):
     return release
 
 
+def synthetic_presentation(root):
+    """A packet and source tree pinned by both source-owned receipt shapes."""
+    packet = root / "packet"
+    packet.mkdir()
+    source = root / "source"
+    (source / "web/src/play/dungeon").mkdir(parents=True)
+    models = {"town_market": "town_market.glb", "town_bank": "town_bank.glb"}
+    dungeon = {"body": "dungeon-adventurer.glb", "motion": "dungeon-motion.glb"}
+    for name in [*models.values(), *dungeon.values(), "martial-male.glb", "martial-female.glb"]:
+        (packet / name).write_bytes(b"mesh:" + name.encode())
+    document(source / "web/src/play/settlementReceipt.json", {
+        "status": "candidate",
+        "geography_master_sha256": "0" * 64,
+        "models": {key: {"file": name, "sha256": digest(packet / name)} for key, name in models.items()}})
+    document(source / "web/src/play/dungeon/receipt.json", {
+        "status": "candidate",
+        "body": {"file": dungeon["body"], "sha256": digest(packet / dungeon["body"])},
+        "motion": {"file": dungeon["motion"], "sha256": digest(packet / dungeon["motion"])},
+        "martial": {gender: {"file": f"martial-{gender}.glb", "sha256": digest(packet / f"martial-{gender}.glb"),
+                             "stride": stride} for gender, stride in (("male", 4.42), ("female", 1.47))}})
+    # Retired shapes and unbound files a packet may still carry: never copied.
+    (packet / "pixel-manifest.json").write_text('{"assets": []}')
+    (packet / "room.png").write_bytes(b"retired raster")
+    (packet / "private-notes.txt").write_text("must not be copied")
+    return packet, source
+
+
 class PrivateDeployment(unittest.TestCase):
+    def test_native_release_admission_refuses_changed_extra_and_symlinked_bytes(self):
+        release = synthetic_release(self.site)
+        self.assertEqual(checked_release(release), release)
+        (release / "extra").write_text("unbound")
+        with self.assertRaisesRegex(ValueError, "integrity receipt"):
+            checked_release(release)
+        (release / "extra").unlink()
+        (release / "server").write_bytes(b"changed")
+        with self.assertRaisesRegex(ValueError, "integrity receipt"):
+            checked_release(release)
+        (release / "server").unlink()
+        outside = self.root / "outside"
+        outside.write_bytes(b"synthetic binary")
+        (release / "server").symlink_to(outside)
+        with self.assertRaisesRegex(ValueError, "integrity receipt"):
+            checked_release(release)
+
+    def test_native_release_admission_binds_current_proof_content(self):
+        release = synthetic_release(self.site)
+        source = self.root / "source"
+        for root in [release, source]:
+            (root / "content").mkdir(parents=True)
+            (root / "content/fixture.json").write_text("{}")
+        receipt = json.loads((release / "release.json").read_text())
+        receipt["files"]["content/fixture.json"] = digest(release / "content/fixture.json")
+        document(release / "release.json", receipt)
+        with patch("presentation_release.REPOSITORY_ROOT", source):
+            self.assertEqual(checked_release(release), release)
+            (source / "content/fixture.json").write_text('{"changed":true}')
+            with self.assertRaisesRegex(ValueError, "content differs"):
+                checked_release(release)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="tme-development-test-")
         self.addCleanup(self.temporary.cleanup)
@@ -76,42 +137,82 @@ class PrivateDeployment(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_settings(settings)
 
-    def test_artwork_copy_is_bound_and_allowlisted(self):
-        from artwork import copy_artwork
-        packet = self.root / "packet"
-        packet.mkdir()
-        (packet / "room.png").write_bytes(b"synthetic image")
-        (packet / "private-notes.txt").write_text("must not be copied")
-        manifest = packet / "pixel-manifest.json"
-        manifest.write_text(json.dumps({"assets": [{"file": "room.png", "sha256": digest(packet / "room.png")}]}))
-        source = self.root / "source"
-        receipt = source / "web/src/play/pixelReceipt.json"
-        document(receipt, {"manifest_sha256": digest(manifest)})
-        (packet / "body.glb").write_bytes(b"synthetic bound mesh")
-        document(source / "web/src/play/dungeon/receipt.json", {"body": {"file": "body.glb", "sha256": digest(packet / "body.glb")}})
+    def test_artwork_validation_is_read_only_and_pins_both_receipts(self):
+        from artwork import copy_artwork, presentation_files
+        packet, source = synthetic_presentation(self.root)
+        before = sorted(path.relative_to(packet).as_posix() for path in packet.rglob("*"))
+        destination = self.root / "copied"
         with patch("artwork.REPO", source):
-            copy_artwork(packet, self.root / "copied")
-            self.assertEqual({p.name for p in (self.root / "copied").iterdir()}, {"pixel-manifest.json", "room.png", "body.glb"})
-            (packet / "room.png").write_bytes(b"changed")
-            with self.assertRaises(ValueError):
-                copy_artwork(packet, self.root / "refused")
-            self.assertFalse((self.root / "refused").exists())
-            manifest.write_text("{}")
-            with self.assertRaises(ValueError):
-                copy_artwork(packet, self.root / "wrong-manifest")
+            pinned = presentation_files(packet)
+            self.assertEqual(set(pinned), {"town_market.glb", "town_bank.glb", "dungeon-adventurer.glb",
+                                           "dungeon-motion.glb", "martial-male.glb", "martial-female.glb"})
+            self.assertEqual(pinned["town_bank.glb"], digest(packet / "town_bank.glb"))
+            self.assertEqual(sorted(path.relative_to(packet).as_posix() for path in packet.rglob("*")), before)
+            self.assertFalse(destination.exists())
+            copy_artwork(packet, destination)
+        copied = sorted(path.relative_to(destination).as_posix() for path in destination.rglob("*") if path.is_file())
+        self.assertEqual(copied, sorted(pinned))
+        self.assertNotIn("pixel-manifest.json", copied)
+        self.assertNotIn("room.png", copied)
+        self.assertNotIn("private-notes.txt", copied)
 
-    def test_town_packet_refuses_mesh_in_raster_receipt(self):
+    def test_artwork_copy_refuses_changed_or_missing_pinned_glbs(self):
         from artwork import copy_artwork
-        packet = self.root / "packet"
-        packet.mkdir()
-        (packet / "room.glb").write_bytes(b"synthetic retired mesh")
-        manifest = packet / "pixel-manifest.json"
-        document(manifest, {"assets": [{"file": "room.glb", "sha256": digest(packet / "room.glb")}]})
-        source = self.root / "source"
-        document(source / "web/src/play/pixelReceipt.json", {"manifest_sha256": digest(manifest)})
-        with patch("artwork.REPO", source), self.assertRaisesRegex(ValueError, "wrong format"):
-            copy_artwork(packet, self.root / "refused-mesh")
-        self.assertFalse((self.root / "refused-mesh").exists())
+        packet, source = synthetic_presentation(self.root)
+        with patch("artwork.REPO", source):
+            (packet / "town_bank.glb").write_bytes(b"changed after the receipt was written")
+            with self.assertRaisesRegex(ValueError, "digest mismatch"):
+                copy_artwork(packet, self.root / "refused-digest")
+            self.assertFalse((self.root / "refused-digest").exists())
+            (packet / "town_bank.glb").write_bytes(b"mesh:town_bank.glb")
+            (packet / "dungeon-motion.glb").unlink()
+            with self.assertRaisesRegex(ValueError, "not a regular file"):
+                copy_artwork(packet, self.root / "refused-missing")
+            self.assertFalse((self.root / "refused-missing").exists())
+
+    def test_artwork_refuses_escaping_names_links_formats_and_conflicts(self):
+        from artwork import presentation_files
+        packet, source = synthetic_presentation(self.root)
+        outside = self.root / "outside"
+        outside.mkdir()
+        (outside / "elsewhere.glb").write_bytes(b"mesh elsewhere")
+        settlement = source / "web/src/play/settlementReceipt.json"
+        dungeon = source / "web/src/play/dungeon/receipt.json"
+        with patch("artwork.REPO", source):
+            for name in ("../elsewhere.glb", "/etc/shadow.glb", "nested/../../elsewhere.glb"):
+                document(settlement, {"models": {"only": {"file": name, "sha256": "0" * 64}}})
+                with self.assertRaisesRegex(ValueError, "normalized relative path"):
+                    presentation_files(packet)
+            (packet / "alias.glb").symlink_to(packet / "town_bank.glb")
+            document(settlement, {"models": {"alias": {"file": "alias.glb", "sha256": digest(packet / "town_bank.glb")}}})
+            with self.assertRaisesRegex(ValueError, "escapes the packet"):
+                presentation_files(packet)
+            (packet / "linked.glb").symlink_to(outside / "elsewhere.glb")
+            document(settlement, {"models": {"linked": {"file": "linked.glb", "sha256": digest(outside / "elsewhere.glb")}}})
+            with self.assertRaisesRegex(ValueError, "escapes the packet"):
+                presentation_files(packet)
+            document(settlement, {"models": {"room": {"file": "room.png", "sha256": digest(packet / "room.png")}}})
+            with self.assertRaisesRegex(ValueError, "wrong format"):
+                presentation_files(packet)
+            (packet / "shared.glb").write_bytes(b"mesh shared")
+            document(settlement, {"models": {"shared": {"file": "shared.glb", "sha256": digest(packet / "shared.glb")}}})
+            document(dungeon, {"body": {"file": "shared.glb", "sha256": "0" * 64}})
+            with self.assertRaisesRegex(ValueError, "conflicting identities"):
+                presentation_files(packet)
+            document(settlement, {})
+            document(dungeon, {})
+            with self.assertRaisesRegex(ValueError, "pin no assets"):
+                presentation_files(packet)
+
+    def test_provision_refuses_a_configured_packet_that_differs_from_a_receipt(self):
+        from provision import stage_release
+        packet, source = synthetic_presentation(self.root)
+        self.site.settings["presentation_assets"] = str(packet)
+        (packet / "martial-female.glb").write_bytes(b"changed after the receipt was written")
+        with patch("artwork.REPO", source), patch("provision.run", return_value=""):
+            with self.assertRaisesRegex(RuntimeError, "does not match the browser"):
+                stage_release(self.site)
+        self.assertFalse((self.site.root / "releases").exists())
 
     def test_state_cannot_be_installed_inside_source(self):
         with self.assertRaises(ValueError):

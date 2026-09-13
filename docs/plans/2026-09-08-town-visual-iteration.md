@@ -334,7 +334,7 @@ and stones, progressively concealed deep bottom, more visible exposed swells,
 and stronger daylight shape through reduced fill and a more directional key.
 The [water record](2026-09-07-coastal-water.md#september-8-clarity-and-daylight-correction)
 owns the correction and research limits. The
-[browser contract](../browser-client.md#coastal-water-and-exterior-camera-comparison)
+[browser contract](../browser-reference-tools.md#coastal-water-and-exterior-camera-comparison)
 owns runtime details. No gameplay, world-time or interior-lighting rules change.
 
 External packet `town-20260908-r6` retains the complete preceding packet unchanged,
@@ -426,7 +426,7 @@ The owner rejected the pond's square outline. Browser presentation owns the
 bounded correction: a rounded, slightly uneven bank derived from the existing
 closed water component, without changing its nine water cells or the surrounding
 temple approaches. Open coast components retain the previous terrain weights.
-The [browser contract](../browser-client.md#candidate-ground-verdicts) owns the
+The [browser contract](../browser-reference-tools.md#candidate-ground-verdicts) owns the
 shared contour/sampler implementation and geometry proof; this Planning section
 owns execution and comparison evidence. The ground renders the new dry corner
 fringes while the standing tactical addresses and their verdicts stay unchanged.
@@ -480,7 +480,7 @@ The owner requested another iteration because the scene looked too smooth.
 Browser presentation owns the bounded response: original normal-map relief for
 stone, plaster, slate and wood; scattered faceted stones along banks and path
 margins; smaller ground scuffs; and a less evenly smoothed pond edge. The
-[browser contract](../browser-client.md#candidate-ground-verdicts) owns runtime
+[browser contract](../browser-reference-tools.md#candidate-ground-verdicts) owns runtime
 behaviour. The existing material hierarchy and readable grid remain the target.
 
 External packet `town-20260908-r8` retains original Blender procedural material
@@ -575,7 +575,7 @@ instance batch, with radius-aware portal and lane-centre clearances. Taller bank
 stones and broad face-colour differences retain their planes under building
 shadows. The initial typecheck caught unconstrained sample-offset tuples; an
 explicit constant tuple fixes that before the completed web run. The
-[browser contract](../browser-client.md#candidate-ground-verdicts) owns runtime
+[browser contract](../browser-reference-tools.md#candidate-ground-verdicts) owns runtime
 behaviour. No new raster, downloaded asset, provider call or artwork master is
 introduced. The previous material-relief pass is retained.
 
@@ -594,7 +594,7 @@ creating a second module instance. Those comparisons are retained as diagnostic,
 not final matched-baseline performance evidence. The corrected harness takes the
 exact dependency URL from Vite for both variants. Native route/night proofs and
 the candidate itself used the normal dependency graph throughout. The
-[browser proof contract](../browser-client.md#operation-and-proof) owns the
+[browser proof contract](../browser-reference-tools.md#operation-and-proof) owns the
 dependency-identity requirement for substituted-source comparisons.
 
 The final selected web/documentation/boundary plan completed in 28.829 seconds,

@@ -2,14 +2,14 @@
 """Prove four-floor drawing and real traversal against an immutable private release."""
 import argparse
 import copy
-import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
 
 from live_server_harness import REPOSITORY_ROOT, read_admin_url
-from run_pixel_temple import PixelServer, temple_world
+from run_world_proof import WorldServer, world_fixture
+from presentation_release import checked_release
 
 
 def location(level, x, y):
@@ -92,18 +92,13 @@ def main():
     parser.add_argument("--engine", choices=["chromium", "firefox", "webkit"])
     parser.add_argument("--scenario", choices=[case["scenario"] for case in cases()])
     args = parser.parse_args()
-    release = args.release.resolve(strict=True)
+    try:
+        release = checked_release(args.release)
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
     output = args.output.resolve()
-    if release.is_relative_to(REPOSITORY_ROOT) or output.is_relative_to(REPOSITORY_ROOT):
-        parser.error("release and proof output must be outside the checkout")
-    receipt = json.loads((release / "release.json").read_text())
-    actual = {str(p.relative_to(release)): hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in release.rglob("*") if p.is_file() and p != release / "release.json"}
-    if any(p.is_symlink() for p in release.rglob("*")) or actual != receipt["files"]:
-        parser.error("release differs from its integrity receipt")
-    for name, digest in actual.items():
-        if name.startswith("content/") and hashlib.sha256((REPOSITORY_ROOT / name).read_bytes()).hexdigest() != digest:
-            parser.error("proof world content differs from the release")
+    if output.is_relative_to(REPOSITORY_ROOT):
+        parser.error("proof output must be outside the checkout")
     output.mkdir(parents=True, exist_ok=True)
     report = output / "verification.json"
     report.write_text(json.dumps(dict(verdict="INCOMPLETE")) + "\n")
@@ -113,7 +108,7 @@ def main():
         for case in cases():
             if args.scenario and case["scenario"] != args.scenario:
                 continue
-            world = temple_world()
+            world = world_fixture()
             player = next(a for a in world.generated_seed["actors"] if a["id"] == world.controlled_actor)
             player["location"] = case["start"]
             if case.get("defense"):
@@ -121,7 +116,7 @@ def main():
                                 occupied=bool(case.get("occupied")))
             elif "sex" in case:
                 martial_fixture(world.generated_seed, player, case["sex"])
-            server = PixelServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
+            server = WorldServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
             server.bundle = release / "web"
             server.assets = release / "web/feel-assets"
             with server:

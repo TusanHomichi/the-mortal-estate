@@ -7,7 +7,7 @@ import {disposeSkeletons} from './rigResources';
 export const COMBAT_CLIPS=['guard','walk','jab_left','jab_right','uppercut_right','hook_left',
   'block_high','block_side','block_cover','block_lean','flying_kick'] as const;
 export interface FigureAsset { scene:T.Group; clips:readonly T.AnimationClip[]; idle:string; stride:number }
-export interface DungeonAssets { fallback:FigureAsset; male:FigureAsset; female:FigureAsset }
+export interface DungeonAssets { fallback:FigureAsset; male:FigureAsset; female:FigureAsset; tomas:FigureAsset; balm_seller:FigureAsset }
 
 export function disposeFigureAssets(assets:readonly FigureAsset[]):void {
   const geometries=new Set<T.BufferGeometry>(),materials=new Set<T.Material>(),textures=new Set<T.Texture>();
@@ -49,10 +49,17 @@ export async function loadDungeonBody():Promise<DungeonAssets> {
   try{
     // Sequential parsing lets refusal release every successfully decoded source.
     const body=await load(receipt.body),motion=await load(receipt.motion);
-    assertFigureClips(body.scene,motion.animations,['idle']);
+    assertFigureClips(body.scene,motion.animations,['idle','walk']);
     const male=await load(receipt.martial.male),female=await load(receipt.martial.female);
     for(const asset of [male,female])assertFigureClips(asset.scene,asset.animations,COMBAT_CLIPS);
+    const residents={} as Pick<DungeonAssets,'tomas'|'balm_seller'>;
+    for(const id of ['tomas','balm_seller'] as const){
+      const model=await load(receipt.residents[id].body),animation=await load(receipt.residents[id].motion);
+      assertFigureClips(model.scene,animation.animations,['idle','walk']);
+      residents[id]={scene:model.scene,clips:animation.animations,idle:'idle',stride:1};
+    }
     return {fallback:{scene:body.scene,clips:motion.animations,idle:'idle',stride:1},
+      ...residents,
       male:{scene:male.scene,clips:male.animations,idle:'guard',stride:receipt.martial.male.stride},
       female:{scene:female.scene,clips:female.animations,idle:'guard',stride:receipt.martial.female.stride}};
   }catch(error){disposeFigureAssets(parsed.map(g=>({scene:g.scene,clips:g.animations,idle:'',stride:1})));throw error;}

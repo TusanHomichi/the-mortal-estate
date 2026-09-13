@@ -19,5 +19,27 @@
       "sha256": "42fb02f9c8c629f791e2cfd6fd9aa692b99869ddfd4b5b3ff3def123d5ac22a4",
       "stride": 1.4668685793876648
     }
+  },
+  "residents": {
+    "tomas": {
+      "body": {
+        "file": "tomas-resident.glb",
+        "sha256": "cd1052dbe52c8197d6e582ef61ebb107a00e5e12652b61f920fc473e3d0dd919"
+      },
+      "motion": {
+        "file": "tomas-motion.glb",
+        "sha256": "353e5086c58c3c2299ddd3e305849e21e5d419491152cca04b000663eabebb31"
+      }
+    },
+    "balm_seller": {
+      "body": {
+        "file": "maude-resident.glb",
+        "sha256": "0dae7ba447632c2a463a6dd1cc2e82827e8678659e76924590de93a9489b24aa"
+      },
+      "motion": {
+        "file": "maude-motion.glb",
+        "sha256": "03b4ac1154e3585e0e82e30a93cc3d705e027de8801b61dd8b6f7ff7167e03bd"
+      }
+    }
   }
 }

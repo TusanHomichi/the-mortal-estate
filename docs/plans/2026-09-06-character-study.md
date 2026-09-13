@@ -214,7 +214,7 @@ and still produce an almost black material. Separate PNG sidecars follow the
 existing packet contract; JPEG sidecars are refused by its format validator.
 The client now preserves dependency-resolution and load failures across a
 successful loader callback and refuses the figure, disposing parsed sources.
-[Browser client](../browser-client.md#figures-and-structures) owns that behavior.
+[Browser client](../browser-reference-tools.md#figures-and-structures) owns that behavior.
 
 **Remaining character-source work.** The clothed body is a visual candidate,
 not independently swappable equipment. Production work must supply clean body

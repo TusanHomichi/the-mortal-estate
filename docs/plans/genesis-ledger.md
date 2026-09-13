@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 96
-status: Restore and proof lifecycle hardening verified; delivery and saved-state preview activation are bound to the linked PR and private installation receipts.
+revision: 98
+status: Full-world 3D implementation follows the owner dispatch; proof, delivery and preserved-state activation are bound to their linked receipts.
 public_safe: true
-summary: Verified restore and cleanup continuation, martial gameplay delivery, receipt ownership and remaining owner gates.
+summary: Full-world 3D and shared martial bodies, prior restore delivery, receipt ownership and remaining owner gates.
 ---
 
 # The genesis ledger
@@ -30,7 +30,13 @@ owner's and are numbered by the phase they guard.
 
 Updated 2026-09-13.
 
-**Current delivery:** the owner dispatched the restore-drill continuation, shared
+**Current presentation delivery:** the owner directed full 3D town and interiors,
+including the character model, using the dungeon and Martial Artist foundation.
+The [world cutover record](2026-09-13-full-world-3d.md) owns the implementation,
+proof, preview refresh and cleanup through [PR #70](https://github.com/TusanHomichi/the-mortal-estate/pull/70). The temporary pixel retention
+in the earlier live-dungeon delivery is superseded by this direction.
+
+**Prior delivery:** the owner dispatched the restore-drill continuation, shared
 test-server cleanup, block-capture assertions, Git delivery and save-preserving
 preview refresh end to end. The [closeout record](2026-09-12-proof-preview-closeout.md)
 owns PR #67, issues #49/#60/#66, current proof and activation receipts. The earlier
@@ -83,8 +89,8 @@ untouched. The current [closeout record](2026-09-12-proof-preview-closeout.md)
 routes the subsequent activation receipts; the required save-preserving offline
 cutover remains owned by [server notes](../server-notes.md#offline-content-cutover).
 
-**Live dungeon continuation:** all four existing dungeon floors now have a
-playable 3D view on the private preview, retaining town/temple presentation. The
+**Earlier live dungeon continuation:** all four existing dungeon floors gained a
+playable 3D preview while that bounded slice retained town/temple presentation. The
 [live execution record](2026-09-10-live-dungeons.md) owns the area renderer
 cutover, authoritative movement/door/stair proof and preview refresh. Earlier
 standalone-study claims below are historical scope, not current integration.

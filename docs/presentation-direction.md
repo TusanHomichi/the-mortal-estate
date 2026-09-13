@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-11
-revision: 84
-status: Selected dungeon view remains; shared Martial Artist combat motion accepted for integration, with walking variants requested.
+last_updated: 2026-09-13
+revision: 85
+status: Full 3D world dispatched, extending the dungeon and Martial Artist foundation through town and interiors.
 public_safe: true
-summary: Dungeon camera and scenery direction, shared martial motion acceptance and requested male/female walking variants.
+summary: Full-world 3D direction, existing male/female player bodies, shared martial motion acceptance and remaining visual review.
 routes:
   - web/**
   - content/test-corpus/**
@@ -14,17 +14,28 @@ routes:
 This Canonical document owns what the game should look like.
 [Client architecture](client-architecture.md) owns the rendering boundary;
 [browser client](browser-client.md) owns implemented behavior;
-[pixel-art production](pixel-art-production.md) owns the reproducible art method.
+[pixel-art production](pixel-art-production.md) preserves the historical raster art method.
 Earlier camera, mesh, lighting and presenter decisions are preserved in
 [presentation history](plans/2026-09-08-presentation-3d-history.md), historical evidence to reassess under the reopening below.
 
 ## 3D reopening
 
+**Owner ruling, September 13, 2026:** move the whole playable world to full 3D,
+including the character model. Extend the existing dungeon and Martial Artist
+foundation through town, temple and service interiors. This supersedes the
+temporary retention of pixel town/interiors in the bounded live-dungeon dispatch.
+Use one continuous presentation and preserve authored geography, authoritative
+observation, movement and individual action deadlines. Earlier modeled buildings
+and rooms may supply original candidate assets when rebound to the current map;
+their historical placements are not geography authority. The
+[world cutover record](plans/2026-09-13-full-world-3d.md) owns execution and proof.
+Technical integration does not confer visual acceptance on candidate artwork.
+
 **Owner ruling, September 10, 2026:** reopen 3D presentation. The previous
 modeled temple is a useful quality benchmark; town exteriors still need work
 and the dungeon has not had a finished 3D pass. This supersedes the September 8
 prohibition on 3D product development. The following pixel-specific sections
-record the previous direction and retained town/interior renderer, not a mandate
+record the previous direction and then-retained town/interior renderer, not a mandate
 to produce more pixel artwork.
 
 Begin with a player-centred 7-by-7 dungeon comparison, including walls and black
@@ -121,6 +132,12 @@ new walking quality still require review at the live camera. The
 [motion execution record](plans/2026-09-10-martial-motion-integration.md) owns
 delivery and evidence. The [gameplay baseline](gameplay-baseline.md#martial-artist-combat-sequence)
 owns the intended closing attack; clip acceptance does not change its rules.
+
+**September 13 player-body clarification:** use these existing male/female
+Martial Artist models and bound Meshy animations throughout the world, including
+for existing characters of other classes. The female display selects the female
+body; otherwise use the provisional male body. This is a presentation selection,
+not a class migration or acceptance of new body or walking quality.
 
 **Tool retirement:** remove the PixelLab MCP and the installed pixel-fixer
 production tools. Stop new sprite-generation and pixel-treatment work. Preserve
@@ -377,7 +394,7 @@ those boundaries.
 
 ### Live characters
 
-The installed pixel presentation uses directional sprite artwork and matching animation. Preserve
+The September 8 pixel presentation used directional sprite artwork and matching animation. Preserve
 identity, adult proportions and fixed gait pivots. Equipment appearance and
 combat clips for its replacement follow the [3D reopening](#3d-reopening). Do not claim a held standing
 pose as finished walking animation.
@@ -421,7 +438,7 @@ and responsive behavior. Judge compact windows separately from desktop captures.
 
 ## What is implemented today
 
-The default playable renderer is pixel art with a connected town, a restyled
+The September 8 default playable renderer was pixel art with a connected town, a restyled
 temple and pixel atmosphere/lighting. Other interiors use an explicitly labelled
 map until their art is constructed. [Browser client](browser-client.md) owns implementation and
 [the transition](plans/2026-09-08-pixel-art-transition.md) records proof and gaps.

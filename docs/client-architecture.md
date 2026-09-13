@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 20
-status: Shared shell selects live Three.js dungeons and retained pixel town/interiors.
+last_updated: 2026-09-13
+revision: 21
+status: One Three.js renderer serves town, interiors and dungeons under the shared authoritative shell.
 public_safe: true
-summary: Browser authority, area-selected rendering, atomic migration obligations and retained pixel implementation.
+summary: Browser authority, full-world 3D presentation and atomic migration obligations.
 routes:
   - web/**
   - crates/tme-protocol/**
@@ -17,39 +17,17 @@ hold whatever the client looks like.
 
 [Browser client](browser-client.md) owns current implementation and operation;
 [presentation direction](presentation-direction.md) owns the visual target.
-The owner retired Godot on September 5. The browser is the sole client runtime;
-a read-only authoritative browser observer now supplies diagnostic Workbench
-capture. The private play shell implements authoritative control and reconciliation
-through the same renderer seam, now drawing the selected pixel-art temple.
-Contracts below describe obligations, not claims of completed browser features.
+The browser is the sole client runtime. A read-only authoritative observer
+supplies diagnostic Workbench capture; the playable shell owns control and
+reconciliation through one renderer seam.
 
-The September 8 ruling selected Canvas 2D pixel art and retired the 3D product
-path; the [September 10 reopening](presentation-direction.md#3d-reopening)
-authorizes developing its 3D replacement. It adds no runtime
-dependency or gameplay authority. The [transition record](plans/2026-09-08-pixel-art-transition.md)
-owns the cutover; [pixel-art production](pixel-art-production.md) owns the art
-method for existing assets. The subsequent [live dungeon dispatch](plans/2026-09-10-live-dungeons.md)
-authorizes Three.js for all four dungeon floors in the shared product shell,
-while town, temple and service interiors retain their existing pixel presentation.
-The September 9 owner direction
-adds raw WebGL pixel effects for lighting, atmosphere and foliage to the Canvas
-2D compositor. This adds no third-party runtime or gameplay authority; the
-[presentation ruling](presentation-direction.md#pixel-atmosphere-and-shader-effects)
-owns that direction and browser client owns the delivered pipeline.
-The subsequent owner-authorized [GPU composition cutover](plans/2026-09-09-pixel-gpu-composition.md)
-retains colour and lighting surfaces in WebGL and composes scenery and figures
-there. Canvas 2D prepares reusable rasters and overlays. This is the same 2D
-pixel-art product and renderer boundary, with no new dependency or game authority.
-
-The original reopened comparison remains a private study. Live dungeon rendering
-now uses the pinned Three.js dependency through the same authoritative seam and
-shared connection adapter. Authored area identity selects the renderer; failures
-clear presentation and cannot fall back to another backend. The cutover migrates
-loaders, build fences, callers and proof under the
-[cutover policy](agent-workflow.md#no-compatibility-adapters). Scripted study
-motion carries no action, health, readiness or observation authority. The
-[live execution record](plans/2026-09-10-live-dungeons.md) separates implemented
-behavior, native evidence and preview installation.
+The [full 3D ruling](presentation-direction.md#3d-reopening) extends the dungeon
+and Martial Artist foundation through town, temple and service interiors. The
+world uses the pinned Three.js dependency and one canvas; authored area selects
+scenery within that renderer. Failures clear presentation and never select an
+alternative backend. The [cutover record](plans/2026-09-13-full-world-3d.md) owns
+implementation, native proof and preview delivery. Prior pixel and local 3D study
+records remain history. No presentation change adds gameplay authority.
 
 ## Authority
 
@@ -87,7 +65,8 @@ because none of those rules was ever about an engine.
 
 Its baseline:
 
-- TypeScript on Vite, Three.js dungeon rendering and retained pixel WebGL composition/effects with Canvas 2D preparation, on Node 22 for the
+- TypeScript on Vite and Three.js for the full world, with Canvas 2D for labels,
+  material preparation and the static menu backdrop, on Node 22 for the
   toolchain. Dependencies are pinned by the committed lockfile and restored
   with `npm ci`; `web/node_modules/` and `web/dist/` are ignored roots
   ([working-root policy](working-root-policy.md#the-roots)).
@@ -282,7 +261,7 @@ Its neutral target owner uses observer rows; the same meshes supply the image,
 GPU identity pass, and raycast pointer targets. It draws no candidate artwork
 and implements no gameplay controls. The older candidate-packet 3D feel scene
 is a retired local reference tool, with no planned production integration. The
-pixel renderer consumes observed actors and the same neutral semantic targets.
+world renderer consumes observed actors and the same neutral semantic targets.
 
 ## Input and the accessibility floor
 
@@ -326,7 +305,7 @@ Production packaging must exclude proof fixtures, test code, and private packets
 | Surface | What it proves | Limit |
 | --- | --- | --- |
 | `web` verification lane | Typecheck, browser unit tests, build | Synthetic inputs; no live server |
-| Pixel temple proof | Native pixel rendering, shared grid, route movement, resident services, descent and reconnect | Selected temple packet; exterior art and completed character gaits remain open |
+| World presentation proof | Native 3D town/interiors, shared grid, route movement, resident services, dungeon traversal and reconnect | Candidate assets; technical proof does not grant visual acceptance |
 | Retired full-roster walk proof | Earlier Three.js movement and rendering tool | Reference implementation only; no product presentation claim |
 | Native and WebAssembly protocol corpus | Current and refused wire formats through the same Rust codec | No production control UI |
 | `tools/run_server_live_proof.py` | Real TLS sign-in, admission, land, individual cooldowns, reconnect, logout | Python wire observer; no rendered browser claim |

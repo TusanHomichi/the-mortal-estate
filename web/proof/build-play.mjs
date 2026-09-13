@@ -16,7 +16,7 @@ await build({ configFile: false, root: web,
   plugins: [{ name: "world-product-boundary", generateBundle(_options,bundle) {
     if(presentation!=="world")return;
     for(const item of Object.values(bundle))if(item.type==="chunk")for(const id of Object.keys(item.modules)) {
-      if(/\/play\/studyRenderer\.|\/play\/pixelDungeon|\/authoritative\/renderer\./.test(id))throw new Error(`Retired renderer reached the product: ${id}`);
+      if(/\/play\/studyRenderer\.|\/play\/pixel|\/authoritative\/renderer\./.test(id))throw new Error(`Retired renderer reached the product: ${id}`);
     }
   } }], build: { outDir: output, emptyOutDir: true,
   rollupOptions: { input: path.join(web, "play.html") } } });

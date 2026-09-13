@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
@@ -7,7 +8,7 @@ const launched=await launchProofBrowser({name:config.engine,engine:PROOF_ENGINES
 let page,frame;const commands=[],results=[],errors=[],captures=[];
 try {
  const context=launched.context||await launched.browser.newContext();page=await context.newPage();await page.setViewportSize({width:1600,height:1100});
- page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',socket=>{
+ collectGraphicsErrors(page,errors);page.on('pageerror',e=>errors.push(String(e)));page.on('websocket',socket=>{
   socket.on('framesent',e=>{const m=JSON.parse(String(e.payload));if(m.kind==='command')commands.push(m);});
   socket.on('framereceived',e=>{const m=JSON.parse(String(e.payload));if(m.frame)frame=m.frame;if(m.kind==='command_result')results.push(m);});
  });
@@ -34,16 +35,16 @@ try {
   await waitForWorldPointing(page);const canvas=page.locator('#world-canvas');
   assert.equal(await canvas.getAttribute('data-presentation-error'),null);
   if(frame.observation_center.level.startsWith('d')){
-   assert.equal(await canvas.getAttribute('data-presentation'),'dungeon-3d');const view=JSON.parse(await canvas.getAttribute('data-dungeon-view'));
+   assert.equal(await canvas.getAttribute('data-presentation'),'world-3d');const view=JSON.parse(await canvas.getAttribute('data-world-view'));
    assert.equal(view.cells,7);assert.equal(view.elevation,55);assert.equal(view.fieldOfView,20);
    const expected=frame.tiles.filter(t=>t.terrain_id&&Math.abs(t.position.x-view.center.x)<=3&&Math.abs(t.position.y-view.center.y)<=3);
    assert.deepEqual(view.tiles.map(t=>t.position),expected.map(t=>t.position));
    assert(view.walls.every(w=>expected.some(t=>t.position.x===w.tile.x&&t.position.y===w.tile.y)));
-   const anchors=JSON.parse(await canvas.getAttribute('data-dungeon-actor-anchors'));
+   const anchors=JSON.parse(await canvas.getAttribute('data-world-actor-anchors'));
    const occupants=frame.actors.filter(a=>a.position.position.x===view.center.x&&a.position.position.y===view.center.y&&a.life_state!=='dead');
    if(occupants.length===1){const self=anchors.find(a=>a.id===frame.observer_actor_id);assert(self);assert(Math.abs(self.x-view.center.x)<1e-9&&Math.abs(self.y-view.center.y)<1e-9);}
    const black=await canvas.evaluate(node=>{const c=document.createElement('canvas');c.width=node.width;c.height=node.height;const x=c.getContext('2d');x.drawImage(node,0,0);return [...x.getImageData(2,2,1,1).data];});assert.deepEqual(black,[0,0,0,255]);
-  }else assert.equal(await canvas.getAttribute('data-presentation'),'pixel-art');
+  }else assert.equal(await canvas.getAttribute('data-presentation'),'world-3d');
   await canvas.screenshot({path:`${config.output}/${config.engine}-${config.scenario}-${name}.png`});captures.push({name,location:frame.observation_center});
  }
  await capture('start');

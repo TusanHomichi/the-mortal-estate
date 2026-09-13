@@ -1,3 +1,4 @@
+import {collectGraphicsErrors} from './graphics-errors.mjs';
 import assert from "node:assert/strict";
 import {worldCellPoint,waitForWorldPointing} from "./world-pointing.mjs";
 import { readFile, writeFile } from "node:fs/promises";
@@ -13,7 +14,7 @@ const errors=[],commands=[],results=[],captures=[];
 try {
   const context=launched.context || await launched.browser.newContext({viewport:{width:1400,height:1200}});
   page=await context.newPage(); await page.setViewportSize({width:1400,height:1200});
-  page.on("pageerror",error=>errors.push(error.message));
+  collectGraphicsErrors(page,errors);page.on("pageerror",error=>errors.push(error.message));
   page.on("websocket",socket=>{
     socket.on("framesent",event=>{const e=JSON.parse(String(event.payload));if(e.kind==="command")commands.push(e);});
     socket.on("framereceived",event=>{const e=JSON.parse(String(event.payload));if(e.frame)frame=e.frame;if(e.kind==="command_result")results.push(e);});
@@ -58,24 +59,29 @@ try {
     }
   }
   async function openActor(id){
-    // Click the presented body, including interpolation and shared-square
-    // separation. A patrol need not stop at its latest authoritative endpoint.
+    // A live patrol may move between the remote projection read and pointer
+    // delivery. Re-aim only when no menu opened; never retry a gameplay command.
     const actor=frame.actors.find(a=>a.actor_id===id);assert(actor);
-    await waitForWorldPointing(page);
-    const p=await canvas.evaluate((node,id)=>{
-      if(node.dataset.presentation==='dungeon-3d'){
-        const hit=JSON.parse(node.dataset.dungeonActorPoints).find(hit=>hit.id===id);if(!hit)throw Error('Actor not drawn');
+    const count=commands.length;stage=`open-actor-${id}`;
+    for(let attempt=0;attempt<6;attempt++){
+      await waitForWorldPointing(page);
+      const p=await canvas.evaluate((node,id)=>{
+        const hit=JSON.parse(node.dataset.worldActorPoints).find(hit=>hit.id===id);if(!hit)throw Error('Actor not drawn');
         const box=node.getBoundingClientRect();return {x:box.left+hit.px*box.width,y:box.top+hit.py*box.height};
+      },id);
+      await page.mouse.click(p.x,p.y,{button:"right"});
+      try {
+        await page.locator(".resident-dialog[open]").waitFor({timeout:600});
+      }catch(error){if(error.name!=="TimeoutError")throw error;}
+      assert.equal(commands.length,count,"opening or re-aiming at an actor cannot submit an action");
+      if(await page.locator(".resident-dialog[open]").isVisible()){
+        assert.equal(await page.locator("#resident-title").textContent(),actor.name);
+        return;
       }
-      const hit=JSON.parse(node.dataset.pixelActorBounds).find(hit=>hit.id===id);
-      if(!hit)throw Error('Resident is not presented');
-      const box=node.getBoundingClientRect(),viewport=JSON.parse(node.dataset.pixelViewport);
-      return {x:box.left+(hit.x+hit.width*.5)*box.width/viewport.width,y:box.top+(hit.y+hit.height*.5)*box.height/viewport.height};
-    },id);
-    await page.mouse.click(p.x,p.y,{button:"right"});
-    await page.locator(".resident-dialog[open]").waitFor();
-    assert.equal(await page.locator("#resident-title").textContent(),actor.name);
+    }
+    assert.fail(`No actor menu opened for ${id} after six current-projection pointer attempts`);
   }
+
   async function traverse(direction){
     await ready();
     const chosen=frame.action_options.filter(a=>a.enabled&&a.intent?.kind==="traverse");
@@ -86,15 +92,14 @@ try {
   for(const entry of ["/", "/index.html", "/index.html?study=diagnostic", "/play.html?study=first-expedition"]) {
     await page.goto(config.origin+entry);
     await wait(()=>document.body.dataset.playReady==="true");
-    assert.equal(await canvas.getAttribute("data-presentation"),"pixel-art",`pixel entry must be stable: ${entry}`);
+    assert.equal(await canvas.getAttribute("data-presentation"),"world-3d",`world entry must be stable: ${entry}`);
   }
   await wait(()=>document.body.dataset.playReady==="true");
   await page.locator("#username").fill(config.username);await page.locator("#password").fill(config.password);
   await page.getByRole("button",{name:"Sign in",exact:true}).click();await wait(()=>document.body.dataset.phase==="selecting");
   await page.getByRole("button",{name:"Enter world",exact:true}).click();await ready();
-  assert.equal(await canvas.getAttribute("data-presentation"),"pixel-art","build cannot switch presentation through URL");
+  assert.equal(await canvas.getAttribute("data-presentation"),"world-3d","build cannot switch presentation through URL");
   assert.equal(await canvas.getAttribute("data-presentation-error"),null);
-  assert.equal(await canvas.getAttribute("data-pixel-native-size"),"700x600");
   assert.equal(await canvas.evaluate(node=>node.width),1400);
   for(const selector of [".controls","#gameplay","#position",".legend","#settings","header"]) {
     assert.equal(await page.locator(selector).isVisible(),false,`temporary HUD must be absent: ${selector}`);
@@ -106,7 +111,7 @@ try {
   const desktopWidth=(await canvas.boundingBox()).width;
   assert(desktopWidth>=1000,"a wide desktop must give the room its available detail budget");
   await page.setViewportSize({width:900,height:1200});
-  await page.waitForFunction(()=>{const c=document.querySelector('#world-canvas');return c.width===900&&!!c.dataset.pixelProjection;});
+  await page.waitForFunction(()=>{const c=document.querySelector('#world-canvas');return c.width===900&&!!c.dataset.worldPoints;});
   const compactWidth=(await canvas.boundingBox()).width;
   assert(compactWidth<=900&&compactWidth<desktopWidth,"the room must still fit a compact window");
   const compactCommands=commands.length;
@@ -115,35 +120,19 @@ try {
   assert.deepEqual(JSON.parse(await canvas.getAttribute("data-walk-route")).at(-1),{i:3,j:3},"compact pointing must retain shared cell identity");
   await page.keyboard.press("Escape");
   await page.setViewportSize({width:1400,height:1200});
-  await page.waitForFunction(()=>{const c=document.querySelector('#world-canvas');return c.width===1400&&!!c.dataset.pixelProjection;});
+  await page.waitForFunction(()=>{const c=document.querySelector('#world-canvas');return c.width===1400&&!!c.dataset.worldPoints;});
   assert.equal(here().level,"temple");await mark("temple-arrival");
-  // A known clear floor edge must come from the overlay, not the room PNG.
-  const grid=await canvas.evaluate(async node=>{
-    const image=new Image();image.src="/feel-assets/temple.png";await image.decode();
-    const plate=document.createElement("canvas");plate.width=512;plate.height=512;
-    const ctx=plate.getContext("2d");ctx.drawImage(image,0,0);
-    const viewport=JSON.parse(node.dataset.pixelViewport),projection=JSON.parse(node.dataset.pixelProjection);
-    const offset={x:projection.origin.x-76,y:projection.origin.y-110};
-    const read=(context,x,y)=>Array.from(context.getImageData(x,y,1,1).data);
-    const copy=document.createElement('canvas');copy.width=node.width;copy.height=node.height;
-    const display=copy.getContext('2d');display.drawImage(node,0,0);
-    const rendered=(x,y)=>read(display,(x+offset.x)*viewport.scale,(y+offset.y)*viewport.scale);
-    return {plate:read(ctx,296,330),grid:rendered(296,330),plainPlate:read(ctx,298,330),plain:rendered(298,330),
-      bedPlate:read(ctx,450,176),bed:rendered(450,176),bedNearPlate:read(ctx,449,176),bedNear:rendered(449,176)};
-  });
-  assert(grid.grid.slice(0,3).every((value,index)=>value<grid.plate[index]-10),"persistent grid must be drawn over the plain room plate at the cell boundary");
-  const luminance=rgb=>rgb.slice(0,3).reduce((sum,x)=>sum+x,0);
-  assert(luminance(grid.grid)/luminance(grid.plate)<luminance(grid.plain)/luminance(grid.plainPlate)-.08,"grid darkening must exceed the local light field");
-  assert(Math.abs(luminance(grid.bed)/luminance(grid.bedPlate)-luminance(grid.bedNear)/luminance(grid.bedNearPlate))<.08,"bed lighting must remain continuous over the occluded grid boundary");
+  assert(Number(await canvas.getAttribute('data-world-grid-edges'))>0,'Observed walkable cells supply the tactical grid');
   const before=here(),count=commands.length;
   await click({x:3,y:3});await wait(()=>document.querySelector("#world-canvas").dataset.walkState==="draft");
   assert.equal(commands.length,count);assert.deepEqual(here(),before);await mark("temple-footprints");
   await page.keyboard.press("Escape");assert.equal(await canvas.getAttribute("data-walk-state"),"idle");
   await click({x:3,y:3});await wait(()=>document.querySelector("#world-canvas").dataset.walkState==="draft");
   await click({x:3,y:3});await wait(()=>document.querySelector("#world-canvas").dataset.canAct==="false");
-  assert.deepEqual(JSON.parse(await canvas.getAttribute("data-pixel-motion-route")),
-    [{x:3,y:6},{x:3,y:5},{x:3,y:4},{x:3,y:3}],"receipt/frame handoff must retain every traveled square");
-  assert(Number(await canvas.getAttribute("data-pixel-motion-duration-ms"))>=1500,"three squares must not collapse into a single short glide");
+  const motion=JSON.parse(await canvas.getAttribute('data-world-motions')).find(m=>m.id===frame.observer_actor_id);
+  assert.equal(motion.moving,true);assert.equal(motion.route.length,4);
+  for(const [i,p] of motion.route.entries())assert(Math.abs(p.x-3)<1e-9&&Math.abs(p.y-(6-i))<1e-9,'Every authoritative route corner is retained');
+  assert(motion.durationMs>=1500,'Three squares retain the authoritative action interval');
   await click({x:3,y:6});assert.equal(commands.length,count+1);await ready();assert.deepEqual(here().position,{x:3,y:3});
   await openActor("tomas");await mark("tomas-menu");await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
   for(let tries=0;tries<5&&!frame.services_here.some(s=>s.actor_id==="tomas");tries++)await walkTo(frame.actors.find(a=>a.actor_id==="tomas").position.position);
@@ -152,6 +141,7 @@ try {
   await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
   await walkTo(frame.actors.find(a=>a.actor_id==="balm_seller").position.position);await openActor("balm_seller");
   const purchase=page.locator(".resident-dialog").getByRole("button",{name:/^Buy .*balm/i}).first();assert(await purchase.isEnabled());
+  // Native locator clicks must survive an unchanged authoritative refresh.
   const purchases=commands.length;await purchase.click();await committed(purchases);
   assert(frame.carried.items.some(i=>i.item.item_definition_id==="healing_balm"));await mark("maude-purchase");
   await page.locator(".resident-dialog").getByRole("button",{name:"Close",exact:true}).click();
@@ -160,8 +150,8 @@ try {
   assert.deepEqual(here().position,{x:24,y:7});
   const dungeon=geography.members.find(member=>member.member==="d1_entry");
   assert.deepEqual([dungeon.width,dungeon.height],[36,43]);await mark("descent");
-  const scenery=JSON.parse(await canvas.getAttribute('data-dungeon-view')).walls;
-  assert.equal(await canvas.getAttribute('data-presentation'),'dungeon-3d');
+  const scenery=JSON.parse(await canvas.getAttribute('data-world-view')).walls;
+  assert.equal(await canvas.getAttribute('data-presentation'),'world-3d');
   assert(scenery.some(p=>!p.door&&p.height>2));
   assert(scenery.some(p=>p.door&&p.axis==='x'));
   assert(scenery.some(p=>p.door&&p.axis==='y'));
@@ -214,29 +204,29 @@ try {
   assert.deepEqual(here().position,{x:3,y:6});await mark("temple-return");
   const position=here();await page.getByRole("button",{name:"Reconnect",exact:true}).click();await ready();assert.deepEqual(here(),position);
   assert.equal(await canvas.getAttribute("data-walk-state"),"idle");assert.equal(await canvas.getAttribute("data-presentation-error"),null);
-  const drawP95Ms=Number(await canvas.getAttribute("data-pixel-draw-p95-ms"));
+
   const resources=await page.evaluate(()=>performance.getEntriesByType("resource").map(r=>r.name));
   assert(resources.some(url=>url.includes("dungeon-adventurer.glb")),"World build must load its bound dungeon body");
   await page.getByRole("button",{name:"Sign out",exact:true}).click();await wait(()=>document.body.dataset.phase==="signed_out");
   assert.equal(await canvas.getAttribute("data-study-actor-count"),"0");assert.deepEqual(errors,[]);
-  assert.deepEqual(await canvas.evaluate(node=>{const copy=document.createElement('canvas');copy.width=node.width;copy.height=node.height;const c=copy.getContext('2d');c.drawImage(node,0,0);return Array.from(c.getImageData(256,256,1,1).data);}),[21,21,25,255]);
+  assert.deepEqual(await canvas.evaluate(node=>{const copy=document.createElement('canvas');copy.width=node.width;copy.height=node.height;const c=copy.getContext('2d');c.drawImage(node,0,0);return Array.from(c.getImageData(256,256,1,1).data);}),[0,0,0,255]);
   // Mutate only art responses after logout; no gameplay transport is intercepted.
-  await page.route("**/feel-assets/pixel-manifest.json",route=>route.fulfill({status:200,contentType:"application/json",body:"{}"}));
+  await page.route("**/feel-assets/town_temple.glb",route=>route.fulfill({status:200,contentType:"model/gltf-binary",body:"invalid"}));
   await page.reload();await wait(()=>document.body.dataset.playReady==="failed");
   assert(await page.locator("#login").isDisabled(),"a mismatched digest must refuse startup");
-  await page.unroute("**/feel-assets/pixel-manifest.json");
+  await page.unroute("**/feel-assets/town_temple.glb");
   await page.route("**/feel-assets/dungeon-adventurer.glb",route=>route.fulfill({status:404,body:"missing"}));
   await page.reload();await wait(()=>document.body.dataset.playReady==="failed");
   assert(await page.locator("#login").isDisabled(),"missing imagery must refuse startup");
-  await writeFile(`${config.output}/${config.engine}-pixel-temple.json`,JSON.stringify({verdict:"PASS",engine:config.engine,
-    rendering:launched.rendering,adapter:launched.renderer,native_viewport:{width:700,height:600,scale:2},desktop_width:desktopWidth,compact_width:compactWidth,
-    temporary_hud_absent:true,direct_stair_double_click:true,responsive_pointing:true,draw_p95_ms:drawP95Ms,commands:commands.length,captures,
+  await writeFile(`${config.output}/${config.engine}-world-room.json`,JSON.stringify({verdict:"PASS",engine:config.engine,
+    rendering:launched.rendering,adapter:launched.renderer,native_viewport:{width:1400,height:1200},desktop_width:desktopWidth,compact_width:compactWidth,
+    temporary_hud_absent:true,direct_stair_double_click:true,responsive_pointing:true,commands:commands.length,captures,
     initial_click_nonmutating:true,cooldown_locked:true,resident_identity:true,moving_service:true,purchase:true,descent_and_return:true,
     creature_menu_nonmutating:true,offered_physical_attack:true,attack_target_and_authorization_preserved:true,
     four_floor_round_trip:true,underfoot_stair_menu:true,offered_traversal_preserved:true,required_dungeon_art:true,
     raised_oriented_walls_and_doors:true,occluder_opacity:.4,
     reconnect:true,logout_clears:true,bound_3d_assets:true,build_mode_pinned:true,stale_digest_refused:true,missing_image_refused:true,
-    grid_independent_of_art:true,grid_occluded_by_furniture:true,committed_route_preserved:true},null,2)+"\n");
+    observed_grid_present:true,committed_route_preserved:true},null,2)+"\n");
 }catch(error){
   await page?.screenshot({path:`${config.output}/${config.engine}-failure.png`}).catch(()=>{});
   await writeFile(`${config.output}/${config.engine}-failure.json`,JSON.stringify({stage,error:String(error),errors,position:frame?.observation_center,

@@ -10,7 +10,7 @@ summary: Coastal transmission, regional wave movement, renewed owner correction 
 
 This Planning record owns the September 7 research and execution follow-up.
 [Presentation direction](../presentation-direction.md#coastal-water-by-depth-and-exposure)
-owns the owner's visual requirement; [browser client](../browser-client.md#coastal-water-and-exterior-camera-comparison)
+owns the owner's visual requirement; [browser client](../browser-reference-tools.md#coastal-water-and-exterior-camera-comparison)
 owns the current renderer. Implementation owner: browser presentation, with
 authored scenic depth and exposure data validated at the asset boundary.
 Status: open. On September 8 the owner explicitly included this water pass in the
@@ -149,7 +149,7 @@ combined exposed swell amplitude of only 0.05 world units. The new candidate
 uses lighter sand/stone, reduced shallow absorption, larger exposed swells,
 surface highlights and restrained moving light on the shallow bottom. Daylight
 fill is reduced relative to its directional key. The
-[browser contract](../browser-client.md#coastal-water-and-exterior-camera-comparison)
+[browser contract](../browser-reference-tools.md#coastal-water-and-exterior-camera-comparison)
 owns these implementation choices; the
 [town iteration record](2026-09-08-town-visual-iteration.md#water-clarity-and-daylight-follow-up)
 owns this pass's exact native, deployment and preservation evidence.
