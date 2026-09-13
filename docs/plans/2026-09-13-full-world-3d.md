@@ -75,7 +75,8 @@ through overlapping roof pieces; a nearest-surface depth pass makes them blend
 once. The retired soft-shadow alias then changed the renderer's shadow sampler
 mode on refresh, while repeated cached frames could skip that normalization.
 This produced GPU draw errors and missing buildings. The renderer now uses the
-supported settlement shadow mode. Native GPU proof passes in all three engines
+supported settlement shadow mode. The initial menu view also requests its first
+shadow build before drawing. Native GPU proof passes in all three engines
 for overlapping geometry, cached lit frames, restored opacity and resource
 cleanup; the retired-mode negative control produces the expected GPU failure.
 Live proof now collects GPU console errors as well as JavaScript errors.

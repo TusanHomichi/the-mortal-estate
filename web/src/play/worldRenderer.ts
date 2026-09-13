@@ -58,6 +58,7 @@ export class WorldRenderer {
     // A static menu view is drawn from the same verified 3D scene, without a
     // synthetic player or server frame. Its raster owns no live world state.
     this.settlement.presentStatic('arrival');
+    this.renderer.shadowMap.needsUpdate=true;
     this.renderer.setSize(innerWidth,innerHeight);
     fitSettlementCamera(this.camera,{x:13,y:12},innerWidth,innerHeight);
     this.renderer.render(this.scene,this.camera);
