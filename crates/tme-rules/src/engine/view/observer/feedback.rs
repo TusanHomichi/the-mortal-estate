@@ -21,10 +21,9 @@ impl Engine {
         visible: &BTreeSet<WorldPosition>,
     ) -> bool {
         actor_id == observer_actor_id
-            || self
-                .world
-                .actor(actor_id)
-                .is_some_and(|actor| visible.contains(&actor.location))
+            || self.world.actor(actor_id).is_some_and(|actor| {
+                visible.contains(&actor.location) && actor.life_state.visible_to_observer(false)
+            })
     }
 
     fn observer_feedback_source(

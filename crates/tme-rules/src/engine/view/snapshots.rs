@@ -347,7 +347,9 @@ impl Engine {
             .actors
             .iter()
             .enumerate()
-            .filter(|(_, a)| visible.contains(&a.location.clone()))
+            .filter(|(_, a)| {
+                visible.contains(&a.location) && a.life_state.visible_to_observer(&a.id == actor_id)
+            })
             .map(|(i, a)| (a.id.clone(), i))
             .collect();
         actor_ids.sort_by(|(id_a, _), (id_b, _)| id_a.cmp(id_b));

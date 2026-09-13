@@ -23,6 +23,15 @@ const MAP_PROPERTIES: &[(&str, PropertyValue)] = &[
 ];
 
 pub static LAND: LandContract = LandContract {
+    resurrection: Some(ResurrectionContract {
+        request_delay_ms: 60_000,
+        lawful_member: "temple",
+        lawful_at: Point { x: 3, y: 6 },
+        neutral_member: "arrival",
+        neutral_at: Point { x: 9, y: 31 },
+        hit_points_missing: 1,
+        stamina_missing: 1,
+    }),
     reviewed_encoding: Some(ReviewedEncoding {
         review_manifest_sha256: "a476f7f0ac5a440c4af65307d46a8e9d882a0e7910a9337a4aebcfbf00dd2c19",
         geography_sha256: "56e414e7fdeee374eab714fbae38770b5a8f06a592998f6a57a2690593857d55",

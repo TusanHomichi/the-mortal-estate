@@ -27,6 +27,17 @@ pub async fn run(arguments: &[String]) -> Result<bool, String> {
             prepare_content_migration(before, after, input, plan, output)?;
             Ok(true)
         }
+        [checkpoint, command, bootstrap, input]
+            if checkpoint == "checkpoint" && command == "verify" =>
+        {
+            let bootstrap = crate::production::load_bootstrap(Path::new(bootstrap))?;
+            let checkpoint = FacetCheckpointV5::from_bytes(std::fs::read(input).map_err(|e| e.to_string())?)
+                .map_err(|e| e.to_string())?;
+            tme_rules::Engine::hydrate_checkpoint(bootstrap.world.engine.definition().clone(), &checkpoint)
+                .map_err(|e| e.to_string())?;
+            println!("checkpoint verify: ok; database_modified=false");
+            Ok(true)
+        }
         [contract, versions] if contract == "contract" && versions == "versions" => {
             println!("{}", serde_json::json!({
                 "storage": {
@@ -79,7 +90,7 @@ pub async fn run(arguments: &[String]) -> Result<bool, String> {
             Ok(true)
         }
         [] => Ok(false),
-        _ => Err("usage: tme-server [checkpoint migrate-content <before-bootstrap> <after-bootstrap> <checkpoint> <plan> <output> | contract versions | migrate | bootstrap verify <path> | account create --username <name> --display-name <name> --compromised-passwords <path> | account set-password --username <name> --compromised-passwords <path> | store verify | store restore-fence --confirm-restored-database]".to_string()),
+        _ => Err("usage: tme-server [checkpoint verify <bootstrap> <checkpoint> | checkpoint migrate-content <before-bootstrap> <after-bootstrap> <checkpoint> <plan> <output> | contract versions | migrate | bootstrap verify <path> | account create --username <name> --display-name <name> --compromised-passwords <path> | account set-password --username <name> --compromised-passwords <path> | store verify | store restore-fence --confirm-restored-database]".to_string()),
     }
 }
 

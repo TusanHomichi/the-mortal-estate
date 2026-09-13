@@ -1,6 +1,6 @@
 //! Deterministic projection of a compiled land into tracked runtime content.
 //!
-//! The projection is built as the runtime's OWN `WorldTemplateV3` value rather
+//! The projection is built as the runtime's OWN `WorldTemplateV4` value rather
 //! than as free-form JSON, so the compiler cannot drift from the contract it
 //! feeds: a change to the runtime shape is a compile error here, not a
 //! discovery at load time. It is then validated against the runtime's own
@@ -17,7 +17,7 @@ use tme_rules::model::{Coord, VerticalDirection, WorldPosition};
 use tme_rules::{
     CatalogProfileKey, CatalogV6, DoorStateDef, LevelDef, RealmDef, TopologyEdgeDef,
     TopologyKindDef, TopologyTargetDef, WORLD_TEMPLATE_KIND, WORLD_TEMPLATE_SCHEMA_VERSION,
-    WorldTemplateV3,
+    WorldTemplateV4,
 };
 
 use crate::Result;
@@ -142,7 +142,7 @@ pub fn build_land(
     Ok(lines)
 }
 
-pub fn project(land: &Land) -> Result<WorldTemplateV3> {
+pub fn project(land: &Land) -> Result<WorldTemplateV4> {
     let contract = land.contract();
     let realm = RealmDef {
         name: contract.realm_name.into(),
@@ -182,7 +182,31 @@ pub fn project(land: &Land) -> Result<WorldTemplateV3> {
             );
         }
     }
-    Ok(WorldTemplateV3 {
+    Ok(WorldTemplateV4 {
+        resurrection: contract
+            .resurrection
+            .map(|policy| {
+                (
+                    contract.realm_id.to_owned(),
+                    tme_rules::content::ResurrectionPolicyDef {
+                        request_delay_ms: policy.request_delay_ms,
+                        lawful_destination: position(
+                            contract,
+                            policy.lawful_member,
+                            policy.lawful_at,
+                        ),
+                        neutral_destination: position(
+                            contract,
+                            policy.neutral_member,
+                            policy.neutral_at,
+                        ),
+                        hit_points_missing: policy.hit_points_missing,
+                        stamina_missing: policy.stamina_missing,
+                    },
+                )
+            })
+            .into_iter()
+            .collect(),
         schema_version: WORLD_TEMPLATE_SCHEMA_VERSION,
         kind: WORLD_TEMPLATE_KIND.into(),
         id: contract.id.into(),
@@ -347,7 +371,7 @@ fn topology(
 fn validate_against_registry(
     root: &Path,
     contract: &'static LandContract,
-    template: &WorldTemplateV3,
+    template: &WorldTemplateV4,
 ) -> Result<()> {
     let path = root.join(contract.terrain_registry_catalog);
     let catalog: CatalogV6 = serde_json::from_slice(&emit::read(&path)?)

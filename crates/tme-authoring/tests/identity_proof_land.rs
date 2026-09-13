@@ -79,7 +79,12 @@ fn the_authored_settlement_compiles_with_the_cast_s_geography() {
 fn the_emitted_template_is_one_realm_one_level_and_one_arrival() {
     let template = emitted_template();
     assert_eq!(template["id"], "identity_proof");
-    assert_eq!(template["schema_version"], 3);
+    assert_eq!(template["schema_version"], 4);
+    assert_eq!(
+        template["resurrection"],
+        json!({}),
+        "World Template 4 requires the map; the identity proof declares no route"
+    );
     let realms = template["realms"].as_object().expect("realms is an object");
     assert_eq!(realms.len(), 1);
     let levels = realms["identity_proof"]["levels"]

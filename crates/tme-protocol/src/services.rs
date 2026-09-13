@@ -483,7 +483,7 @@ impl StaticSceneContext {
 
 impl ObserverFrame {
     pub fn validate(&self) -> Result<(), ProtocolError> {
-        if self.contract_version != 8 {
+        if self.contract_version != 9 {
             return Err(ProtocolError::new(
                 "observer frame contract version is not current",
             ));

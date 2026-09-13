@@ -68,7 +68,7 @@ fn warm_and_cast_warmed_payloads_round_trip_truthfully() {
 
 #[test]
 fn spell_command_payloads_serialize_with_typed_targets() {
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26, "EU uses command contract v26");
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27, "command contract v27");
 
     let cast = make_command(PlayerIntentPayloadV1::CastSpell {
         spell_id: "spark".to_string(),
@@ -132,7 +132,7 @@ fn spell_item_target_json_uses_item_instance_id_and_rejects_item_id() {
 
 #[test]
 fn learn_spell_command_contract_round_trips_with_version_16() {
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27);
 
     let mut engine = learn_spell_context_engine(|_| {});
     engine

@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "kind": "world_template",
   "id": "first_expedition",
   "visual_manifest_digest": "0b6cd1149004780dbab45ec52ef9853751ed02e1962efba25317fdc6de09f6ee",
@@ -23523,6 +23523,29 @@
         "x": 8,
         "y": 34
       }
+    }
+  },
+  "resurrection": {
+    "first_expedition": {
+      "request_delay_ms": 60000,
+      "lawful_destination": {
+        "realm": "first_expedition",
+        "level": "temple",
+        "position": {
+          "x": 3,
+          "y": 6
+        }
+      },
+      "neutral_destination": {
+        "realm": "first_expedition",
+        "level": "arrival",
+        "position": {
+          "x": 9,
+          "y": 31
+        }
+      },
+      "hit_points_missing": 1,
+      "stamina_missing": 1
     }
   },
   "topology": {

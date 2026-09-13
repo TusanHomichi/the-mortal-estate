@@ -385,18 +385,19 @@ pub enum Intent {
     Close {
         direction: Direction,
     },
-    Inspect,
-    Hide,
-    ShowSack,
-    Wait,
-    Rest,
+    Inspect {},
+    Hide {},
+    ShowSack {},
+    RequestResurrection {},
+    Wait {},
+    Rest {},
     PhysicalAttack {
         mode: PhysicalAttackMode,
         target_actor_id: ActorId,
         authorization: HostilityAuthorization,
     },
-    Nock,
-    UnloadBow,
+    Nock {},
+    UnloadBow {},
     WarmSpell {
         spell_id: WireLabel,
     },
@@ -411,7 +412,7 @@ pub enum Intent {
         target: Option<SpellTarget>,
         authorization: HostilityAuthorization,
     },
-    FizzleWarmedSpell,
+    FizzleWarmedSpell {},
     SearchCorpse {
         corpse_id: CorpseId,
     },
@@ -515,18 +516,18 @@ pub enum Intent {
     CancelInvite {
         invitation_id: DecimalU64,
     },
-    LeaveGroup,
+    LeaveGroup {},
     RemoveMember {
         member_character_id: CharacterId,
     },
-    DisbandGroup,
+    DisbandGroup {},
     TransferLeadership {
         member_character_id: CharacterId,
     },
     BeginFollow {
         target_character_id: CharacterId,
     },
-    EndFollow,
+    EndFollow {},
     SetPagesEnabled {
         enabled: bool,
     },

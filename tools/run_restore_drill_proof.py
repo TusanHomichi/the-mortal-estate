@@ -84,7 +84,7 @@ from restore_drill_installation import (  # noqa: E402
 SUCCESS_SENTINEL = "TME_RESTORE_DRILL_PROOF_OK"
 
 #: The observer contract the frames below are read at.
-OBSERVER_CONTRACT_VERSION = 8
+OBSERVER_CONTRACT_VERSION = 9
 
 #: Scratch databases this tool creates outside the drill's own naming.
 ALTERED_PREFIX = "tme_altered_"

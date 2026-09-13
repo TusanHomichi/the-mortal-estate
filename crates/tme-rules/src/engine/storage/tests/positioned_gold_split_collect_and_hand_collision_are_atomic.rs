@@ -388,7 +388,7 @@ fn action_context_projects_command_ready_bank_locker_and_offer_surfaces() {
     let context = engine
         .actor_observed_action_context(&tme_rules::ActorId::from("player"))
         .expect("observed storage context");
-    assert_eq!(context.contract_version, 32);
+    assert_eq!(context.contract_version, 33);
     assert_eq!(context.carried.gold.sack, 500);
     assert_eq!(context.item_offer_actions.len(), 2);
     assert!(matches!(

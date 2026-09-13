@@ -21,13 +21,13 @@ fn trace_v2_town_adventure_loop_gallery_closes_end_to_end_state() {
             trace.header.action_context_contract_version,
             trace.header.intent_contract_version,
         ),
-        (2, 41, 31, 30, 32, 26)
+        (2, 41, 31, 31, 33, 27)
     );
     assert_eq!(trace.r#final.contract_version, 2);
     assert_eq!(trace.steps.len(), 27);
     assert!(
         trace.steps.iter().enumerate().all(|(index, step)| {
-            step.step_index == index && step.command.contract_version == 26
+            step.step_index == index && step.command.contract_version == 27
         })
     );
 

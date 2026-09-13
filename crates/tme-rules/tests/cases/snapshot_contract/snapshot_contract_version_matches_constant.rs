@@ -19,7 +19,7 @@ fn snapshot_contract_version_matches_constant() {
 #[test]
 fn debug_30_ecology_slot_state_is_exact_ordered_and_strict() {
     assert_eq!(SNAPSHOT_CONTRACT_VERSION, 31);
-    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
+    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 31);
     let engine = ContentParts::tracked(
         "creature_ecology_gallery",
         "profile/creature_ecology_gallery",

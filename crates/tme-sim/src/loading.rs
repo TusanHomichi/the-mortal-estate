@@ -7,7 +7,7 @@ use serde_json::Value;
 use serde_path_to_error::Segment;
 use sha2::{Digest, Sha256};
 use tme_rules::content::{
-    CatalogProfileKey, CatalogV6, ResearchBoundary, WorldTemplateV3, boundary_policy,
+    CatalogProfileKey, CatalogV6, ResearchBoundary, WorldTemplateV4, boundary_policy,
     scan_raw_documents,
 };
 use tme_rules::{GameDefinition, ValidatedWorldSeed};
@@ -281,7 +281,7 @@ pub(crate) fn load_simulation_with_context(
     } else {
         let catalog: CatalogV6 =
             strict_deserialize(catalog_raw, DiagnosticComponent::Catalog, "Catalog 6")?;
-        let world_template: WorldTemplateV3 = strict_deserialize(
+        let world_template: WorldTemplateV4 = strict_deserialize(
             world_template_raw,
             DiagnosticComponent::WorldTemplate,
             "World Template 3",

@@ -9,7 +9,7 @@ use crate::combat::{
 use crate::content::{
     ActorAiDef, ActorSeedDef, CatalogProfileKey, CatalogV6, ServiceCapabilityDef,
     TransactionCostDef, TransactionDef, TransactionRequirementDef, TransactionRewardDef,
-    ValidationError, WorldSeedDef, WorldTemplateV3,
+    ValidationError, WorldSeedDef, WorldTemplateV4,
 };
 use crate::events::Event;
 use crate::model::{
@@ -849,7 +849,7 @@ impl GameDefinition {
     pub fn from_content(
         catalog: CatalogV6,
         profile_key: CatalogProfileKey,
-        template: WorldTemplateV3,
+        template: WorldTemplateV4,
     ) -> Result<Arc<Self>, ValidationError> {
         let selected = catalog.select(&profile_key)?;
         selected.validate_with_template(&template)?;
@@ -921,14 +921,14 @@ impl Engine {
 #[cfg(test)]
 pub(crate) fn test_parts(
     case_id: &str,
-) -> (CatalogV6, CatalogProfileKey, WorldTemplateV3, WorldSeedDef) {
+) -> (CatalogV6, CatalogProfileKey, WorldTemplateV4, WorldSeedDef) {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content/test-corpus");
     let catalog: CatalogV6 = serde_json::from_str(
         &std::fs::read_to_string(root.join("catalogs/prototype_catalog_v6.json"))
             .expect("test catalog should be readable"),
     )
     .expect("test catalog should deserialize");
-    let template: WorldTemplateV3 = serde_json::from_str(
+    let template: WorldTemplateV4 = serde_json::from_str(
         &std::fs::read_to_string(root.join(format!("world_templates/{case_id}.json")))
             .expect("test world template should be readable"),
     )
@@ -958,7 +958,7 @@ pub(crate) fn test_parts(
 pub(crate) fn test_engine_from_parts(
     catalog: CatalogV6,
     profile_key: CatalogProfileKey,
-    template: WorldTemplateV3,
+    template: WorldTemplateV4,
     seed: WorldSeedDef,
 ) -> Engine {
     let definition = GameDefinition::from_content(catalog, profile_key, template)

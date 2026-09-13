@@ -8,7 +8,25 @@ body[data-world3d] #world { margin: 0; }
 body[data-world3d] #session-actions { position: fixed; top: .5rem; right: .5rem; z-index: 2; }
 body[data-world3d][data-phase="playing"] #feedback:not(:empty),
 body[data-world3d][data-phase="disconnected"] #feedback:not(:empty) {
-  position: fixed; bottom: .5rem; left: .5rem; background: #191919; padding: .4rem .7rem; z-index: 2;
+  position: fixed; bottom: .5rem; right: .5rem; max-width: min(24rem, 45vw); background: #191919; padding: .4rem .7rem; z-index: 2;
+}
+body[data-world3d] #death-status {
+  position: fixed; top: 4rem; left: .5rem; width: min(25rem, calc(100vw - 1rem));
+  margin: 0; padding: .6rem .8rem; z-index: 2; background: #182428ed;
+}
+body[data-world3d] #death-status p { margin: 0 0 .5rem; }
+body[data-world3d] #communication {
+  position: fixed; bottom: .5rem; left: .5rem; width: min(27rem, calc(100vw - 1rem));
+  margin: 0; padding: .5rem; z-index: 2; background: #191919e8;
+}
+body[data-world3d] #communication input { min-width: 0; }
+body[data-world3d] #communication ol { margin: .4rem 0 0; max-height: min(8rem, 20vh); }
+body[data-world3d] #communication ol:empty { margin: 0; }
+@media (max-width: 55rem) {
+  body[data-world3d][data-phase="playing"] #feedback:not(:empty),
+  body[data-world3d][data-phase="disconnected"] #feedback:not(:empty) {
+    bottom: calc(4rem + min(8rem, 20vh)); left: .5rem; right: .5rem; max-width: none;
+  }
 }
 /* The diagnostic controls remain available in explicit inspection builds only. */
 body[data-world3d] .controls,

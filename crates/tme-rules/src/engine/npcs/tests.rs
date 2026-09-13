@@ -1,9 +1,9 @@
 use super::*;
-use crate::content::{CatalogProfileKey, CatalogV6, WorldSeedDef, WorldTemplateV3};
+use crate::content::{CatalogProfileKey, CatalogV6, WorldSeedDef, WorldTemplateV4};
 use crate::engine::{GameDefinition, ValidatedWorldSeed};
 use crate::model::{ActorLifeState, Coord, ServicePlacement};
 
-fn temple_parts() -> (CatalogV6, CatalogProfileKey, WorldTemplateV3, WorldSeedDef) {
+fn temple_parts() -> (CatalogV6, CatalogProfileKey, WorldTemplateV4, WorldSeedDef) {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../content/lands/first-expedition");
     let read = |name: &str| std::fs::read_to_string(root.join(name)).unwrap();

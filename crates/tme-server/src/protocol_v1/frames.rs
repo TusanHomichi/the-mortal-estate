@@ -16,11 +16,12 @@ pub(super) fn observer_intent(
         rules::PlayerIntentPayloadV1::Close { direction: value } => wire::Intent::Close {
             direction: direction(*value),
         },
-        rules::PlayerIntentPayloadV1::Inspect => wire::Intent::Inspect,
-        rules::PlayerIntentPayloadV1::Hide => wire::Intent::Hide,
-        rules::PlayerIntentPayloadV1::ShowSack => wire::Intent::ShowSack,
-        rules::PlayerIntentPayloadV1::Wait => wire::Intent::Wait,
-        rules::PlayerIntentPayloadV1::Rest => wire::Intent::Rest,
+        rules::PlayerIntentPayloadV1::Inspect => wire::Intent::Inspect {},
+        rules::PlayerIntentPayloadV1::Hide => wire::Intent::Hide {},
+        rules::PlayerIntentPayloadV1::ShowSack => wire::Intent::ShowSack {},
+        rules::PlayerIntentPayloadV1::RequestResurrection => wire::Intent::RequestResurrection {},
+        rules::PlayerIntentPayloadV1::Wait => wire::Intent::Wait {},
+        rules::PlayerIntentPayloadV1::Rest => wire::Intent::Rest {},
         rules::PlayerIntentPayloadV1::PhysicalAttack {
             mode,
             target_actor_id,
@@ -30,8 +31,8 @@ pub(super) fn observer_intent(
             target_actor_id: actor_id(target_actor_id)?,
             authorization: authorization(*value),
         },
-        rules::PlayerIntentPayloadV1::Nock => wire::Intent::Nock,
-        rules::PlayerIntentPayloadV1::UnloadBow => wire::Intent::UnloadBow,
+        rules::PlayerIntentPayloadV1::Nock => wire::Intent::Nock {},
+        rules::PlayerIntentPayloadV1::UnloadBow => wire::Intent::UnloadBow {},
         rules::PlayerIntentPayloadV1::WarmSpell { spell_id } => wire::Intent::WarmSpell {
             spell_id: label(spell_id)?,
         },
@@ -51,7 +52,7 @@ pub(super) fn observer_intent(
             target: target.as_ref().map(spell_target).transpose()?,
             authorization: authorization(*value),
         },
-        rules::PlayerIntentPayloadV1::FizzleWarmedSpell => wire::Intent::FizzleWarmedSpell,
+        rules::PlayerIntentPayloadV1::FizzleWarmedSpell => wire::Intent::FizzleWarmedSpell {},
         rules::PlayerIntentPayloadV1::SearchCorpse { corpse_id } => wire::Intent::SearchCorpse {
             corpse_id: wire::CorpseId::new(corpse_id.as_str())?,
         },

@@ -425,7 +425,7 @@
       "name": "Undercroft Loop"
     }
   },
-  "schema_version": 3,
+  "schema_version": 4,
   "topology": {
     "edge/entrance_hall/1/2": {
       "at": {
@@ -596,5 +596,6 @@
       }
     }
   },
-  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca"
+  "visual_manifest_digest": "3c5ab0e7a9571e9ff0863acfeb8ee7644a1eaf53cc277136c500755c496368ca",
+  "resurrection": {}
 }

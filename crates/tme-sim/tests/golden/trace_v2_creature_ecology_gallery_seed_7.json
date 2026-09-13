@@ -5,9 +5,9 @@
     "seed": 7,
     "event_contract_version": 41,
     "snapshot_contract_version": 31,
-    "observed_snapshot_contract_version": 30,
-    "action_context_contract_version": 32,
-    "intent_contract_version": 26,
+    "observed_snapshot_contract_version": 31,
+    "action_context_contract_version": 33,
+    "intent_contract_version": 27,
     "initial_debug_snapshot": {
       "contract_version": 31,
       "scope": "omniscient_local",
@@ -1120,7 +1120,7 @@
       "quest_states": []
     },
     "initial_observed_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "logical_time": {
         "milliseconds": 3000
       },
@@ -2126,7 +2126,7 @@
       "tile_effects": []
     },
     "initial_action_context": {
-      "contract_version": 32,
+      "contract_version": 33,
       "actor_id": "player",
       "actor_name": "Trailwarden",
       "actor_kind": "player",
@@ -2354,7 +2354,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -2380,7 +2380,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -2495,7 +2495,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -2521,7 +2521,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -2636,7 +2636,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -2662,7 +2662,7 @@
               "full_two_handed_effect": true,
               "barefoot_full_effect": true,
               "command": {
-                "contract_version": 26,
+                "contract_version": 27,
                 "actor_id": "player",
                 "intent": {
                   "physical_attack": {
@@ -2791,7 +2791,7 @@
     {
       "step_index": 0,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": {
           "physical_attack": {
@@ -4508,7 +4508,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 6000
         },
@@ -5276,100 +5276,6 @@
             }
           },
           {
-            "id": "ecology:gallery_pack:runner:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 3000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
             "id": "player",
             "kind": "player",
             "creature_traits": [],
@@ -5543,7 +5449,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -5794,7 +5700,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -5820,7 +5726,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -5935,7 +5841,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -5961,7 +5867,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -6105,7 +6011,7 @@
     {
       "step_index": 1,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": {
           "physical_attack": {
@@ -7595,7 +7501,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 9000
         },
@@ -8269,194 +8175,6 @@
             }
           },
           {
-            "id": "ecology:gallery_pack:keeper:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Keeper",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 9000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 9000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:runner:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 3000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
             "id": "player",
             "kind": "player",
             "creature_traits": [],
@@ -8657,7 +8375,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -8908,7 +8626,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -8934,7 +8652,7 @@
                 "full_two_handed_effect": true,
                 "barefoot_full_effect": true,
                 "command": {
-                  "contract_version": 26,
+                  "contract_version": 27,
                   "actor_id": "player",
                   "intent": {
                     "physical_attack": {
@@ -9093,7 +8811,7 @@
     {
       "step_index": 2,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": {
           "physical_attack": {
@@ -10532,7 +10250,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 12000
         },
@@ -11090,288 +10808,6 @@
         ],
         "actors": [
           {
-            "id": "ecology:gallery_lair:burrower:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Cinder Burrower",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 3,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 12000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:keeper:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Keeper",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 9000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 9000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:runner:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 3000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
             "id": "player",
             "kind": "player",
             "creature_traits": [],
@@ -11599,7 +11035,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -11908,7 +11344,7 @@
     {
       "step_index": 3,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": "wait"
       },
@@ -13187,7 +12623,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 15000
         },
@@ -13745,288 +13181,6 @@
         ],
         "actors": [
           {
-            "id": "ecology:gallery_lair:burrower:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Cinder Burrower",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 3,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 12000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:keeper:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Keeper",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 9000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 9000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:runner:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 3000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
             "id": "player",
             "kind": "player",
             "creature_traits": [],
@@ -14254,7 +13408,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -14563,7 +13717,7 @@
     {
       "step_index": 4,
       "command": {
-        "contract_version": 26,
+        "contract_version": 27,
         "actor_id": "player",
         "intent": "wait"
       },
@@ -15838,7 +14992,7 @@
         "quest_states": []
       },
       "after_observed_snapshot": {
-        "contract_version": 30,
+        "contract_version": 31,
         "logical_time": {
           "milliseconds": 18000
         },
@@ -16396,288 +15550,6 @@
         ],
         "actors": [
           {
-            "id": "ecology:gallery_lair:burrower:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Cinder Burrower",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 3,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 12000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:keeper:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Keeper",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 9000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 9000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
-            "id": "ecology:gallery_pack:runner:0",
-            "kind": "monster",
-            "creature_traits": [],
-            "social": {
-              "apparent_behavior": "alignment_creature",
-              "hostile_to_observer": false,
-              "hostility_reason": "no_hostility",
-              "attack_safety": "invalid"
-            },
-            "name": "Bramble Runner",
-            "location": {
-              "realm": "realm_0",
-              "level": "room_0",
-              "position": {
-                "x": 2,
-                "y": 1
-              }
-            },
-            "hp": 0,
-            "max_hp": 2,
-            "wound_state": "dead",
-            "armor_protection": {
-              "sources": [],
-              "block_rating": 0,
-              "encumbrance": 0,
-              "cutting_reduction": 0,
-              "piercing_reduction": 0,
-              "crushing_reduction": 0
-            },
-            "life_state": {
-              "kind": "dead"
-            },
-            "ready_at": {
-              "milliseconds": 3000
-            },
-            "last_resource_activity_at": null,
-            "attack_ready_at": {
-              "milliseconds": 3000
-            },
-            "physical_weapon": {
-              "item_instance_id": null,
-              "item_definition_id": null,
-              "skill_track_id": "hand",
-              "skill_level": 0,
-              "default_attack_mode": "fight",
-              "attack_modes": [
-                {
-                  "mode": "fight",
-                  "maximum_range": 0,
-                  "damage_kind": "crushing"
-                }
-              ],
-              "cooldown_units": 1,
-              "combat_add_rating": 0,
-              "effective_combat_add_rating": 0,
-              "handedness": null,
-              "block_value": 0,
-              "nocking_unloads_on_movement": null,
-              "offhand_occupied": false,
-              "full_two_handed_effect": true,
-              "bow_readiness": null,
-              "required_alignment": null,
-              "binding_usable": true,
-              "alignment_usable": true,
-              "restriction_usable": true,
-              "eligible_block_candidates": []
-            },
-            "carried": {
-              "items": [],
-              "gold": {
-                "left_hand": 0,
-                "right_hand": 0,
-                "sack": 0
-              }
-            },
-            "burden": {
-              "item_burden": 0,
-              "coin_burden": 0,
-              "total_burden": 0,
-              "lightly_loaded_limit": null,
-              "moderately_loaded_limit": null,
-              "heavily_loaded_limit": null,
-              "tier": null
-            },
-            "npc": null,
-            "character": null,
-            "active_effects": [],
-            "magic_resistance": {
-              "natural_save_twentieths": 5,
-              "evidence_state": "original_provisional",
-              "boosts": []
-            }
-          },
-          {
             "id": "player",
             "kind": "player",
             "creature_traits": [],
@@ -16884,7 +15756,7 @@
         "tile_effects": []
       },
       "after_action_context": {
-        "contract_version": 32,
+        "contract_version": 33,
         "actor_id": "player",
         "actor_name": "Trailwarden",
         "actor_kind": "player",
@@ -18328,7 +17200,7 @@
       "quest_states": []
     },
     "final_observed_snapshot": {
-      "contract_version": 30,
+      "contract_version": 31,
       "logical_time": {
         "milliseconds": 18000
       },
@@ -18886,288 +17758,6 @@
       ],
       "actors": [
         {
-          "id": "ecology:gallery_lair:burrower:0",
-          "kind": "monster",
-          "creature_traits": [],
-          "social": {
-            "apparent_behavior": "alignment_creature",
-            "hostile_to_observer": false,
-            "hostility_reason": "no_hostility",
-            "attack_safety": "invalid"
-          },
-          "name": "Cinder Burrower",
-          "location": {
-            "realm": "realm_0",
-            "level": "room_0",
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          },
-          "hp": 0,
-          "max_hp": 3,
-          "wound_state": "dead",
-          "armor_protection": {
-            "sources": [],
-            "block_rating": 0,
-            "encumbrance": 0,
-            "cutting_reduction": 0,
-            "piercing_reduction": 0,
-            "crushing_reduction": 0
-          },
-          "life_state": {
-            "kind": "dead"
-          },
-          "ready_at": {
-            "milliseconds": 12000
-          },
-          "last_resource_activity_at": null,
-          "attack_ready_at": {
-            "milliseconds": 3000
-          },
-          "physical_weapon": {
-            "item_instance_id": null,
-            "item_definition_id": null,
-            "skill_track_id": "hand",
-            "skill_level": 0,
-            "default_attack_mode": "fight",
-            "attack_modes": [
-              {
-                "mode": "fight",
-                "maximum_range": 0,
-                "damage_kind": "crushing"
-              }
-            ],
-            "cooldown_units": 1,
-            "combat_add_rating": 0,
-            "effective_combat_add_rating": 0,
-            "handedness": null,
-            "block_value": 0,
-            "nocking_unloads_on_movement": null,
-            "offhand_occupied": false,
-            "full_two_handed_effect": true,
-            "bow_readiness": null,
-            "required_alignment": null,
-            "binding_usable": true,
-            "alignment_usable": true,
-            "restriction_usable": true,
-            "eligible_block_candidates": []
-          },
-          "carried": {
-            "items": [],
-            "gold": {
-              "left_hand": 0,
-              "right_hand": 0,
-              "sack": 0
-            }
-          },
-          "burden": {
-            "item_burden": 0,
-            "coin_burden": 0,
-            "total_burden": 0,
-            "lightly_loaded_limit": null,
-            "moderately_loaded_limit": null,
-            "heavily_loaded_limit": null,
-            "tier": null
-          },
-          "npc": null,
-          "character": null,
-          "active_effects": [],
-          "magic_resistance": {
-            "natural_save_twentieths": 5,
-            "evidence_state": "original_provisional",
-            "boosts": []
-          }
-        },
-        {
-          "id": "ecology:gallery_pack:keeper:0",
-          "kind": "monster",
-          "creature_traits": [],
-          "social": {
-            "apparent_behavior": "alignment_creature",
-            "hostile_to_observer": false,
-            "hostility_reason": "no_hostility",
-            "attack_safety": "invalid"
-          },
-          "name": "Bramble Keeper",
-          "location": {
-            "realm": "realm_0",
-            "level": "room_0",
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          },
-          "hp": 0,
-          "max_hp": 2,
-          "wound_state": "dead",
-          "armor_protection": {
-            "sources": [],
-            "block_rating": 0,
-            "encumbrance": 0,
-            "cutting_reduction": 0,
-            "piercing_reduction": 0,
-            "crushing_reduction": 0
-          },
-          "life_state": {
-            "kind": "dead"
-          },
-          "ready_at": {
-            "milliseconds": 9000
-          },
-          "last_resource_activity_at": null,
-          "attack_ready_at": {
-            "milliseconds": 9000
-          },
-          "physical_weapon": {
-            "item_instance_id": null,
-            "item_definition_id": null,
-            "skill_track_id": "hand",
-            "skill_level": 0,
-            "default_attack_mode": "fight",
-            "attack_modes": [
-              {
-                "mode": "fight",
-                "maximum_range": 0,
-                "damage_kind": "crushing"
-              }
-            ],
-            "cooldown_units": 1,
-            "combat_add_rating": 0,
-            "effective_combat_add_rating": 0,
-            "handedness": null,
-            "block_value": 0,
-            "nocking_unloads_on_movement": null,
-            "offhand_occupied": false,
-            "full_two_handed_effect": true,
-            "bow_readiness": null,
-            "required_alignment": null,
-            "binding_usable": true,
-            "alignment_usable": true,
-            "restriction_usable": true,
-            "eligible_block_candidates": []
-          },
-          "carried": {
-            "items": [],
-            "gold": {
-              "left_hand": 0,
-              "right_hand": 0,
-              "sack": 0
-            }
-          },
-          "burden": {
-            "item_burden": 0,
-            "coin_burden": 0,
-            "total_burden": 0,
-            "lightly_loaded_limit": null,
-            "moderately_loaded_limit": null,
-            "heavily_loaded_limit": null,
-            "tier": null
-          },
-          "npc": null,
-          "character": null,
-          "active_effects": [],
-          "magic_resistance": {
-            "natural_save_twentieths": 5,
-            "evidence_state": "original_provisional",
-            "boosts": []
-          }
-        },
-        {
-          "id": "ecology:gallery_pack:runner:0",
-          "kind": "monster",
-          "creature_traits": [],
-          "social": {
-            "apparent_behavior": "alignment_creature",
-            "hostile_to_observer": false,
-            "hostility_reason": "no_hostility",
-            "attack_safety": "invalid"
-          },
-          "name": "Bramble Runner",
-          "location": {
-            "realm": "realm_0",
-            "level": "room_0",
-            "position": {
-              "x": 2,
-              "y": 1
-            }
-          },
-          "hp": 0,
-          "max_hp": 2,
-          "wound_state": "dead",
-          "armor_protection": {
-            "sources": [],
-            "block_rating": 0,
-            "encumbrance": 0,
-            "cutting_reduction": 0,
-            "piercing_reduction": 0,
-            "crushing_reduction": 0
-          },
-          "life_state": {
-            "kind": "dead"
-          },
-          "ready_at": {
-            "milliseconds": 3000
-          },
-          "last_resource_activity_at": null,
-          "attack_ready_at": {
-            "milliseconds": 3000
-          },
-          "physical_weapon": {
-            "item_instance_id": null,
-            "item_definition_id": null,
-            "skill_track_id": "hand",
-            "skill_level": 0,
-            "default_attack_mode": "fight",
-            "attack_modes": [
-              {
-                "mode": "fight",
-                "maximum_range": 0,
-                "damage_kind": "crushing"
-              }
-            ],
-            "cooldown_units": 1,
-            "combat_add_rating": 0,
-            "effective_combat_add_rating": 0,
-            "handedness": null,
-            "block_value": 0,
-            "nocking_unloads_on_movement": null,
-            "offhand_occupied": false,
-            "full_two_handed_effect": true,
-            "bow_readiness": null,
-            "required_alignment": null,
-            "binding_usable": true,
-            "alignment_usable": true,
-            "restriction_usable": true,
-            "eligible_block_candidates": []
-          },
-          "carried": {
-            "items": [],
-            "gold": {
-              "left_hand": 0,
-              "right_hand": 0,
-              "sack": 0
-            }
-          },
-          "burden": {
-            "item_burden": 0,
-            "coin_burden": 0,
-            "total_burden": 0,
-            "lightly_loaded_limit": null,
-            "moderately_loaded_limit": null,
-            "heavily_loaded_limit": null,
-            "tier": null
-          },
-          "npc": null,
-          "character": null,
-          "active_effects": [],
-          "magic_resistance": {
-            "natural_save_twentieths": 5,
-            "evidence_state": "original_provisional",
-            "boosts": []
-          }
-        },
-        {
           "id": "player",
           "kind": "player",
           "creature_traits": [],
@@ -19374,7 +17964,7 @@
       "tile_effects": []
     },
     "final_action_context": {
-      "contract_version": 32,
+      "contract_version": 33,
       "actor_id": "player",
       "actor_name": "Trailwarden",
       "actor_kind": "player",

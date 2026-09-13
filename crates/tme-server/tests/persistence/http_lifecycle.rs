@@ -155,7 +155,7 @@ async fn http_reconnect_replay_and_logout(
         client_sequence: wire::DecimalU64::new(1),
         observed_world_revision: wire::DecimalU64::new(facet_revision),
         actor_id,
-        intent: wire::Intent::Wait,
+        intent: wire::Intent::Wait {},
     };
     first
         .send(Message::Text(

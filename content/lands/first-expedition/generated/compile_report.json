@@ -909,7 +909,7 @@
       }
     ]
   },
-  "world_template_sha256": "3d4348a6e19a5892c757b6543a8fa6629813b63f8d442e425e63db62e9042a53",
+  "world_template_sha256": "2548b66be730cdbf004d6eca2b89d64a79170fc139b06cd6775271b18bd50e49",
   "terrain_registry_catalog": "content/lands/first-expedition/catalog.json",
   "terrain_registry_profile": "profile/first_expedition"
 }

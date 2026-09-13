@@ -632,9 +632,9 @@ fn recovery_is_hp_then_mp_then_inactive_full_hp_stamina_with_caps_and_mirrors() 
 fn dn_component_versions_and_direct_shapes_are_exact() {
     assert_eq!(EVENT_CONTRACT_VERSION, 41);
     assert_eq!(SNAPSHOT_CONTRACT_VERSION, 31);
-    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
-    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 32);
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 31);
+    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 33);
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27);
     assert_eq!(PATH_PREVIEW_CONTRACT_VERSION, 8);
 
     let engine = engine();
@@ -656,9 +656,9 @@ fn dn_component_versions_and_direct_shapes_are_exact() {
             .expect("observed frame"),
     )
     .expect("observed frame serializes");
-    assert_eq!(observed["contract_version"], 30);
-    assert_eq!(observed["observed_snapshot"]["contract_version"], 30);
-    assert_eq!(observed["action_context"]["contract_version"], 32);
+    assert_eq!(observed["contract_version"], 31);
+    assert_eq!(observed["observed_snapshot"]["contract_version"], 31);
+    assert_eq!(observed["action_context"]["contract_version"], 33);
 
     let preview = serde_json::to_value(
         engine
@@ -691,7 +691,7 @@ fn dn_component_versions_and_direct_shapes_are_exact() {
         },
     };
     let command = serde_json::to_value(command).expect("command serializes");
-    assert_eq!(command["contract_version"], 26);
+    assert_eq!(command["contract_version"], 27);
     assert_eq!(
         command["intent"]["move_path"]["path"]
             .as_array()

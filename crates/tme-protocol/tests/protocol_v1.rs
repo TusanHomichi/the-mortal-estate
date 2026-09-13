@@ -31,7 +31,7 @@ fn character_id() -> CharacterId {
 
 fn observer_frame(sack_gold: i64, pile_amounts: &[i64]) -> ObserverFrame {
     ObserverFrame {
-        contract_version: 8,
+        contract_version: 9,
         logical_time: DecimalU64::new(0),
         ready_at: DecimalU64::new(0),
         observer_actor_id: ActorId::new("player").unwrap(),
@@ -224,17 +224,17 @@ fn feedback_envelope(cue: serde_json::Value) -> ServerEnvelope {
 
 #[test]
 fn hello_is_exact_strict_and_never_exposes_ticket_in_debug() {
-    let hello = format!(r#"{{"kind":"client_hello","ticket":"{TICKET}","supported_minors":[10]}}"#);
+    let hello = format!(r#"{{"kind":"client_hello","ticket":"{TICKET}","supported_minors":[11]}}"#);
     let decoded = decode_client_hello(hello.as_bytes()).expect("hello");
     assert!(!format!("{decoded:?}").contains(TICKET));
     assert!(decode_client_hello(format!("{hello} ").as_bytes()).is_ok());
     assert!(decode_client_hello(format!("{hello} true").as_bytes()).is_err());
     assert!(decode_client_hello(
-        format!(r#"{{"kind":"client_hello","ticket":"{TICKET}","ticket":"{TICKET}","supported_minors":[10]}}"#).as_bytes()
+        format!(r#"{{"kind":"client_hello","ticket":"{TICKET}","ticket":"{TICKET}","supported_minors":[11]}}"#).as_bytes()
     ).is_err());
     assert!(
         decode_client_hello(
-            format!(r#"{{"kind":"client_hello","ticket":"{TICKET}","supported_minors":[10,10]}}"#)
+            format!(r#"{{"kind":"client_hello","ticket":"{TICKET}","supported_minors":[11,11]}}"#)
                 .as_bytes()
         )
         .is_err()
@@ -557,14 +557,15 @@ fn observer_frame_validation_rejects_negative_gold() {
 #[test]
 fn control_api_4_dtos_are_strict_and_predecessor_shapes_fail() {
     assert_eq!(CONTROL_API_VERSION, 4);
-    assert_eq!(PROTOCOL_MINOR, 10);
+    assert_eq!(PROTOCOL_MINOR, 11);
 
     let command = format!(
         r#"{{"kind":"command","command_id":"{COMMAND}","control_epoch":"1","client_sequence":"1","observed_world_revision":"0","actor_id":"player","intent":{{"kind":"wait"}}}}"#
     );
-    assert!(decode_client_command(command.as_bytes(), 10).is_ok());
+    assert!(decode_client_command(command.as_bytes(), 11).is_ok());
     assert!(decode_client_command(command.as_bytes(), 8).is_err());
     assert!(decode_client_command(command.as_bytes(), 9).is_err());
+    assert!(decode_client_command(command.as_bytes(), 10).is_err());
 
     let bootstrap: SessionBootstrapV1 = serde_json::from_value(bootstrap_json()).unwrap();
     assert!(bootstrap.characters.is_empty());
@@ -730,7 +731,7 @@ fn size_nesting_unknown_fields_and_invalid_utf8_fail_closed() {
     }
     assert!(decode_client_hello(nested.as_bytes()).is_err());
     let unknown = format!(
-        r#"{{"kind":"client_hello","ticket":"{TICKET}","supported_minors":[10],"legacy":true}}"#
+        r#"{{"kind":"client_hello","ticket":"{TICKET}","supported_minors":[11],"legacy":true}}"#
     );
     assert!(decode_client_hello(unknown.as_bytes()).is_err());
 }

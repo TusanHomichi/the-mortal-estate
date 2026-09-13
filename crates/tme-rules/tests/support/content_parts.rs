@@ -12,7 +12,7 @@ use std::sync::Arc;
 
 use serde_json::Value;
 use tme_rules::engine::{GameDefinition, ValidatedWorldSeed};
-use tme_rules::{CatalogProfileKey, CatalogV6, Engine, WorldSeedDef, WorldTemplateV3};
+use tme_rules::{CatalogProfileKey, CatalogV6, Engine, WorldSeedDef, WorldTemplateV4};
 
 #[derive(Debug, Clone)]
 pub struct ContentParts {
@@ -62,13 +62,13 @@ impl ContentParts {
 
     pub fn decode(
         &self,
-    ) -> Result<(CatalogV6, CatalogProfileKey, WorldTemplateV3, WorldSeedDef), String> {
+    ) -> Result<(CatalogV6, CatalogProfileKey, WorldTemplateV4, WorldSeedDef), String> {
         let catalog = serde_json::from_value(self.catalog.clone())
             .map_err(|error| format!("catalog: {error}"))?;
         let profile = CatalogProfileKey::new(self.catalog_profile.clone())
             .map_err(|error| error.to_string())?;
         let mut world_template = self.world_template.clone();
-        complete_compact_world_template_v3_levels(&mut world_template);
+        complete_compact_world_template_v4_levels(&mut world_template);
         let template = serde_json::from_value(world_template)
             .map_err(|error| format!("world_template: {error}"))?;
         let seed = serde_json::from_value(self.world_seed.clone())
@@ -225,10 +225,12 @@ impl ContentParts {
 }
 
 /// Complete compact, test-authored level rows into the one current World
-/// Template 3 shape. This is fixture construction only: it does not recognize
+/// Template 4 shape. This is fixture construction only: it does not recognize
 /// or upgrade an older envelope and it is absent from production decoding.
-fn complete_compact_world_template_v3_levels(world_template: &mut Value) {
-    if world_template.get("schema_version") != Some(&Value::from(3)) {
+/// It never invents an absent `resurrection` map: presence of that key is part
+/// of the envelope contract the tests below exercise.
+fn complete_compact_world_template_v4_levels(world_template: &mut Value) {
+    if world_template.get("schema_version") != Some(&Value::from(4)) {
         return;
     }
     let Some(realms) = world_template
@@ -271,12 +273,12 @@ fn complete_compact_world_template_v3_levels(world_template: &mut Value) {
                 .or_insert_with(|| Value::Array(Vec::new()));
         }
     }
-    complete_compact_world_template_v3_doors(world_template);
+    complete_compact_world_template_v4_doors(world_template);
 }
 
 /// Give compact test doors exact reciprocal bindings. Production content has
 /// no such completion route; tracked documents must author both endpoints.
-fn complete_compact_world_template_v3_doors(world_template: &mut Value) {
+fn complete_compact_world_template_v4_doors(world_template: &mut Value) {
     let Some(topology) = world_template.get("topology").and_then(Value::as_object) else {
         return;
     };

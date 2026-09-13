@@ -6,13 +6,14 @@ import {occupantAnchors,TILE,cellKey} from './view';
 import {disposeFigureAssets,type DungeonAssets,type FigureAsset} from './assets';
 import {combatCues,movementRoute,movementSeconds} from './motion';
 import {FigurePlayback} from './playback';
+import {FigureMaterials} from './figureMaterials';
 export {loadDungeonBody} from './assets';
 
 type BodyKind=keyof DungeonAssets;
 interface Travel { points:T.Vector3[]; lengths:number[]; distance:number; started:number; seconds:number; progress:number; clip:'walk'|'flying_kick' }
 interface Figure {
   root:T.Group;body:T.Object3D;playback:FigurePlayback;label:T.Sprite;asset:FigureAsset;kind:BodyKind;
-  position:Coord;travel:Travel|null;
+  position:Coord;travel:Travel|null;materials:FigureMaterials;ghost:boolean;
 }
 
 /** The owner-selected martial bodies present every controlled character. */
@@ -48,12 +49,17 @@ export class DungeonActors {
         const ink=raster.getContext('2d')!;ink.font='22px Georgia';ink.textAlign='center';ink.fillStyle='#ead7b0';ink.shadowColor='#000';ink.shadowBlur=4;ink.fillText(row.name,128,28,250);
         const label=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(raster),transparent:true,depthTest:false,toneMapped:false}));
         label.position.y=2;label.scale.set(1.65,.26,1);label.renderOrder=100;root.add(label);
-        figure={root,body,playback,label,asset,kind,position:row.position.position,travel:null};
+        figure={root,body,playback,label,asset,kind,position:row.position.position,travel:null,materials:new FigureMaterials(body),ghost:false};
         this.figures.set(row.actor_id,figure);this.group.add(root);root.userData.actorId=row.actor_id;
       }
       const at=anchors.get(row.actor_id)!;const destination=new T.Vector3(at.x*TILE,0,at.y*TILE);
+      const ghost=row.life_state==='ghost';
+      if(ghost!==figure.ghost){
+        figure.ghost=ghost;figure.materials.ghost(ghost);figure.travel=null;
+        figure.root.position.copy(destination);figure.playback.play(figure.asset.idle,now);
+      }
       const moved=cellKey(figure.position)!==cellKey(row.position.position);
-      const route=!created&&moved?movementRoute(events,row.actor_id,row.position.level,row.position.realm,visibleCells,row.position.position):null;
+      const route=!ghost&&!created&&moved?movementRoute(events,row.actor_id,row.position.level,row.position.realm,visibleCells,row.position.position):null;
       if(route&&cellKey(route[0]!)===cellKey(figure.position)&&(row.actor_id!==self||!frame.can_act)){
         const points=route.map(p=>new T.Vector3(p.x*TILE,0,p.y*TILE));points[points.length-1]=destination;
         const lengths=points.slice(1).map((p,i)=>p.distanceTo(points[i]!));
@@ -71,7 +77,7 @@ export class DungeonActors {
       const unarmed=!snapshot.envelope.frame.carried.items.some(item=>item.position==='right_hand');
       const cues=combatCues(events,self,active,this.punchVariation,unarmed);
       this.punchVariation=(this.punchVariation+cues.filter(c=>['jab_left','jab_right','uppercut_right','hook_left'].includes(c.clip)).length)%4;
-      for(const cue of cues){const figure=this.figures.get(cue.actorId);if(!figure)continue;
+      for(const cue of cues){const figure=this.figures.get(cue.actorId);if(!figure||figure.ghost)continue;
         // The accepted closing route owns the approach pose. Later defensive
         // feedback must not turn the airborne attacker into a walking blocker.
         if(figure.travel?.clip==='flying_kick'&&cue.clip!=='flying_kick')continue;
@@ -112,7 +118,7 @@ export class DungeonActors {
       f.playback.update(now,walked);
     }
   }
-  diagnostics():unknown[]{return [...this.figures].map(([id,f])=>({id,body:f.kind,...f.playback.diagnostics(),moving:f.travel!==null&&f.travel.progress<1,
+  diagnostics():unknown[]{return [...this.figures].map(([id,f])=>({id,body:f.kind,ghost:f.ghost,...f.playback.diagnostics(),moving:f.travel!==null&&f.travel.progress<1,
     routeProgress:f.travel?.progress??null,
     route:f.travel?.points.map(p=>({x:p.x/TILE,y:p.z/TILE}))??null,durationMs:f.travel?f.travel.seconds*1000:null}));}
   anchor(id:string):Coord|null {const f=this.figures.get(id);return f?{x:f.root.position.x/TILE,y:f.root.position.z/TILE}:null;}
@@ -121,7 +127,7 @@ export class DungeonActors {
     const hit=ray.intersectObjects(this.bodies(),true)[0];if(!hit)return null;
     let o:T.Object3D|null=hit.object;while(o&&!o.userData.actorId)o=o.parent;return o?.userData.actorId??null;
   }
-  private remove(f:Figure):void {f.playback.dispose();disposeSkeletons(f.body);f.root.removeFromParent();f.label.material.map?.dispose();f.label.material.dispose();}
+  private remove(f:Figure):void {f.playback.dispose();f.materials.dispose();disposeSkeletons(f.body);f.root.removeFromParent();f.label.material.map?.dispose();f.label.material.dispose();}
   clear():void {for(const f of this.figures.values())this.remove(f);this.figures.clear();this.sequence=null;this.punchVariation=0;}
   dispose():void {this.clear();disposeFigureAssets(Object.values(this.assets));}
 }

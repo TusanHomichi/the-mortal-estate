@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-06
-revision: 6
-status: Three declared lands; four-floor encoding includes local and paired doors and explicit deferred-access regions.
+last_updated: 2026-09-13
+revision: 7
+status: Three declared lands emit world-template V4 with explicit realm return policies.
 public_safe: true
-summary: Land declarations, geographic acceptance, deterministic compilation, transition layouts, Workbench and rejection proof.
+summary: Land declarations, geography, realm return policies, deterministic compilation and rejection proof.
 routes:
   - crates/tme-authoring/**
   - content/lands/**
@@ -27,13 +27,21 @@ to the compiler.
 | --- | --- | --- | --- |
 | `authoring_fixture` ([directory](../content/authoring-fixture/README.md)) | `surface`, `interior` | diagnostic capture only; no production content authority | owner-accepted at G4X |
 | `identity_proof` ([directory](../content/lands/identity-proof/README.md)) | `settlement` | served through its explicit world declaration | owner-accepted at S1 |
+| `first_expedition` ([directory](../content/lands/first-expedition/README.md)) | arrival, seven town interiors and four dungeon floors | current private playable world | accepted geography and subsequent owner amendments |
 
 The fixture carries **zero content authority** — it exists so the compiler and
 the Workbench have an honest logical target, and it deliberately names nothing
-this project intends to ship. The identity proof's land is the one a runtime
-loads; its receipt is the only one in the tree whose authority block sets
-`runtime_loads_authoring_source`, and owner ruling R1 (2026-08-21) is what put it
-there.
+this project intends to ship. Each runtime land's declaration and receipt own its
+authority; identity proof is the original S1 land, and first expedition is the
+current private world.
+
+World-template V4 requires the `resurrection` map. `LandContract.resurrection`
+projects a realm policy with its eligibility delay, lawful and neutral member
+destinations, and return-resource deficits. An empty map explicitly supplies no
+ordinary return route. Validation rejects missing maps, retired V3 envelopes,
+unknown realms, cross-realm or blocked destinations and invalid values.
+The [death owner](boundary-map.md#113-death-and-corpse-state) consumes these facts;
+the compiler does not decide when a character dies or returns.
 
 Every subcommand but the build addresses **one land, named explicitly**. There
 is no default land: the compiler carries more than one, and a tool that guessed

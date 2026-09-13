@@ -56,6 +56,7 @@ const WORLD_ZOOM: WorldZoomDef = WorldZoomDef {
 };
 
 pub static LAND: LandContract = LandContract {
+    resurrection: None,
     reviewed_encoding: None,
     id: "authoring_fixture",
     realm_id: "testland",

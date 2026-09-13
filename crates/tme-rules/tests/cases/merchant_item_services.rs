@@ -492,7 +492,7 @@ fn rejected_merchant_and_service_commands_roll_back_the_complete_world() {
 fn public_ec_wire_shapes_are_exact_required_and_strict() {
     let commands = [
         serde_json::json!({
-            "contract_version": 26,
+            "contract_version": 27,
             "actor_id": "player",
             "intent": {"buy_from_merchant": {
                 "service_id": "counter",
@@ -501,7 +501,7 @@ fn public_ec_wire_shapes_are_exact_required_and_strict() {
             }}
         }),
         serde_json::json!({
-            "contract_version": 26,
+            "contract_version": 27,
             "actor_id": "player",
             "intent": {"sell_to_merchant": {
                 "service_id": "counter",
@@ -510,7 +510,7 @@ fn public_ec_wire_shapes_are_exact_required_and_strict() {
             }}
         }),
         serde_json::json!({
-            "contract_version": 26,
+            "contract_version": 27,
             "actor_id": "player",
             "intent": {"use_item_service": {
                 "service_id": "counter",

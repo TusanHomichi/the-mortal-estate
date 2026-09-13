@@ -35,7 +35,7 @@ fn transaction_command(engine: &Engine) -> tme_rules::PlayerCommandV1 {
 fn generic_service_transaction_discovers_commits_and_blocks_replay() {
     let mut engine = engine_from(value());
     let command = transaction_command(&engine);
-    assert_eq!(command.contract_version, 26);
+    assert_eq!(command.contract_version, 27);
     assert!(matches!(
         &command.intent,
         PlayerIntentPayloadV1::CommitServiceTransaction {

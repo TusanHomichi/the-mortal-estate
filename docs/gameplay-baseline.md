@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-11
-revision: 12
-status: Historical gameplay baseline with a closing jumpkick specification whose configured proof passes; native motion acceptance remains pending.
+last_updated: 2026-09-13
+revision: 13
+status: Historical baseline; ordinary corpse-bound death selected as the death-return programme resumes.
 public_safe: true
-summary: Historical gameplay target, local-door movement, provisional closing-jumpkick rules and remaining fidelity work.
+summary: Historical gameplay target, ordinary death ruling, local-door movement, provisional martial rules and remaining fidelity work.
 routes:
   - crates/tme-rules/**
   - content/**
@@ -71,6 +71,39 @@ owns the guild trainer, skill and spell venue. Detection,
 AI hostility and combat belong to rules. Preserve the basement route and reserved
 surface stair while recovering the applicable evidence. The exact town building
 or hidden-door position remains unauthored.
+
+## Ordinary death and return
+
+**Owner clarification, September 13:** ordinary ghosts remain at their corpse;
+preserve historical behavior. This supersedes the August identity packet's
+roaming-ghost proposal. The character retains awareness and ordinary speech,
+while movement resumes in the authored dead-world stage. The current dispatch
+is in the [death-return plan](plans/2026-09-13-death-return.md).
+
+Recovered selected-release help describes ordinary ghosts as unable to move,
+able to speak, and able to request resurrection after 60 seconds from death.
+The threshold authorizes a request; it does not prescribe automatic resurrection
+at that instant. New UI must distinguish that request from actual sign-out.
+Neutral evidence identity `death-help-111`, SHA-256
+`de745be933d1a73f5e8d213e31b5f18fefff3387279b333482fe84b5849a2e1f`,
+passages 2135–2142 and 2163–2177, binds the privately retained source. Builds and
+tests consume the authored rule here and never require that source.
+
+Corpse custody, fire, being eaten, alignment, rescue, penalties and ancestry are
+separate behaviors. Reconcile their evidence and later world changes before
+implementation; the older packet's simplified return ladder does not establish
+historical fidelity. Exact automatic intervention delays and undocumented
+numeric penalties remain unresolved. The
+[death owner](boundary-map.md#22-death-as-continued-play) retains authority over
+every transition and its transactional proof.
+
+**Further owner clarification, September 13:** use historical automatic return.
+Fire death returns immediately; ordinary death also has eventual automatic
+return, separately from the one-minute player-request threshold. This supersedes
+the older death-boundary prohibition. The owner then chose to wait for evidence
+before adding the ordinary automatic timer; no provisional duration is approved.
+The source's “several minutes” does not establish a value. This ruling authorizes
+fire-return implementation and does not assert that route is built.
 
 ## Local-door movement
 

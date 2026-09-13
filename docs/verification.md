@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 8
-status: Standing verification usage with explicit served-proof prerequisites and observable owned-resource cleanup.
+revision: 9
+status: Standing verification usage with independent staged/unstaged whitespace checks and observable proof-resource cleanup.
 public_safe: true
-summary: Lane usage, served-proof prerequisites, browser roster, owned-resource cleanup and current reference-tool routing.
+summary: Lane usage, pending whitespace surfaces, served-proof prerequisites, browser roster and resource cleanup.
 routes:
   - tools/run_verification.py
   - tools/verification/**
@@ -58,6 +58,12 @@ asserts the step table's partition. Anything the fast lane does not recognise
 escalates to `portable` and says why — a guess is never cheaper than a build.
 Escalation is a floor, not a ceiling: the lanes the recognised paths beside it
 select (`web`) still run.
+
+The whitespace step checks the index and working tree independently. A staged
+defect must fail even when an unstaged correction cancels it in the combined
+diff against HEAD. Committed history is the baseline; untracked files enter the
+index before the final source check. The runner's real temporary-repository tests
+exercise each pending surface and their cancellation case.
 
 One honest qualification, since Workbench V1: the Workbench reaches the authoring
 compiler's semantics through one command, because there is exactly one

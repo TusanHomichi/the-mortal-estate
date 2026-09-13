@@ -33,3 +33,9 @@ progress { width: 100%; accent-color: #c4b48b; }
 #login-controls { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 1rem; }
 
 .movement-announcement { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+
+#death-status { padding: .8rem 1rem; border-left: 3px solid #b9d7de; background: #263238; }
+#communication { margin-block: 1rem; }
+#communication form { display: flex; gap: .6rem; max-width: 40rem; }
+#communication input { flex: 1; }
+#communication ol { list-style: none; padding: 0; max-height: 10rem; overflow: auto; overflow-wrap: anywhere; }

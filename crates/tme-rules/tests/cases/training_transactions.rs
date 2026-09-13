@@ -750,7 +750,7 @@ fn insufficient_overflowing_and_exact_boundary_offers_are_atomic() {
 
 #[test]
 fn command_round_trip_action_options_and_offer_validation_use_current_contracts() {
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27);
     let engine = engine_with(|_| {});
     for intent in [
         train("trainer", 7),

@@ -14,12 +14,21 @@ interface Login { session_token: string; bootstrap: Bootstrap }
 interface Ticket { ticket: string }
 interface Result { kind: "command_result"; command_id: string; disposition: { kind: string; code?: string }; events: FeedbackEvent[] }
 interface Pending { readonly id: string; readonly epoch: string; readonly sequence: bigint; readonly bytes: string }
+interface ServerSocial { kind: "social_message"; message_id: string; scope: { kind: string }; sender_character_id: string; sender_name: string; body: string }
+interface SpeechResult { kind: "message_result"; message_id: string; disposition: string }
 export interface ControlView {
   phase: Phase; busy: boolean; characters: readonly Character[]; snapshot: Snapshot | null;
   pending: boolean; feedback: string; nextSequence: string;
   creationOptions: readonly CreationOption[]; createdCharacterId: string | null;
-  creationRetry: CreationDraft | null;
+  creationRetry: CreationDraft | null; messages: readonly SpeechMessage[];
 }
+/** Decoded local speech. Presentation state: bounded, discarded with authority, and never proof of delivery. */
+export interface SpeechMessage {
+  readonly messageId: string; readonly scope: string;
+  readonly senderCharacterId: string; readonly senderName: string; readonly text: string;
+}
+/** Retained transcript lines; older lines are dropped. */
+export const MESSAGE_BACKLOG = 64;
 export interface Transport {
   fetch: typeof fetch;
   socket(url: string): WebSocket;
@@ -40,6 +49,8 @@ export class PlayControl {
   private pending: Pending | null = null;
   private preview: { id: string; finish: (value: PathPreviewResult | null) => void } | null = null;
   private feedback = "";
+  private messages: readonly SpeechMessage[] = [];
+  private readonly speechReceipts = new Map<string, { envelope: ServerSocial; timer: ReturnType<typeof setTimeout> }>();
   private queue: Promise<unknown> = Promise.resolve();
   private busy = 0;
   private creationOptions: CreationOption[] = [];
@@ -62,7 +73,7 @@ export class PlayControl {
     return { phase: this.phase, busy: this.busy > 0, characters: this.bootstrap?.characters ?? [],
       snapshot: this.state.snapshot, pending: this.pending !== null, feedback: this.feedback, nextSequence: this.nextSequence.toString(),
       creationOptions: this.creationOptions, createdCharacterId: this.createdCharacterId,
-      creationRetry: this.pendingCreation ? structuredClone(this.pendingCreation.draft) : null };
+      creationRetry: this.pendingCreation ? structuredClone(this.pendingCreation.draft) : null, messages: this.messages };
   }
   private emit(): void { this.changed(this.view); }
   private serial<T>(work: () => Promise<T>): Promise<T> {
@@ -211,7 +222,7 @@ export class PlayControl {
         if (this.socket !== socket) return;
         try {
           if (typeof event.data !== "string") throw new Error("Binary envelope");
-          const value = this.codec.decode<Result | { kind: string; reason?: string }>("server_envelope", event.data);
+          const value = this.codec.decode<Result | ServerSocial | SpeechResult | { kind: string; reason?: string }>("server_envelope", event.data);
           if (!welcomed && value.kind !== "server_welcome") throw new Error("Welcome required");
           if (value.kind === "server_draining") { fail("Server disconnected. Reconnect when it is ready."); return; }
           if (value.kind === "error") { fail("Server refused the connection."); return; }
@@ -221,6 +232,8 @@ export class PlayControl {
             return;
           }
           if (value.kind === "command_result") this.settle(value as Result);
+          else if (value.kind === "social_message") this.deliver(value as ServerSocial);
+          else if (value.kind === "message_result") this.speechResult(value as SpeechResult);
           else if (this.state.accept(event.data)) {
             if (!welcomed) {
               this.epoch = this.state.snapshot!.envelope.control_epoch!; this.nextSequence = 1n;
@@ -289,6 +302,50 @@ export class PlayControl {
     catch { this.detach(); this.phase = "disconnected"; this.feedback = "Command outcome unknown. Reconnect to reconcile it."; }
     this.emit(); return true;
   }
+
+  /** Ordinary local speech through the existing social envelope. It carries its own
+   * identity fields, so it neither uses nor advances the gameplay command cursor, and
+   * it refuses only on connection state: a dead or waiting character still speaks. */
+  sendSay(text: string): boolean {
+    const snapshot = this.state.snapshot;
+    if (this.phase !== "playing" || !this.socket || this.epoch === null || !snapshot) return false;
+    if (this.speechReceipts.size >= MESSAGE_BACKLOG) {
+      this.feedback = "Waiting for speech confirmations."; this.emit(); return false;
+    }
+    const id = this.transport.uuid();
+    try {
+      const bytes = JSON.stringify(this.codec.decode("client_command_envelope", JSON.stringify({
+        kind: "social_message", message_id: id, control_epoch: this.epoch,
+        actor_id: snapshot.envelope.frame.observer_actor_id, scope: { kind: "say" }, body: text })));
+      const frame = snapshot.envelope.frame;
+      const envelope: ServerSocial = { kind: "social_message", message_id: id, scope: {kind: "say"},
+        sender_character_id: frame.social.character_id,
+        sender_name: frame.actors.find(actor => actor.actor_id === frame.observer_actor_id)!.name, body: text };
+      const timer = setTimeout(() => {
+        this.speechReceipts.delete(id); this.feedback = "Speech confirmation was lost."; this.emit();
+      }, 15_000);
+      this.speechReceipts.set(id, { envelope, timer });
+      this.socket.send(bytes);
+      return true;
+    } catch {
+      clearTimeout(this.speechReceipts.get(id)?.timer); this.speechReceipts.delete(id);
+      this.feedback = "Speech could not be sent. Check the message and connection."; this.emit(); return false;
+    }
+  }
+  private speechResult(result: SpeechResult): void {
+    const receipt = this.speechReceipts.get(result.message_id);
+    if (!receipt) return;
+    clearTimeout(receipt.timer); this.speechReceipts.delete(result.message_id);
+    if (result.disposition === "accepted") this.deliver(receipt.envelope);
+    else this.feedback = result.disposition === "rate_limited" ? "You are speaking too quickly. Try again shortly."
+      : "The server could not accept that speech.";
+  }
+  private deliver(envelope: ServerSocial): void {
+    const message: SpeechMessage = Object.freeze({ messageId: envelope.message_id, scope: envelope.scope.kind,
+      senderCharacterId: envelope.sender_character_id, senderName: envelope.sender_name, text: envelope.body });
+    const next = [...this.messages, message];
+    this.messages = Object.freeze(next.length > MESSAGE_BACKLOG ? next.slice(next.length - MESSAGE_BACKLOG) : next);
+  }
   private settle(result: Result): void {
     const pending = this.pending;
     if (!pending || result.command_id !== pending.id) return;
@@ -312,7 +369,9 @@ export class PlayControl {
     clearTimeout(this.commandTimer); clearTimeout(this.reconnectTimer);
     const socket = this.socket; this.socket = null;
     if (socket) { socket.onopen = socket.onmessage = socket.onerror = socket.onclose = null; socket.close(); }
-    this.state.reset(); this.epoch = null;
+    this.state.reset(); this.epoch = null; this.messages = [];
+    for (const receipt of this.speechReceipts.values()) clearTimeout(receipt.timer);
+    this.speechReceipts.clear();
   }
   private clear(): void { this.detach(); this.token = null; this.bootstrap = null; this.pending = null; this.phase = "signed_out";
     this.creationOptions = []; this.createdCharacterId = null; this.pendingCreation = null; }

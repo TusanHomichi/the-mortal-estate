@@ -106,7 +106,7 @@ class ProvisioningEnvironment(unittest.TestCase):
             patch.object(
                 LiveServer,
                 "_wait_for_ready",
-                return_value={"gameplay_ready": True, "protocol_major": 1, "protocol_minor": 10},
+                return_value={"gameplay_ready": True, "protocol_major": 1, "protocol_minor": 11},
             ),
         ):
             server.__enter__()

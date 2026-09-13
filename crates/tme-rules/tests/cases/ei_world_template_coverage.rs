@@ -35,12 +35,20 @@ fn assert_has(error: &str, expected: &str) {
 }
 
 #[test]
-fn world_template_three_envelope_geometry_and_layers_are_strict() {
+fn world_template_four_envelope_geometry_and_layers_are_strict() {
     let mut schema = parts("first_room");
     schema.world_template["schema_version"] = json!(1);
     assert_has(
         &definition_error(&schema),
-        "world_template.schema_version must be 3",
+        "world_template.schema_version must be 4",
+    );
+
+    // The retired three-field envelope is refused rather than upgraded.
+    let mut retired_schema = parts("first_room");
+    retired_schema.world_template["schema_version"] = json!(3);
+    assert_has(
+        &definition_error(&retired_schema),
+        "world_template.schema_version must be 4",
     );
 
     let mut kind = parts("first_room");
@@ -117,6 +125,91 @@ fn world_template_three_envelope_geometry_and_layers_are_strict() {
 }
 
 #[test]
+fn resurrection_routes_are_explicit_per_realm_and_malformed_routes_are_refused() {
+    // The empty map is the explicit "this realm declares no ordinary return
+    // route" answer, not an absent field.
+    parts("first_room")
+        .definition()
+        .expect("the canonical template declares no resurrection route");
+
+    let route = json!({
+        "request_delay_ms": 15_000,
+        "lawful_destination": {
+            "realm": "realm_0",
+            "level": "room_0",
+            "position": {"x": 1, "y": 1}
+        },
+        "neutral_destination": {
+            "realm": "realm_0",
+            "level": "room_0",
+            "position": {"x": 2, "y": 1}
+        },
+        "hit_points_missing": 4,
+        "stamina_missing": 6
+    });
+    let mut declared = parts("first_room");
+    declared.world_template["resurrection"]["realm_0"] = route.clone();
+    declared
+        .definition()
+        .expect("a well-formed resurrection route is accepted");
+
+    let mut unknown_realm = parts("first_room");
+    unknown_realm.world_template["resurrection"]["missing_realm"] = route.clone();
+    assert_has(
+        &definition_error(&unknown_realm),
+        "world_template.resurrection[\"missing_realm\"] references an unknown realm",
+    );
+
+    let mut foreign_lawful = parts("first_room");
+    let mut policy = route.clone();
+    policy["lawful_destination"]["realm"] = json!("missing_realm");
+    foreign_lawful.world_template["resurrection"]["realm_0"] = policy;
+    let error = definition_error(&foreign_lawful);
+    assert_has(
+        &error,
+        "world_template.resurrection[\"realm_0\"].lawful_destination must remain within its realm",
+    );
+    assert_has(
+        &error,
+        "world_template.resurrection[\"realm_0\"].lawful_destination references missing realm/level missing_realm/room_0",
+    );
+
+    let mut missing_level = parts("first_room");
+    let mut policy = route.clone();
+    policy["neutral_destination"]["level"] = json!("missing");
+    missing_level.world_template["resurrection"]["realm_0"] = policy;
+    assert_has(
+        &definition_error(&missing_level),
+        "world_template.resurrection[\"realm_0\"].neutral_destination references missing realm/level realm_0/missing",
+    );
+
+    for delay in [json!(0), json!(86_400_001)] {
+        let mut bad_delay = parts("first_room");
+        let mut policy = route.clone();
+        policy["request_delay_ms"] = delay;
+        bad_delay.world_template["resurrection"]["realm_0"] = policy;
+        assert_has(
+            &definition_error(&bad_delay),
+            "world_template.resurrection[\"realm_0\"].request_delay_ms must be within 1..=86400000",
+        );
+    }
+
+    for (field, value) in [
+        ("hit_points_missing", json!(0)),
+        ("stamina_missing", json!(-1)),
+    ] {
+        let mut bad_deficit = parts("first_room");
+        let mut policy = route.clone();
+        policy[field] = value;
+        bad_deficit.world_template["resurrection"]["realm_0"] = policy;
+        assert_has(
+            &definition_error(&bad_deficit),
+            "world_template.resurrection[\"realm_0\"] resource deficits must be positive",
+        );
+    }
+}
+
+#[test]
 fn realm_level_dimensions_and_required_fields_are_exact() {
     parts("first_room")
         .definition()
@@ -147,7 +240,7 @@ fn realm_level_dimensions_and_required_fields_are_exact() {
     obsolete_map.world_template["map"] = json!({});
     assert_has(&decode_error(&obsolete_map), "unknown field `map`");
 
-    for required in ["realms", "arrivals", "topology"] {
+    for required in ["realms", "arrivals", "resurrection", "topology"] {
         let mut missing = parts("first_room");
         missing
             .world_template

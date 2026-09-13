@@ -28,6 +28,7 @@ mod commands;
 mod npc_discovery;
 mod observation;
 mod options;
+mod payload;
 mod service_discovery;
 mod spell_actions;
 

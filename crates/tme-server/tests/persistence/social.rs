@@ -158,7 +158,7 @@ async fn two_client_social_socket_smoke(database_url: &str, pool: &sqlx::PgPool)
         second_epoch,
         2,
         second_revision,
-        wire::Intent::DisbandGroup,
+        wire::Intent::DisbandGroup {},
     )
     .await;
     send_durable_socket_command(

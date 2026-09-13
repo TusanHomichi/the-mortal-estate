@@ -17,7 +17,7 @@
 use serde_json::{Value, json};
 use tme_rules::{LawZoneDef, PresentationModeDef, SceneRoleDef, StagedViewportDef, WorldZoomDef};
 
-use crate::Result;
+use crate::{Result, tiled::Point};
 
 pub mod first_expedition;
 pub mod fixture;
@@ -233,6 +233,7 @@ impl MemberContract {
 /// that is the only door from its authored bytes to a compiled land.
 #[derive(Debug)]
 pub struct LandContract {
+    pub resurrection: Option<ResurrectionContract>,
     /// An explicitly accepted visual review may need lossless authored encoding.
     /// Both review identity and compiled geographic identity remain pinned.
     pub reviewed_encoding: Option<ReviewedEncoding>,
@@ -260,6 +261,17 @@ pub struct LandContract {
     /// and the profile that selects it.
     pub terrain_registry_catalog: &'static str,
     pub terrain_registry_profile: &'static str,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ResurrectionContract {
+    pub request_delay_ms: u64,
+    pub lawful_member: &'static str,
+    pub lawful_at: Point,
+    pub neutral_member: &'static str,
+    pub neutral_at: Point,
+    pub hit_points_missing: i32,
+    pub stamina_missing: i32,
 }
 
 impl LandContract {

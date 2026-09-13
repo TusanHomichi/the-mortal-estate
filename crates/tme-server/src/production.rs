@@ -7,7 +7,7 @@ use tme_protocol as wire;
 use tme_rules::content::{
     ActorSeedDef, CatalogProfileKey, CatalogV6, EcologySiteDef, GroundItemSeedDef,
     ItemInstanceSeedDef, MerchantInventorySeedDef, ServiceInstanceSeedDef, WorldSeedDef,
-    WorldTemplateV3,
+    WorldTemplateV4,
 };
 use tme_rules::{ActorId, Engine, GameDefinition, ValidatedWorldSeed};
 
@@ -95,7 +95,7 @@ pub fn load_bootstrap(path: &Path) -> Result<PostgresBootstrap, String> {
     let catalog_path = resolve_reference(base, &manifest.catalog)?;
     let template_path = resolve_reference(base, &manifest.world_template)?;
     let catalog: CatalogV6 = read_json(&catalog_path, MAX_CONTENT_BYTES)?;
-    let template: WorldTemplateV3 = read_json(&template_path, MAX_CONTENT_BYTES)?;
+    let template: WorldTemplateV4 = read_json(&template_path, MAX_CONTENT_BYTES)?;
     if tme_rules::content::boundary_policy(catalog.clean_content, &catalog.research_boundary)
         .map_err(|error| error.to_string())?
         != tme_rules::content::ContentBoundaryPolicy::Clean

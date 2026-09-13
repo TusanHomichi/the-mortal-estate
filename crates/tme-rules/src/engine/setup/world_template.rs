@@ -1,11 +1,11 @@
 use crate::content::{
     DoorStateDef, LawZoneDef, PresentationModeDef, SceneRoleDef, TopologyKindDef,
-    TopologyTargetDef, WorldTemplateV3,
+    TopologyTargetDef, WorldTemplateV4,
 };
 use crate::engine::WorldTemplate;
 use crate::model::{DoorState, LawZone, LevelState, NavigationDef, NavigationKind, RealmState};
 
-pub(super) fn compile(source: &WorldTemplateV3) -> WorldTemplate {
+pub(super) fn compile(source: &WorldTemplateV4) -> WorldTemplate {
     let realms = source
         .realms
         .iter()
@@ -96,6 +96,7 @@ pub(super) fn compile(source: &WorldTemplateV3) -> WorldTemplate {
     }
 
     WorldTemplate {
+        resurrection: source.resurrection.clone(),
         visual_manifest_digest: source.visual_manifest_digest.clone(),
         realms,
         arrivals,

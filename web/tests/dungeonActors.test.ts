@@ -21,6 +21,28 @@ function moved(from:{x:number;y:number},to:{x:number;y:number}){return {kind:'ac
 function canvas(){vi.stubGlobal('document',{createElement:()=>({width:0,height:0,getContext:()=>({fillText:()=>{}})})});}
 afterEach(()=>vi.unstubAllGlobals());
 describe('dungeon shared character playback',()=>{
+ it('keeps a ghost stationary and restores its own material without changing shared assets or other figures',()=>{
+ canvas();let now=0;const source=assets(),material=new T.MeshStandardMaterial({opacity:.8});
+ source.male.scene.add(new T.Mesh(new T.BoxGeometry(),material));
+ source.tomas=source.male;
+ const a=new DungeonActors(source,()=>now);let s=snapshot();
+ s.envelope.frame.actors.push({...s.envelope.frame.actors[0]!,actor_id:'tomas'});
+ a.present(s.envelope.frame,s);
+ const mesh=(body:T.Object3D)=>{let found:T.Mesh|null=null;body.traverse(o=>{if(o instanceof T.Mesh)found=o;});return found!;};
+ const own=mesh(a.bodies()[0]!).material as T.Material,other=mesh(a.bodies()[1]!).material as T.Material;
+ expect(own).not.toBe(material);expect(other).not.toBe(own);
+ const disposed=vi.spyOn(own,'dispose');
+ s=snapshot('2',{x:1,y:1,events:[moved({x:0,y:0},{x:0,y:1}),moved({x:0,y:1},{x:1,y:1}),attack]});
+ s.envelope.frame.actors[0]!.life_state='ghost';
+ s.envelope.frame.actors.push({...s.envelope.frame.actors[0]!,actor_id:'tomas',life_state:'alive'});
+ a.present(s.envelope.frame,s);now=1500;a.update();
+ expect(a.diagnostics()).toContainEqual(expect.objectContaining({id:'self',ghost:true,moving:false,clip:'guard'}));
+ expect(a.anchor('self')!.x).toBeCloseTo(1.26);expect(a.anchor('self')!.y).toBe(1);expect(own.opacity).toBeCloseTo(.28);expect(own.depthWrite).toBe(false);
+ expect(material.opacity).toBe(.8);expect(other.opacity).toBe(.8);
+ s=snapshot('3',{ready:true});a.present(s.envelope.frame,s);
+ expect(own.opacity).toBe(.8);expect(own.transparent).toBe(false);expect(own.depthWrite).toBe(true);
+ a.clear();expect(disposed).toHaveBeenCalledTimes(1);a.dispose();
+ });
  it('animates existing non-martial characters and residents through the same accepted route seam',()=>{
  canvas();let now=0;const a=new DungeonActors(assets(),()=>now);let s=snapshot();
  s.envelope.frame.character.identity.base_class_id='fighter';a.present(s.envelope.frame,s);

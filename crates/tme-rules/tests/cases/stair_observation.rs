@@ -42,7 +42,7 @@ fn base_parts() -> ContentParts {
     };
     let visual_manifest_digest = parts.world_template["visual_manifest_digest"].clone();
     parts.world_template = json!({
-        "schema_version": 3,
+        "schema_version": 4,
         "kind": "world_template",
         "id": "stair_observation",
         "visual_manifest_digest": visual_manifest_digest,
@@ -62,6 +62,7 @@ fn base_parts() -> ContentParts {
             }}
         },
         "arrivals": {},
+        "resurrection": {},
         "topology": {
             "edge/gallery/6/4": {
                 "at": {"realm": "realm_0", "level": "gallery", "position": {"x": 6, "y": 4}},

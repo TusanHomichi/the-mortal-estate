@@ -43,7 +43,7 @@ fn add_greatsword(parts: &mut ContentParts) {
 #[test]
 fn hide_command_contract_round_trips_with_version_16() {
     let engine = profession_action_engine("thief", &["thief"]);
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26, "EU uses command contract v26");
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27, "command contract v27");
 
     let command = PlayerCommandV1 {
         contract_version: COMMAND_CONTRACT_VERSION,

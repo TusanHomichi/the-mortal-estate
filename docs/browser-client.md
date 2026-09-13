@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 63
-status: Shared martial playback uses elapsed pose time, bound contact phases and complete rig visibility; linked execution records own proof and delivery.
+revision: 64
+status: Corpse-bound death presents the selected 3D body, server return offers and ordinary speech; execution records own proof and delivery.
 public_safe: true
-summary: Full-world 3D, elapsed shared rig playback, root-motion binding, contact-phase arrival and native pose proof.
+summary: Full-world 3D, martial playback, corpse-bound presentation, ordinary speech and authoritative return controls.
 routes:
   - web/**
   - tools/run_world_proof.py
@@ -258,6 +258,41 @@ JavaScript and disabled controls during delayed or failed codec startup in the
 browser roster. Its JSON stdin supplies the installed `origin` and receipt `output`.
 
 ## Private authoritative play
+
+### Ordinary death and speech
+
+The [gameplay baseline](gameplay-baseline.md#ordinary-death-and-return) owns the
+stationary-ghost rule. The server offers `request_resurrection` without client
+destination, method, corpse or resource parameters. Wire minor 11 requires the
+current contract; minor 10 is refused. A ghost's `ready_at` reports derived
+request eligibility, and `can_act` permits the offered request only. Physical
+buttons, keys and path controls remain unavailable for that observed life state.
+Local cooldown interpolation cannot grant resurrection.
+
+`play/deathControl.ts` presents the current return offer in a visible death
+panel and retires it on authority loss or return to life. `worldStyle.css` places
+that panel and local speech above the full-screen 3D canvas. The hidden diagnostic
+action panel is not the playable return control.
+
+`play/communication.ts` presents local speech through the existing typed social
+envelope. It remains usable during death and action cooldown and consumes no
+gameplay command sequence. The Rust codec validates text. A bounded transcript
+shows incoming speech and locally sent speech only after its matching server
+acknowledgement; refusals and lost receipts produce feedback. Authority loss
+clears transcript and pending speech. Text uses DOM text nodes.
+
+The controlled ghost retains its selected martial body and becomes translucent.
+`dungeon/figureMaterials.ts` owns material instances per figure, restores their
+original settings after resurrection, and disposes only those instances. Shared
+model materials, geometry and textures remain asset-owned. Ghosts do not animate
+movement or combat cues. These are presentation candidates, with native proof
+and delivery tracked in the [death-return record](plans/2026-09-13-death-return.md).
+
+Native death/return proof uses `tools/run_death_return_proof.py` with a checked
+immutable release, disposable PostgreSQL authorities and the configured browser
+roster. It drives real combat, speech, reconnect and return through the shipped UI.
+
+### Control lifecycle
 
 `web/src/play/control.ts` owns the serialized control lifecycle and all transient
 credentials. `main.ts` maps semantic actions and HUD facts onto the selected

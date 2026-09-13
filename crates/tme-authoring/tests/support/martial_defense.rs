@@ -6,15 +6,15 @@ use tme_rules::{
     ActorId, ActorState, BlockSourceKind, CarriedPosition, CatalogProfileKey, CharacterId, Engine,
     Event, GameDefinition, GroundItem, HostilityAuthorization, ItemBindingState, ItemInstanceState,
     ItemKnowledgeState, ItemMoveDestination, PhysicalAttackMode, PhysicalBlockCandidateViewV1,
-    PlayerIntent, ValidatedWorldSeed, WorldSeedDef, WorldTemplateV3,
+    PlayerIntent, ValidatedWorldSeed, WorldSeedDef, WorldTemplateV4,
 };
 
 pub const PROFILE: &str = "profile/first_expedition";
 pub const ACTION: &str = "profession_action/martial_hand_block/first_expedition";
 pub const ARMOR: &str = "defense_test_armor";
 
-fn inputs() -> &'static (Value, WorldTemplateV3, WorldSeedDef) {
-    static INPUTS: OnceLock<(Value, WorldTemplateV3, WorldSeedDef)> = OnceLock::new();
+fn inputs() -> &'static (Value, WorldTemplateV4, WorldSeedDef) {
+    static INPUTS: OnceLock<(Value, WorldTemplateV4, WorldSeedDef)> = OnceLock::new();
     INPUTS.get_or_init(|| {
         let root = tme_authoring::repository_root().unwrap();
         let land =

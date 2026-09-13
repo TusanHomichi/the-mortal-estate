@@ -355,9 +355,9 @@ fn catalog_rejects_invalid_skill_structure_and_knight_magic_eligibility() {
 fn optional_catalog_titles_flow_through_events_and_snapshot_views() {
     assert_eq!(EVENT_CONTRACT_VERSION, 41);
     assert_eq!(SNAPSHOT_CONTRACT_VERSION, 31);
-    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 30);
-    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 32);
-    assert_eq!(COMMAND_CONTRACT_VERSION, 26);
+    assert_eq!(OBSERVED_SNAPSHOT_CONTRACT_VERSION, 31);
+    assert_eq!(ACTION_CONTEXT_CONTRACT_VERSION, 33);
+    assert_eq!(COMMAND_CONTRACT_VERSION, 27);
 
     let mut engine = progression_value()
         .engine(7)

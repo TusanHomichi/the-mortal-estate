@@ -124,16 +124,16 @@ impl Engine {
         intent: PlayerIntent,
         drain_after: bool,
     ) -> Result<Vec<Event>, StepError> {
-        let actor_index = self.controlled_actor_index(actor_id)?;
+        let actor_index = self.player_actor_index(actor_id)?;
         let actor = &self.world.actors[actor_index];
-        if !actor.is_alive() {
+        if !actor.is_alive() && !matches!(intent, PlayerIntent::RequestResurrection) {
             return Err(StepError::new("cannot step after actor death"));
         }
         if actor.kind != ActorKind::Player {
             return Err(StepError::new("addressed actor is not player-controlled"));
         }
         let cost = Self::player_intent_cost(&intent);
-        if cost != ActionCost::FREE && actor.timing.ready_at > self.world.timing.now {
+        if cost != ActionCost::FREE && self.actor_ready_at(actor_index) > self.world.timing.now {
             return Err(StepError::new(format!(
                 "actor {actor_id:?} is not ready by logical time {}",
                 self.world.timing.now
@@ -204,10 +204,18 @@ impl Engine {
     }
 
     pub(super) fn actor_can_act(&self, actor_index: usize) -> bool {
-        self.world
-            .actors
-            .get(actor_index)
-            .is_some_and(|actor| actor.is_alive() && actor.timing.ready_at <= self.world.timing.now)
+        self.world.actors.get(actor_index).is_some_and(|actor| {
+            if actor.is_alive() {
+                actor.timing.ready_at <= self.world.timing.now
+            } else {
+                self.requested_resurrection_plan(actor_index).is_ok()
+            }
+        })
+    }
+
+    pub(super) fn actor_ready_at(&self, actor_index: usize) -> LogicalTime {
+        self.resurrection_request_at(actor_index)
+            .unwrap_or(self.world.actors[actor_index].timing.ready_at)
     }
 
     pub(super) fn schedule_actor(

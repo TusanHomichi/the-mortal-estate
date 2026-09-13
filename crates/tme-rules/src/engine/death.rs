@@ -1,3 +1,5 @@
+mod control;
+
 use crate::events::{
     Event, GoldLocationViewV1, GoldRelocationReason, ItemRelocationReason, SpellFizzleCause,
 };

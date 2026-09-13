@@ -47,8 +47,8 @@ class LiveWireClient:
     @property
     def frame(self):
         frame = self.gameplay.latest_state.get("frame")
-        if not isinstance(frame, dict) or frame.get("contract_version") != 8:
-            raise ProofError("live wire proof requires observer contract 8")
+        if not isinstance(frame, dict) or frame.get("contract_version") != 9:
+            raise ProofError("live wire proof requires observer contract 9")
         return frame
 
     def wait_for(self, predicate, timeout: float = 30.0):

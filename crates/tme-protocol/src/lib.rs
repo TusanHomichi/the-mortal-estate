@@ -10,7 +10,7 @@ use uuid::Uuid;
 mod client_fixture_tests;
 
 pub const PROTOCOL_MAJOR: u16 = 1;
-pub const PROTOCOL_MINOR: u16 = 10;
+pub const PROTOCOL_MINOR: u16 = 11;
 pub const WEBSOCKET_SUBPROTOCOL: &str = "tme.v1";
 pub const MAX_INPUT_BYTES: usize = 32 * 1024;
 pub const MAX_JSON_NESTING: usize = 32;

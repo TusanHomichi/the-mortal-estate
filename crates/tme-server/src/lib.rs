@@ -47,7 +47,7 @@ mod tests {
         assert_eq!(config::COMMAND_RATE_BURST, 20);
         assert_eq!(config::COMMAND_RATE_PER_SECOND, 20);
         assert_eq!(config::DRAIN_TIMEOUT, std::time::Duration::from_secs(5));
-        assert_eq!(wire::PROTOCOL_MINOR, 10);
+        assert_eq!(wire::PROTOCOL_MINOR, 11);
         assert_eq!(wire::CONTROL_API_VERSION, 4);
         assert_eq!(wire::MAX_CONTROL_INPUT_BYTES, 16 * 1024);
         assert_eq!(wire::MAX_CONTROL_JSON_NESTING, 16);
@@ -84,7 +84,7 @@ mod tests {
             );
         }
         assert_eq!(
-            protocol_v1::intent(&wire::Intent::Wait),
+            protocol_v1::intent(&wire::Intent::Wait {}),
             protocol_v1::RulesIntent::Gameplay(tme_rules::PlayerIntent::Wait)
         );
     }
