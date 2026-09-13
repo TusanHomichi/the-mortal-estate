@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 13
-status: Historical baseline; ordinary corpse-bound death selected as the death-return programme resumes.
+revision: 14
+status: Historical baseline; corpse-bound ordinary death and alignment-qualified immediate fire return.
 public_safe: true
-summary: Historical gameplay target, ordinary death ruling, local-door movement, provisional martial rules and remaining fidelity work.
+summary: Historical gameplay target, ordinary and fire death rulings, provisional martial rules and remaining fidelity work.
 routes:
   - crates/tme-rules/**
   - content/**
@@ -103,7 +103,17 @@ return, separately from the one-minute player-request threshold. This supersedes
 the older death-boundary prohibition. The owner then chose to wait for evidence
 before adding the ordinary automatic timer; no provisional duration is approved.
 The source's “several minutes” does not establish a value. This ruling authorizes
-fire-return implementation and does not assert that route is built.
+fire-return implementation; the execution record owns delivery evidence.
+
+The same selected source, passages 2126–2128 and 2157–2170, limits gods return to
+lawful and neutral characters. Fire leaves no corpse or ghost interval and drops
+all carried belongings at the death site. Evil and chaotic deaths require their
+separate dead-world route; this exception cannot supply a temple return for them.
+Implementation reuses the authored destinations and current-pool deficits of
+ordinary requested return and the existing standard resurrection cooldown. Those
+resource deficits remain provisional integration values; permanent attrition and
+its odds are unresolved. Immediate return means no wait before embodiment, not a
+new exemption from the existing action cooldown.
 
 ## Local-door movement
 

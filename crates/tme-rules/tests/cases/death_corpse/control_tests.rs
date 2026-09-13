@@ -2,7 +2,7 @@ use super::*;
 use serde_json::json;
 use tme_rules::{ActorId, SocialBroadcastScope};
 
-fn return_engine(alignment: &str, witness: bool) -> Engine {
+pub(super) fn return_engine(alignment: &str, witness: bool) -> Engine {
     let mut parts = fixture_value();
     parts.world_template["resurrection"] = json!({"realm_0": {
         "request_delay_ms": 60_000,

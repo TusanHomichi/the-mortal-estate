@@ -1,8 +1,9 @@
-//! Ordinary death control: derived eligibility and the existing return transaction.
+//! Death control: derived eligibility and the existing return transaction.
 
 use crate::engine::{Engine, StepError};
 use crate::model::{
-    ActorLifeState, CharacterAlignment, LogicalTime, ResurrectionMethod, ResurrectionRequest,
+    ActorKind, ActorLifeState, CharacterAlignment, CorpseId, DeathCause, LogicalTime,
+    ResurrectionMethod, ResurrectionRequest,
 };
 use crate::view::ActionBlockedReasonV1;
 
@@ -38,7 +39,21 @@ impl Engine {
         if self.current_time() < at {
             return Err(ActionBlockedReasonV1::NotReady);
         }
-        let policy = &self.definition.world_template.resurrection[&actor.location.realm];
+        self.gods_return_plan(actor_index, Some(corpse_id))
+    }
+
+    fn gods_return_plan(
+        &self,
+        actor_index: usize,
+        corpse_id: Option<CorpseId>,
+    ) -> Result<ResurrectionRequest, ActionBlockedReasonV1> {
+        let actor = &self.world.actors[actor_index];
+        let policy = self
+            .definition
+            .world_template
+            .resurrection
+            .get(&actor.location.realm)
+            .ok_or(ActionBlockedReasonV1::NoService)?;
         let destination = match self
             .true_actor_alignment(actor_index)
             .map_err(|_| ActionBlockedReasonV1::UnsupportedRestoration)?
@@ -51,7 +66,7 @@ impl Engine {
         };
         let request = ResurrectionRequest {
             actor_id: actor.id.clone(),
-            corpse_id: Some(corpse_id),
+            corpse_id,
             method: ResurrectionMethod::Gods,
             destination,
             current_hp: actor
@@ -66,6 +81,33 @@ impl Engine {
         self.validate_resurrection_request(&request)
             .map_err(|_| ActionBlockedReasonV1::UnsupportedRestoration)?;
         Ok(request)
+    }
+
+    pub(in crate::engine) fn return_after_fire_defeat(
+        &mut self,
+        actor_index: usize,
+        events: &mut Vec<crate::events::Event>,
+    ) -> Result<(), StepError> {
+        let actor = &self.world.actors[actor_index];
+        if actor.kind != ActorKind::Player
+            || !matches!(
+                actor.life_state,
+                ActorLifeState::AwaitingResurrection {
+                    cause: DeathCause::Fire,
+                    ..
+                }
+            )
+        {
+            return Ok(());
+        }
+        // Missing authored routes and unsupported alignment/resource states retain
+        // their explicit awaiting state. They cannot borrow another return route.
+        let Ok(plan) = self.gods_return_plan(actor_index, None) else {
+            return Ok(());
+        };
+        let actor_id = plan.actor_id.clone();
+        events.extend(self.apply_resurrection_request(plan)?);
+        self.schedule_resurrected_actor(&actor_id, events)
     }
 
     pub(in crate::engine) fn request_resurrection(

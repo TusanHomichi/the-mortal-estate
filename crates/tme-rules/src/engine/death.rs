@@ -344,6 +344,7 @@ impl Engine {
             });
         }
         self.observe_ecology_defeat(&actor_id, events)?;
+        self.return_after_fire_defeat(actor_index, events)?;
         Ok(())
     }
 

@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 100
-status: Death-return gameplay resumed after 3D and martial delivery; the separate presentation experiment remains paused.
+revision: 101
+status: Ordinary and immediate fire return are tracked through PRs 75 and 77; the separate presentation experiment remains paused.
 public_safe: true
-summary: Resumed death-return programme, delivered 3D and martial motion, and remaining acceptance gates.
+summary: Ordinary and immediate fire return continuation, delivered 3D and martial motion, and remaining acceptance gates.
 ---
 
 # The genesis ledger
@@ -38,6 +38,9 @@ earlier pause; the separate presentation experiment and G10/G11 remain open.
 The ordinary corpse-bound control foundation is tracked through
 [PR #75](https://github.com/TusanHomichi/the-mortal-estate/pull/75); exceptional
 routes and initial combat-value reconciliation remain distinct follow-ups.
+The next bounded continuation completes the approved immediate lawful/neutral
+fire-return route through [PR #77](https://github.com/TusanHomichi/the-mortal-estate/pull/77);
+the same death-return record owns its scope and proof. Ordinary automatic timing still waits for evidence.
 
 **Delivered martial correction:** the
 [wall-motion record](2026-09-13-martial-wall-motion.md) routes issue #68's playback,
