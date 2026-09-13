@@ -59,18 +59,29 @@ try {
     }
   }
   async function openActor(id){
-    // Click the presented body, including interpolation and shared-square
-    // separation. A patrol need not stop at its latest authoritative endpoint.
+    // A live patrol may move between the remote projection read and pointer
+    // delivery. Re-aim only when no menu opened; never retry a gameplay command.
     const actor=frame.actors.find(a=>a.actor_id===id);assert(actor);
-    await waitForWorldPointing(page);
-    const p=await canvas.evaluate((node,id)=>{
-      const hit=JSON.parse(node.dataset.worldActorPoints).find(hit=>hit.id===id);if(!hit)throw Error('Actor not drawn');
-      const box=node.getBoundingClientRect();return {x:box.left+hit.px*box.width,y:box.top+hit.py*box.height};
-    },id);
-    await page.mouse.click(p.x,p.y,{button:"right"});
-    await page.locator(".resident-dialog[open]").waitFor();
-    assert.equal(await page.locator("#resident-title").textContent(),actor.name);
+    const count=commands.length;stage=`open-actor-${id}`;
+    for(let attempt=0;attempt<6;attempt++){
+      await waitForWorldPointing(page);
+      const p=await canvas.evaluate((node,id)=>{
+        const hit=JSON.parse(node.dataset.worldActorPoints).find(hit=>hit.id===id);if(!hit)throw Error('Actor not drawn');
+        const box=node.getBoundingClientRect();return {x:box.left+hit.px*box.width,y:box.top+hit.py*box.height};
+      },id);
+      await page.mouse.click(p.x,p.y,{button:"right"});
+      try {
+        await page.locator(".resident-dialog[open]").waitFor({timeout:600});
+      }catch(error){if(error.name!=="TimeoutError")throw error;}
+      assert.equal(commands.length,count,"opening or re-aiming at an actor cannot submit an action");
+      if(await page.locator(".resident-dialog[open]").isVisible()){
+        assert.equal(await page.locator("#resident-title").textContent(),actor.name);
+        return;
+      }
+    }
+    assert.fail(`No actor menu opened for ${id} after six current-projection pointer attempts`);
   }
+
   async function traverse(direction){
     await ready();
     const chosen=frame.action_options.filter(a=>a.enabled&&a.intent?.kind==="traverse");
