@@ -54,6 +54,9 @@ try {
   await mark('ghost');
   stage='ghost speech';const sequence=await canvas.getAttribute('data-sequence');
   await page.locator('input[name="say"]').fill('I am still here.');await page.getByRole('button',{name:'Say',exact:true}).click();
+  // Browser input completion does not order Playwright's asynchronous socket
+  // notifications. Observe the actual outgoing frame before checking its result.
+  await eventually(()=>sent.some(value=>value.kind==='social_message'));
   const speech=sent.find(value=>value.kind==='social_message');assert(speech);
   await eventually(()=>received.some(value=>value.kind==='message_result'&&value.message_id===speech.message_id&&value.disposition==='accepted'));
   await wait(()=>document.querySelector('[role="log"]').textContent.includes('I am still here.'));
