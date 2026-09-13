@@ -7,7 +7,7 @@ export function measureOcclusion(){
  const renderer=new T.WebGLRenderer({canvas,antialias:false,preserveDrawingBuffer:true});renderer.setSize(64,64);
  const scene=new T.Scene(),camera=new T.PerspectiveCamera(40,1,.1,100);camera.position.set(0,0,5);camera.lookAt(0,0,0);camera.updateMatrixWorld(true);
  const body=new T.Mesh(new T.PlaneGeometry(2,2),new T.MeshBasicMaterial({color:0x00ff00,toneMapped:false}));
- const head=new T.Bone();head.name='Head';body.add(head);scene.add(body);
+ const head=new T.Bone();head.name='hand_l';body.add(head);scene.add(body);
  const roof=new T.Group();scene.add(roof);
  for(const z of [1,1.1,1.2]){
   const mesh=new T.Mesh(new T.PlaneGeometry(2,2),new T.MeshBasicMaterial({color:0xff0000,toneMapped:false}));mesh.position.z=z;roof.add(mesh);

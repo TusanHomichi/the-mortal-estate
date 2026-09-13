@@ -6,7 +6,7 @@ import type {Snapshot} from '../src/authoritative/state';
 function asset(idle='guard'):FigureAsset {
  const scene=new T.Group(),bone=new T.Bone();bone.name='root';scene.add(bone);
  const clips=[...new Set([...COMBAT_CLIPS,idle])].map(name=>new T.AnimationClip(name,1,[new T.NumberKeyframeTrack('root.position[x]',[0,1],[0,.1])]));
- return {scene,clips,idle,stride:1};
+ return {scene,clips,idle,stride:1,closingKick:{contactPhase:.25,landingPhase:.45}};
 }
 function assets():DungeonAssets{return {fallback:asset('idle'),male:asset(),female:asset(),tomas:asset('idle'),balm_seller:asset('idle')};}
 function snapshot(sequence='1',o:{x?:number;y?:number;sex?:string|null;events?:unknown[];ready?:boolean;kind?:string}={}):Snapshot {
@@ -25,7 +25,7 @@ describe('dungeon shared character playback',()=>{
  canvas();let now=0;const a=new DungeonActors(assets(),()=>now);let s=snapshot();
  s.envelope.frame.character.identity.base_class_id='fighter';a.present(s.envelope.frame,s);
  s=snapshot('2',{x:1,y:1,events:[moved({x:0,y:0},{x:0,y:1}),moved({x:0,y:1},{x:1,y:1})]});
- s.envelope.frame.character.identity.base_class_id='fighter';a.present(s.envelope.frame,s);now=1500;a.update(.01);
+ s.envelope.frame.character.identity.base_class_id='fighter';a.present(s.envelope.frame,s);now=1500;a.update();
  expect(a.diagnostics()).toMatchObject([{body:'male',clip:'walk',moving:true}]);
  expect(a.anchor('self')!.x).toBeCloseTo(0);expect(a.anchor('self')!.y).toBeCloseTo(1);
  s=snapshot('3',{ready:true});s.envelope.frame.actors.push({...s.envelope.frame.actors[0]!,actor_id:'tomas'});a.present(s.envelope.frame,s);
@@ -44,7 +44,7 @@ describe('dungeon shared character playback',()=>{
  });
  it('consumes a combat update once and expires a hidden-tab reaction',()=>{
  canvas();let now=0;const a=new DungeonActors(assets(),()=>now),s=snapshot('1',{events:[attack]});a.present(s.envelope.frame,s);
- expect(a.diagnostics()).toMatchObject([{clip:'jab_left'}]);now=500;a.present(s.envelope.frame,s);now=1001;a.update(.01);expect(a.diagnostics()).toMatchObject([{clip:'guard'}]);a.dispose();
+ expect(a.diagnostics()).toMatchObject([{clip:'jab_left'}]);now=500;a.present(s.envelope.frame,s);now=1001;a.update();expect(a.diagnostics()).toMatchObject([{clip:'guard'}]);a.dispose();
  });
  it('never replays welcome cues and clears sequence state on disconnect',()=>{
  canvas();const a=new DungeonActors(assets());let s=snapshot('1',{kind:'server_welcome',events:[attack]});a.present(s.envelope.frame,s);expect(a.diagnostics()).toMatchObject([{clip:'guard'}]);a.clear();expect(a.group.children).toHaveLength(0);
@@ -52,7 +52,7 @@ describe('dungeon shared character playback',()=>{
  });
  it('keeps the authoritative corner and ends travel on readiness',()=>{
  canvas();let now=0;const a=new DungeonActors(assets(),()=>now);let s=snapshot();a.present(s.envelope.frame,s);
- s=snapshot('2',{x:1,y:1,events:[moved({x:0,y:0},{x:0,y:1}),moved({x:0,y:1},{x:1,y:1})]});a.present(s.envelope.frame,s);now=1500;a.update(.01);
+ s=snapshot('2',{x:1,y:1,events:[moved({x:0,y:0},{x:0,y:1}),moved({x:0,y:1},{x:1,y:1})]});a.present(s.envelope.frame,s);now=1500;a.update();
  const root=a.group.children[0]!;expect(root.position.x).toBeCloseTo(0);expect(root.position.z).toBeCloseTo(1.65);expect(a.diagnostics()).toMatchObject([{clip:'walk',moving:true}]);
  s=snapshot('3',{x:1,y:1,ready:true});a.present(s.envelope.frame,s);expect(root.position.x).toBeCloseTo(1.65);expect(a.diagnostics()).toMatchObject([{clip:'guard',moving:false}]);a.dispose();
  });

@@ -4,6 +4,7 @@ export class DungeonOcclusion {
   private entries:{group:T.Group;mesh:T.Mesh;original:T.Material|T.Material[];faded:T.Material|T.Material[];depth:T.Mesh;order:number}[]=[];
   private ray=new T.Raycaster();
   count=0;
+  actors:{id:string|null;joints:number;groups:string[]}[]=[];
   bind(groups:T.Group[]):void {
     this.clear();
     for(const group of groups){
@@ -23,14 +24,19 @@ export class DungeonOcclusion {
   }
   update(camera:T.Camera,bodies:T.Object3D[]):void {
     const groups=new Set<T.Group>(),meshes=this.entries.map(e=>e.mesh),owners=new Map(this.entries.map(e=>[e.mesh,e.group]));
+    this.actors=[];
     for(const body of bodies){
-      const samples:T.Object3D[]=[];
-      body.traverse(o=>{if(o instanceof T.Bone&&/Hips|Spine|Head|Arm$|ForeArm$|Hand$|Leg$|Foot$/.test(o.name))samples.push(o);});
+      const samples:T.Object3D[]=[],obstructions=new Set<T.Group>();
+      // Bound rigs use different naming conventions. Every joint can explain
+      // an obstruction; a name filter reduced the martial rig to its head.
+      body.traverse(o=>{if(o instanceof T.Bone)samples.push(o);});
       for(const bone of samples){
       const target=bone.getWorldPosition(new T.Vector3()),screen=target.clone().project(camera);
       this.ray.setFromCamera(new T.Vector2(screen.x,screen.y),camera);this.ray.far=this.ray.ray.origin.distanceTo(target)-.03;
-      for(const hit of this.ray.intersectObjects(meshes,false))groups.add(owners.get(hit.object as T.Mesh)!);
+      for(const hit of this.ray.intersectObjects(meshes,false))obstructions.add(owners.get(hit.object as T.Mesh)!);
       }
+      for(const group of obstructions)groups.add(group);
+      this.actors.push({id:body.parent?.userData.actorId??null,joints:samples.length,groups:[...obstructions].map(g=>g.name)});
     }
     for(const e of this.entries){const faded=groups.has(e.group);e.mesh.material=faded?e.faded:e.original;e.mesh.renderOrder=faded?91:e.order;e.depth.visible=faded;}
     this.count=groups.size;
@@ -39,6 +45,6 @@ export class DungeonOcclusion {
     for(const e of this.entries){e.mesh.material=e.original;e.mesh.renderOrder=e.order;e.depth.removeFromParent();
       for(const value of [e.faded,e.depth.material])for(const m of Array.isArray(value)?value:[value])m.dispose();
     }
-    this.entries=[];this.count=0;
+    this.entries=[];this.count=0;this.actors=[];
   }
 }

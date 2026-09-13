@@ -9,7 +9,7 @@ function asset(idle='guard'):FigureAsset {
   const clips=[...new Set([...COMBAT_CLIPS,idle])].map(name=>new T.AnimationClip(name,1,[
     new T.NumberKeyframeTrack('root.position[x]',[0,1],[0,.1]),
   ]));
-  return {scene,clips,idle,stride:1};
+  return {scene,clips,idle,stride:1,closingKick:{contactPhase:.25,landingPhase:.45}};
 }
 function assets():DungeonAssets{return {fallback:asset('idle'),male:asset(),female:asset(),tomas:asset('idle'),balm_seller:asset('idle')};}
 const place=(x:number)=>({realm:'test',level:'d1_entry',position:{x,y:0}});
@@ -39,12 +39,15 @@ describe('closing jumpkick presentation',()=>{
       const events=[...Array.from({length:distance},(_,x)=>move(x)),hit('jumpkick',outcome)];
       const kicked=snapshot(2,distance,events,false,sex,'state_update',distance);present(actors,kicked);
       expect(self(actors)).toMatchObject({body:sex,clip:'flying_kick',moving:true});
-      now=2000;actors.update(2);
+      now=300;actors.update();
       expect(self(actors)).toMatchObject({clip:'flying_kick',moving:true});
       expect(actors.anchor('self')!.x).toBeGreaterThan(0);
       expect(actors.anchor('self')!.x).toBeLessThan(distance+.5);
+      now=750;actors.update();
+      expect(self(actors)).toMatchObject({clip:'flying_kick',moving:false,routeProgress:1});
+      const impact=actors.anchor('self');now=1500;actors.update();expect(actors.anchor('self')).toEqual(impact);
       present(actors,kicked); // Same receipt cannot restart the clip or the route.
-      now=3001;actors.update(1.001);
+      now=3001;actors.update();
       expect(self(actors)).toMatchObject({clip:'guard',moving:false});
       const landed=actors.anchor('self');present(actors,kicked);
       expect(actors.anchor('self')).toEqual(landed);
@@ -58,14 +61,14 @@ describe('closing jumpkick presentation',()=>{
   });
   it('readiness ends a still-playing kick and allows the next punch',()=>{
     canvas();let now=0;const actors=new DungeonActors(assets(),()=>now);present(actors,snapshot(1,0));
-    present(actors,snapshot(2,3,[move(0),move(1),move(2),hit()]));now=400;actors.update(.4);
+    present(actors,snapshot(2,3,[move(0),move(1),move(2),hit()]));now=400;actors.update();
     present(actors,snapshot(3,3,[],true));expect(self(actors)).toMatchObject({clip:'guard',moving:false});
     present(actors,snapshot(4,3,[hit('fight')]));expect(self(actors)).toMatchObject({clip:'jab_left',moving:false});actors.dispose();
   });
   it('a short authoritative remainder bounds both travel and the kick',()=>{
     canvas();let now=0;const actors=new DungeonActors(assets(),()=>now);present(actors,snapshot(1,0));
     const s=snapshot(2,3,[move(0),move(1),move(2),hit()]);s.envelope.frame.ready_at='1100';present(actors,s);
-    now=101;actors.update(.101);expect(self(actors)).toMatchObject({clip:'guard',moving:false});actors.dispose();
+    now=101;actors.update();expect(self(actors)).toMatchObject({clip:'guard',moving:false});actors.dispose();
   });
   it('partial or missing routes never manufacture approach travel',()=>{
     for(const events of [[move(2),hit()],[hit()]]){

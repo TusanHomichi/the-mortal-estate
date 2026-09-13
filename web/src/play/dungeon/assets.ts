@@ -6,7 +6,8 @@ import {disposeSkeletons} from './rigResources';
 
 export const COMBAT_CLIPS=['guard','walk','jab_left','jab_right','uppercut_right','hook_left',
   'block_high','block_side','block_cover','block_lean','flying_kick'] as const;
-export interface FigureAsset { scene:T.Group; clips:readonly T.AnimationClip[]; idle:string; stride:number }
+export interface FigureAsset { scene:T.Group; clips:readonly T.AnimationClip[]; idle:string; stride:number;
+  closingKick?:{contactPhase:number;landingPhase:number} }
 export interface DungeonAssets { fallback:FigureAsset; male:FigureAsset; female:FigureAsset; tomas:FigureAsset; balm_seller:FigureAsset }
 
 export function disposeFigureAssets(assets:readonly FigureAsset[]):void {
@@ -33,6 +34,22 @@ export function assertFigureClips(scene:T.Object3D,clips:readonly T.AnimationCli
   }
 }
 
+/** Accepted routes own planar relocation; retain the source's vertical lift. */
+export function inPlaceClips(scene:T.Object3D,clips:readonly T.AnimationClip[],motionRoot:string):T.AnimationClip[] {
+  const root=scene.getObjectByName(motionRoot);
+  if(!(root instanceof T.Bone))throw Error('Martial motion root missing.');
+  return clips.map(source=>{
+    const clip=source.clone(),tracks=clip.tracks.filter(t=>{
+      const parsed=T.PropertyBinding.parseTrackName(t.name);
+      return parsed.nodeName===motionRoot&&parsed.propertyName==='position';
+    });
+    if(tracks.length!==1||tracks[0]!.getValueSize()!==3)throw Error(`Martial root translation missing or invalid: ${source.name}.`);
+    const values=tracks[0]!.values;
+    for(let i=0;i<values.length;i+=3){values[i]=root.position.x;values[i+2]=root.position.z;}
+    return clip;
+  });
+}
+
 export async function loadDungeonBody():Promise<DungeonAssets> {
   const parsed:GLTF[]=[];
   const load=async(asset:{file:string;sha256:string})=>{
@@ -52,6 +69,9 @@ export async function loadDungeonBody():Promise<DungeonAssets> {
     assertFigureClips(body.scene,motion.animations,['idle','walk']);
     const male=await load(receipt.martial.male),female=await load(receipt.martial.female);
     for(const asset of [male,female])assertFigureClips(asset.scene,asset.animations,COMBAT_CLIPS);
+    const {motionRoot,closingKick}=receipt.martialPlayback;
+    if(!(closingKick.contactPhase>0&&closingKick.contactPhase<closingKick.landingPhase&&closingKick.landingPhase<1))
+      throw Error('Martial closing-kick phases invalid.');
     const residents={} as Pick<DungeonAssets,'tomas'|'balm_seller'>;
     for(const id of ['tomas','balm_seller'] as const){
       const model=await load(receipt.residents[id].body),animation=await load(receipt.residents[id].motion);
@@ -60,7 +80,7 @@ export async function loadDungeonBody():Promise<DungeonAssets> {
     }
     return {fallback:{scene:body.scene,clips:motion.animations,idle:'idle',stride:1},
       ...residents,
-      male:{scene:male.scene,clips:male.animations,idle:'guard',stride:receipt.martial.male.stride},
-      female:{scene:female.scene,clips:female.animations,idle:'guard',stride:receipt.martial.female.stride}};
+      male:{scene:male.scene,clips:inPlaceClips(male.scene,male.animations,motionRoot),idle:'guard',stride:receipt.martial.male.stride,closingKick},
+      female:{scene:female.scene,clips:inPlaceClips(female.scene,female.animations,motionRoot),idle:'guard',stride:receipt.martial.female.stride,closingKick}};
   }catch(error){disposeFigureAssets(parsed.map(g=>({scene:g.scene,clips:g.animations,idle:'',stride:1})));throw error;}
 }
