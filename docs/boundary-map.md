@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 13
-status: Death control derives ordinary return eligibility and content-owned destinations; saved-state obligations stay with the server owner.
+revision: 14
+status: Death control owns ordinary eligibility and immediate fire return; saved-state obligations stay with the server owner.
 public_safe: true
-summary: Fact ownership, corpse-bound return control, checkpoint migration, resident services and individual timing.
+summary: Fact ownership, ordinary and fire return transactions, checkpoint migration, resident services and individual timing.
 always: true
 ---
 
@@ -335,6 +335,12 @@ validates same-square corpse search, and applies validated resurrection transact
 `death/control.rs` derives ordinary request eligibility from the death timestamp
 and the realm's authored return policy. The player submits only the request;
 rules select its destination and resources from validated content.
+The same control owner completes eligible fire return inside lethal resolution,
+after drops, social consequences and defeat rewards, through that resurrection
+transaction and the existing standard resurrection scheduler. No event consumer
+or client action supplies this return. Missing authored routes and unsupported
+alignment/resource states retain `AwaitingResurrection`; their outstanding routes
+are tracked in [issue #73](https://github.com/TusanHomichi/the-mortal-estate/issues/73).
 
 **Rule.** Life state is one enum with one writer. Corpse contents are real item
 locations owned by inventory; death asks inventory to relocate them.

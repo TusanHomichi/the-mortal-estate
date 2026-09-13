@@ -1,13 +1,14 @@
 ---
 last_updated: 2026-09-13
-revision: 64
-status: Corpse-bound death presents the selected 3D body, server return offers and ordinary speech; execution records own proof and delivery.
+revision: 65
+status: Ordinary and fire return consume authoritative life state; execution records own native proof and delivery.
 public_safe: true
-summary: Full-world 3D, martial playback, corpse-bound presentation, ordinary speech and authoritative return controls.
+summary: Full-world 3D, martial playback, ordinary death controls, immediate fire return and native proof.
 routes:
   - web/**
   - tools/run_world_proof.py
   - tools/run_dungeon_proof.py
+  - tools/run_death_return_proof.py
 ---
 
 # Browser client
@@ -291,6 +292,12 @@ and delivery tracked in the [death-return record](plans/2026-09-13-death-return.
 Native death/return proof uses `tools/run_death_return_proof.py` with a checked
 immutable release, disposable PostgreSQL authorities and the configured browser
 roster. It drives real combat, speech, reconnect and return through the shipped UI.
+Its `--cause fire` variant gives the disposable monster a fire ability with
+zero range and drives real movement into its square. The resulting authoritative
+frame is already alive at the return destination, with empty carried inventory
+and the standard cooldown. `web/proof/fire-return-proof.mjs` checks this atomic
+result, the selected 3D body, reconnect, subsequent movement and sign-out.
+Production spell definitions and monster tuning are unchanged.
 
 ### Control lifecycle
 

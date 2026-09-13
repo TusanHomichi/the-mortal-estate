@@ -1,9 +1,9 @@
 ---
 last_updated: 2026-09-13
-revision: 1
-status: Ordinary death control implemented; final proof and delivery have separate receipts, with exceptional routes still open.
+revision: 2
+status: Ordinary control delivered through PR 75; immediate fire return in verification, with further exceptional routes still open.
 public_safe: true
-summary: Backlog reconciliation and resumed death, return and lineage work under the current historical baseline.
+summary: Ordinary return delivery, immediate fire continuation, backlog reconciliation and remaining death and lineage work.
 ---
 
 # Death, return and continuity
@@ -101,8 +101,9 @@ declaration selects lawful temple `(3,6)` and neutral outdoor dock `(9,31)`
 destinations. Current-pool deficits remain the existing restoration convention of
 one HP and one stamina below maximum. These are provisional implementation values,
 not a claim of recovered attrition odds or permanent penalties. Full attrition,
-corpse custody, fire/eaten routing, dead-world entry and lineage remain subsequent
-work. An empty fixture map explicitly authors no ordinary return route.
+corpse custody, eaten routing, dead-world entry and lineage remain subsequent
+work. The fire continuation is recorded below. An empty fixture map explicitly
+authors no return route.
 
 This is an atomic content-schema cutover. Normal loaders refuse V3. The saved
 preview requires a backed-up, stopped-writer offline migration with pinned source
@@ -167,3 +168,36 @@ opponent cannot hit the starting player under its current authored scores (#74),
 and a looting opponent legitimately removes corpse contents during the wait.
 This fixture isolates return and inventory restoration. It changes no production
 combat resolver or installed catalog and proves no claim about initial balance.
+
+
+## Immediate fire-return continuation
+
+Base: `b7d6d74678b6092e06abb937c49c8b8a546e3c90`. The owner continued the programme
+with its already approved fire exception. The gameplay baseline owns alignment,
+drops and immediacy; this slice completes lawful/neutral fire return with an
+authored policy and supported current resources. The no-corpse state is internal
+to the lethal transaction and no ghost interval is published. Non-fire no-corpse
+cases, absent policies and unsupported alignments/resources retain their explicit
+awaiting state; issue #73 retains their completion criteria, including the
+pre-existing max-HP-one restoration floor conflict. No ordinary automatic timer
+is added. No content, wire or checkpoint shape changes.
+
+Hazard proof checks same-instant return, item/gold conservation at the death site,
+no corpse allocation, one resurrection, checkpoint recovery and complete cooldown.
+The native fire mode uses an explicit disposable monster-ability fixture and the
+same configured six browser/body/route cases. Its catalog digests and overrides
+are retained. A self-target direct-damage fixture was rejected because that target
+executes as stubbed; the accepted proof uses the existing automatic monster spell
+path. Self-target damage support is tracked in
+[issue #76](https://github.com/TusanHomichi/the-mortal-estate/issues/76), separately
+from the fire route. Final configured verification and saved-preview activation
+receipts must establish delivery before this continuation is marked complete.
+
+
+The parent observed all six native fire cases pass on chromium, firefox and
+webkit, with lawful male and neutral female bodies. The rules test fixes the
+cooldown at exactly three seconds from lethal resolution. Native publication may
+follow a scheduled death by a small elapsed interval, so its assertion checks a
+positive remaining interval no greater than three seconds and an unchanged
+deadline after reconnect; it does not mislabel publication time as damage time.
+The first native attempt exposed and corrected that proof-clock assumption.
