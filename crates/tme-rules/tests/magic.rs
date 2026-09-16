@@ -29,6 +29,8 @@ mod spell_items;
 mod spell_learning;
 #[path = "cases/spell_lifecycle.rs"]
 mod spell_lifecycle;
+#[path = "cases/spell_realm_identity.rs"]
+mod spell_realm_identity;
 #[path = "cases/spell_summons.rs"]
 mod spell_summons;
 #[path = "cases/spell_targeting.rs"]

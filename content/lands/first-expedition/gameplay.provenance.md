@@ -41,6 +41,49 @@ shares the inherited integration distribution. Initial item, spell and numeric
 rule definitions derive from the project's original adventure integration
 fixture. The unrelated trail quest and sentinel are excluded.
 
+### Starter combat ratings reconciliation
+
+The first-expedition initiative values were `40/40/40` for the player and
+`2/4/6` for the cellar scavenger. Those numbers were never compatible with the
+combat resolver: a hit needs `d20 + attack/2 + adds > 10 + defense/2 +
+dexterity/3`, and the scavenger's best possible attack score of 21 could not
+exceed the created player's defense score of 34. No damage or healing value
+could repair that, because `engine/skills.rs` and `engine/weapons.rs` give an
+unarmed, character-less monster zero skill and zero combat adds. Issue #74 owns
+the finding; `crates/tme-rules/tests/first_expedition_encounter.rs` owns the
+regression and its pre-fix failure.
+
+The reconciled values are **player `10/14/40`** and **cellar scavenger
+`18/8/18`**. They are provisional integration tuning under the
+[first-expedition provisional values](../../../docs/gameplay-baseline.md#first-expedition-provisional-values)
+ruling, not recovered numbers:
+
+- **Missing evidence:** no selected-version source establishes original starting
+  combat ratings, the cellar encounter's values, or its intended difficulty. The
+  earlier `40/40/40` block was not derived from the recovered creation tables
+  either; the recovered facts cover attribute bounds, creation caps and
+  allocation pools only.
+- **Selected temporary behaviour:** both sides are authored on one comparable
+  scale, so each opponent's attack score can reach the other's defense score and
+  a landing hit costs a meaningful share of the target's pool. Player attack and
+  defense moved down; only the player's health was left alone, because it is
+  already the documented starting value and the character-owned resource every
+  creation profile and recovery path already uses.
+- **Observed outcome:** through the ordinary Fight command with ordinary
+  character creation, the scavenger lands hits that remove 4-6 HP from a 40 HP
+  player, and the encounter resolves in roughly a dozen exchanges in either
+  direction instead of ending before the opponent can act.
+- **Replacement criterion:** recover original creature and starting-character
+  ratings for the selected release, then re-derive both sides and re-run the
+  encounter regression. Do not promote the current numbers to historical fact
+  because they are saved, tested or shipped.
+
+`attack` and `defense` are immutable actor-definition facts, so a retained actor
+cannot keep an obsolete rating after this change. Deployments reconcile them
+through the explicit content cutover's `rederive_actor_stats` declaration, which
+preserves identity, resources, progression, inventory, balances, deadlines and
+life state.
+
 The testable loop uses the current prepaid-learning-rate implementation; its
 remaining difference from the recovered five-rank account remains in the class
 contract. An instructor's supported tracks are deliberately bounded to this

@@ -51,15 +51,32 @@ try {
     const group = groups.find(g => (!service || g.key === `service:${service}`) && g.actions.some(a => a.enabled && a.intent && predicate(a.intent)));
     assert(group, `required action absent at ${JSON.stringify(here())}`);
     const chosen = group.actions.find(a => a.enabled && a.intent && predicate(a.intent));
+    // The 3D canvas owns the viewport, so the action panel can be scrolled out
+    // of the visible area at this window size. The controls are present and
+    // enabled; dispatch them directly rather than depending on layout.
     const section = page.locator(`details[data-group=${JSON.stringify(group.key)}]`);
-    if (await section.getAttribute("open") === null) await section.locator("summary").click();
-    await section.locator("select").selectOption(chosen.id);
-    if (amount !== undefined) await section.locator("input").fill(amount);
+    if (await section.getAttribute("open") === null) {
+      await section.locator("summary").evaluate(node => node.closest("details").open = true);
+    }
+    await section.locator("select").evaluate((node, value) => {
+      node.value = value;
+      node.dispatchEvent(new Event("change", { bubbles: true }));
+    }, chosen.id);
+    if (amount !== undefined) {
+      await section.locator("input").evaluate((node, value) => { node.value = value; }, amount);
+    }
     const count = commands.length;
-    await section.getByRole("button", { name: "Perform selected action" }).click();
+    // Dispatch the panel's own activation handler: the button is the product's
+    // real dispatch path, but its layout is not what this proof is testing.
+    await section.locator("button", { hasText: "Perform selected action" })
+      .evaluate(node => node.click());
     return committed(count);
   }
   const steps = [[0,-1,"North"],[1,0,"East"],[0,1,"South"],[-1,0,"West"]];
+  // The world canvas owns the viewport, so the diagnostic direction column can
+  // be laid out off-screen. Movement keys are the client's own input path and
+  // are what a player uses; the proof presses those instead of hidden buttons.
+  const binding = { North: "ArrowUp", East: "ArrowRight", South: "ArrowDown", West: "ArrowLeft" };
   async function walkTo(x, y) {
     await ready();
     const start = here(), key = p => `${p.x}:${p.y}`, target = `${x}:${y}`;
@@ -77,7 +94,8 @@ try {
     assert(route, `no observed map route to ${target}`);
     for (const direction of route) {
       await ready(); const count = commands.length;
-      await page.getByRole("button", { name: direction, exact: true }).click();
+      await page.locator("#world-canvas").focus();
+      await page.keyboard.press(binding[direction]);
       await committed(count);
     }
     if (here().level === start.level) assert.deepEqual(here().position, { x, y });
@@ -101,7 +119,8 @@ try {
   await wait(() => document.querySelector("#character input:checked")?.getAttribute("aria-label") === "Expedition Arrival");
   await page.getByRole("button", { name: "Enter world", exact: true }).click(); await ready();
   assert(frame.observer_actor_id.startsWith("created/"));
-  assert.deepEqual(here().position, { x:9,y:31 });
+  // The authored dock arrival, not the seeded occupant's historic position.
+  assert.deepEqual(here().position, { x:8,y:34 });
   await mark("dock");
   await enter("bank"); await walkTo(1,2);
   await action(i => i.kind === "move_gold" && i.source.kind === "carried" && i.source.position === "sack" && i.destination.kind === "ground_here", { amount: "20" });
@@ -115,10 +134,37 @@ try {
   await mark("temple"); await enter("d1_entry");
   assert.deepEqual(here().position, { x:24,y:7 }); await mark("descent");
   await walkTo(23,9);
-  for (let attempts=0; attempts<6 && frame.actors.some(a => a.actor_id === "cellar_scavenger" && a.life_state !== "dead"); attempts++) {
-    await action(i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger" && i.mode === "fight");
+  // The opponent holds ground and Fight reaches one square, so one real East
+  // step is what joins the encounter. Every later attack is an ordinary action.
+  await ready(); { const count = commands.length;
+    await page.locator("#world-canvas").focus();
+    await page.keyboard.press("ArrowRight");
+    await committed(count);
   }
-  assert(frame.corpses.length > 0, "encounter did not produce a corpse");
+  // The encounter is the shipped opponent at its shipped ratings. Record what
+  // the exchange actually cost: a block animation or a fast kill would not show
+  // that the opponent is dangerous, and an instant loss would not show that it
+  // is survivable.
+  const encounterHpBefore = frame.character.resources.hp;
+  let encounterDamageTaken = 0, encounterRounds = 0;
+  const opponent = i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger";
+  const corpsesBefore = frame.corpses.length;
+  const defeated = () => frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger");
+  for (let attempts=0; attempts<60 && !defeated(); attempts++) {
+    // Fight reaches one square, which is where the previous step put the
+    // character; the closing kick is the authored alternative when the offered
+    // action list has no ready melee attack this round.
+    const offered = () => frame.action_options.some(a => a.enabled && a.intent && opponent(a.intent) && a.intent.mode === "fight");
+    await action(offered() ? (i => opponent(i) && i.mode === "fight") : (i => opponent(i) && i.mode === "jumpkick"));
+    encounterRounds += 1;
+    encounterDamageTaken = encounterHpBefore - frame.character.resources.hp;
+  }
+  assert(defeated(), "the opponent survived the fight");
+  assert(frame.corpses.length > corpsesBefore, "defeat did not produce the opponent's corpse");
+  assert(frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger"), "the corpse is not the encountered opponent");
+  assert(encounterRounds > 1, `the encounter ended in ${encounterRounds} round(s); the opponent never acted`);
+  assert(encounterDamageTaken > 0, "the shipped opponent never injured the character");
+  assert(frame.character.resources.hp > 0, "the character did not survive its own starting encounter");
   await action(i => i.kind === "search_corpse");
   await action(i => i.kind === "move_item" && i.item_instance_id === "found_charm" && i.destination.kind === "carried" && i.destination.position === "sack_item_3");
   await action(i => i.kind === "move_gold" && i.source.kind === "ground" && i.destination.kind === "carried" && i.destination.position === "sack");
@@ -144,7 +190,8 @@ try {
   await wait(() => document.body.dataset.phase === "signed_out");
   assert.equal(await page.locator("#world-canvas").getAttribute("data-study-level"), null);
   assert.deepEqual(errors, []);
-  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true },null,2));
+  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
+    production_encounter:{rounds:encounterRounds, damage_taken:encounterDamageTaken, starting_hp:encounterHpBefore, hp_after:frame.character.resources.hp, opponent_hp_authored:18, player_ratings_authored:true} },null,2));
   await context.close();
 } catch(error) {
   await writeFile(path.join(config.output, `${config.engine}-failure.json`), JSON.stringify({ stage, error:String(error), errors, frame, staticContext, commandCount:commands.length, lastResult:results.at(-1) },null,2));

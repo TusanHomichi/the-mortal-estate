@@ -23,6 +23,87 @@ pub struct CheckpointContentMigration {
     /// seed absent door and hidden-transition state. Existing mutated state is
     /// always preserved; new keys are inserted only when this is true.
     pub initialize_new_topology: bool,
+    /// Actor definition IDs whose immutable combat ratings are re-derived from
+    /// the destination definition for every retained actor that uses them.
+    /// Authored stat reconciliation is the only reason this exists: identity,
+    /// kind, resources, life state, progression, inventory, balances, timing
+    /// and every other mutable fact are untouched, and an actor whose retained
+    /// ratings already match the destination is left byte-identical.
+    pub rederive_actor_stats: BTreeSet<String>,
+}
+
+impl CheckpointContentMigration {
+    /// Actor definition IDs whose authored combat ratings differ between the
+    /// two definitions. Ratings are immutable definition facts, so every one of
+    /// them is a deliberate cutover decision.
+    fn moved_actor_stat_definitions(
+        before: &GameDefinition,
+        after: &GameDefinition,
+    ) -> BTreeSet<String> {
+        after
+            .catalog
+            .actor_definitions
+            .iter()
+            .filter_map(|(definition_id, destination)| {
+                let moved = before
+                    .catalog
+                    .actor_definitions
+                    .get(definition_id)
+                    .is_none_or(|source| source.stats != destination.stats);
+                moved.then(|| definition_id.clone())
+            })
+            .collect()
+    }
+
+    /// Refuse a plan that would leave any retained actor on a rating the
+    /// destination definition no longer authors. Retained ratings cannot be
+    /// rescued later by ordinary recovery: hydration still requires exact
+    /// content identity, so an undeclared movement is a silent rules split.
+    /// A declared ID that did not move is a stale plan, and is refused too.
+    fn declared_actor_stat_movements(
+        &self,
+        before: &GameDefinition,
+        after: &GameDefinition,
+    ) -> Result<BTreeSet<String>, CheckpointError> {
+        let moved = Self::moved_actor_stat_definitions(before, after);
+        for definition_id in &self.rederive_actor_stats {
+            if !moved.contains(definition_id) {
+                return Err(CheckpointError::new(format!(
+                    "declared actor definition {definition_id:?} did not change"
+                )));
+            }
+        }
+        if let Some(definition_id) = moved
+            .iter()
+            .find(|definition_id| !self.rederive_actor_stats.contains(*definition_id))
+        {
+            return Err(CheckpointError::new(format!(
+                "content migration leaves {definition_id:?} on superseded ratings"
+            )));
+        }
+        Ok(moved)
+    }
+
+    /// Replace authored combat ratings in place. Every other field of the actor
+    /// state is a mutable gameplay fact and is preserved exactly.
+    fn apply_actor_stat_reconciliation(
+        moved: &BTreeSet<String>,
+        after: &GameDefinition,
+        engine: &mut Engine,
+    ) -> Result<(), CheckpointError> {
+        for actor in &mut engine.world.actors {
+            if !moved.contains(&actor.definition_id) {
+                continue;
+            }
+            let destination = after
+                .catalog
+                .actor_definitions
+                .get(&actor.definition_id)
+                .ok_or_else(|| CheckpointError::new("rederived actor definition is absent"))?;
+            actor.stats = destination.stats.clone();
+        }
+        Ok(())
+    }
 }
 
 impl Engine {
@@ -126,6 +207,15 @@ impl Engine {
             .world
             .service_instances
             .retain(|s| !plan.merge_merchants.contains_key(&s.id));
+        // Authored combat ratings are immutable definition facts, so no
+        // retained actor may keep a rating the destination definition no longer
+        // authors. Every movement is declared before any state is written.
+        let moved = plan.declared_actor_stat_movements(before.as_ref(), after.as_ref())?;
+        CheckpointContentMigration::apply_actor_stat_reconciliation(
+            &moved,
+            after.as_ref(),
+            &mut engine,
+        )?;
         // Translate every typed live spatial field for the authored members
         // that moved, then reconcile keyed topology state against the
         // destination definition before the actor passability refusal runs.
