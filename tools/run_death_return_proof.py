@@ -8,7 +8,10 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import threading
 import time
+from dataclasses import dataclass
+from typing import Callable
 
 from live_server_harness import REPOSITORY_ROOT, read_admin_url
 from live_wire_client import LiveWireClient
@@ -124,38 +127,28 @@ def main():
                 proof = "fire-return" if args.cause == "fire" else "death-return"
                 request_path = output / "restart-request.json"
                 complete_path = output / "restart-complete.json"
-                for stale in (request_path, complete_path):
-                    stale.unlink(missing_ok=True)
-                child = subprocess.Popen(
-                    ["node", f"web/proof/{proof}-proof.mjs"], cwd=REPOSITORY_ROOT,
-                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                    text=True, env={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)})
-                # The proof reads its whole configuration before it does anything
-                # else, so the pipe is closed now: waiting for the restart request
-                # on an open stdin would deadlock both halves.
-                child.stdin.write(json.dumps(config))
-                child.stdin.close()
-                try:
-                    if args.cause == "ordinary":
-                        # The browser asks for the restart at the point where the
-                        # character is a ghost, so the death state is what the
-                        # restart has to preserve. The process is replaced here,
-                        # between the browser's own sessions; no gameplay state
-                        # crosses the boundary in either direction.
-                        requested = await_restart_request(child, request_path)
-                        restart = prove_restart_durability(server, expect=requested)
-                        # The restarted process listens on new loopback ports, so
-                        # the browser half is told where to reconnect. Only the
-                        # address crosses; no gameplay fact does.
-                        restart["origin"] = server.origin
-                        complete_path.write_text(json.dumps(restart, indent=2) + "\n")
-                    stdout, stderr = child.communicate(timeout=900)
-                except BaseException:
-                    child.kill()
-                    child.communicate()
-                    raise
-                if child.returncode:
-                    raise RuntimeError(f"{engine}/{alignment}: {stderr[-3500:]}")
+                def on_restart_request(requested: dict) -> dict:
+                    """Replace the serving process while the browser waits."""
+                    # The browser asks for this at the point where the character
+                    # is a ghost, so the death state is what the restart has to
+                    # preserve. No gameplay state crosses the boundary in either
+                    # direction, and the browser half is told only the new
+                    # address, because the restarted process listens elsewhere.
+                    restart = prove_restart_durability(server, expect=requested)
+                    restart["origin"] = server.origin
+                    return restart
+
+                result = run_proof_child(
+                    ["node", f"web/proof/{proof}-proof.mjs"],
+                    configuration=config,
+                    request_path=request_path,
+                    complete_path=complete_path,
+                    on_restart_request=on_restart_request if args.cause == "ordinary" else None,
+                    timeout=900,
+                    environment={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)},
+                )
+                if result.returncode:
+                    raise RuntimeError(f"{engine}/{alignment}: {result.stderr[-3500:]}")
                 report = json.loads((output / f"{engine}-{alignment}.json").read_text())
                 reports.append(report)
                 print(f"PASS {engine}/{alignment}", flush=True)
@@ -163,16 +156,116 @@ def main():
                                   "release": str(release), "fixture": fixture, "reports": reports}, indent=2) + "\n")
 
 
-def await_restart_request(child: subprocess.Popen, request_path: Path, timeout: float = 900.0) -> dict:
-    """Wait for the browser to reach the state it wants preserved across a restart."""
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        if request_path.exists():
-            return json.loads(request_path.read_text())
-        if child.poll() is not None:
-            raise RuntimeError("the browser proof ended before requesting its restart")
-        time.sleep(0.2)
-    raise RuntimeError("the browser proof never requested its restart")
+@dataclass
+class ProofChildResult:
+    returncode: int
+    stdout: str
+    stderr: str
+    restart: dict | None
+
+
+class ProofChildFailure(RuntimeError):
+    """The child ended or was stopped before it could be collected."""
+
+
+def run_proof_child(
+    command: list[str],
+    *,
+    configuration: dict,
+    request_path: Path,
+    complete_path: Path,
+    on_restart_request: "Callable[[dict], dict] | None" = None,
+    timeout: float = 900.0,
+    environment: dict | None = None,
+    cwd: Path | None = None,
+) -> ProofChildResult:
+    """Run one browser proof process and collect it exactly once.
+
+    The child reads its whole configuration from standard input before it does
+    anything else, so the pipe is written and closed first: waiting for a
+    restart request while stdin stayed open would deadlock both halves.
+
+    Output is drained by a reader thread rather than by `communicate`, because
+    `communicate` re-enters the closed stdin stream on some interpreters and a
+    full pipe buffer would otherwise stall the child while this process waits on
+    a file. A timeout or any other failure still terminates, drains and reaps the
+    child, and re-raises the original error rather than a cleanup error.
+    """
+    for stale in (request_path, complete_path):
+        stale.unlink(missing_ok=True)
+    child = subprocess.Popen(
+        command,
+        cwd=str(cwd) if cwd is not None else None,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=environment,
+    )
+    streams: dict[str, list[str]] = {"stdout": [], "stderr": []}
+
+    def drain(name: str, stream) -> None:
+        try:
+            for line in stream:
+                streams[name].append(line)
+        except (OSError, ValueError):  # a killed child's pipe can close mid-read
+            pass
+
+    readers = [
+        threading.Thread(target=drain, args=("stdout", child.stdout), daemon=True),
+        threading.Thread(target=drain, args=("stderr", child.stderr), daemon=True),
+    ]
+    for reader in readers:
+        reader.start()
+    restart: dict | None = None
+    try:
+        assert child.stdin is not None
+        child.stdin.write(json.dumps(configuration))
+        child.stdin.flush()
+        child.stdin.close()
+        deadline = time.monotonic() + timeout
+        while child.poll() is None:
+            if on_restart_request is not None and request_path.exists():
+                restart = on_restart_request(json.loads(request_path.read_text()))
+                complete_path.write_text(json.dumps(restart, indent=2) + "\n")
+                on_restart_request = None
+            if time.monotonic() > deadline:
+                raise ProofChildFailure(f"the proof process exceeded {timeout:g}s")
+            time.sleep(0.05)
+        if on_restart_request is not None and request_path.exists():
+            restart = on_restart_request(json.loads(request_path.read_text()))
+            complete_path.write_text(json.dumps(restart, indent=2) + "\n")
+    except BaseException:
+        terminate_child(child)
+        for reader in readers:
+            reader.join(timeout=5)
+        for stream in (child.stdout, child.stderr):
+            if stream is not None:
+                stream.close()
+        raise
+    child.wait()
+    for reader in readers:
+        reader.join(timeout=5)
+    for stream in (child.stdout, child.stderr):
+        if stream is not None:
+            stream.close()
+    return ProofChildResult(
+        returncode=child.returncode,
+        stdout="".join(streams["stdout"]),
+        stderr="".join(streams["stderr"]),
+        restart=restart,
+    )
+
+
+def terminate_child(child: subprocess.Popen) -> None:
+    """Stop and reap a child without touching its already-closed streams."""
+    if child.poll() is None:
+        child.terminate()
+        try:
+            child.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait(timeout=10)
 
 
 #: Volatile checkpoint facts that any client session start, end or absence

@@ -75,6 +75,8 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_restore_drill_proof",
         "tests.test_run_clean_clone_proof",
         "tests.test_run_gated_postgres",
+        "tests.test_proof_child_lifecycle",
+        "tests.test_proof_wait_signature",
     ),
     "verification": (
         "tests.test_agent_context",

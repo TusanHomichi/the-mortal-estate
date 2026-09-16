@@ -69,7 +69,7 @@ try {
     if(dead())return;
     const before=commands().length;
     await page.keyboard.press(key);
-    await eventually(()=>commands().length>before||dead(),null,60000);
+    await eventually(()=>commands().length>before||dead(),60000);
     await page.waitForFunction(()=>document.querySelector('#world-canvas').dataset.pending==='false',null,{polling:30,timeout:90000});};
   let damageTaken=0;
   await step('ArrowRight');
