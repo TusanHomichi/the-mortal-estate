@@ -25,10 +25,21 @@ try {
     socket.on("framesent", event => { const e = JSON.parse(String(event.payload)); if (e.kind === "command") commands.push(e); });
   });
   const wait = (fn, arg) => page.waitForFunction(fn, arg, { polling: 50, timeout: 45000 });
+  // Node-side polling: some expectations are about the latest observed frame
+  // rather than about the document, so they cannot run in the page context.
+  const eventually = async (predicate, timeout = 30000) => {
+    const end = Date.now() + timeout;
+    while (!predicate()) { if (Date.now() > end) return false; await new Promise(resolve => setTimeout(resolve, 25)); }
+    return true;
+  };
   const ready = () => wait(() => document.body.dataset.phase === "playing" && document.querySelector("#world-canvas").dataset.canAct === "true" && document.querySelector("#world-canvas").dataset.pending === "false");
   const here = () => frame.observation_center;
+  // Collections differ in shape: carried items nest the instance under `item`,
+  // ground items and their siblings flatten it. One reader handles both.
+  const definitionOf = row => (row.item ?? row).item_definition_id;
   async function mark(name) {
-    stage = name; checkpoints.push({ stage, location: here(), gold: frame.carried.gold.sack, hp: frame.character.resources.hp });
+    stage = name; checkpoints.push({ stage, location: here(), gold: frame.carried.gold.sack, hp: frame.character.resources.hp,
+      items: frame.carried.items.map(row => `${row.item.item_definition_id}@${row.position}`) });
     await writeFile(path.join(config.output, `${config.engine}-progress.json`), JSON.stringify({ stage, commands: commands.length, checkpoints }, null, 2));
     assert.equal(await page.locator("#world-canvas").getAttribute("data-study-level"), here().level);
     await page.locator("#world-canvas").screenshot({ path: path.join(config.output, `${config.engine}-${name}.png`) });
@@ -45,11 +56,19 @@ try {
   }
   const serviceActions = service => service.capabilities.flatMap(cap => cap.actions ??
     (cap.transactions ? cap.transactions.flatMap(row => row.actions) : cap.operations ? cap.operations.flatMap(row => row.actions) : cap.listings ? [...cap.listings.map(row => row.purchase), cap.buy_all, ...cap.sales] : [...cap.deposit_actions, ...cap.withdrawal_actions]));
+  // The observed action list is recomputed by the server for the square the
+  // character actually stands on. A frame can arrive immediately after a move
+  // and still carry the previous square's offers, so an expected action is
+  // waited for rather than demanded from whatever frame happened to be last.
+  const groupsNow = () => [...frame.services_here.map(row => ({ key: `service:${row.service_id}`, actions: serviceActions(row) })), { key: "character", actions: frame.action_options }];
+  const offeredIn = key => groupsNow().find(g => g.key === key);
   async function action(predicate, { service, amount } = {}) {
     await ready();
-    const groups = [...frame.services_here.map(row => ({ key: `service:${row.service_id}`, actions: serviceActions(row) })), { key: "character", actions: frame.action_options }];
-    const group = groups.find(g => (!service || g.key === `service:${service}`) && g.actions.some(a => a.enabled && a.intent && predicate(a.intent)));
-    assert(group, `required action absent at ${JSON.stringify(here())}`);
+    const key = service ? `service:${service}` : null;
+    await eventually(() => (key ? [offeredIn(key)] : groupsNow()).some(g => g && g.actions.some(a => a.enabled && a.intent && predicate(a.intent))));
+    const groups = key ? [offeredIn(key)] : groupsNow();
+    const group = groups.find(g => g && g.actions.some(a => a.enabled && a.intent && predicate(a.intent)));
+    assert(group, `required action absent at ${JSON.stringify(here())} with ${JSON.stringify(groups.map(g => g.actions.length))}`);
     const chosen = group.actions.find(a => a.enabled && a.intent && predicate(a.intent));
     // The 3D canvas owns the viewport, so the action panel can be scrolled out
     // of the visible area at this window size. The controls are present and
@@ -119,6 +138,9 @@ try {
   await wait(() => document.querySelector("#character input:checked")?.getAttribute("aria-label") === "Expedition Arrival");
   await page.getByRole("button", { name: "Enter world", exact: true }).click(); await ready();
   assert(frame.observer_actor_id.startsWith("created/"));
+  // The weapon ordinary creation put in the character's hand, remembered so the
+  // instruction step can require it to be held again after the encounter.
+  const createdWeaponId=frame.carried.items.find(row=>row.position==="right_hand")?.item.item_instance_id ?? null;
   // The authored dock arrival, not the seeded occupant's historic position.
   assert.deepEqual(here().position, { x:8,y:34 });
   await mark("dock");
@@ -146,7 +168,7 @@ try {
   // that the opponent is dangerous, and an instant loss would not show that it
   // is survivable.
   const encounterHpBefore = frame.character.resources.hp;
-  let encounterDamageTaken = 0, encounterRounds = 0;
+  let encounterDamageTaken = 0, encounterRounds = 0; const encounterLog = [];
   const opponent = i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger";
   const corpsesBefore = frame.corpses.length;
   const defeated = () => frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger");
@@ -158,6 +180,12 @@ try {
     await action(offered() ? (i => opponent(i) && i.mode === "fight") : (i => opponent(i) && i.mode === "jumpkick"));
     encounterRounds += 1;
     encounterDamageTaken = encounterHpBefore - frame.character.resources.hp;
+    encounterLog.push({round:encounterRounds,
+      held:frame.carried.items.filter(row=>row.position==="right_hand").map(row=>row.item.item_definition_id),
+      ground:frame.ground_items.map(definitionOf),
+      corpse:frame.corpses.flatMap(row=>(row.contents??[]).map(definitionOf)),
+      scavenger:frame.actors.some(row=>row.actor_id==="cellar_scavenger")});
+    await writeFile(path.join(config.output, `${config.engine}-encounter-log.json`), JSON.stringify(encounterLog, null, 2));
   }
   assert(defeated(), "the opponent survived the fight");
   assert(frame.corpses.length > corpsesBefore, "defeat did not produce the opponent's corpse");
@@ -168,7 +196,43 @@ try {
   await action(i => i.kind === "search_corpse");
   await action(i => i.kind === "move_item" && i.item_instance_id === "found_charm" && i.destination.kind === "carried" && i.destination.position === "sack_item_3");
   await action(i => i.kind === "move_gold" && i.source.kind === "ground" && i.destination.kind === "carried" && i.destination.position === "sack");
+  // Instruction follows the held weapon, so the character must hold the weapon
+  // it was created with. A weapon-backed attack can fumble and drop it, which is
+  // ordinary authored combat: the opponent may then take it, and the character
+  // can take it back from the corpse. This is recovered here, at the encounter
+  // site, because that is where the character can still see it.
+  const held = () => frame.carried.items.find(row => row.item.item_instance_id === createdWeaponId);
+  for (let attempt = 0; attempt < 4 && held()?.position !== "right_hand"; attempt++) {
+    if (!held()) {
+      const onGround = frame.ground_items.find(row => row.item_instance_id === createdWeaponId);
+      if (onGround) {
+        await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId && i.destination.kind === "carried");
+        continue;
+      }
+      assert(frame.corpses.length > 0, "the created weapon is not on the ground and there is no corpse to search");
+      await action(i => i.kind === "search_corpse");
+    }
+    await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId
+      && i.destination.kind === "carried");
+  }
+  if (held() && held().position !== "right_hand") {
+    await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId
+      && i.destination.kind === "carried" && i.destination.position === "right_hand");
+  }
+  if (held()?.position !== "right_hand") {
+    await writeFile(path.join(config.output, `${config.engine}-weapon-recovery-failure.json`),
+      JSON.stringify({ createdWeaponId, carried: frame.carried.items, ground: frame.ground_items,
+        corpses: frame.corpses, encounter: encounterLog,
+        scavengerHere: frame.actors.some(row => row.actor_id === "cellar_scavenger") }, null, 2));
+  }
+  assert.equal(held()?.position, "right_hand",
+    "the created weapon must be recovered from the encounter before leaving it");
   await mark("loot"); await enter("temple"); await enter("arrival"); await enter("trainers"); await walkTo(1,2);
+  // The instructor's offered track is selected from what the character holds,
+  // and a magic-capable character with a free hand is read as asking for spell
+  // instruction and told to produce a bound spell book. The weapon was recovered
+  // at the encounter site, so it is still in hand here.
+  assert.equal(held()?.position, "right_hand", "the created weapon must still be in hand at the instructor");
   const before = frame.character.skill_ledger.find(s => s.track_id === "staff").learning_rate;
   await action(i => i.kind === "train", { service: "trainer_1", amount: "14" });
   assert(BigInt(frame.character.skill_ledger.find(s => s.track_id === "staff").learning_rate) > BigInt(before));
@@ -191,7 +255,11 @@ try {
   assert.equal(await page.locator("#world-canvas").getAttribute("data-study-level"), null);
   assert.deepEqual(errors, []);
   await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
+    encounter_rounds_logged:encounterLog.length,
     production_encounter:{rounds:encounterRounds, damage_taken:encounterDamageTaken, starting_hp:encounterHpBefore, hp_after:frame.character.resources.hp, opponent_hp_authored:18, player_ratings_authored:true} },null,2));
+  // The per-round trace is useful evidence but does not belong in the summary
+  // receipt; it is written beside it.
+  await writeFile(path.join(config.output, `${config.engine}-encounter-log.json`), JSON.stringify(encounterLog, null, 2));
   await context.close();
 } catch(error) {
   await writeFile(path.join(config.output, `${config.engine}-failure.json`), JSON.stringify({ stage, error:String(error), errors, frame, staticContext, commandCount:commands.length, lastResult:results.at(-1) },null,2));

@@ -42,8 +42,13 @@ def main():
         with server:
             config = dict(origin=server.origin, authority=str(server.authority), engine=engine,
                           username=server.username, password=server.password, output=str(output))
+            # The route is a full journey: cross-town travel, an eight-round
+            # fight, training, a locker round trip, reconnects and sign-out all
+            # run in real time against a real server. The default budget is not
+            # a statement about the product, so it is generous and explicit.
             result = subprocess.run(["node", "web/proof/expedition-proof.mjs"], cwd=REPOSITORY_ROOT,
-                                    input=json.dumps(config), text=True, capture_output=True)
+                                    input=json.dumps(config), text=True, capture_output=True,
+                                    timeout=1800)
             if result.returncode:
                 raise RuntimeError(f"{engine}: {result.stderr[-5000:]}")
             reports.append(json.loads((output / f"{engine}-expedition.json").read_text()))
