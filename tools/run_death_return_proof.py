@@ -11,7 +11,7 @@ import subprocess
 import threading
 import time
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Sequence
 
 from live_server_harness import REPOSITORY_ROOT, read_admin_url
 from live_wire_client import LiveWireClient
@@ -43,17 +43,22 @@ def main():
     declared = world_fixture()
     catalog_source = (release / declared.catalog).read_bytes()
     catalog = json.loads(catalog_source)
+    seed_source_bytes = (release / "content/lands/first-expedition/simulation_seed.json").read_bytes()
+    template_bytes = (release / "content/lands/first-expedition/generated/world_template.json").read_bytes()
     adversary = next(actor for actor in catalog["actor_definitions"].values()
                      if actor["id"] == "actor/first_expedition/cellar_scavenger")
-    # An ordinary death is proved with the shipped content exactly as it is
-    # published: no adversary override, no starting-HP override and no disabled
-    # scavenging. The character simply stands in the encounter and is beaten by
-    # the authored opponent, which is what ordinary death means.
+    # This runner serves the release catalog unchanged, but its **seed is a
+    # fixture**: the controlled character is placed at the encounter, given a
+    # body, an alignment and a starting pool, and the opponent is placed beside
+    # it. It also selects a preseeded character rather than creating one through
+    # the ordinary creation flow, which is why the composed journey in
+    # `tools/run_first_expedition_proof.py --journey death` exists and why this
+    # receipt says exactly which kind of run it is.
     #
-    # The immediate-fire route still needs an adversary fixture: production
-    # content has no monster-dealt fire attack, and the fire exception is a
-    # separate behaviour with its own issue. This explicit disposable ability
-    # changes a spell, never the resolver.
+    # The immediate-fire route additionally needs an adversary fixture, because
+    # production content authors no monster-dealt fire attack. That override is
+    # recorded separately below and never stands in for ordinary gameplay.
+    overrides = {}
     if args.cause == "ordinary":
         catalog_path = release / declared.catalog
     else:
@@ -73,17 +78,32 @@ def main():
         catalog["profiles"]["profile/first_expedition"]["spells"].append("spell/fire_proof")
         adversary["monster_abilities"] = [{"id": "fire_proof", "kind": "special_attack",
             "spell_id": "fire_proof", "cooldown_rounds": 2, "target_policy": "nearest_hostile"}]
-        adversary["scavenging_profile_id"] = None
         catalog_path = output / "combat-catalog.json"
         catalog_path.write_text(json.dumps(catalog) + "\n")
-    fixture = {"source_catalog_sha256": hashlib.sha256(catalog_source).hexdigest(),
-               "served_catalog_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
-               "cause": args.cause,
-               "production_content": args.cause == "ordinary",
-               "overrides": {} if args.cause == "ordinary"
-               else {"fire_proof_damage_kind": "fire", "potency": 100, "range": 0, "lane": "monster_special",
-                     "cast_class": "not_applicable", "scavenger_ability": "fire_proof", "scavenging": False},
-               "initial_player_hp": 40, "resource_maxima_unchanged": True}
+        overrides = {"fire_proof_damage_kind": "fire", "potency": 100, "range": 0,
+                     "lane": "monster_special", "cast_class": "not_applicable",
+                     "scavenger_ability": "fire_proof", "scavenging": False}
+    fixture = {
+        "kind": "modified_seed_with_release_catalog",
+        "note": ("the release catalog is served unchanged; the seed is a fixture and the "
+                 "character is preseeded, not created through the ordinary flow"),
+        "cause": args.cause,
+        "release": str(release),
+        "catalog": {"path": str(catalog_path.relative_to(release)) if str(catalog_path).startswith(str(release)) else str(catalog_path),
+                    "release_sha256": hashlib.sha256(catalog_source).hexdigest(),
+                    "served_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
+                    "catalog_changed": catalog_path.read_bytes() != catalog_source},
+        "template_release_sha256": hashlib.sha256(template_bytes).hexdigest(),
+        "template_served_sha256": hashlib.sha256(template_bytes).hexdigest(),
+        "seed_release_sha256": hashlib.sha256(seed_source_bytes).hexdigest(),
+        "seed_served_sha256": None,
+        "seed_overrides": ["controlled_actor_location", "sex_or_gender_display", "alignment",
+                           "current_hp", "opponent_location", "opponent_location_offset"],
+        "catalog_overrides": overrides,
+        "initial_player_hp": 40,
+        "resource_maxima_unchanged": True,
+        "character_created_through_ui": False,
+    }
     for engine in engines:
         for alignment, body in [("lawful", "male"), ("neutral", "female")]:
             # Content comes from the release under proof, not from the checkout
@@ -98,6 +118,12 @@ def main():
             player["character"]["identity"]["sex_or_gender_display"] = body
             player["character"]["alignment_state"]["alignment"] = alignment
             player["character"]["resources"]["hp"] = fixture["initial_player_hp"]
+            if fixture["seed_served_sha256"] is None:
+                # The seed the run actually serves, hashed after every fixture
+                # change, so `seed_overrides` above cannot drift from reality.
+                fixture["seed_served_sha256"] = hashlib.sha256(
+                    json.dumps(world.generated_seed, sort_keys=True).encode("utf-8")
+                ).hexdigest()
             monster = next(actor for actor in world.generated_seed["actors"] if actor["id"] == "cellar_scavenger")
             monster["location"] = copy.deepcopy(player["location"])
             # The opponent holds ground, so a real East movement command is what
@@ -127,6 +153,9 @@ def main():
                 proof = "fire-return" if args.cause == "fire" else "death-return"
                 request_path = output / "restart-request.json"
                 complete_path = output / "restart-complete.json"
+                ledger_path = output / "ledger-request.json"
+                ledger_complete_path = output / "ledger-complete.json"
+                ledger = LedgerAudit(server.database_url)
                 def on_restart_request(requested: dict) -> dict:
                     """Replace the serving process while the browser waits."""
                     # The browser asks for this at the point where the character
@@ -144,6 +173,12 @@ def main():
                     request_path=request_path,
                     complete_path=complete_path,
                     on_restart_request=on_restart_request if args.cause == "ordinary" else None,
+                    # The item and coin ledger is read from the stored checkpoint
+                    # on the browser's behalf: the proof asserts against the
+                    # authoritative world instead of against its own frames.
+                    extra_handshakes=[
+                        ProofHandshake("ledger", ledger_path, ledger_complete_path, ledger.answer)
+                    ],
                     timeout=900,
                     environment={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)},
                 )
@@ -154,6 +189,42 @@ def main():
                 print(f"PASS {engine}/{alignment}", flush=True)
     receipt.write_text(json.dumps({"verdict": "INSPECTION" if args.engine else "PASS",
                                   "release": str(release), "fixture": fixture, "reports": reports}, indent=2) + "\n")
+
+
+@dataclass
+class ProofHandshake:
+    """One file-pair conversation the browser proof can start with its runner.
+
+    The child writes `request_path` when it needs something only the process
+    owner can do; the runner calls `answer` with the parsed request and writes
+    what it returns to `complete_path`. `kind` is for diagnostics only.
+    """
+
+    kind: str
+    request_path: Path
+    complete_path: Path
+    answer: "Callable[[dict], dict]"
+    served: bool = False
+
+    def clear(self) -> None:
+        for path in (self.request_path, self.complete_path):
+            path.unlink(missing_ok=True)
+
+    def serve(self) -> dict | None:
+        """Answer this handshake once, if the child has asked for it.
+
+        The request file stays on disk — the child wrote it, and deleting it
+        would race the child's own read. The `served` mark, not the file's
+        absence, is what keeps one request from being answered twice: a restart
+        that ran twice because the file was still there would replace the
+        serving process under a child that had already reconnected to it.
+        """
+        if self.served or not self.request_path.exists():
+            return None
+        self.served = True
+        response = self.answer(json.loads(self.request_path.read_text()))
+        self.complete_path.write_text(json.dumps(response, indent=2) + "\n")
+        return response
 
 
 @dataclass
@@ -175,6 +246,7 @@ def run_proof_child(
     request_path: Path,
     complete_path: Path,
     on_restart_request: "Callable[[dict], dict] | None" = None,
+    extra_handshakes: "Sequence[ProofHandshake]" = (),
     timeout: float = 900.0,
     environment: dict | None = None,
     cwd: Path | None = None,
@@ -185,14 +257,23 @@ def run_proof_child(
     anything else, so the pipe is written and closed first: waiting for a
     restart request while stdin stayed open would deadlock both halves.
 
+    Besides the restart it may ask for, the child can start any of
+    `extra_handshakes` — the ledger audit is the other one — and each is answered
+    exactly once while the child runs.
+
     Output is drained by a reader thread rather than by `communicate`, because
     `communicate` re-enters the closed stdin stream on some interpreters and a
     full pipe buffer would otherwise stall the child while this process waits on
     a file. A timeout or any other failure still terminates, drains and reaps the
     child, and re-raises the original error rather than a cleanup error.
     """
-    for stale in (request_path, complete_path):
-        stale.unlink(missing_ok=True)
+    handshakes = list(extra_handshakes)
+    if on_restart_request is not None:
+        handshakes.append(
+            ProofHandshake("restart", request_path, complete_path, on_restart_request)
+        )
+    for handshake in handshakes:
+        handshake.clear()
     child = subprocess.Popen(
         command,
         cwd=str(cwd) if cwd is not None else None,
@@ -225,16 +306,20 @@ def run_proof_child(
         child.stdin.close()
         deadline = time.monotonic() + timeout
         while child.poll() is None:
-            if on_restart_request is not None and request_path.exists():
-                restart = on_restart_request(json.loads(request_path.read_text()))
-                complete_path.write_text(json.dumps(restart, indent=2) + "\n")
-                on_restart_request = None
+            for handshake in handshakes:
+                response = handshake.serve()
+                if handshake.kind == "restart" and response is not None:
+                    restart = response
             if time.monotonic() > deadline:
                 raise ProofChildFailure(f"the proof process exceeded {timeout:g}s")
             time.sleep(0.05)
-        if on_restart_request is not None and request_path.exists():
-            restart = on_restart_request(json.loads(request_path.read_text()))
-            complete_path.write_text(json.dumps(restart, indent=2) + "\n")
+        # One last look: a child can write its request and exit before the poll
+        # above notices, and an unanswered request would otherwise be reported as
+        # a missing file in the browser half rather than as the runner's miss.
+        for handshake in handshakes:
+            response = handshake.serve()
+            if handshake.kind == "restart" and response is not None:
+                restart = response
     except BaseException:
         terminate_child(child)
         for reader in readers:
@@ -273,14 +358,26 @@ def terminate_child(child: subprocess.Popen) -> None:
 VOLATILE_CHECKPOINT_FIELDS = ("character_presence",)
 
 
-def durable_checkpoint(database_url: str) -> tuple[str, str]:
-    """The stored checkpoint's digest and its gameplay payload, read only.
+def stored_checkpoint(database_url: str) -> dict:
+    """The stored checkpoint document, read only."""
+    result = subprocess.run(
+        ["psql", database_url, "-tA", "-v", "ON_ERROR_STOP=1", "-c",
+         "SELECT encode(checkpoint_bytes,'escape') FROM tme.facets"],
+        capture_output=True, text=True, check=False)
+    if result.returncode:
+        raise RuntimeError(f"checkpoint unavailable: {result.stderr.strip()}")
+    return json.loads(result.stdout.strip())
+
+
+def durable_checkpoint(database_url: str) -> tuple[str, str, dict]:
+    """The stored checkpoint's digest, its gameplay payload, and its volatile marks.
 
     `character_presence` is the one field a restart legitimately moves: it
     records who is connected and when a session went absent, and the proof's own
-    reconnect rewrites it. Every other field is compared verbatim, so a restart
-    that changed location, life state, inventory, balances, progression, timers,
-    topology or scheduling still fails.
+    reconnect rewrites it. It is returned separately so the caller can judge the
+    movement it permits rather than ignore it; every other field is compared
+    verbatim, so a restart that changed location, life state, inventory,
+    balances, progression, timers, topology or scheduling still fails.
     """
     result = subprocess.run(
         ["psql", database_url, "-tA", "-v", "ON_ERROR_STOP=1", "-c",
@@ -294,7 +391,205 @@ def durable_checkpoint(database_url: str) -> tuple[str, str]:
     for field in VOLATILE_CHECKPOINT_FIELDS:
         if field in document["world"]:
             volatile[field] = document["world"].pop(field)
-    return digest, json.dumps(document, sort_keys=True), json.dumps(volatile, sort_keys=True)
+    return digest, json.dumps(document, sort_keys=True), volatile
+
+
+def checkpoint_ledger(document: dict) -> dict:
+    """Every item instance and every coin the stored checkpoint holds.
+
+    This is a read-only audit of the authoritative record, not a second
+    inventory model: it resolves each instance to the collections the checkpoint
+    actually has (ground, carried, corpse, merchant, locker, offer) and fails
+    closed on an instance that is in none of them or in more than one. The typed
+    rules owner for the same boundary is
+    `crates/tme-rules/tests/first_expedition_death_ledger.rs`, which resolves
+    `ItemLocation` inside the engine; this reads the durable copy of the same
+    facts so a browser journey can assert against the world rather than against
+    its own frames.
+    """
+    world = document["world"]
+    locations: dict[str, list[str]] = {}
+
+    def place(item_instance_id, label):
+        locations.setdefault(item_instance_id, []).append(label)
+
+    for ground in world.get("ground_items") or []:
+        place(ground["item_instance_id"], f"ground:{position_label(ground['location'])}")
+    for actor in world.get("actors") or []:
+        holder = actor.get("character_id") or actor["id"]
+        for position, item_instance_id in (actor.get("carried", {}).get("items") or {}).items():
+            place(item_instance_id, f"carried:{holder}:{position}")
+    for corpse_id, corpse in (world.get("corpses") or {}).items():
+        for position, item_instance_id in (corpse.get("contents") or {}).items():
+            place(item_instance_id, f"corpse:{corpse_id}:{position}")
+    for inventory in world.get("merchant_inventories") or []:
+        service = inventory.get("service_instance_id", "?")
+        capability = inventory.get("capability_id", "?")
+        for listing in inventory.get("listings") or []:
+            place(listing["item_instance_id"], f"merchant:{service}:{capability}")
+    for vault_id, vault in (world.get("locker_vaults") or {}).items():
+        for owner, contents in (vault.get("lockers") or {}).items():
+            for item_instance_id in contents:
+                place(item_instance_id, f"locker:{vault_id}:{owner}")
+    for item_instance_id, offer in (world.get("item_offers") or {}).items():
+        place(
+            item_instance_id,
+            f"offered:{offer['sender_character_id']}:{offer['recipient_character_id']}",
+        )
+
+    items = {}
+    for item_instance_id, instance in (world.get("item_instances") or {}).items():
+        found = sorted(locations.get(item_instance_id, []))
+        items[item_instance_id] = {
+            "definition_id": instance["definition_id"],
+            "quantity": instance["quantity"],
+            "locations": found,
+        }
+
+    gold: dict[str, int] = {}
+    for actor in world.get("actors") or []:
+        holder = actor.get("character_id") or actor["id"]
+        carried = (actor.get("carried") or {}).get("gold") or {}
+        for position in ("left_hand", "right_hand", "sack"):
+            amount = carried.get(position, 0)
+            if amount:
+                gold[f"actor:{holder}:{position}"] = amount
+    for corpse_id, corpse in (world.get("corpses") or {}).items():
+        if corpse.get("gold"):
+            gold[f"corpse:{corpse_id}"] = corpse["gold"]
+    for pile_id, pile in (world.get("ground_gold") or {}).items():
+        if pile.get("amount"):
+            gold[f"ground:{pile_id}"] = pile["amount"]
+    for bank_id, bank in (world.get("banks") or {}).items():
+        for character_id, balance in (bank.get("balances") or {}).items():
+            if balance:
+                gold[f"bank:{bank_id}:{character_id}"] = balance
+
+    return {
+        "items": items,
+        "gold": gold,
+        "item_count": len(items),
+        "gold_total": sum(gold.values()),
+        "unowned": sorted(
+            item_instance_id
+            for item_instance_id, row in items.items()
+            if len(row["locations"]) != 1
+        ),
+    }
+
+
+def position_label(position: dict) -> str:
+    """One world position as a stable, comparable label."""
+    coord = position["position"]
+    return f"{position['realm']}/{position['level']}/{coord['x']},{coord['y']}"
+
+
+def ledger_summary(ledger: dict) -> dict:
+    """The compact, JSON-safe account of one ledger reading."""
+    return {
+        "item_count": ledger["item_count"],
+        "gold_total": ledger["gold_total"],
+        "unowned": ledger["unowned"],
+        "ledger_sha256": hashlib.sha256(
+            json.dumps(ledger, sort_keys=True).encode("utf-8")
+        ).hexdigest(),
+    }
+
+
+def ledger_movement(before: dict, after: dict) -> dict:
+    """Where every instance went, so a receipt can name the legitimate thefts."""
+    movement = {}
+    for item_instance_id in sorted(set(before["items"]) | set(after["items"])):
+        source = before["items"].get(item_instance_id, {}).get("locations")
+        destination = after["items"].get(item_instance_id, {}).get("locations")
+        if source != destination:
+            movement[item_instance_id] = {"from": source, "to": destination}
+    return movement
+
+
+class LedgerAudit:
+    """The runner's half of the browser's ledger handshake.
+
+    The browser asks for a capture before the boundary it cares about and for an
+    audit after it; the answer is computed here, from the stored checkpoint, so a
+    browser journey asserts against the authoritative world rather than against
+    its own frames. An audit whose capture is missing is refused rather than
+    silently compared against an empty ledger.
+    """
+
+    def __init__(self, database_url: str):
+        self.database_url = database_url
+        self.captures: dict[str, dict] = {}
+
+    def answer(self, requested: dict) -> dict:
+        action = requested.get("action")
+        label = requested.get("label")
+        if action == "capture":
+            ledger = checkpoint_ledger(stored_checkpoint(self.database_url))
+            self.captures[label] = ledger
+            return {"verdict": "captured", "label": label, **ledger_summary(ledger)}
+        if action == "audit":
+            if label not in self.captures:
+                return {
+                    "verdict": "refused",
+                    "label": label,
+                    "defects": [f"no ledger was captured under {label!r}"],
+                }
+            before = self.captures[label]
+            after = checkpoint_ledger(stored_checkpoint(self.database_url))
+            return {
+                "verdict": "audited",
+                "label": label,
+                "defects": audit_ledgers(before, after),
+                "before": ledger_summary(before),
+                "after": ledger_summary(after),
+                "movement": ledger_movement(before, after),
+            }
+        return {
+            "verdict": "refused",
+            "label": label,
+            "defects": [f"unknown ledger action {action!r}"],
+        }
+
+
+def audit_ledgers(before: dict, after: dict) -> list[str]:
+    """Every way a later ledger can fail to be the same ledger, named.
+
+    The same rule the rules test owns, applied to two read-only readings of the
+    stored checkpoint: instances may move but not stop existing, appear,
+    duplicate, change identity or change quantity, and coins may move but not be
+    created or destroyed anywhere in the world. Deliberate theft is a move, so it
+    passes; anything the return invents fails.
+    """
+    defects = []
+    lost = sorted(set(before["items"]) - set(after["items"]))
+    if lost:
+        defects.append(f"item instances stopped existing: {lost}")
+    created = sorted(set(after["items"]) - set(before["items"]))
+    if created:
+        defects.append(f"item instances appeared from nowhere: {created}")
+    for item_instance_id in sorted(set(before["items"]) & set(after["items"])):
+        source, destination = before["items"][item_instance_id], after["items"][item_instance_id]
+        if source["definition_id"] != destination["definition_id"]:
+            defects.append(
+                f"item instance {item_instance_id!r} changed identity: "
+                f"{source['definition_id']} -> {destination['definition_id']}"
+            )
+        if source["quantity"] != destination["quantity"]:
+            defects.append(
+                f"item instance {item_instance_id!r} changed quantity: "
+                f"{source['quantity']} -> {destination['quantity']}"
+            )
+    for item_instance_id in after["unowned"]:
+        defects.append(
+            f"item instance {item_instance_id!r} is not in exactly one place: "
+            f"{after['items'][item_instance_id]['locations']}"
+        )
+    if before["gold_total"] != after["gold_total"]:
+        defects.append(
+            f"gold was created or destroyed: {before['gold_total']} -> {after['gold_total']}"
+        )
+    return defects
 
 
 def observe_frame(frame: dict) -> dict:
@@ -313,6 +608,162 @@ def observe_frame(frame: dict) -> dict:
         "ready_at": frame["ready_at"],
         "logical_time": frame["logical_time"],
         "can_act": frame["can_act"],
+    }
+
+
+def judge_presence_movement(before: dict, after: dict) -> list[str]:
+    """The only presence differences a restart may legitimately produce.
+
+    Both arguments are the presence ledger alone: character ID to that
+    character's own marks. `character_presence` records who is connected and
+    when a session went absent, so a restart that drops the old session
+    legitimately moves `connected` and `absent_since`. Everything else about it
+    is gameplay state and is judged: a character appearing in or vanishing from
+    the ledger, or a control epoch moving, is an unexplained difference rather
+    than a lifecycle mark.
+    """
+    defects = []
+    if set(before) != set(after):
+        added = sorted(set(after) - set(before))
+        removed = sorted(set(before) - set(after))
+        defects.append(
+            f"the restart changed which characters hold a presence mark: +{added} -{removed}"
+        )
+    for character_id in sorted(set(before) & set(after)):
+        source, destination = before[character_id], after[character_id]
+        if source.get("control_epoch") != destination.get("control_epoch"):
+            defects.append(
+                f"the restart moved character {character_id!r} control epoch "
+                f"{source.get('control_epoch')!r} -> {destination.get('control_epoch')!r}"
+            )
+        unexplained = sorted(
+            key
+            for key in set(source) | set(destination)
+            if key not in ("connected", "absent_since", "control_epoch")
+            and source.get(key) != destination.get(key)
+        )
+        if unexplained:
+            defects.append(
+                f"the restart changed unexplained presence fields for {character_id!r}: {unexplained}"
+            )
+    return defects
+
+
+def judge_volatile_fields(before: dict, after: dict) -> list[str]:
+    """Judge the named lifecycle fields instead of ignoring them wholesale.
+
+    Each entry in [`VOLATILE_CHECKPOINT_FIELDS`] has its own rule. A field with
+    no rule yet is refused rather than excluded silently, and a field that
+    appears outside the named set means the exclusion list has drifted from the
+    checkpoint it describes.
+    """
+    defects = []
+    for field in VOLATILE_CHECKPOINT_FIELDS:
+        if field == "character_presence":
+            defects.extend(judge_presence_movement(before.get(field) or {}, after.get(field) or {}))
+        elif before.get(field) != after.get(field):
+            defects.append(
+                f"the restart changed the volatile field {field!r}, which has no judging rule"
+            )
+    unclassified = sorted((set(before) | set(after)) - set(VOLATILE_CHECKPOINT_FIELDS))
+    if unclassified:
+        defects.append(f"the restart reported unclassified volatile fields: {unclassified}")
+    return defects
+
+
+def compare_checkpoints(
+    *,
+    digest_before: str,
+    digest_after: str,
+    gameplay_before: str,
+    gameplay_after: str,
+    volatile_before: dict,
+    volatile_after: dict,
+) -> dict:
+    """Judge what a restart did to the stored checkpoint, from what was read.
+
+    Two claims live here and they are not the same claim. `checkpoint_bytes_identical`
+    reports the raw stored digest, which a legitimate presence rewrite may move.
+    `durable_payload_unchanged` compares every gameplay field verbatim — the
+    presence ledger is the only field removed, and it is judged separately by
+    [`judge_volatile_fields`] rather than ignored. Every field of this receipt is
+    computed from its arguments, so a receipt cannot claim a comparison that was
+    never run.
+    """
+    defects = judge_volatile_fields(volatile_before, volatile_after)
+    unchanged = gameplay_before == gameplay_after
+    if not unchanged:
+        offset = next(
+            (
+                index
+                for index, (left, right) in enumerate(zip(gameplay_before, gameplay_after))
+                if left != right
+            ),
+            min(len(gameplay_before), len(gameplay_after)),
+        )
+        defects.append(
+            "the durable checkpoint payload changed across a serving-process restart "
+            f"at offset {offset}: "
+            f"{gameplay_before[max(0, offset - 80):offset + 80]!r} != "
+            f"{gameplay_after[max(0, offset - 80):offset + 80]!r}"
+        )
+    return {
+        "checkpoint_sha256_before": digest_before,
+        "checkpoint_sha256_after": digest_after,
+        "checkpoint_bytes_identical": digest_before == digest_after,
+        "payload_comparison": "parsed_json_minus_named_volatile_fields",
+        "durable_payload_unchanged": unchanged,
+        "excluded_volatile_fields": list(VOLATILE_CHECKPOINT_FIELDS),
+        "volatile_before": volatile_before,
+        "volatile_after": volatile_after,
+        "volatile_presence_movement": volatile_before != volatile_after,
+        "defects": defects,
+    }
+
+
+def judge_dead_actor_attempts(attempts: dict, *, logical_time, ready_at) -> dict:
+    """Judge what a restarted server actually answered a ghost.
+
+    `attempts` is the wire session's own record: for each intent, the
+    disposition, command id and server sequence that came back. Nothing is
+    assumed. Rules admit no intent to a dead actor except an eligible return
+    request, so a physical or sheet action that was *not* refused is a defect,
+    and the return answer is judged against the character's own deadline in
+    authoritative logical time. Every receipt field below is computed from the
+    observation it names.
+    """
+    defects = []
+    return_order = attempts.get("request_resurrection", {})
+    physical_order = attempts.get("show_sack", {})
+    return_kind = return_order.get("disposition", {}).get("kind")
+    physical_kind = physical_order.get("disposition", {}).get("kind")
+    if return_kind not in ("accepted", "rejected"):
+        defects.append(
+            f"the restarted server did not answer a return request: {return_order!r}"
+        )
+    if physical_kind != "rejected":
+        defects.append(
+            "a dead actor was not refused a physical or sheet action after a restart: "
+            f"{physical_order!r}"
+        )
+    eligibility = int(logical_time) >= int(ready_at)
+    if return_kind == "accepted" and not eligibility:
+        defects.append(
+            "the restarted server answered a return request before the character's own "
+            f"deadline: logical_time={logical_time} ready_at={ready_at}"
+        )
+    if return_kind == "rejected" and eligibility:
+        defects.append(
+            "the restarted server refused a return the character's own deadline allows: "
+            f"logical_time={logical_time} ready_at={ready_at}"
+        )
+    return {
+        "command_attempts": attempts,
+        "physical_action_refused_while_dead": physical_kind == "rejected",
+        "return_accepted": return_kind == "accepted",
+        "return_refused_before_deadline": return_kind == "rejected" and not eligibility,
+        "eligibility_evaluated_at": {"logical_time": logical_time, "ready_at": ready_at},
+        "defects": defects,
     }
 
 
@@ -348,20 +799,16 @@ def prove_restart_durability(server, *, expect: dict | None = None) -> dict:
     digest_before, payload_before, volatile_before = durable_checkpoint(server.database_url)
     server.restart()
     digest_after, payload_after, volatile_after = durable_checkpoint(server.database_url)
-    if payload_before != payload_after:
-        first = next(
-            (
-                line
-                for line, (a, b) in enumerate(zip(payload_before, payload_after))
-                if a != b
-            ),
-            min(len(payload_before), len(payload_after)),
-        )
-        raise RuntimeError(
-            "the durable checkpoint payload changed across a serving-process restart "
-            f"at offset {first}: {payload_before[max(0, first - 80):first + 80]!r} != "
-            f"{payload_after[max(0, first - 80):first + 80]!r}"
-        )
+    comparison = compare_checkpoints(
+        digest_before=digest_before,
+        digest_after=digest_after,
+        gameplay_before=payload_before,
+        gameplay_after=payload_after,
+        volatile_before=volatile_before,
+        volatile_after=volatile_after,
+    )
+    if comparison["defects"]:
+        raise RuntimeError("; ".join(comparison["defects"]))
     with LiveWireClient(server) as after:
         recovered = observed(after.frame)
         for field in ["life_state", "hp", "location", "actor_id", "character_id",
@@ -370,35 +817,32 @@ def prove_restart_durability(server, *, expect: dict | None = None) -> dict:
                 raise RuntimeError(
                     f"restart changed {field}: {recovered[field]!r} != {death[field]!r}"
                 )
-        # This session is a fresh authenticated session against the restarted
-        # process. It records what that process actually answers for a ghost
-        # rather than guessing: rules admit no intent to a dead actor except a
-        # return request, so the durable state is the evidence here and the
-        # browser half owns the accepted command once the threshold elapses.
+        # This is a fresh authenticated session against the restarted process.
+        # What it answers is recorded, not assumed: rules admit no intent to a
+        # dead actor except an eligible return request, so the physical-action
+        # refusal is a real observation, and the return answer is judged against
+        # the character's own deadline in authoritative logical time.
         attempts = {}
         for intent in ({"kind": "request_resurrection"}, {"kind": "show_sack"}):
             result, _ = after.command(intent)
-            attempts[intent["kind"]] = result.get("disposition", {})
-        if attempts["request_resurrection"].get("kind") not in ("accepted", "rejected"):
-            raise RuntimeError(
-                f"the restarted server did not answer a return request: {attempts['request_resurrection']!r}"
-            )
-        if attempts["show_sack"].get("kind") != "rejected":
-            raise RuntimeError(
-                "a dead actor must not perform a physical or sheet action after a restart: "
-                f"{attempts['show_sack']!r}"
-            )
-        if attempts["request_resurrection"].get("kind") == "accepted":
-            # The restart itself must not have made the return available early.
-            raise RuntimeError(
-                "the restarted server offered a return before the character's own deadline"
-            )
-    return {"checkpoint_sha256_before": digest_before, "checkpoint_sha256_after": digest_after,
-            "payload_unchanged_across_restart": True,
-            "excluded_volatile_fields": list(VOLATILE_CHECKPOINT_FIELDS),
-            "volatile_before": volatile_before, "volatile_after": volatile_after,
-            "before": death, "after": recovered, "command_attempts": attempts,
-            "accepted_intent": {"kind": "show_sack"}, "accepted_command": True}
+            attempts[intent["kind"]] = {
+                "disposition": result.get("disposition", {}),
+                "command_id": result.get("command_id"),
+                "server_sequence": result.get("server_sequence"),
+            }
+        judgment = judge_dead_actor_attempts(
+            attempts,
+            logical_time=recovered["logical_time"],
+            ready_at=recovered["ready_at"],
+        )
+        if judgment["defects"]:
+            raise RuntimeError("; ".join(judgment["defects"]))
+    return {
+        **comparison,
+        "before": death,
+        "after": recovered,
+        **{key: value for key, value in judgment.items() if key != "defects"},
+    }
 
 
 if __name__ == "__main__":

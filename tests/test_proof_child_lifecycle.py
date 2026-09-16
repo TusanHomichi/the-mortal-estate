@@ -30,7 +30,11 @@ from pathlib import Path
 # the verification runner imports it: through `tools/` on the path.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
-from run_death_return_proof import ProofChildFailure, run_proof_child  # noqa: E402
+from run_death_return_proof import (  # noqa: E402
+    ProofChildFailure,
+    ProofHandshake,
+    run_proof_child,
+)
 
 #: A child that reads its configuration, optionally asks for a restart, then
 #: reports. `LARGE_OUTPUT` proves the reader drains a full pipe buffer.
@@ -42,17 +46,23 @@ CHILD = textwrap.dedent(
     if configuration.get("emit_large_output"):
         sys.stdout.write("x" * 400000)
         sys.stdout.flush()
-    if configuration.get("request_restart"):
-        with open(os.path.join(output, "restart-request.json"), "w") as handle:
-            json.dump({"actor_id": configuration["actor_id"]}, handle)
+    def converse(name, request):
+        with open(os.path.join(output, name + "-request.json"), "w") as handle:
+            json.dump(request, handle)
         deadline = time.time() + 30
-        complete = os.path.join(output, "restart-complete.json")
+        complete = os.path.join(output, name + "-complete.json")
         while not os.path.exists(complete):
             if time.time() > deadline:
                 sys.exit(3)
             time.sleep(0.02)
         with open(complete) as handle:
-            sys.stderr.write("restart:" + json.load(handle)["marker"] + "\\n")
+            return json.load(handle)
+    if configuration.get("request_ledger"):
+        answer = converse("ledger", {"action": "capture"})
+        sys.stderr.write("ledger:" + answer["verdict"] + "\\n")
+    if configuration.get("request_restart"):
+        answer = converse("restart", {"actor_id": configuration["actor_id"]})
+        sys.stderr.write("restart:" + answer["marker"] + "\\n")
     if configuration.get("fail"):
         sys.exit(4)
     if configuration.get("sleep_seconds"):
@@ -100,7 +110,13 @@ class ProofChildLifecycleTests(unittest.TestCase):
 
         def on_restart_request(requested):
             seen.append(requested["actor_id"])
-            return {"marker": "restarted", "payload_unchanged_across_restart": True}
+            # The same shape the production runner returns, so this stub cannot
+            # keep a renamed receipt field alive.
+            return {
+                "marker": "restarted",
+                "payload_comparison": "parsed_json_minus_named_volatile_fields",
+                "durable_payload_unchanged": True,
+            }
 
         result = self.run_child(
             self.configuration(request_restart=True), on_restart_request=on_restart_request, timeout=30
@@ -116,6 +132,35 @@ class ProofChildLifecycleTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIsNone(result.restart)
         self.assertFalse(self.complete_path.exists())
+
+    def test_an_extra_handshake_is_answered_once_on_its_own_file_pair(self):
+        # The ledger audit is a second conversation with the same child. It must
+        # not borrow the restart's files, and a request left on disk must not be
+        # answered twice.
+        ledger_request = self.directory / "ledger-request.json"
+        ledger_complete = self.directory / "ledger-complete.json"
+        seen = []
+
+        def answer(requested):
+            seen.append(requested["action"])
+            return {"verdict": "audited", "defects": [], "action": requested["action"]}
+
+        result = run_proof_child(
+            [sys.executable, "-c", CHILD],
+            configuration=self.configuration(request_restart=True, request_ledger=True),
+            request_path=self.request_path,
+            complete_path=self.complete_path,
+            on_restart_request=lambda requested: {"marker": "restarted", **requested},
+            extra_handshakes=[
+                ProofHandshake("ledger", ledger_request, ledger_complete, answer)
+            ],
+            cwd=self.directory,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(seen, ["capture"])
+        self.assertEqual(json.loads(ledger_complete.read_text())["verdict"], "audited")
+        self.assertTrue(self.complete_path.exists(), "the restart handshake still ran")
 
     def test_a_failing_child_reports_its_own_status_and_output(self):
         result = self.run_child(self.configuration(fail=True), timeout=30)

@@ -65,6 +65,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_capture_sidecar",
     ),
     "harness": (
+        "tests.test_checkpoint_ledger",
         "tests.test_development_deploy",
         "tests.test_live_proof_land",
         "tests.test_live_wire_client",
@@ -77,6 +78,7 @@ PYTHON_TEST_OWNERS: dict[str, tuple[str, ...]] = {
         "tests.test_run_gated_postgres",
         "tests.test_proof_child_lifecycle",
         "tests.test_proof_wait_signature",
+        "tests.test_restart_receipt",
     ),
     "verification": (
         "tests.test_agent_context",
