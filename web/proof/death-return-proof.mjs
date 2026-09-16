@@ -46,13 +46,14 @@ try {
   const hpBefore=frame.actors.find(row=>row.actor_id===actor).hp;
   await canvas.focus();
   let damageTaken=0;
-  for(let step=0;step<120;step+=1){
-    const self=frame.actors.find(row=>row.actor_id===actor);
-    damageTaken=hpBefore-self.hp;
-    if(self.life_state==='ghost')break;
+  for(let step=0;step<200;step+=1){
+    const self=()=>frame.actors.find(row=>row.actor_id===actor);
+    damageTaken=hpBefore-self().hp;
+    if(self().life_state==='ghost')break;
     await page.keyboard.press('ArrowRight');
-    await eventually(()=>frame.actors.find(row=>row.actor_id===actor).hp<hpBefore||
-      frame.actors.find(row=>row.actor_id===actor).life_state==='ghost',30000);
+    // Advance one ordinary action. The opponent acts on its own deadline, so a
+    // step may pass without new damage; only the loop bound is a failure.
+    await eventually(()=>commands().length>step,null,30000);
   }
   await wait(()=>document.querySelector('#world-canvas').dataset.lifeState==='ghost',null,60000);
   assert(damageTaken>0,'production combat must be what removed the character, not a fixture');

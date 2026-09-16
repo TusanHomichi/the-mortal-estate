@@ -80,7 +80,13 @@ def main():
                "initial_player_hp": 40, "resource_maxima_unchanged": True}
     for engine in engines:
         for alignment, body in [("lawful", "male"), ("neutral", "female")]:
-            world = replace(world_fixture(), catalog=str(catalog_path))
+            # Content comes from the release under proof, not from the checkout
+            # that happens to be running this script. `world_fixture` carries the
+            # seed in memory, so it is re-read from the release here.
+            world = replace(world_fixture(), catalog=str(catalog_path),
+                            generated_seed=json.loads((
+                                release / "content/lands/first-expedition/simulation_seed.json"
+                            ).read_text()))
             player = next(actor for actor in world.generated_seed["actors"] if actor["id"] == world.controlled_actor)
             player["location"] = dict(realm="first_expedition", level="d1_entry", position=dict(x=23, y=9))
             player["character"]["identity"]["sex_or_gender_display"] = body
@@ -88,11 +94,18 @@ def main():
             player["character"]["resources"]["hp"] = fixture["initial_player_hp"]
             monster = next(actor for actor in world.generated_seed["actors"] if actor["id"] == "cellar_scavenger")
             monster["location"] = copy.deepcopy(player["location"])
-            # The production hold-ground monster cannot fight across squares.
-            # A real East command joins it after the browser has observed life.
+            # The opponent holds ground, so a real East movement command is what
+            # brings the character onto its square. The browser proof performs
+            # that step and then keeps taking ordinary actions until the authored
+            # opponent has finished the fight.
             monster["location"]["position"]["x"] = 24
             server = WorldServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
-            server.bundle, server.assets = release / "web", release / "web/feel-assets"
+            server.bundle = release / "web"
+            # The presentation packet is an optional external capability. Absent,
+            # the client serves its carried bundle and the proof records that no
+            # candidate artwork was bound rather than claiming one.
+            packet = release / "web/feel-assets"
+            server.assets = packet if packet.is_dir() else None
             with server:
                 config = dict(engine=engine, alignment=alignment, body=body, origin=server.origin,
                               authority=str(server.authority), username=server.username, password=server.password,
@@ -112,23 +125,33 @@ def main():
                                   "release": str(release), "fixture": fixture, "reports": reports}, indent=2) + "\n")
 
 
-def facet_checkpoint_hash(database_url: str) -> str:
-    """The stored checkpoint's own digest, read without modifying anything."""
+def durable_checkpoint(database_url: str) -> tuple[str, str]:
+    """The stored checkpoint's digest and its gameplay payload, read only.
+
+    `character_presence` is the one field a restart legitimately moves: it
+    records who is connected and when a session went absent, and the proof's own
+    reconnect rewrites it. Every other field is compared verbatim, so a restart
+    that changed location, life state, inventory, balances, progression, timers,
+    topology or scheduling still fails.
+    """
     result = subprocess.run(
         ["psql", database_url, "-tA", "-v", "ON_ERROR_STOP=1", "-c",
-         "SELECT encode(checkpoint_sha256,'hex') FROM tme.facets"],
+         "SELECT encode(checkpoint_sha256,'hex'), encode(checkpoint_bytes,'escape') FROM tme.facets"],
         capture_output=True, text=True, check=False)
     if result.returncode:
-        raise RuntimeError(f"checkpoint digest unavailable: {result.stderr.strip()}")
-    return result.stdout.strip()
+        raise RuntimeError(f"checkpoint unavailable: {result.stderr.strip()}")
+    digest, raw = result.stdout.strip().split("|", 1)
+    document = json.loads(raw)
+    document["world"].pop("character_presence", None)
+    return digest, json.dumps(document, sort_keys=True)
 
 
 def prove_restart_durability(server) -> dict:
     """Stop the serving process, serve the same database, and play again.
 
-    The durable checkpoint must be byte-identical across the restart, and a
-    fresh authenticated session must still select the same character, observe
-    the same life state and location, and have an ordinary command accepted.
+    The durable payload must be identical across the restart, and a fresh
+    authenticated session must still select the same character, observe the same
+    life state and location, and have an ordinary command accepted.
     """
     def observed(frame: dict) -> dict:
         actor_id = frame["observer_actor_id"]
@@ -145,15 +168,13 @@ def prove_restart_durability(server) -> dict:
         }
 
     with LiveWireClient(server) as before:
-        before.wait_for(lambda frame: frame.get("frame") is not None)
         death = observed(before.frame)
-    digest_before = facet_checkpoint_hash(server.database_url)
+    digest_before, payload_before = durable_checkpoint(server.database_url)
     server.restart()
-    digest_after = facet_checkpoint_hash(server.database_url)
-    if digest_before != digest_after:
-        raise RuntimeError("the durable checkpoint changed across a serving-process restart")
+    digest_after, payload_after = durable_checkpoint(server.database_url)
+    if payload_before != payload_after:
+        raise RuntimeError("the durable checkpoint payload changed across a serving-process restart")
     with LiveWireClient(server) as after:
-        after.wait_for(lambda frame: frame.get("frame") is not None)
         recovered = observed(after.frame)
         for field in ["life_state", "hp", "location", "actor_id", "character_id",
                       "carried_gold", "items", "skill_ledger"]:
@@ -166,7 +187,8 @@ def prove_restart_durability(server) -> dict:
         disposition = result.get("disposition", {})
         if disposition.get("kind") != "accepted":
             raise RuntimeError(f"a fresh authenticated command was refused after restart: {result!r}")
-    return {"checkpoint_sha256": digest_after, "unchanged_across_restart": True,
+    return {"checkpoint_sha256_before": digest_before, "checkpoint_sha256_after": digest_after,
+            "payload_unchanged_across_restart": True, "excluded_live_field": "character_presence",
             "before": death, "after": recovered, "accepted_intent": intent,
             "accepted_command": True}
 
