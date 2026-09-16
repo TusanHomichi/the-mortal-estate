@@ -202,6 +202,22 @@ class ProofChildLifecycleTests(unittest.TestCase):
         self.assertEqual(json.loads(ledger_complete.read_text())["verdict"], "audited")
         self.assertIn("ledger2:audited", result.stderr)
 
+    def test_a_half_written_request_is_not_read_as_a_request(self):
+        # The browser writes the request file and the runner polls it. A reader
+        # that parsed whatever was on disk crashed the run when it caught the file
+        # between creation and content.
+        handshake = ProofHandshake(
+            "ledger",
+            self.directory / "ledger-request.json",
+            self.directory / "ledger-complete.json",
+            lambda requested: {"verdict": requested["action"]},
+        )
+        handshake.request_path.write_text("")
+        self.assertIsNone(handshake.serve(), "an empty request file is not a request")
+        self.assertFalse(handshake.complete_path.exists())
+        handshake.request_path.write_text('{"action": "capture", "sequence": 1}')
+        self.assertEqual(handshake.serve()["verdict"], "capture")
+
     def test_a_repeated_request_sequence_is_not_answered_twice(self):
         handshake = ProofHandshake(
             "ledger",

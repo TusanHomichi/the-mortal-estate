@@ -229,7 +229,15 @@ class ProofHandshake:
         """
         if not self.request_path.exists():
             return None
-        requested = json.loads(self.request_path.read_text())
+        try:
+            requested = json.loads(self.request_path.read_text())
+        except (OSError, json.JSONDecodeError):
+            # A writer that has created the file but not finished it is not a
+            # request yet. Reading it as one crashed the first bound run; the
+            # next poll reads it again, and a request that never becomes readable
+            # is reported by the child's own timeout rather than by a parse
+            # traceback in the middle of the runner.
+            return None
         sequence = int(requested.pop("sequence", 1))
         if sequence <= self.answered_sequence:
             return None

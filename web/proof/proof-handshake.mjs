@@ -13,7 +13,7 @@
 // through the ordinary client.
 
 import {existsSync} from 'node:fs';
-import {readFile, rm, writeFile} from 'node:fs/promises';
+import {readFile, rename, rm, writeFile} from 'node:fs/promises';
 
 /**
  * Per-kind request counters.
@@ -38,7 +38,10 @@ export async function requestRunner(configuration, kind, payload, eventually, ti
   const sequence = (sequences.get(kind) ?? 0) + 1;
   sequences.set(kind, sequence);
   await rm(complete, {force: true});
-  await writeFile(request, JSON.stringify({...payload, sequence}));
+  // Written to a temporary name and renamed, because the runner polls this path:
+  // a half-written request must not be readable as a request at all.
+  await writeFile(`${request}.tmp`, JSON.stringify({...payload, sequence}));
+  await rename(`${request}.tmp`, request);
   await eventually(() => existsSync(complete), timeout);
   const answer = JSON.parse(await readFile(complete, 'utf8'));
   if (answer.sequence !== sequence)
