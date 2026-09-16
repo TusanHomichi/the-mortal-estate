@@ -378,13 +378,19 @@ def source_identity() -> dict:
     proof that drove it, so a receipt can say which source produced the run
     rather than leaving that to the PR description.
     """
-    def git(*arguments: str) -> str:
-        return subprocess.run(
+    def git(*arguments: str) -> "str | None":
+        result = subprocess.run(
             ["git", *arguments], cwd=REPOSITORY_ROOT, capture_output=True, text=True,
-            check=False).stdout.strip()
+            check=False)
+        # A copied tree has no repository, and `git` answers `HEAD` on stdout while
+        # failing. An unreadable identity is reported as unknown, never as a value.
+        return result.stdout.strip() if result.returncode == 0 else None
 
-    return {"head": git("rev-parse", "HEAD"), "tree": git("write-tree"),
-            "worktree_dirty": bool(git("status", "--porcelain"))}
+    head, tree = git("rev-parse", "HEAD"), git("write-tree")
+    if head is None or tree is None:
+        return {"head": None, "tree": None, "worktree_dirty": None,
+                "note": "this tree is not a git checkout, so the receipt cannot name its source"}
+    return {"head": head, "tree": tree, "worktree_dirty": bool(git("status", "--porcelain"))}
 
 
 def stored_checkpoint(database_url: str) -> dict:

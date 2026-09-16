@@ -84,16 +84,27 @@ class SourceIdentity(unittest.TestCase):
 
     def test_the_identity_names_the_head_tree_and_worktree_state(self):
         identity = proof.source_identity()
+        if identity["head"] is None:
+            # The clean-clone proof runs the same suite inside a copied tree with
+            # no repository. The root checkout does have one, so this branch is
+            # how the field stays honest instead of reporting git's "HEAD" text.
+            self.assertIsNone(identity["tree"])
+            self.assertIsNone(identity["worktree_dirty"])
+            self.assertIn("not a git checkout", identity["note"])
+            return
         self.assertRegex(identity["head"], r"^[0-9a-f]{40}$")
         self.assertRegex(identity["tree"], r"^[0-9a-f]{40}$")
         self.assertIsInstance(identity["worktree_dirty"], bool)
 
-    def test_a_dirty_worktree_is_reported_rather_than_hidden(self):
-        # The proof output lives outside the checkout, so this session's own
-        # uncommitted edits are the only thing that can make it dirty; the field
-        # must still be a real answer rather than a constant.
-        original = proof.source_identity()
-        self.assertEqual(original["worktree_dirty"], bool(original["worktree_dirty"]))
+    def test_an_unreadable_identity_is_unknown_rather_than_invented(self):
+        # `git rev-parse HEAD` prints "HEAD" on a tree without a repository and
+        # exits non-zero. That text must never reach a receipt as a source ID.
+        with mock.patch.object(proof.subprocess, "run") as run:
+            run.return_value = mock.Mock(returncode=128, stdout="HEAD\n", stderr="not a repository")
+            identity = proof.source_identity()
+        self.assertIsNone(identity["head"])
+        self.assertIsNone(identity["tree"])
+        self.assertIn("note", identity)
 
 
 class ReadingFrames(unittest.TestCase):
