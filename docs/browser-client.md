@@ -299,6 +299,45 @@ and the standard cooldown. `web/proof/fire-return-proof.mjs` checks this atomic
 result, the selected 3D body, reconnect, subsequent movement and sign-out.
 Production spell definitions and monster tuning are unchanged.
 
+`--cause ordinary` serves the release catalog unchanged but places the
+controlled actor and the opponent itself, so its receipt declares
+`kind: modified_seed_with_release_catalog`, lists the seed overrides and records
+`character_created_through_ui: false`. It binds the source and served digests of
+the catalog, the template and the seed. The journey with ordinary creation on the
+unmodified release world is
+`tools/run_first_expedition_proof.py --journey death`, which creates its
+character through the UI, walks to the shipped opponent, is beaten by it,
+survives a serving-process restart, waits out the character's own deadline,
+returns at the authored destination and walks again.
+
+### Proof handshakes
+
+A browser proof cannot replace the serving process it is talking to, so
+`web/proof/proof-handshake.mjs` and `ProofHandshake` in
+`tools/run_death_return_proof.py` own one file-pair protocol between the two
+halves. Each request carries a sequence, the stale answer is removed before the
+request is written, and every sequence is answered exactly once, so a reused pair
+cannot hand back an earlier answer. Two kinds exist: `restart` (the runner
+replaces the process and reports what the durable checkpoint did) and `ledger`
+(the runner reads the authoritative item and coin ledger from the stored
+checkpoint, and audits a later reading against an earlier capture).
+
+Restart receipts are computed from what was read. The raw stored digest is
+reported as an observation; the enforced claim is that the gameplay payload is
+unchanged with only `character_presence` excluded, and that exclusion is judged —
+a character appearing in or vanishing from the presence ledger, or a control
+epoch moving, fails. A dead actor's physical or sheet action must be refused, and
+the return request is asked only while the character is still inside its own
+deadline, where a refusal is the only correct answer; once eligible, the
+browser's own accepted return is the evidence and the runner must not consume it.
+
+The ledger audit resolves every item instance to exactly one collection in the
+stored checkpoint and totals gold across every holder, and fails on loss,
+duplication, identity replacement, quantity change and currency minted or burned.
+The typed rules owner of the same boundary is
+`crates/tme-rules/tests/first_expedition_death_ledger.rs`; the browser never
+assembles its own inventory model.
+
 ### Control lifecycle
 
 `web/src/play/control.ts` owns the serialized control lifecycle and all transient
@@ -540,3 +579,18 @@ and checks real server receipts. It covers creation, preparation, descent,
 encounter, loot, return, instruction, critique, lodge storage and reconnect.
 It establishes the private integration loop, not final artwork or exact numeric
 fidelity. The [execution record](plans/2026-09-06-first-expedition.md) owns results.
+
+`--journey death` runs the losing composed journey instead: the same ordinary
+creation on the same unmodified release world, walking to the shipped opponent,
+being beaten by it, observing the ghost, surviving a restart, waiting out the
+character's own deadline, returning at the authored destination and walking
+again. Its receipt names the encounter boundary — rounds survived, damage taken,
+health at the end of combat, the opponent's health then, and the life state — and
+asserts conservation through the runner's ledger audit over a capture taken while
+the character was still alive. The return destination is the character's authored
+alignment's branch, so this journey exercises the lawful one; every shipped
+creation profile selects `lawful`, and the neutral branch is proved by
+`crates/tme-rules/tests/first_expedition_return_destination.rs` through the
+ordinary social law rather than by assigning an alignment creation cannot
+produce. Encounter figures in every receipt are the ones frozen when combat
+ended, with the later recovered state reported beside them.

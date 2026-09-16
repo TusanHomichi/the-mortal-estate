@@ -46,20 +46,32 @@ CHILD = textwrap.dedent(
     if configuration.get("emit_large_output"):
         sys.stdout.write("x" * 400000)
         sys.stdout.flush()
+    counters = {}
     def converse(name, request):
-        with open(os.path.join(output, name + "-request.json"), "w") as handle:
-            json.dump(request, handle)
-        deadline = time.time() + 30
+        # The same protocol the browser half uses: number the request and drop
+        # the previous answer, so a reused file pair cannot hand back a stale one.
+        counters[name] = counters.get(name, 0) + 1
         complete = os.path.join(output, name + "-complete.json")
+        if os.path.exists(complete):
+            os.remove(complete)
+        with open(os.path.join(output, name + "-request.json"), "w") as handle:
+            json.dump({**request, "sequence": counters[name]}, handle)
+        deadline = time.time() + 30
         while not os.path.exists(complete):
             if time.time() > deadline:
                 sys.exit(3)
             time.sleep(0.02)
         with open(complete) as handle:
-            return json.load(handle)
+            answer = json.load(handle)
+        if answer.get("sequence") != counters[name]:
+            sys.exit(5)
+        return answer
     if configuration.get("request_ledger"):
         answer = converse("ledger", {"action": "capture"})
         sys.stderr.write("ledger:" + answer["verdict"] + "\\n")
+        if configuration.get("request_ledger_twice"):
+            answer = converse("ledger", {"action": "audit"})
+            sys.stderr.write("ledger2:" + answer["verdict"] + "\\n")
     if configuration.get("request_restart"):
         answer = converse("restart", {"actor_id": configuration["actor_id"]})
         sys.stderr.write("restart:" + answer["marker"] + "\\n")
@@ -161,6 +173,52 @@ class ProofChildLifecycleTests(unittest.TestCase):
         self.assertEqual(seen, ["capture"])
         self.assertEqual(json.loads(ledger_complete.read_text())["verdict"], "audited")
         self.assertTrue(self.complete_path.exists(), "the restart handshake still ran")
+
+    def test_a_reused_handshake_answers_each_sequence_once(self):
+        # The ledger conversation is two requests on one file pair. A handshake
+        # that stops after the first leaves the second reading the first answer:
+        # the native journey saw exactly that, with an audit reporting "captured".
+        ledger_request = self.directory / "ledger-request.json"
+        ledger_complete = self.directory / "ledger-complete.json"
+        seen = []
+
+        def answer(requested):
+            seen.append(requested["action"])
+            return {"verdict": "audited" if requested["action"] == "audit" else "captured"}
+
+        result = run_proof_child(
+            [sys.executable, "-c", CHILD],
+            configuration=self.configuration(request_ledger=True, request_ledger_twice=True),
+            request_path=self.request_path,
+            complete_path=self.complete_path,
+            extra_handshakes=[
+                ProofHandshake("ledger", ledger_request, ledger_complete, answer)
+            ],
+            cwd=self.directory,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(seen, ["capture", "audit"])
+        self.assertEqual(json.loads(ledger_complete.read_text())["verdict"], "audited")
+        self.assertIn("ledger2:audited", result.stderr)
+
+    def test_a_repeated_request_sequence_is_not_answered_twice(self):
+        handshake = ProofHandshake(
+            "ledger",
+            self.directory / "ledger-request.json",
+            self.directory / "ledger-complete.json",
+            lambda requested: {"verdict": requested["action"]},
+        )
+        handshake.request_path.write_text(json.dumps({"action": "capture", "sequence": 1}))
+        self.assertEqual(handshake.serve()["verdict"], "capture")
+        self.assertIsNone(handshake.serve(), "the same request must not be answered again")
+        handshake.request_path.write_text(json.dumps({"action": "audit", "sequence": 2}))
+        self.assertEqual(handshake.serve()["verdict"], "audit")
+        self.assertEqual(
+            json.loads(handshake.complete_path.read_text())["sequence"],
+            2,
+            "the answer says which request it answers",
+        )
 
     def test_a_failing_child_reports_its_own_status_and_output(self):
         result = self.run_child(self.configuration(fail=True), timeout=30)

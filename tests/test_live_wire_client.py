@@ -11,6 +11,34 @@ from run_production_smoke import GameplaySocket
 
 
 class WireObservation(unittest.TestCase):
+    def test_the_session_selects_the_character_the_caller_names(self):
+        # One account can own both the harness's enrolled character and a
+        # character a proof created through the UI. A session that always took
+        # the harness's own row observed a different actor than the browser was
+        # driving, which is what the composed death journey hit.
+        slots = []
+        gameplay = SimpleNamespace(latest_state={"frame": {"contract_version": 9}})
+        session = SimpleNamespace(
+            bootstrap={"characters": [
+                {"character_id": "harness", "slot": 1},
+                {"character_id": "created", "slot": 2},
+            ]},
+            select=slots.append,
+            connect=Mock(return_value=gameplay),
+            logout=Mock(),
+        )
+        server = SimpleNamespace(origin="https://localhost:1", authority="/dev/null",
+                                 username="u", password="p", character_id="harness")
+        for character_id, expected_slot in [(None, 1), ("created", 2)]:
+            slots.clear()
+            with patch("live_wire_client.PublicClient") as public:
+                public.return_value.login.return_value = session
+                client = LiveWireClient(server, character_id=character_id)
+                client.public.context = Mock()
+                client.__enter__()
+                self.assertEqual(client.frame["contract_version"], 9)
+            self.assertEqual(slots, [expected_slot], character_id)
+
     def test_command_keeps_state_received_before_its_result(self):
         gameplay = GameplaySocket.__new__(GameplaySocket)
         gameplay.latest_state = {}

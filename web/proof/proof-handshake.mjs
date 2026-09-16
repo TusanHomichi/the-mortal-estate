@@ -13,7 +13,17 @@
 // through the ordinary client.
 
 import {existsSync} from 'node:fs';
-import {readFile, writeFile} from 'node:fs/promises';
+import {readFile, rm, writeFile} from 'node:fs/promises';
+
+/**
+ * Per-kind request counters.
+ *
+ * A handshake file pair is reused, so "the answer file exists" cannot mean "my
+ * request was answered": the second request would read the first answer. Every
+ * request therefore carries a sequence, the runner answers each sequence once,
+ * and the stale answer is removed before the request is written.
+ */
+const sequences = new Map();
 
 /**
  * Ask the runner for one piece of evidence and wait for its answer.
@@ -23,10 +33,17 @@ import {readFile, writeFile} from 'node:fs/promises';
  */
 export async function requestRunner(configuration, kind, payload, eventually, timeout = 300000) {
   const stem = `${configuration.output}/${configuration.engine}-${configuration.journey ?? 'death'}-${kind}`;
+  const request = `${stem}-request.json`;
   const complete = `${stem}-complete.json`;
-  await writeFile(`${stem}-request.json`, JSON.stringify(payload));
+  const sequence = (sequences.get(kind) ?? 0) + 1;
+  sequences.set(kind, sequence);
+  await rm(complete, {force: true});
+  await writeFile(request, JSON.stringify({...payload, sequence}));
   await eventually(() => existsSync(complete), timeout);
-  return JSON.parse(await readFile(complete, 'utf8'));
+  const answer = JSON.parse(await readFile(complete, 'utf8'));
+  if (answer.sequence !== sequence)
+    throw new Error(`the ${kind} answer is for request ${answer.sequence}, not ${sequence}`);
+  return answer;
 }
 
 /**

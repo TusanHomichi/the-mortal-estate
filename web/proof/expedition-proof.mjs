@@ -15,18 +15,23 @@ const launched = await launchProofBrowser({ name: config.engine, engine, executa
 const geography = JSON.parse(await readFile(new URL("../../content/lands/first-expedition/generated/workbench_projection.json", import.meta.url), "utf8"));
 let page, frame, staticContext, stage = "starting";
 const errors = [], commands = [], results = [], checkpoints = [];
+// A bounded window of authoritative frames. The latest frame is enough for
+// most steps, but a transition like the return to life has to be observed as
+// it happened, not reconstructed from whatever arrived last.
+const frames = [];
 try {
   const context = launched.context || await launched.browser.newContext({ viewport: { width: 1280, height: 1000 } });
   page = await context.newPage();
   page.on("pageerror", error => errors.push(error.message));
   page.on("websocket", socket => {
     socket.on("framereceived", event => { const envelope = JSON.parse(String(event.payload));
-      if (envelope.frame) { frame = envelope.frame; staticContext = envelope.static_scene_context; }
+      if (envelope.frame) { frame = envelope.frame; staticContext = envelope.static_scene_context;
+        frames.push(envelope.frame); if (frames.length > 400) frames.shift(); }
       if (envelope.kind === "command_result") results.push(envelope);
     });
     socket.on("framesent", event => { const e = JSON.parse(String(event.payload)); if (e.kind === "command") commands.push(e); });
   });
-  const wait = (fn, arg) => page.waitForFunction(fn, arg, { polling: 50, timeout: 45000 });
+  const wait = (fn, arg, timeout = 45000) => page.waitForFunction(fn, arg, { polling: 50, timeout });
   // Node-side polling: some expectations are about the latest observed frame
   // rather than about the document, so they cannot run in the page context.
   const eventually = async (predicate, timeout = 30000) => {
@@ -34,10 +39,16 @@ try {
     while (!predicate()) { if (Date.now() > end) return false; await new Promise(resolve => setTimeout(resolve, 25)); }
     return true;
   };
-  const ready = () => wait(() => document.body.dataset.phase === "playing" && document.querySelector("#world-canvas").dataset.canAct === "true" && document.querySelector("#world-canvas").dataset.pending === "false");
+  // The timeout is a parameter, not a decoration: a ghost becomes ready for its
+  // own return only after the character's authored deadline, which is longer
+  // than the default, and a call that silently used the default would time out
+  // while the product was behaving correctly.
+  const ready = (timeout = 45000) => wait(() => document.body.dataset.phase === "playing" && document.querySelector("#world-canvas").dataset.canAct === "true" && document.querySelector("#world-canvas").dataset.pending === "false", null, timeout);
   const here = () => frame.observation_center;
   // Collections differ in shape: carried items nest the instance under `item`,
-  // ground items and their siblings flatten it. One reader handles both.
+  // while ground items, corpse contents and locker contents flatten it. One pair
+  // of readers handles both, so a shape change cannot read as an empty list.
+  const instanceOf = row => (row.item ?? row).item_instance_id;
   const definitionOf = row => (row.item ?? row).item_definition_id;
   async function mark(name) {
     stage = name; checkpoints.push({ stage, location: here(), gold: frame.carried.gold.sack, hp: frame.character.resources.hp,
@@ -134,6 +145,7 @@ try {
   const observer = () => frame.actors.find(row => row.actor_id === frame.observer_actor_id);
   const ghost = () => observer()?.life_state === "ghost";
   const heldWeapon = () => frame.carried.items.find(row => row.item.item_instance_id === createdWeaponId);
+  const opponentRow = () => frame.actors.find(row => row.actor_id === "cellar_scavenger");
   const opponent = i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger";
   const opponentDefeated = () => frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger");
   // The opponent holds ground and Fight reaches one square, so one real East
@@ -243,11 +255,24 @@ try {
       "the durable checkpoint payload changed across the restart");
     assert.equal(restart.physical_action_refused_while_dead, true,
       "a restarted ghost was allowed to perform a physical action");
+    // The return request below is this half's own proof of acceptance, so the
+    // runner must not have consumed it: it asks only while the character is
+    // still inside its deadline, where the only correct answer is a refusal.
+    if (restart.return_attempted_while_ineligible)
+      assert.equal(restart.return_refused_before_deadline, true,
+        "an ineligible character was offered its return early");
+    else
+      assert.equal(restart.return_left_to_the_browser, true,
+        "the runner consumed the eligible character's return");
     // Re-enter through the ordinary client on the restarted origin.
     await page.goto(config.origin + "/"); await wait(() => document.body.dataset.playReady === "true");
     await page.locator("#username").fill(config.username); await page.locator("#password").fill(config.password);
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await wait(() => document.body.dataset.phase === "selecting");
+    // The account owns the harness's enrolled character as well as the one this
+    // journey created, and the roster defaults to the first. Selecting by ID is
+    // how the restarted session re-enters the character under proof.
+    await page.locator(`#character input[value="${character}"]`).check();
     await page.getByRole("button", { name: "Enter world", exact: true }).click(); await ready(90000);
     assert.equal(frame.social.character_id, character, "the restart changed the character identity");
     assert.equal(observer()?.life_state, "ghost", "the restart resurrected the character");
@@ -260,10 +285,11 @@ try {
     await page.getByRole("button", { name: "Request resurrection", exact: true }).click();
     await wait(() => document.querySelector("#world-canvas").dataset.lifeState === "alive");
     assert.equal(commands.length, returnStart + 1, "the return is one ordinary request");
-    const returnedFrame = received.slice(-40).filter(value =>
-      value.frame?.actors.some(row => row.actor_id === frame.observer_actor_id && row.life_state === "alive"));
+    const observerId = frame.observer_actor_id;
+    const returnedFrame = frames.filter(value =>
+      value.actors.some(row => row.actor_id === observerId && row.life_state === "alive"));
     assert(returnedFrame.length, "no authoritative frame reported the return");
-    const returning = returnedFrame.at(-1).frame;
+    const returning = returnedFrame.at(-1);
     assert.deepEqual(returning.observation_center, config.destination, "the return landed at the configured destination");
     // Conservation, not a happy ending. Production scavenging stays enabled, so
     // the scavenging opponent legitimately strips the corpse and what it took is
@@ -293,11 +319,14 @@ try {
       scavenging_enabled: true, ordinary_creation: true,
     };
   }
-  /// Stand on the opponent's square and take ordinary Wait actions until the
-  /// authored opponent removes the character. No HP is assigned and no event is
-  /// synthesized: this is production combat resolving an ordinary death.
+  /// Take ordinary Wait actions until the authored opponent removes the
+  /// character. No HP is assigned and no event is synthesized: this is
+  /// production combat resolving an ordinary death. Every round is kept, with
+  /// both actors' positions, because an opponent that never acts is a
+  /// positioning fact and the trace is what names it.
   async function dieToAuthoredOpponent() {
     const hpBefore = frame.character.resources.hp;
+    const trace = [];
     let rounds = 0;
     await page.locator("#world-canvas").focus();
     while (!ghost() && rounds < 200) {
@@ -311,10 +340,14 @@ try {
       await eventually(() => commands.length > before || ghost(), 60000);
       await wait(() => document.querySelector("#world-canvas").dataset.pending === "false");
       rounds += 1;
+      trace.push({
+        round: rounds, player_hp: frame.character.resources.hp,
+        opponent_hp: opponentRow()?.hp ?? null, life_state: observer()?.life_state ?? null,
+        here: here(), opponent: opponentRow()?.position ?? null,
+        command: commands.at(-1)?.intent ?? null,
+      });
       await writeFile(path.join(config.output, `${config.engine}-death-journey-log.json`),
-        JSON.stringify({ round: rounds, starting_hp: hpBefore, player_hp: frame.character.resources.hp,
-          opponent_hp: frame.actors.find(row => row.actor_id === "cellar_scavenger")?.hp ?? null,
-          life_state: observer()?.life_state }, null, 2));
+        JSON.stringify({ starting_hp: hpBefore, rounds, trace }, null, 2));
     }
     assert(ghost(), "the shipped opponent could not defeat a passive created character");
     const damageTaken = hpBefore - frame.character.resources.hp;
@@ -356,13 +389,19 @@ try {
     await enter("temple"); await enter("d1_entry");
     assert.deepEqual(here().position, { x: 24, y: 7 }); await mark("descent");
     await walkTo(23, 9);
+    // The authored opponent holds the square it is seeded on, and its reach is
+    // that square: a character standing next to it and waiting is never attacked,
+    // which is an observation this proof made before it made an assertion. The
+    // death route therefore stands where the opponent stands, exactly as the
+    // ordinary death-return fixture does.
+    assert.deepEqual(here().position, opponentRow().position.position,
+      "the death route must stand on the authored opponent's square");
     // The authoritative item and coin ledger, read from the stored checkpoint by
     // the runner while the created character is still alive. From here the world
     // may move an instance into the corpse, onto the ground or into the
     // scavenging opponent's hands, but nothing may stop existing or appear.
     const ledgerBefore = await checkpointLedger(config, "capture", "before-death", eventually);
     assert.equal(ledgerBefore.verdict, "captured", JSON.stringify(ledgerBefore));
-    await joinEncounter();
     const deathEncounter = await dieToAuthoredOpponent();
     const deathEvidence = await completeOrdinaryDeath();
     // Conservation is decided by the runner's audit of the authoritative
@@ -433,11 +472,13 @@ try {
   await mark("trained-return");
   await enter("arrival"); await enter("lodge"); await walkTo(6,1);
   await action(i => i.kind === "deposit_locker_item" && i.item_instance_id === "found_charm", { service: "lodge_keeper" });
-  assert(!frame.carried.items.some(i => i.item.item_instance_id === "found_charm"));
+  assert(!frame.carried.items.some(i => instanceOf(i) === "found_charm"));
   await reconnectToOrigin();
-  assert(frame.services_here.flatMap(s => s.capabilities).some(c => c.kind === "locker" && c.items.some(i => i.item.item_instance_id === "found_charm")));
+  assert(frame.services_here.flatMap(s => s.capabilities)
+    .some(c => c.kind === "locker" && c.items.some(i => instanceOf(i) === "found_charm")),
+    "the locker must hold the deposited charm after a reconnect");
   await action(i => i.kind === "withdraw_locker_item" && i.item_instance_id === "found_charm" && i.destination === "sack_item_3", { service: "lodge_keeper" });
-  assert(frame.carried.items.some(i => i.item.item_instance_id === "found_charm"));
+  assert(frame.carried.items.some(i => instanceOf(i) === "found_charm"));
   await mark("lodge-return");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await wait(() => document.body.dataset.phase === "signed_out");

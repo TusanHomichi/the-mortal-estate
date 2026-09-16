@@ -24,6 +24,7 @@ claim a result its inputs do not support:
   success-looking receipt.
 """
 
+import copy
 import sys
 import unittest
 from pathlib import Path
@@ -51,7 +52,8 @@ DEATH_FRAME = {
 
 
 def death_frame(**overrides):
-    frame = {**DEATH_FRAME, "actors": [dict(DEATH_FRAME["actors"][0])]}
+    # A deep copy: a case that edits `carried` must not leak into the next one.
+    frame = copy.deepcopy(DEATH_FRAME)
     frame.update(overrides)
     return frame
 
@@ -75,6 +77,27 @@ def attempts(return_kind="accepted", physical_kind="rejected"):
             "server_sequence": 43,
         },
     }
+
+
+class ReadingFrames(unittest.TestCase):
+    def test_carried_rows_are_read_in_both_shapes(self):
+        # Carried rows nest the instance under `item`; ground rows and their
+        # siblings flatten it. A reader that assumes one shape reports an empty
+        # inventory, which is how the first native restart run failed.
+        nested = death_frame()
+        nested["carried"]["items"] = [
+            {"item": {"item_instance_id": "weathered_staff"}, "position": "right_hand"}
+        ]
+        flat = death_frame()
+        flat["carried"]["items"] = [{"item_instance_id": "weathered_staff"},
+                                    {"item_instance_id": "spell_book"}]
+        self.assertEqual(proof.observe_frame(nested)["items"], ["weathered_staff"])
+        self.assertEqual(
+            proof.observe_frame(flat)["items"], ["spell_book", "weathered_staff"]
+        )
+
+    def test_a_frame_with_no_carried_items_reports_an_empty_inventory(self):
+        self.assertEqual(proof.observe_frame(death_frame())["items"], [])
 
 
 class ComparingCheckpoints(unittest.TestCase):
@@ -140,52 +163,64 @@ class ComparingCheckpoints(unittest.TestCase):
 
 
 class JudgingDeadActorAttempts(unittest.TestCase):
-    def test_a_refused_action_and_an_eligible_return_are_reported_as_observed(self):
-        verdict = proof.judge_dead_actor_attempts(
-            attempts(), logical_time="200", ready_at="100"
-        )
-        self.assertEqual(verdict["defects"], [])
-        self.assertTrue(verdict["physical_action_refused_while_dead"])
-        self.assertTrue(verdict["return_accepted"])
-        self.assertFalse(verdict["return_refused_before_deadline"])
-        self.assertEqual(
-            verdict["eligibility_evaluated_at"], {"logical_time": "200", "ready_at": "100"}
-        )
-
-    def test_an_accepted_action_for_a_dead_actor_cannot_be_reported_as_refused(self):
-        verdict = proof.judge_dead_actor_attempts(
-            attempts(physical_kind="accepted"), logical_time="200", ready_at="100"
-        )
-        self.assertFalse(verdict["physical_action_refused_while_dead"])
-        self.assertIn("not refused", verdict["defects"][0])
-
-    def test_an_accepted_return_before_the_deadline_is_a_defect(self):
-        verdict = proof.judge_dead_actor_attempts(
-            attempts(return_kind="accepted"), logical_time="99", ready_at="100"
-        )
-        self.assertFalse(verdict["return_refused_before_deadline"])
-        self.assertIn("before the character's own deadline", verdict["defects"][0])
-
-    def test_a_refused_return_after_the_deadline_is_a_defect(self):
-        verdict = proof.judge_dead_actor_attempts(
-            attempts(return_kind="rejected"), logical_time="100", ready_at="100"
-        )
-        self.assertIn("refused a return", verdict["defects"][0])
-
-    def test_a_refused_return_before_the_deadline_is_the_correct_answer(self):
+    def test_a_refused_return_before_the_deadline_is_the_observed_answer(self):
         verdict = proof.judge_dead_actor_attempts(
             attempts(return_kind="rejected"), logical_time="99", ready_at="100"
         )
         self.assertEqual(verdict["defects"], [])
-        self.assertFalse(verdict["return_accepted"])
+        self.assertTrue(verdict["physical_action_refused_while_dead"])
+        self.assertTrue(verdict["return_attempted_while_ineligible"])
         self.assertTrue(verdict["return_refused_before_deadline"])
+        self.assertFalse(verdict["return_left_to_the_browser"])
+        self.assertFalse(verdict["eligible_at_restart"])
+        self.assertEqual(
+            verdict["eligibility_evaluated_at"], {"logical_time": "99", "ready_at": "100"}
+        )
+
+    def test_an_eligible_restart_leaves_the_return_to_the_browser(self):
+        # The composed journey waits out the deadline before restarting, so the
+        # session must send only the physical action and let the browser's own
+        # authorized return be the accepted-command evidence.
+        verdict = proof.judge_dead_actor_attempts(
+            {"show_sack": attempts()["show_sack"]}, logical_time="100", ready_at="100"
+        )
+        self.assertEqual(verdict["defects"], [])
+        self.assertTrue(verdict["eligible_at_restart"])
+        self.assertTrue(verdict["return_left_to_the_browser"])
+        self.assertFalse(verdict["return_attempted_while_ineligible"])
+
+    def test_consuming_an_eligible_return_is_a_defect(self):
+        verdict = proof.judge_dead_actor_attempts(
+            attempts(return_kind="accepted"), logical_time="200", ready_at="100"
+        )
+        self.assertIn("consumed the return of an eligible character", verdict["defects"][0])
+
+    def test_an_ineligible_character_whose_return_was_never_attempted_is_a_defect(self):
+        verdict = proof.judge_dead_actor_attempts(
+            {"show_sack": attempts()["show_sack"]}, logical_time="99", ready_at="100"
+        )
+        self.assertIn("never attempted", verdict["defects"][0])
+
+    def test_an_accepted_action_for_a_dead_actor_cannot_be_reported_as_refused(self):
+        verdict = proof.judge_dead_actor_attempts(
+            attempts(return_kind="rejected", physical_kind="accepted"),
+            logical_time="99", ready_at="100",
+        )
+        self.assertFalse(verdict["physical_action_refused_while_dead"])
+        self.assertIn("not refused", verdict["defects"][0])
+
+    def test_an_early_acceptance_is_a_defect(self):
+        verdict = proof.judge_dead_actor_attempts(
+            attempts(return_kind="accepted"), logical_time="99", ready_at="100"
+        )
+        self.assertIn("did not refuse the return", verdict["defects"][0])
 
     def test_an_unanswered_return_is_a_defect_rather_than_an_acceptance(self):
-        unanswered = attempts()
+        unanswered = attempts(return_kind="rejected")
         unanswered["request_resurrection"]["disposition"] = {}
-        verdict = proof.judge_dead_actor_attempts(unanswered, logical_time="200", ready_at="100")
-        self.assertFalse(verdict["return_accepted"])
-        self.assertIn("did not answer a return request", verdict["defects"][0])
+        verdict = proof.judge_dead_actor_attempts(unanswered, logical_time="99", ready_at="100")
+        self.assertFalse(verdict["return_refused_before_deadline"])
+        self.assertIn("did not refuse the return", verdict["defects"][0])
 
 
 class ScriptedClient:
@@ -219,7 +254,7 @@ class ProvingRestartDurability(unittest.TestCase):
     """
 
     def run_proof(self, *, after_frame, answers, gameplay_after=None,
-                  volatile_before=None, volatile_after=None):
+                  volatile_before=None, volatile_after=None, expect_intents=None):
         client = ScriptedClient(after_frame, answers)
         self.client = client
         checkpoints = [
@@ -238,18 +273,24 @@ class ProvingRestartDurability(unittest.TestCase):
             )
         self.assertEqual(
             [intent["kind"] for intent in client.intents],
-            ["request_resurrection", "show_sack"],
-            "the restarted session is asked exactly the two intents the receipt names",
+            expect_intents if expect_intents is not None
+            else ["request_resurrection", "show_sack"],
+            "the restarted session is asked exactly the intents the receipt names",
         )
         return receipt
 
     def test_a_clean_restart_receipt_claims_only_what_was_observed(self):
+        # Before the deadline: the session asks for the return, is refused, and
+        # the physical action is refused too. Nothing else is claimed.
         receipt = self.run_proof(
-            after_frame=death_frame(logical_time="200"), answers=attempts()
+            after_frame=death_frame(logical_time="99"),
+            answers=attempts(return_kind="rejected"),
+            expect_intents=["request_resurrection", "show_sack"],
         )
         self.assertTrue(receipt["durable_payload_unchanged"])
         self.assertTrue(receipt["physical_action_refused_while_dead"])
-        self.assertTrue(receipt["return_accepted"])
+        self.assertTrue(receipt["return_refused_before_deadline"])
+        self.assertFalse(receipt["eligible_at_restart"])
         self.assertEqual(
             receipt["command_attempts"]["show_sack"]["disposition"]["kind"], "rejected"
         )
@@ -257,7 +298,16 @@ class ProvingRestartDurability(unittest.TestCase):
         # No field may report a rejection as an accepted command.
         self.assertNotIn("accepted_command", receipt)
         self.assertNotIn("accepted_intent", receipt)
-        self.assertFalse(receipt["return_refused_before_deadline"])
+
+    def test_an_eligible_restart_sends_only_the_physical_action(self):
+        receipt = self.run_proof(
+            after_frame=death_frame(logical_time="200"),
+            answers=attempts(),
+            expect_intents=["show_sack"],
+        )
+        self.assertTrue(receipt["return_left_to_the_browser"])
+        self.assertNotIn("request_resurrection", receipt["command_attempts"])
+        self.assertTrue(receipt["physical_action_refused_while_dead"])
 
     def test_a_forged_acceptance_raises_instead_of_reaching_the_receipt(self):
         with self.assertRaises(RuntimeError) as raised:
@@ -273,7 +323,7 @@ class ProvingRestartDurability(unittest.TestCase):
                 after_frame=death_frame(logical_time="99"),
                 answers=attempts(return_kind="accepted"),
             )
-        self.assertIn("before the character's own deadline", str(raised.exception))
+        self.assertIn("did not refuse the return", str(raised.exception))
 
     def test_an_altered_gameplay_payload_raises_before_the_session_is_opened(self):
         with self.assertRaises(RuntimeError) as raised:

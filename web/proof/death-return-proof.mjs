@@ -134,11 +134,21 @@ try {
   // even when every durable gameplay field is identical.
   assert.equal(typeof restart.checkpoint_bytes_identical,'boolean','the raw digest comparison must be reported');
   assert.equal(restart.physical_action_refused_while_dead,true,'a restarted ghost was allowed to act');
+  // The runner asks for the return only while the character is still inside its
+  // own deadline, where the answer must be a refusal; once eligible, this half's
+  // own accepted return below is the proof and the runner must not consume it.
+  if(restart.return_attempted_while_ineligible)
+    assert.equal(restart.return_refused_before_deadline,true,'an ineligible character was offered its return early');
+  else
+    assert.equal(restart.return_left_to_the_browser,true,'the runner consumed an eligible character\'s return');
   const restartedOrigin=restart.origin||config.origin;
   config.origin=restartedOrigin;
   await page.goto(restartedOrigin+'/');await wait(()=>document.body.dataset.playReady==='true');
   await page.locator('#username').fill(config.username);await page.locator('#password').fill(config.password);
   await page.locator('#login').click();await wait(()=>document.body.dataset.phase==='selecting');
+  // An account can own more than the character under proof; the roster defaults
+  // to the first, so the restarted session selects the one it is observing.
+  await page.locator(`#character input[value="${character}"]`).check();
   await page.locator('#enter').click();await ready(75000);
   assert.equal(frame.observer_actor_id,actor);assert.equal(frame.social.character_id,character);
   assert.equal(frame.actors.find(row=>row.actor_id===actor).life_state,'ghost','the restart resurrected the character');

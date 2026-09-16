@@ -147,14 +147,21 @@ def main():
                 packet = args.assets
             server.assets = packet
             with server:
+                # `journey` is the browser half's own name for this route, and it
+                # is half of every handshake file name. Both halves build those
+                # names from the same two fields, so a rename here without one
+                # there leaves the child waiting for a file nobody writes.
+                journey = "death" if args.cause == "ordinary" else "fire"
                 config = dict(engine=engine, alignment=alignment, body=body, origin=server.origin,
                               authority=str(server.authority), username=server.username, password=server.password,
-                              output=str(output), destination=policy[f"{alignment}_destination"])
+                              output=str(output), journey=journey,
+                              destination=policy[f"{alignment}_destination"])
                 proof = "fire-return" if args.cause == "fire" else "death-return"
-                request_path = output / "restart-request.json"
-                complete_path = output / "restart-complete.json"
-                ledger_path = output / "ledger-request.json"
-                ledger_complete_path = output / "ledger-complete.json"
+                stem = f"{engine}-{journey}"
+                request_path = output / f"{stem}-restart-request.json"
+                complete_path = output / f"{stem}-restart-complete.json"
+                ledger_path = output / f"{stem}-ledger-request.json"
+                ledger_complete_path = output / f"{stem}-ledger-complete.json"
                 ledger = LedgerAudit(server.database_url)
                 def on_restart_request(requested: dict) -> dict:
                     """Replace the serving process while the browser waits."""
@@ -204,25 +211,30 @@ class ProofHandshake:
     request_path: Path
     complete_path: Path
     answer: "Callable[[dict], dict]"
-    served: bool = False
+    answered_sequence: int = 0
 
     def clear(self) -> None:
         for path in (self.request_path, self.complete_path):
             path.unlink(missing_ok=True)
 
     def serve(self) -> dict | None:
-        """Answer this handshake once, if the child has asked for it.
+        """Answer the next request on this file pair, exactly once each.
 
-        The request file stays on disk — the child wrote it, and deleting it
-        would race the child's own read. The `served` mark, not the file's
-        absence, is what keeps one request from being answered twice: a restart
-        that ran twice because the file was still there would replace the
-        serving process under a child that had already reconnected to it.
+        The browser reuses the pair and numbers its requests, because a file that
+        stays on disk cannot say whether it is the request just written or the
+        one answered a moment ago. A handshake with a single request (the
+        restart) carries sequence 1 and is answered once; the ledger's capture
+        and audit are two requests and get two answers.
         """
-        if self.served or not self.request_path.exists():
+        if not self.request_path.exists():
             return None
-        self.served = True
-        response = self.answer(json.loads(self.request_path.read_text()))
+        requested = json.loads(self.request_path.read_text())
+        sequence = int(requested.pop("sequence", 1))
+        if sequence <= self.answered_sequence:
+            return None
+        self.answered_sequence = sequence
+        response = self.answer(requested)
+        response["sequence"] = sequence
         self.complete_path.write_text(json.dumps(response, indent=2) + "\n")
         return response
 
@@ -596,6 +608,10 @@ def observe_frame(frame: dict) -> dict:
     """The durable facts one observer frame states about its own character."""
     actor_id = frame["observer_actor_id"]
     self_row = next(row for row in frame["actors"] if row["actor_id"] == actor_id)
+    # Carried rows nest the instance under `item`; ground rows and their siblings
+    # flatten it. The same reader handles both, so a frame that changes shape
+    # cannot quietly report an empty inventory.
+    instance_of = lambda row: (row.get("item") or row)["item_instance_id"]
     return {
         "life_state": self_row["life_state"],
         "hp": self_row["hp"],
@@ -603,7 +619,7 @@ def observe_frame(frame: dict) -> dict:
         "actor_id": actor_id,
         "character_id": frame["social"]["character_id"],
         "carried_gold": frame["carried"]["gold"]["sack"],
-        "items": sorted(row["item_instance_id"] for row in frame["carried"]["items"]),
+        "items": sorted(instance_of(row) for row in frame["carried"]["items"]),
         "skill_ledger": frame["character"]["skill_ledger"],
         "ready_at": frame["ready_at"],
         "logical_time": frame["logical_time"],
@@ -724,44 +740,52 @@ def compare_checkpoints(
 def judge_dead_actor_attempts(attempts: dict, *, logical_time, ready_at) -> dict:
     """Judge what a restarted server actually answered a ghost.
 
-    `attempts` is the wire session's own record: for each intent, the
+    `attempts` is the wire session's own record: for each intent it sent, the
     disposition, command id and server sequence that came back. Nothing is
-    assumed. Rules admit no intent to a dead actor except an eligible return
-    request, so a physical or sheet action that was *not* refused is a defect,
-    and the return answer is judged against the character's own deadline in
-    authoritative logical time. Every receipt field below is computed from the
-    observation it names.
+    assumed. A ghost may not perform a physical or sheet action at any time, so
+    one that was not refused is a defect. The return request is only ever sent
+    while the character is still inside its own authored deadline — asking then
+    can only be refused, and asking changes nothing — and once the deadline has
+    elapsed the session must *not* ask, because the browser's own authorized
+    return is what proves acceptance and consuming it here would take that proof
+    away from the half that can observe it. Every receipt field below is computed
+    from the observation it names.
     """
     defects = []
-    return_order = attempts.get("request_resurrection", {})
+    eligibility = int(logical_time) >= int(ready_at)
+    return_order = attempts.get("request_resurrection")
     physical_order = attempts.get("show_sack", {})
-    return_kind = return_order.get("disposition", {}).get("kind")
     physical_kind = physical_order.get("disposition", {}).get("kind")
-    if return_kind not in ("accepted", "rejected"):
-        defects.append(
-            f"the restarted server did not answer a return request: {return_order!r}"
-        )
+    return_kind = (return_order or {}).get("disposition", {}).get("kind")
     if physical_kind != "rejected":
         defects.append(
             "a dead actor was not refused a physical or sheet action after a restart: "
             f"{physical_order!r}"
         )
-    eligibility = int(logical_time) >= int(ready_at)
-    if return_kind == "accepted" and not eligibility:
+    if not eligibility and return_order is None:
         defects.append(
-            "the restarted server answered a return request before the character's own "
-            f"deadline: logical_time={logical_time} ready_at={ready_at}"
+            "the character was still inside its own deadline and its return request was never "
+            "attempted, so the refusal was never observed"
         )
-    if return_kind == "rejected" and eligibility:
+    if eligibility and return_order is not None:
         defects.append(
-            "the restarted server refused a return the character's own deadline allows: "
-            f"logical_time={logical_time} ready_at={ready_at}"
+            "the session consumed the return of an eligible character, which the browser half's "
+            f"own accepted return has to prove: {return_order!r}"
         )
+    if return_order is not None:
+        return_kind = return_order.get("disposition", {}).get("kind")
+        if return_kind != "rejected":
+            defects.append(
+                "the restarted server did not refuse the return of a character still inside its "
+                f"own deadline: {return_order!r}"
+            )
     return {
         "command_attempts": attempts,
         "physical_action_refused_while_dead": physical_kind == "rejected",
-        "return_accepted": return_kind == "accepted",
+        "return_attempted_while_ineligible": return_order is not None,
         "return_refused_before_deadline": return_kind == "rejected" and not eligibility,
+        "return_left_to_the_browser": return_order is None and eligibility,
+        "eligible_at_restart": eligibility,
         "eligibility_evaluated_at": {"logical_time": logical_time, "ready_at": ready_at},
         "defects": defects,
     }
@@ -778,8 +802,12 @@ def prove_restart_durability(server, *, expect: dict | None = None) -> dict:
     reset the return threshold fails here as well as in the browser.
     """
     observed = observe_frame
+    # The browser half may be observing a character it created itself, which the
+    # harness did not enroll. Selecting it by the ID the browser reported is what
+    # makes this session's observations about the same character.
+    character_id = (expect or {}).get("character_id")
 
-    with LiveWireClient(server) as before:
+    with LiveWireClient(server, character_id=character_id) as before:
         death = observed(before.frame)
     if expect is not None:
         for field in ["actor_id", "character_id"]:
@@ -809,7 +837,7 @@ def prove_restart_durability(server, *, expect: dict | None = None) -> dict:
     )
     if comparison["defects"]:
         raise RuntimeError("; ".join(comparison["defects"]))
-    with LiveWireClient(server) as after:
+    with LiveWireClient(server, character_id=character_id) as after:
         recovered = observed(after.frame)
         for field in ["life_state", "hp", "location", "actor_id", "character_id",
                       "carried_gold", "items", "skill_ledger", "ready_at"]:
@@ -818,12 +846,19 @@ def prove_restart_durability(server, *, expect: dict | None = None) -> dict:
                     f"restart changed {field}: {recovered[field]!r} != {death[field]!r}"
                 )
         # This is a fresh authenticated session against the restarted process.
-        # What it answers is recorded, not assumed: rules admit no intent to a
-        # dead actor except an eligible return request, so the physical-action
-        # refusal is a real observation, and the return answer is judged against
-        # the character's own deadline in authoritative logical time.
+        # What it answers is recorded, not assumed. The return request is asked
+        # only while the character is still inside its own deadline, where the
+        # only correct answer is a refusal; once the deadline has elapsed the
+        # browser half's own accepted return is the proof, and asking here would
+        # both consume it and take that observation away from the half that can
+        # make it. The physical action is asked in both cases: a ghost may never
+        # perform one, eligible or not.
+        eligibility = int(recovered["logical_time"]) >= int(recovered["ready_at"])
         attempts = {}
-        for intent in ({"kind": "request_resurrection"}, {"kind": "show_sack"}):
+        intents = [{"kind": "show_sack"}]
+        if not eligibility:
+            intents.insert(0, {"kind": "request_resurrection"})
+        for intent in intents:
             result, _ = after.command(intent)
             attempts[intent["kind"]] = {
                 "disposition": result.get("disposition", {}),
