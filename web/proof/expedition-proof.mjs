@@ -4,10 +4,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { createCharacterManually } from "./creation-allocation.mjs";
 import { launchProofBrowser, PROOF_ENGINES } from "./serve.mjs";
+import { checkpointLedger, restartServingProcess } from "./proof-handshake.mjs";
 let input = "";
 for await (const chunk of process.stdin) input += chunk;
 const config = JSON.parse(input); input = "";
 const engine = PROOF_ENGINES[config.engine];
+const journey = config.journey ?? "success";
 if (!engine) throw new Error("Unrostered engine");
 const launched = await launchProofBrowser({ name: config.engine, engine, executablePath: engine.executablePath(), trustedAuthority: config.authority });
 const geography = JSON.parse(await readFile(new URL("../../content/lands/first-expedition/generated/workbench_projection.json", import.meta.url), "utf8"));
@@ -126,8 +128,208 @@ try {
     if (here().level !== target) await action(i => i.kind === "traverse" && i.traversal === (target === "d1_entry" ? "stairs_down" : "stairs_up"));
     assert.equal(here().level, target);
   }
-  async function reconnect() {
+  async function reconnectToOrigin() {
     await page.getByRole("button", { name: "Reconnect", exact: true }).click(); await ready();
+  }
+  const observer = () => frame.actors.find(row => row.actor_id === frame.observer_actor_id);
+  const ghost = () => observer()?.life_state === "ghost";
+  const heldWeapon = () => frame.carried.items.find(row => row.item.item_instance_id === createdWeaponId);
+  const opponent = i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger";
+  const opponentDefeated = () => frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger");
+  // The opponent holds ground and Fight reaches one square, so one real East
+  // step is what joins the encounter. Every later action is an ordinary action.
+  async function joinEncounter() {
+    await ready(); const count = commands.length;
+    await page.locator("#world-canvas").focus();
+    await page.keyboard.press("ArrowRight");
+    await committed(count);
+  }
+  /// Attack the shipped opponent until it dies, and snapshot the encounter the
+  /// moment it ends. The snapshot is the encounter's own outcome: reading HP
+  /// again after travel, rest and reconnect would report a later, healed state.
+  async function fightToVictory(encounterLog) {
+    const hpBefore = frame.character.resources.hp;
+    let rounds = 0, damagingHits = 0, damageTaken = 0;
+    for (let attempts = 0; attempts < 60 && !opponentDefeated(); attempts++) {
+      // Fight reaches one square, which is where the previous step put the
+      // character; the closing kick is the authored alternative when the offered
+      // action list has no ready melee attack this round.
+      const offered = () => frame.action_options.some(a => a.enabled && a.intent && opponent(a.intent) && a.intent.mode === "fight");
+      await action(offered() ? (i => opponent(i) && i.mode === "fight") : (i => opponent(i) && i.mode === "jumpkick"));
+      rounds += 1;
+      damageTaken = hpBefore - frame.character.resources.hp;
+      damagingHits = encounterLog.filter(row => row.player_hp_before > row.player_hp).length + 1;
+      encounterLog.push({
+        round: rounds, opponent_hp: frame.actors.find(row => row.actor_id === "cellar_scavenger")?.hp ?? null,
+        player_hp: frame.character.resources.hp, player_hp_before: hpBefore,
+        held: frame.carried.items.filter(row => row.position === "right_hand").map(row => row.item.item_definition_id),
+        ground: frame.ground_items.map(definitionOf),
+        corpse: frame.corpses.flatMap(row => (row.contents ?? []).map(definitionOf)),
+      });
+      await writeFile(path.join(config.output, `${config.engine}-encounter-log.json`), JSON.stringify(encounterLog, null, 2));
+    }
+    // Snapshot immediately, before any later step can heal or rest. Cumulative
+    // damage taken, the net change across the exchange and any healing inside it
+    // are three different numbers, so all three are recorded rather than one
+    // standing in for the others.
+    const hpAtEnd = frame.character.resources.hp;
+    const snapshot = {
+      rounds, damage_taken: damageTaken, damaging_hits: damagingHits,
+      starting_hp: hpBefore, hp_at_end_of_combat: hpAtEnd,
+      net_hp_change: hpBefore - hpAtEnd,
+      healing_during_combat: damageTaken - (hpBefore - hpAtEnd),
+      opponent_defeated: opponentDefeated(),
+      corpse_present: frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger"),
+    };
+    await writeFile(path.join(config.output, `${config.engine}-encounter-snapshot.json`), JSON.stringify(snapshot, null, 2));
+    return { rounds, damageTaken, hpBefore, hpAfter: snapshot.hp_at_end_of_combat, defeated: snapshot.opponent_defeated, snapshot };
+  }
+  /// Recover the weapon ordinary creation put in the character's hand. A
+  /// weapon-backed attack can fumble and drop it, which is ordinary authored
+  /// combat: the opponent may then take it, and the character can take it back
+  /// from the corpse. Recovered at the encounter site, where it is still visible.
+  async function recoverCreatedWeapon() {
+    for (let attempt = 0; attempt < 4 && heldWeapon()?.position !== "right_hand"; attempt++) {
+      if (!heldWeapon()) {
+        const onGround = frame.ground_items.find(row => row.item_instance_id === createdWeaponId);
+        if (onGround) {
+          await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId && i.destination.kind === "carried");
+          continue;
+        }
+        assert(frame.corpses.length > 0, "the created weapon is not on the ground and there is no corpse to search");
+        await action(i => i.kind === "search_corpse");
+      }
+      await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId
+        && i.destination.kind === "carried");
+    }
+    if (heldWeapon() && heldWeapon().position !== "right_hand") {
+      await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId
+        && i.destination.kind === "carried" && i.destination.position === "right_hand");
+    }
+    if (heldWeapon()?.position !== "right_hand") {
+      await writeFile(path.join(config.output, `${config.engine}-weapon-recovery-failure.json`),
+        JSON.stringify({ createdWeaponId, carried: frame.carried.items, ground: frame.ground_items,
+          corpses: frame.corpses }, null, 2));
+    }
+    assert.equal(heldWeapon()?.position, "right_hand",
+      "the created weapon must be recovered from the encounter before leaving it");
+  }
+  /// The ordinary death journey's second half: observe the ghost, prove the
+  /// death state survives a serving-process restart, request the supported
+  /// return once the character is eligible, and resume living movement. Each
+  /// step is the product's own control or an ordinary command.
+  async function completeOrdinaryDeath() {
+    const character = frame.social.character_id;
+    const corpse = structuredClone(frame.observation_center);
+    const deadline = frame.ready_at;
+    const items = structuredClone(frame.carried.items);
+    const goldBefore = frame.carried.gold.sack;
+    const hpAtDeath = frame.character.resources.hp;
+    assert.equal(hpAtDeath, 0, "an ordinary death leaves the character at zero health");
+    await mark("ghost");
+    const speech = page.getByRole("form", { name: "Local speech", exact: true });
+    assert(await speech.isVisible(), "the ghost retains local speech");
+    assert(await page.getByRole("button", { name: "Request resurrection", exact: true }).isDisabled(),
+      "the return must not be offered before the character's own deadline");
+    // The eligibility threshold is a wait, not a failure to hide behind sleeps.
+    await ready(90000);
+    assert(BigInt(frame.logical_time) >= BigInt(deadline), "the deadline elapsed before eligibility was claimed");
+    const restart = await restartServingProcess(config, {
+      engine: config.engine, journey: "death", actor_id: frame.observer_actor_id,
+      character_id: character, ready_at: deadline, location: corpse, life_state: "ghost" }, eventually);
+    assert.equal(restart.payload_comparison, "parsed_json_minus_named_volatile_fields",
+      "the restart receipt must name how it compared the checkpoint");
+    assert.equal(restart.durable_payload_unchanged, true,
+      "the durable checkpoint payload changed across the restart");
+    assert.equal(restart.physical_action_refused_while_dead, true,
+      "a restarted ghost was allowed to perform a physical action");
+    // Re-enter through the ordinary client on the restarted origin.
+    await page.goto(config.origin + "/"); await wait(() => document.body.dataset.playReady === "true");
+    await page.locator("#username").fill(config.username); await page.locator("#password").fill(config.password);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await wait(() => document.body.dataset.phase === "selecting");
+    await page.getByRole("button", { name: "Enter world", exact: true }).click(); await ready(90000);
+    assert.equal(frame.social.character_id, character, "the restart changed the character identity");
+    assert.equal(observer()?.life_state, "ghost", "the restart resurrected the character");
+    assert.deepEqual(frame.observation_center, corpse, "the restart moved the corpse-bound ghost");
+    assert.equal(frame.ready_at, deadline, "the restart reset the return eligibility deadline");
+    assert(await page.getByRole("form", { name: "Local speech", exact: true }).isVisible(),
+      "the restarted ghost lost its speech");
+    await mark("restarted-ghost");
+    const returnStart = commands.length;
+    await page.getByRole("button", { name: "Request resurrection", exact: true }).click();
+    await wait(() => document.querySelector("#world-canvas").dataset.lifeState === "alive");
+    assert.equal(commands.length, returnStart + 1, "the return is one ordinary request");
+    const returnedFrame = received.slice(-40).filter(value =>
+      value.frame?.actors.some(row => row.actor_id === frame.observer_actor_id && row.life_state === "alive"));
+    assert(returnedFrame.length, "no authoritative frame reported the return");
+    const returning = returnedFrame.at(-1).frame;
+    assert.deepEqual(returning.observation_center, config.destination, "the return landed at the configured destination");
+    // Conservation, not a happy ending. Production scavenging stays enabled, so
+    // the scavenging opponent legitimately strips the corpse and what it took is
+    // expected to stay with it. What the return may not do is invent or destroy
+    // anything; the authoritative audit of the stored checkpoint, run by the
+    // runner over the capture taken before the encounter, is what decides that.
+    // The count comparison that used to live here accepted an emptied inventory
+    // and an emptied purse, so it survives only as a diagnostic in the receipt.
+    const returnedIds = new Set(returning.carried.items.map(row => row.item.item_instance_id));
+    assert(returning.carried.items.length <= items.length, "a return cannot create items");
+    assert(BigInt(returning.carried.gold.sack) <= BigInt(goldBefore), "a return cannot create gold");
+    await mark("returned");
+    await page.locator("#world-canvas").focus();
+    const beforeMove = commands.length;
+    await page.keyboard.press("ArrowUp");
+    await eventually(() => commands.length > beforeMove && JSON.stringify(frame.observation_center) !== JSON.stringify(config.destination));
+    await ready();
+    assert.notDeepEqual(frame.observation_center, config.destination, "the returned character can move again");
+    await page.getByRole("button", { name: "Sign out", exact: true }).click();
+    await wait(() => document.body.dataset.phase === "signed_out");
+    assert.deepEqual(errors, []);
+    return {
+      restart_while_dead: restart, death_hp: hpAtDeath, death_deadline: deadline, corpse,
+      return_destination: config.destination, items_at_creation: items,
+      items_after_return: returning.carried.items, gold_at_creation: goldBefore,
+      return_carried_gold: returning.carried.gold.sack,
+      scavenging_enabled: true, ordinary_creation: true,
+    };
+  }
+  /// Stand on the opponent's square and take ordinary Wait actions until the
+  /// authored opponent removes the character. No HP is assigned and no event is
+  /// synthesized: this is production combat resolving an ordinary death.
+  async function dieToAuthoredOpponent() {
+    const hpBefore = frame.character.resources.hp;
+    let rounds = 0;
+    await page.locator("#world-canvas").focus();
+    while (!ghost() && rounds < 200) {
+      await page.waitForFunction(() => {
+        const canvas = document.querySelector("#world-canvas");
+        return canvas.dataset.canAct === "true" || canvas.dataset.lifeState === "ghost";
+      }, null, { polling: 30, timeout: 120000 });
+      if (ghost()) break;
+      const before = commands.length;
+      await page.keyboard.press("Space");
+      await eventually(() => commands.length > before || ghost(), 60000);
+      await wait(() => document.querySelector("#world-canvas").dataset.pending === "false");
+      rounds += 1;
+      await writeFile(path.join(config.output, `${config.engine}-death-journey-log.json`),
+        JSON.stringify({ round: rounds, starting_hp: hpBefore, player_hp: frame.character.resources.hp,
+          opponent_hp: frame.actors.find(row => row.actor_id === "cellar_scavenger")?.hp ?? null,
+          life_state: observer()?.life_state }, null, 2));
+    }
+    assert(ghost(), "the shipped opponent could not defeat a passive created character");
+    const damageTaken = hpBefore - frame.character.resources.hp;
+    assert(damageTaken > 0, "the character lost no health before dying");
+    // The encounter boundary for the losing journey: what the exchange cost,
+    // recorded where it ended rather than after the later return.
+    const snapshot = {
+      rounds_survived: rounds, damage_taken: damageTaken, starting_hp: hpBefore,
+      hp_at_end_of_combat: frame.character.resources.hp,
+      opponent_hp_at_end_of_combat: frame.actors.find(row => row.actor_id === "cellar_scavenger")?.hp ?? null,
+      opponent_defeated: false, life_state: observer()?.life_state ?? null,
+    };
+    await writeFile(path.join(config.output, `${config.engine}-encounter-snapshot.json`),
+      JSON.stringify(snapshot, null, 2));
+    return snapshot;
   }
   await page.goto(`${config.origin}/play.html?study=first-expedition`);
   await wait(() => document.body.dataset.playReady === "true");
@@ -144,11 +346,50 @@ try {
   // The authored dock arrival, not the seeded occupant's historic position.
   assert.deepEqual(here().position, { x:8,y:34 });
   await mark("dock");
+  // Which composed journey this run is. Both start from a character created
+  // through the ordinary UI on the unmodified release world; they differ in what
+  // the character does when it reaches the shipped opponent.
+  if (journey === "death") {
+    // The direct route: the bank and the provisioner belong to the success
+    // route, and stopping at them would spend actions the doomed character does
+    // not need. Everything from the temple onwards is the same navigation.
+    await enter("temple"); await enter("d1_entry");
+    assert.deepEqual(here().position, { x: 24, y: 7 }); await mark("descent");
+    await walkTo(23, 9);
+    // The authoritative item and coin ledger, read from the stored checkpoint by
+    // the runner while the created character is still alive. From here the world
+    // may move an instance into the corpse, onto the ground or into the
+    // scavenging opponent's hands, but nothing may stop existing or appear.
+    const ledgerBefore = await checkpointLedger(config, "capture", "before-death", eventually);
+    assert.equal(ledgerBefore.verdict, "captured", JSON.stringify(ledgerBefore));
+    await joinEncounter();
+    const deathEncounter = await dieToAuthoredOpponent();
+    const deathEvidence = await completeOrdinaryDeath();
+    // Conservation is decided by the runner's audit of the authoritative
+    // checkpoint, not by counting what the returned character can see. A count
+    // comparison accepts an emptied inventory, a same-count substitution and a
+    // duplicate instance; this fails on each of them.
+    const ledgerAfter = await checkpointLedger(config, "audit", "before-death", eventually);
+    assert.equal(ledgerAfter.verdict, "audited", JSON.stringify(ledgerAfter.defects));
+    assert.deepEqual(ledgerAfter.defects, [], "the death boundary must conserve every item and coin");
+    assert.equal(ledgerAfter.after.item_count, ledgerAfter.before.item_count, "every instance still exists");
+    assert.equal(ledgerAfter.after.gold_total, ledgerAfter.before.gold_total, "every coin still exists");
+    assert.deepEqual(ledgerAfter.after.unowned, [], "every instance has exactly one owner");
+    const destination = config.destination;
+    await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({
+      verdict: "PASS", engine: config.engine, journey: "death", renderer: launched.renderer,
+      checkpoints, commands: commands.map(command => command.intent.kind),
+      created_through_ui: true, authored_world: true, normal_tls: true, scratch_postgres: true,
+      candidate_art: true, return_destination: destination,
+      production_encounter: deathEncounter,
+      ledger_before: ledgerBefore, ledger_after: ledgerAfter, ...deathEvidence }, null, 2));
+    await context.close();
+  } else {
   await enter("bank"); await walkTo(1,2);
   await action(i => i.kind === "move_gold" && i.source.kind === "carried" && i.source.position === "sack" && i.destination.kind === "ground_here", { amount: "20" });
   await action(i => i.kind === "deposit_bank_gold", { service: "banker" });
   const bank = () => frame.services_here.flatMap(s => s.capabilities).find(c => c.kind === "bank").balance_gold;
-  assert.equal(bank(), "20"); await reconnect(); assert.equal(bank(), "20");
+  assert.equal(bank(), "20"); await reconnectToOrigin(); assert.equal(bank(), "20");
   await mark("bank"); await enter("arrival"); await enter("temple");
   const seller = frame.actors.find(actor => actor.actor_id === "balm_seller").position.position;
   await walkTo(seller.x,seller.y); await action(i => i.kind === "buy_from_merchant" && i.item_instance_ids.length === 1, { service: "balm_seller" });
@@ -156,83 +397,31 @@ try {
   await mark("temple"); await enter("d1_entry");
   assert.deepEqual(here().position, { x:24,y:7 }); await mark("descent");
   await walkTo(23,9);
-  // The opponent holds ground and Fight reaches one square, so one real East
-  // step is what joins the encounter. Every later attack is an ordinary action.
-  await ready(); { const count = commands.length;
-    await page.locator("#world-canvas").focus();
-    await page.keyboard.press("ArrowRight");
-    await committed(count);
-  }
+  await joinEncounter();
   // The encounter is the shipped opponent at its shipped ratings. Record what
   // the exchange actually cost: a block animation or a fast kill would not show
   // that the opponent is dangerous, and an instant loss would not show that it
   // is survivable.
-  const encounterHpBefore = frame.character.resources.hp;
-  let encounterDamageTaken = 0, encounterRounds = 0; const encounterLog = [];
-  const opponent = i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger";
-  const corpsesBefore = frame.corpses.length;
-  const defeated = () => frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger");
-  for (let attempts=0; attempts<60 && !defeated(); attempts++) {
-    // Fight reaches one square, which is where the previous step put the
-    // character; the closing kick is the authored alternative when the offered
-    // action list has no ready melee attack this round.
-    const offered = () => frame.action_options.some(a => a.enabled && a.intent && opponent(a.intent) && a.intent.mode === "fight");
-    await action(offered() ? (i => opponent(i) && i.mode === "fight") : (i => opponent(i) && i.mode === "jumpkick"));
-    encounterRounds += 1;
-    encounterDamageTaken = encounterHpBefore - frame.character.resources.hp;
-    encounterLog.push({round:encounterRounds,
-      held:frame.carried.items.filter(row=>row.position==="right_hand").map(row=>row.item.item_definition_id),
-      ground:frame.ground_items.map(definitionOf),
-      corpse:frame.corpses.flatMap(row=>(row.contents??[]).map(definitionOf)),
-      scavenger:frame.actors.some(row=>row.actor_id==="cellar_scavenger")});
-    await writeFile(path.join(config.output, `${config.engine}-encounter-log.json`), JSON.stringify(encounterLog, null, 2));
-  }
-  assert(defeated(), "the opponent survived the fight");
-  assert(frame.corpses.length > corpsesBefore, "defeat did not produce the opponent's corpse");
+  const encounterLog = [];
+  const { rounds, damageTaken, hpBefore, hpAfter, defeated, snapshot: encounterSnapshot } =
+    await fightToVictory(encounterLog);
+  assert(defeated, "the opponent survived the fight");
+  assert(rounds > 1, `the encounter ended in ${rounds} round(s); the opponent never acted`);
+  assert(damageTaken > 0, "the shipped opponent never injured the character");
+  assert(hpAfter > 0, "the character did not survive its own starting encounter");
   assert(frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger"), "the corpse is not the encountered opponent");
-  assert(encounterRounds > 1, `the encounter ended in ${encounterRounds} round(s); the opponent never acted`);
-  assert(encounterDamageTaken > 0, "the shipped opponent never injured the character");
-  assert(frame.character.resources.hp > 0, "the character did not survive its own starting encounter");
   await action(i => i.kind === "search_corpse");
   await action(i => i.kind === "move_item" && i.item_instance_id === "found_charm" && i.destination.kind === "carried" && i.destination.position === "sack_item_3");
   await action(i => i.kind === "move_gold" && i.source.kind === "ground" && i.destination.kind === "carried" && i.destination.position === "sack");
-  // Instruction follows the held weapon, so the character must hold the weapon
-  // it was created with. A weapon-backed attack can fumble and drop it, which is
-  // ordinary authored combat: the opponent may then take it, and the character
-  // can take it back from the corpse. This is recovered here, at the encounter
-  // site, because that is where the character can still see it.
-  const held = () => frame.carried.items.find(row => row.item.item_instance_id === createdWeaponId);
-  for (let attempt = 0; attempt < 4 && held()?.position !== "right_hand"; attempt++) {
-    if (!held()) {
-      const onGround = frame.ground_items.find(row => row.item_instance_id === createdWeaponId);
-      if (onGround) {
-        await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId && i.destination.kind === "carried");
-        continue;
-      }
-      assert(frame.corpses.length > 0, "the created weapon is not on the ground and there is no corpse to search");
-      await action(i => i.kind === "search_corpse");
-    }
-    await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId
-      && i.destination.kind === "carried");
-  }
-  if (held() && held().position !== "right_hand") {
-    await action(i => i.kind === "move_item" && i.item_instance_id === createdWeaponId
-      && i.destination.kind === "carried" && i.destination.position === "right_hand");
-  }
-  if (held()?.position !== "right_hand") {
-    await writeFile(path.join(config.output, `${config.engine}-weapon-recovery-failure.json`),
-      JSON.stringify({ createdWeaponId, carried: frame.carried.items, ground: frame.ground_items,
-        corpses: frame.corpses, encounter: encounterLog,
-        scavengerHere: frame.actors.some(row => row.actor_id === "cellar_scavenger") }, null, 2));
-  }
-  assert.equal(held()?.position, "right_hand",
-    "the created weapon must be recovered from the encounter before leaving it");
+  await recoverCreatedWeapon();
+  assert.equal(encounterSnapshot.hp_at_end_of_combat, hpAfter,
+    "the reported combat outcome is the one measured at the encounter boundary");
   await mark("loot"); await enter("temple"); await enter("arrival"); await enter("trainers"); await walkTo(1,2);
   // The instructor's offered track is selected from what the character holds,
   // and a magic-capable character with a free hand is read as asking for spell
   // instruction and told to produce a bound spell book. The weapon was recovered
   // at the encounter site, so it is still in hand here.
-  assert.equal(held()?.position, "right_hand", "the created weapon must still be in hand at the instructor");
+  assert.equal(heldWeapon()?.position, "right_hand", "the created weapon must still be in hand at the instructor");
   const before = frame.character.skill_ledger.find(s => s.track_id === "staff").learning_rate;
   await action(i => i.kind === "train", { service: "trainer_1", amount: "14" });
   assert(BigInt(frame.character.skill_ledger.find(s => s.track_id === "staff").learning_rate) > BigInt(before));
@@ -240,13 +429,13 @@ try {
   assert(critique.events.some(e => e.kind === "feedback" && e.cue.kind === "skill_critique"));
   assert.match(await page.locator("#feedback").textContent(), /Staff:/);
   const saved = { skills: frame.character.skill_ledger, items: frame.carried.items, gold: frame.carried.gold.sack, location: here() };
-  await reconnect(); assert.deepEqual(frame.character.skill_ledger,saved.skills); assert.deepEqual(frame.carried.items,saved.items); assert.equal(frame.carried.gold.sack,saved.gold); assert.deepEqual(here(),saved.location);
+  await reconnectToOrigin(); assert.deepEqual(frame.character.skill_ledger,saved.skills); assert.deepEqual(frame.carried.items,saved.items); assert.equal(frame.carried.gold.sack,saved.gold); assert.deepEqual(here(),saved.location);
   await mark("trained-return");
   await enter("arrival"); await enter("lodge"); await walkTo(6,1);
   await action(i => i.kind === "deposit_locker_item" && i.item_instance_id === "found_charm", { service: "lodge_keeper" });
   assert(!frame.carried.items.some(i => i.item.item_instance_id === "found_charm"));
-  await reconnect();
-  assert(frame.services_here.flatMap(s => s.capabilities).some(c => c.kind === "locker" && c.items.some(i => i.item_instance_id === "found_charm")));
+  await reconnectToOrigin();
+  assert(frame.services_here.flatMap(s => s.capabilities).some(c => c.kind === "locker" && c.items.some(i => i.item.item_instance_id === "found_charm")));
   await action(i => i.kind === "withdraw_locker_item" && i.item_instance_id === "found_charm" && i.destination === "sack_item_3", { service: "lodge_keeper" });
   assert(frame.carried.items.some(i => i.item.item_instance_id === "found_charm"));
   await mark("lodge-return");
@@ -254,13 +443,19 @@ try {
   await wait(() => document.body.dataset.phase === "signed_out");
   assert.equal(await page.locator("#world-canvas").getAttribute("data-study-level"), null);
   assert.deepEqual(errors, []);
-  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
+  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, journey:"success", renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
     encounter_rounds_logged:encounterLog.length,
-    production_encounter:{rounds:encounterRounds, damage_taken:encounterDamageTaken, starting_hp:encounterHpBefore, hp_after:frame.character.resources.hp, opponent_hp_authored:18, player_ratings_authored:true} },null,2));
+    // The encounter figures are the ones frozen when combat ended, and the
+    // receipt also says what later recovery did to the character, so a healed
+    // later state can never be read as the outcome of the fight.
+    production_encounter:{...encounterSnapshot, opponent_hp_authored:18, player_ratings_authored:true,
+      hp_at_receipt:frame.character.resources.hp,
+      post_combat_recovery:frame.character.resources.hp-encounterSnapshot.hp_at_end_of_combat} },null,2));
   // The per-round trace is useful evidence but does not belong in the summary
   // receipt; it is written beside it.
   await writeFile(path.join(config.output, `${config.engine}-encounter-log.json`), JSON.stringify(encounterLog, null, 2));
   await context.close();
+  }
 } catch(error) {
   await writeFile(path.join(config.output, `${config.engine}-failure.json`), JSON.stringify({ stage, error:String(error), errors, frame, staticContext, commandCount:commands.length, lastResult:results.at(-1) },null,2));
   await page?.screenshot({ path:path.join(config.output, `${config.engine}-failure.png`), fullPage:true }).catch(()=>{});

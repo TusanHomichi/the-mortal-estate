@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import {readFile,writeFile} from 'node:fs/promises';
-import {existsSync} from 'node:fs';
+import {writeFile} from 'node:fs/promises';
 import {setTimeout as delay} from 'node:timers/promises';
 import {launchProofBrowser,PROOF_ENGINES} from './serve.mjs';
 import {collectGraphicsErrors} from './graphics-errors.mjs';
+import {checkpointLedger,restartServingProcess} from './proof-handshake.mjs';
 import {worldCellPoint} from './world-pointing.mjs';
 
 let input='';for await(const chunk of process.stdin)input+=chunk;
@@ -50,6 +50,14 @@ try {
   stage='enter combat';
   const self=()=>frame.actors.find(row=>row.actor_id===actor);
   const hpBefore=self().hp;
+  // The authoritative item and coin ledger, read from the stored checkpoint by
+  // the runner while the character is still alive and about to join the
+  // encounter. Everything the world owns is accounted for from here on: an
+  // instance may be dropped, retained in the corpse or taken by the scavenging
+  // opponent, but it may not stop existing, duplicate, change identity or
+  // quantity, and no coin may be minted or burned.
+  const ledgerBefore=await checkpointLedger(config,'capture','before-death',eventually);
+  assert.equal(ledgerBefore.verdict,'captured',JSON.stringify(ledgerBefore));
   await canvas.focus();
   // One real East movement puts the character on the opponent's square; every
   // later step is the ordinary Wait action. The opponent acts on its own
@@ -114,12 +122,18 @@ try {
   // files; no gameplay state crosses the boundary, and the page is reloaded
   // because the restarted process listens on a new port.
   stage='restart while dead';
-  await writeFile(`${config.output}/restart-request.json`,JSON.stringify({engine:config.engine,alignment:config.alignment,
-    actor_id:actor,character_id:character,ready_at:deadline,location:corpse,life_state:'ghost'}));
-  await eventually(()=>existsSync(`${config.output}/restart-complete.json`),180000);
-  const restart=JSON.parse(await readFile(`${config.output}/restart-complete.json`,'utf8'));
-  assert.equal(restart.payload_unchanged_across_restart,true,'the durable checkpoint changed across the restart');
+  const restart=await restartServingProcess(config,
+    {engine:config.engine,alignment:config.alignment,actor_id:actor,character_id:character,
+     ready_at:deadline,location:corpse,life_state:'ghost'},eventually);
+  assert.equal(restart.payload_comparison,'parsed_json_minus_named_volatile_fields',
+    'the restart receipt must name how it compared the checkpoint');
+  assert.equal(restart.durable_payload_unchanged,true,'the durable checkpoint payload changed across the restart');
   assert.deepEqual(restart.excluded_volatile_fields,['character_presence'],'only the live presence mark may move');
+  // The raw stored digest is reported as an observation, not asserted: a restart
+  // drops the old session, so the presence mark inside the checkpoint may move
+  // even when every durable gameplay field is identical.
+  assert.equal(typeof restart.checkpoint_bytes_identical,'boolean','the raw digest comparison must be reported');
+  assert.equal(restart.physical_action_refused_while_dead,true,'a restarted ghost was allowed to act');
   const restartedOrigin=restart.origin||config.origin;
   config.origin=restartedOrigin;
   await page.goto(restartedOrigin+'/');await wait(()=>document.body.dataset.playReady==='true');
@@ -169,9 +183,17 @@ try {
   // the wrong oracle. What is checked is what the return itself can create:
   // nothing. No duplicated item, no created gold, and the same character.
   const returnedIds=new Set(returning.carried.items.map(row=>row.item.item_instance_id));
-  assert(returning.carried.items.length<=items.length,'a return cannot create items');
-  assert(BigInt(returning.carried.gold.sack)<=BigInt(goldBefore),'a return cannot create gold');
   const unobserved=items.map(row=>row.item.item_instance_id).filter(id=>!returnedIds.has(id));
+  // The counted oracle above is diagnostic only. Conservation is decided by the
+  // runner's audit of the authoritative ledger, taken against the capture made
+  // at the death boundary; a count comparison would accept an emptied inventory,
+  // a same-count substitution or a duplicated instance.
+  const ledgerAfter=await checkpointLedger(config,'audit','before-death',eventually);
+  assert.equal(ledgerAfter.verdict,'audited',JSON.stringify(ledgerAfter.defects));
+  assert.deepEqual(ledgerAfter.defects,[],'the death boundary must conserve every item and coin');
+  assert.equal(ledgerAfter.after.item_count,ledgerAfter.before.item_count,'every instance still exists');
+  assert.equal(ledgerAfter.after.gold_total,ledgerAfter.before.gold_total,'every coin still exists');
+  assert.deepEqual(ledgerAfter.after.unowned,[],'every instance has exactly one owner');
   assert(received.slice(returnStart).some(value=>value.kind==='command_result'&&value.command_id===commands().at(-1).command_id&&value.disposition.kind==='accepted'));
   await ready();assert.equal((await motion()).ghost,false);await mark('returned');
   stage='living movement';await canvas.focus();await page.keyboard.press('ArrowUp');
@@ -188,6 +210,7 @@ try {
     gold_at_creation:goldBefore,return_carried_gold:returning.carried.gold.sack,
     items_at_creation_count:items.length,items_after_return_count:returning.carried.items.length,
     items_not_visible_from_the_return_destination:unobserved,
+    ledger_before:ledgerBefore,ledger_after:ledgerAfter,
     commands:commands().map(command=>command.intent),errors},null,2)+'\n');
 }catch(error){
   await page?.screenshot({path:`${config.output}/${name}-failure.png`}).catch(()=>{});
