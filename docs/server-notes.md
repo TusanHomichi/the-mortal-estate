@@ -116,7 +116,8 @@ listings into an existing compatible provider without changing item IDs, prices,
 listing origin or quantities. Player state is never reseeded. It refuses retained
 actors whose current or home positions remain impassable after explicitly declared
 member translations and reuses full checkpoint hydration to validate the result.
-The strict plan requires `relocations` and `initialize_new_topology`; retired plans
+The strict plan requires `relocations`, `initialize_new_topology` and
+`rederive_actor_stats`; retired plans
 without those fields are refused. Member translations preserve every typed live
 location, NPC patrol and remembered location, including keyed door and hidden
 state. Duplicate, overflowing, absent-member or out-of-bounds transforms fail.
@@ -127,6 +128,20 @@ revelation state survives. Bootstrap
 deployment retains the source-definition binding beside its migration receipt.
 This is an offline migration, not a recovery
 fallback or a second supported in-memory shape.
+
+Actor `attack` and `defense` are immutable definition facts, so a cutover that
+moves an authored rating cannot leave a retained actor on the old one: ordinary
+recovery refuses a changed content identity, so the stale value would survive
+indefinitely and the world would quietly run two rule sets.
+`rederive_actor_stats` names the runtime actor definition IDs whose authored
+ratings move. Every movement between the two definitions must be declared, a
+declared ID that did not move fails the plan, and the declared ratings are then
+written into every retained actor that references them before any other rule
+reads them. Nothing else about an actor is touched — identity, kind, resources,
+life state, progression, inventory, balances, deadlines and timing are preserved
+exactly, and current HP is never healed or damaged by a rating change. Authored
+health is out of scope for this field; moving it needs its own explicit decision
+about current and maximum pools.
 
 The server command `checkpoint migrate-content <before-bootstrap> <after-bootstrap>
 <checkpoint> <plan> <output>` validates both complete definitions, retains the

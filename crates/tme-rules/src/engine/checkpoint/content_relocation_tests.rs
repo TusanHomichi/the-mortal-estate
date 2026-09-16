@@ -35,6 +35,7 @@ fn merchant_retirement_preserves_stock_prices_and_all_item_instances() {
         to_definition_sha256: after.content_identity().definition_sha256.clone(),
         relocations: vec![],
         initialize_new_topology: false,
+        rederive_actor_stats: BTreeSet::new(),
         retire_npcs: BTreeSet::from([actor_id.clone()]),
         merge_merchants: BTreeMap::from([("retiring_counter".into(), "waystation_counter".into())]),
     };
@@ -93,6 +94,7 @@ fn explicit_rebind_preserves_every_mutable_byte_and_refuses_wrong_identity_and_p
         to_definition_sha256: after.content_identity().definition_sha256.clone(),
         relocations: vec![],
         initialize_new_topology: false,
+        rederive_actor_stats: BTreeSet::new(),
         retire_npcs: BTreeSet::new(),
         merge_merchants: BTreeMap::new(),
     };
@@ -182,6 +184,7 @@ fn relocation_plan(
             offset,
         }],
         initialize_new_topology: false,
+        rederive_actor_stats: BTreeSet::new(),
     }
 }
 
@@ -314,6 +317,7 @@ fn new_topology_requires_explicit_initialization_and_existing_open_state_survive
         merge_merchants: BTreeMap::new(),
         relocations: vec![],
         initialize_new_topology: false,
+        rederive_actor_stats: BTreeSet::new(),
     };
     let checkpoint = engine.export_checkpoint().unwrap();
     assert!(
