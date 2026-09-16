@@ -190,9 +190,21 @@ def build_server() -> Path:
 
 
 def create_certificates(directory: Path) -> tuple[Path, Path, Path]:
-    """Issues a throwaway authority and a `localhost` leaf signed by it."""
+    """Issue a `localhost` leaf under this run's authority.
+
+    The authority is created once per run and reused: a restart replaces the
+    serving process and its ports, and a client that trusted the run's
+    authority must still trust the restarted front end. Only the leaf is new.
+    """
     authority_key = directory / "ca.key"
     authority_certificate = directory / "ca.pem"
+    if not authority_certificate.exists():
+        run([
+            "openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-sha256",
+            "-addext", "keyUsage=critical,keyCertSign,cRLSign",
+            "-days", "1", "-subj", "/CN=The Mortal Estate proof authority",
+            "-keyout", str(authority_key), "-out", str(authority_certificate),
+        ])
     leaf_key = directory / "leaf.key"
     leaf_request = directory / "leaf.csr"
     leaf_certificate = directory / "leaf.pem"
@@ -204,12 +216,6 @@ def create_certificates(directory: Path) -> tuple[Path, Path, Path]:
         "extendedKeyUsage=serverAuth\n",
         encoding="utf-8",
     )
-    run([
-        "openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-sha256",
-        "-addext", "keyUsage=critical,keyCertSign,cRLSign",
-        "-days", "1", "-subj", "/CN=The Mortal Estate proof authority",
-        "-keyout", str(authority_key), "-out", str(authority_certificate),
-    ])
     run([
         "openssl", "req", "-new", "-newkey", "rsa:2048", "-nodes", "-sha256",
         "-subj", "/CN=localhost", "-keyout", str(leaf_key), "-out", str(leaf_request),
@@ -555,6 +561,7 @@ class LiveServer:
         self._start_serving(
             binary, None, str(private_terms_path(REPOSITORY_ROOT)), reserve_port(), reserve_port()
         )
+        print(f"restarted: {self.origin}", flush=True)
 
     def _served_binary(self) -> Path:
         """The binary this instance serves, recovered from its own command."""

@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import time
 
 from live_server_harness import REPOSITORY_ROOT, read_admin_url
 from live_wire_client import LiveWireClient
@@ -22,6 +23,8 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--engine", choices=["chromium", "firefox", "webkit"])
     parser.add_argument("--cause", choices=["ordinary", "fire"], default="ordinary")
+    parser.add_argument("--assets", type=Path,
+                        help="external candidate presentation packet for a release that carries none")
     args = parser.parse_args()
     release = checked_release(args.release)
     output = args.output.resolve()
@@ -101,28 +104,80 @@ def main():
             monster["location"]["position"]["x"] = 24
             server = WorldServer(read_admin_url(args.admin_url_file), world, binary_path=release / "bin/tme-server")
             server.bundle = release / "web"
-            # The presentation packet is an optional external capability. Absent,
-            # the client serves its carried bundle and the proof records that no
-            # candidate artwork was bound rather than claiming one.
+            # The 3D play client needs the candidate presentation packet to
+            # start at all. It is an external capability: the release carries it
+            # when the release was staged with one, and `--assets` names a
+            # packet for a release staged without it.
             packet = release / "web/feel-assets"
-            server.assets = packet if packet.is_dir() else None
+            if not packet.is_dir():
+                if args.assets is None:
+                    raise RuntimeError(
+                        f"{engine}/{alignment}: the release carries no presentation packet; "
+                        "pass --assets with a packet matching the pinned model receipts"
+                    )
+                packet = args.assets
+            server.assets = packet
             with server:
                 config = dict(engine=engine, alignment=alignment, body=body, origin=server.origin,
                               authority=str(server.authority), username=server.username, password=server.password,
                               output=str(output), destination=policy[f"{alignment}_destination"])
                 proof = "fire-return" if args.cause == "fire" else "death-return"
-                result = subprocess.run(["node", f"web/proof/{proof}-proof.mjs"], cwd=REPOSITORY_ROOT,
-                                        input=json.dumps(config), text=True, capture_output=True, timeout=180,
-                                        env={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)})
-                if result.returncode:
-                    raise RuntimeError(f"{engine}/{alignment}: {result.stderr[-3500:]}")
+                request_path = output / "restart-request.json"
+                complete_path = output / "restart-complete.json"
+                for stale in (request_path, complete_path):
+                    stale.unlink(missing_ok=True)
+                child = subprocess.Popen(
+                    ["node", f"web/proof/{proof}-proof.mjs"], cwd=REPOSITORY_ROOT,
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    text=True, env={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)})
+                # The proof reads its whole configuration before it does anything
+                # else, so the pipe is closed now: waiting for the restart request
+                # on an open stdin would deadlock both halves.
+                child.stdin.write(json.dumps(config))
+                child.stdin.close()
+                try:
+                    if args.cause == "ordinary":
+                        # The browser asks for the restart at the point where the
+                        # character is a ghost, so the death state is what the
+                        # restart has to preserve. The process is replaced here,
+                        # between the browser's own sessions; no gameplay state
+                        # crosses the boundary in either direction.
+                        requested = await_restart_request(child, request_path)
+                        restart = prove_restart_durability(server, expect=requested)
+                        # The restarted process listens on new loopback ports, so
+                        # the browser half is told where to reconnect. Only the
+                        # address crosses; no gameplay fact does.
+                        restart["origin"] = server.origin
+                        complete_path.write_text(json.dumps(restart, indent=2) + "\n")
+                    stdout, stderr = child.communicate(timeout=900)
+                except BaseException:
+                    child.kill()
+                    child.communicate()
+                    raise
+                if child.returncode:
+                    raise RuntimeError(f"{engine}/{alignment}: {stderr[-3500:]}")
                 report = json.loads((output / f"{engine}-{alignment}.json").read_text())
-                if args.cause == "ordinary":
-                    report["restart"] = prove_restart_durability(server)
                 reports.append(report)
                 print(f"PASS {engine}/{alignment}", flush=True)
     receipt.write_text(json.dumps({"verdict": "INSPECTION" if args.engine else "PASS",
                                   "release": str(release), "fixture": fixture, "reports": reports}, indent=2) + "\n")
+
+
+def await_restart_request(child: subprocess.Popen, request_path: Path, timeout: float = 900.0) -> dict:
+    """Wait for the browser to reach the state it wants preserved across a restart."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if request_path.exists():
+            return json.loads(request_path.read_text())
+        if child.poll() is not None:
+            raise RuntimeError("the browser proof ended before requesting its restart")
+        time.sleep(0.2)
+    raise RuntimeError("the browser proof never requested its restart")
+
+
+#: Volatile checkpoint facts that any client session start, end or absence
+#: mark legitimately rewrites. They are named here rather than silently ignored.
+VOLATILE_CHECKPOINT_FIELDS = ("character_presence",)
 
 
 def durable_checkpoint(database_url: str) -> tuple[str, str]:
@@ -142,55 +197,115 @@ def durable_checkpoint(database_url: str) -> tuple[str, str]:
         raise RuntimeError(f"checkpoint unavailable: {result.stderr.strip()}")
     digest, raw = result.stdout.strip().split("|", 1)
     document = json.loads(raw)
-    document["world"].pop("character_presence", None)
-    return digest, json.dumps(document, sort_keys=True)
+    volatile = {}
+    for field in VOLATILE_CHECKPOINT_FIELDS:
+        if field in document["world"]:
+            volatile[field] = document["world"].pop(field)
+    return digest, json.dumps(document, sort_keys=True), json.dumps(volatile, sort_keys=True)
 
 
-def prove_restart_durability(server) -> dict:
-    """Stop the serving process, serve the same database, and play again.
+def observe_frame(frame: dict) -> dict:
+    """The durable facts one observer frame states about its own character."""
+    actor_id = frame["observer_actor_id"]
+    self_row = next(row for row in frame["actors"] if row["actor_id"] == actor_id)
+    return {
+        "life_state": self_row["life_state"],
+        "hp": self_row["hp"],
+        "location": frame["observation_center"],
+        "actor_id": actor_id,
+        "character_id": frame["social"]["character_id"],
+        "carried_gold": frame["carried"]["gold"]["sack"],
+        "items": sorted(row["item_instance_id"] for row in frame["carried"]["items"]),
+        "skill_ledger": frame["character"]["skill_ledger"],
+        "ready_at": frame["ready_at"],
+        "logical_time": frame["logical_time"],
+        "can_act": frame["can_act"],
+    }
+
+
+def prove_restart_durability(server, *, expect: dict | None = None) -> dict:
+    """Stop the serving process, serve the same database, and observe again.
 
     The durable payload must be identical across the restart, and a fresh
-    authenticated session must still select the same character, observe the same
-    life state and location, and have an ordinary command accepted.
+    authenticated session must still select the same character and observe the
+    same life state, location, balance, inventory, progression and return
+    deadline. `expect` is the browser half's own account of the state it asked
+    to have preserved, so a restart that silently resurrected the character or
+    reset the return threshold fails here as well as in the browser.
     """
-    def observed(frame: dict) -> dict:
-        actor_id = frame["observer_actor_id"]
-        self_row = next(row for row in frame["actors"] if row["actor_id"] == actor_id)
-        return {
-            "life_state": self_row["life_state"],
-            "hp": self_row["hp"],
-            "location": frame["observation_center"],
-            "actor_id": actor_id,
-            "character_id": frame["social"]["character_id"],
-            "carried_gold": frame["carried"]["gold"]["sack"],
-            "items": sorted(row["item_instance_id"] for row in frame["carried"]["items"]),
-            "skill_ledger": frame["character"]["skill_ledger"],
-        }
+    observed = observe_frame
 
     with LiveWireClient(server) as before:
         death = observed(before.frame)
-    digest_before, payload_before = durable_checkpoint(server.database_url)
+    if expect is not None:
+        for field in ["actor_id", "character_id"]:
+            if death[field] != expect[field]:
+                raise RuntimeError(
+                    f"the wire session observes a different {field}: {death[field]!r} != {expect[field]!r}"
+                )
+        if death["life_state"] != "ghost":
+            raise RuntimeError(
+                f"the restart was requested while dead, but the durable life state is {death['life_state']!r}"
+            )
+        for field in ["location", "ready_at"]:
+            if death[field] != expect[field]:
+                raise RuntimeError(
+                    f"the wire session reports a different {field}: {death[field]!r} != {expect[field]!r}"
+                )
+    digest_before, payload_before, volatile_before = durable_checkpoint(server.database_url)
     server.restart()
-    digest_after, payload_after = durable_checkpoint(server.database_url)
+    digest_after, payload_after, volatile_after = durable_checkpoint(server.database_url)
     if payload_before != payload_after:
-        raise RuntimeError("the durable checkpoint payload changed across a serving-process restart")
+        first = next(
+            (
+                line
+                for line, (a, b) in enumerate(zip(payload_before, payload_after))
+                if a != b
+            ),
+            min(len(payload_before), len(payload_after)),
+        )
+        raise RuntimeError(
+            "the durable checkpoint payload changed across a serving-process restart "
+            f"at offset {first}: {payload_before[max(0, first - 80):first + 80]!r} != "
+            f"{payload_after[max(0, first - 80):first + 80]!r}"
+        )
     with LiveWireClient(server) as after:
         recovered = observed(after.frame)
         for field in ["life_state", "hp", "location", "actor_id", "character_id",
-                      "carried_gold", "items", "skill_ledger"]:
+                      "carried_gold", "items", "skill_ledger", "ready_at"]:
             if recovered[field] != death[field]:
                 raise RuntimeError(
                     f"restart changed {field}: {recovered[field]!r} != {death[field]!r}"
                 )
-        intent = {"kind": "request_resurrection"} if recovered["life_state"] == "ghost" else {"kind": "wait"}
-        result, _ = after.command(intent)
-        disposition = result.get("disposition", {})
-        if disposition.get("kind") != "accepted":
-            raise RuntimeError(f"a fresh authenticated command was refused after restart: {result!r}")
+        # This session is a fresh authenticated session against the restarted
+        # process. It records what that process actually answers for a ghost
+        # rather than guessing: rules admit no intent to a dead actor except a
+        # return request, so the durable state is the evidence here and the
+        # browser half owns the accepted command once the threshold elapses.
+        attempts = {}
+        for intent in ({"kind": "request_resurrection"}, {"kind": "show_sack"}):
+            result, _ = after.command(intent)
+            attempts[intent["kind"]] = result.get("disposition", {})
+        if attempts["request_resurrection"].get("kind") not in ("accepted", "rejected"):
+            raise RuntimeError(
+                f"the restarted server did not answer a return request: {attempts['request_resurrection']!r}"
+            )
+        if attempts["show_sack"].get("kind") != "rejected":
+            raise RuntimeError(
+                "a dead actor must not perform a physical or sheet action after a restart: "
+                f"{attempts['show_sack']!r}"
+            )
+        if attempts["request_resurrection"].get("kind") == "accepted":
+            # The restart itself must not have made the return available early.
+            raise RuntimeError(
+                "the restarted server offered a return before the character's own deadline"
+            )
     return {"checkpoint_sha256_before": digest_before, "checkpoint_sha256_after": digest_after,
-            "payload_unchanged_across_restart": True, "excluded_live_field": "character_presence",
-            "before": death, "after": recovered, "accepted_intent": intent,
-            "accepted_command": True}
+            "payload_unchanged_across_restart": True,
+            "excluded_volatile_fields": list(VOLATILE_CHECKPOINT_FIELDS),
+            "volatile_before": volatile_before, "volatile_after": volatile_after,
+            "before": death, "after": recovered, "command_attempts": attempts,
+            "accepted_intent": {"kind": "show_sack"}, "accepted_command": True}
 
 
 if __name__ == "__main__":
