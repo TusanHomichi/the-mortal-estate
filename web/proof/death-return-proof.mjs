@@ -38,8 +38,25 @@ try {
   assert.equal(frame.actors.find(row=>row.actor_id===actor).life_state,'alive');
   assert.equal(await canvas.getAttribute('data-presentation'),'world-3d');
   const items=structuredClone(frame.carried.items),retained=items.filter(row=>row.position.startsWith('sack_')||row.position.startsWith('belt_'));
-  stage='enter combat';await canvas.focus();await page.keyboard.press('ArrowRight');
-  await wait(()=>document.querySelector('#world-canvas').dataset.lifeState==='ghost',null,45000);
+  // Ordinary death is production combat: the character walks onto the shipped
+  // opponent and then stands there. Nothing here grants, removes or assigns HP,
+  // and the scavenger keeps its authored attack and its scavenging profile.
+  // Each step is an ordinary movement command that also lets the monster act.
+  stage='enter combat';
+  const hpBefore=frame.actors.find(row=>row.actor_id===actor).hp;
+  await canvas.focus();
+  let damageTaken=0;
+  for(let step=0;step<120;step+=1){
+    const self=frame.actors.find(row=>row.actor_id===actor);
+    damageTaken=hpBefore-self.hp;
+    if(self.life_state==='ghost')break;
+    await page.keyboard.press('ArrowRight');
+    await eventually(()=>frame.actors.find(row=>row.actor_id===actor).hp<hpBefore||
+      frame.actors.find(row=>row.actor_id===actor).life_state==='ghost',30000);
+  }
+  await wait(()=>document.querySelector('#world-canvas').dataset.lifeState==='ghost',null,60000);
+  assert(damageTaken>0,'production combat must be what removed the character, not a fixture');
+  assert(hpBefore>0,'the character started the encounter with its authored starting health');
   assert(received.some(value=>value.events?.some(event=>event.kind==='feedback'&&event.cue.kind==='defeat')),'real defeat feedback must reach the browser');
   const corpse=structuredClone(frame.observation_center),deadline=frame.ready_at;
   assert.deepEqual(corpse.position,{x:24,y:9});
@@ -100,6 +117,7 @@ try {
   await writeFile(`${config.output}/${name}.json`,JSON.stringify({verdict:'PASS',engine:config.engine,renderer:launched.renderer,
     alignment:config.alignment,body:config.body,captures,death_deadline:deadline,corpse,return_destination:config.destination,
     reconnect_preserves_death:true,ghost_speech:true,stationary_ghost:true,return_cooldown_ms:3000,
+    production_combat_damage:damageTaken,starting_hp:hpBefore,production_content:true,
     commands:commands().map(command=>command.intent),errors},null,2)+'\n');
 }catch(error){
   await page?.screenshot({path:`${config.output}/${name}-failure.png`}).catch(()=>{});

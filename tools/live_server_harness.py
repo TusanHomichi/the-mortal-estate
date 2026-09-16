@@ -467,6 +467,28 @@ class LiveServer:
 
         public_port = reserve_port()
         operations_port = reserve_port()
+        self._start_serving(server_binary, installation, banned_terms, public_port, operations_port)
+
+    def _start_serving(
+        self,
+        server_binary: Path,
+        installation: ServedInstallation | None,
+        banned_terms: str,
+        public_port: int,
+        operations_port: int,
+    ) -> None:
+        """Serve whatever the database already holds, on freshly reserved ports.
+
+        On the first call the schema, account and bootstrap manifest already
+        exist. On a restart the caller has stopped the process and this serves
+        exactly the same durable state again: no migration, no enrolment and no
+        reseeding, so what a client sees after this returns is what survived.
+        """
+        manifest = (
+            installation.bootstrap_manifest.resolve()
+            if installation is not None
+            else self.run_directory / "bootstrap.json"
+        )
         tls_port = reserve_port()
         self.authority, certificate, key = create_certificates(self.run_directory)
         self._proxy = self.start_proxy(tls_port, public_port, certificate, key)
@@ -493,7 +515,8 @@ class LiveServer:
             # the log it writes is empty and any tail of it would say nothing.
             "RUST_LOG": os.environ.get("RUST_LOG", "info"),
         }
-        with self.server_log.open("w", encoding="utf-8") as log_handle:
+        with self.server_log.open("a", encoding="utf-8") as log_handle:
+            log_handle.write("\n--- serving process start ---\n")
             self._server = subprocess.Popen(
                 [str(server_binary), "serve"],
                 env=environment,
@@ -510,6 +533,49 @@ class LiveServer:
                 self.status.get("protocol_minor"),
             )
         )
+
+    def restart(self, *, server_binary: Path | None = None) -> None:
+        """Stop the serving process and serve the same database again.
+
+        The bootstrap manifest, run directory, database and account stay the
+        same facts; only the process and its loopback ports are new. Nothing
+        here writes gameplay state, which is the point: what a client sees
+        afterwards is what survived the process it was talking to.
+        """
+        if self.installation is not None or not hasattr(self, "run_directory"):
+            raise ProofError("restart requires a harness-provisioned installation")
+        binary = (
+            server_binary.resolve(strict=True)
+            if server_binary is not None
+            else self._served_binary()
+        )
+        if not binary.is_file() or not os.access(binary, os.X_OK):
+            raise ValueError("proof server binary must be an executable regular file")
+        self._stop_serving()
+        self._start_serving(
+            binary, None, str(private_terms_path(REPOSITORY_ROOT)), reserve_port(), reserve_port()
+        )
+
+    def _served_binary(self) -> Path:
+        """The binary this instance serves, recovered from its own command."""
+        if self._server is not None and self._server.args:
+            return Path(self._server.args[0])
+        return build_server()
+
+    def _stop_serving(self) -> None:
+        if self._server is not None:
+            if self._server.poll() is None:
+                self._server.terminate()
+            try:
+                self._server.wait(timeout=SERVER_EXIT_TIMEOUT_SECONDS)
+            except subprocess.TimeoutExpired:
+                self._server.kill()
+                self._server.wait(timeout=SERVER_EXIT_TIMEOUT_SECONDS)
+                raise ProofError("the serving process ignored termination and was killed")
+            self._server = None
+        if self._proxy is not None:
+            self._proxy.close()
+            self._proxy = None
 
     def start_proxy(self, listen_port: int, upstream_port: int, certificate: Path, key: Path):
         """The client harness owns its front end; authority provisioning is shared."""

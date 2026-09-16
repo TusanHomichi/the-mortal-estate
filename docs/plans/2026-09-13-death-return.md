@@ -169,6 +169,30 @@ and a looting opponent legitimately removes corpse contents during the wait.
 This fixture isolates return and inventory restoration. It changes no production
 combat resolver or installed catalog and proves no claim about initial balance.
 
+### Ordinary death now runs on unmodified production content
+
+Issue #74 reconciled the authored starter encounter, so the ordinary cause no
+longer needs an adversary fixture at all. `--cause ordinary` serves the shipped
+catalog and seed **byte for byte** and records one digest as both the source and
+the served catalog: the character walks onto the authored opponent with real
+movement and then stands there until production combat removes it. The receipt
+records the HP the character actually lost, and a case fails if that is zero.
+No attribute, attack value, starting HP, scavenging profile, AI or geography is
+overridden on this route.
+
+The attack-80, non-scavenging fixture survives only where it is still the right
+tool: `--cause fire` needs a monster-delivered fire attack that production
+content does not author, and that receipt labels itself as a fixture. Nothing
+here changes the resolver or the installed catalog.
+
+The runner also proves restart durability for the ordinary route. It stops the
+serving process, serves the same database again, and then requires the stored
+checkpoint digest to be unchanged and a fresh authenticated session to observe
+the same actor, character identity, life state, location, carried items,
+balance and earned progression before accepting another ordinary command. The
+restart is a real process restart through the harness's own lifecycle and writes
+no gameplay state.
+
 
 ## Immediate fire-return continuation
 

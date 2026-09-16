@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 
 from live_server_harness import REPOSITORY_ROOT, read_admin_url
+from live_wire_client import LiveWireClient
 from presentation_release import checked_release
 from run_world_proof import WorldServer, world_fixture
 
@@ -36,16 +37,19 @@ def main():
     declared = world_fixture()
     catalog_source = (release / declared.catalog).read_bytes()
     catalog = json.loads(catalog_source)
-    # The presentation land gives the player defense 40 and its sole monster
-    # attack 2; that opponent cannot hit an ordinary player. This explicit
-    # disposable adversary fixture changes its attack, never the resolver. It
-    # does not loot during the request delay, so the retained-inventory assertion
-    # exercises resurrection rather than the independent corpse-scavenging path.
     adversary = next(actor for actor in catalog["actor_definitions"].values()
                      if actor["id"] == "actor/first_expedition/cellar_scavenger")
+    # An ordinary death is proved with the shipped content exactly as it is
+    # published: no adversary override, no starting-HP override and no disabled
+    # scavenging. The character simply stands in the encounter and is beaten by
+    # the authored opponent, which is what ordinary death means.
+    #
+    # The immediate-fire route still needs an adversary fixture: production
+    # content has no monster-dealt fire attack, and the fire exception is a
+    # separate behaviour with its own issue. This explicit disposable ability
+    # changes a spell, never the resolver.
     if args.cause == "ordinary":
-        adversary["stats"]["attack"] = 80
-        adversary["scavenging_profile_id"] = None
+        catalog_path = release / declared.catalog
     else:
         # The existing automatic-ability path supplies a real fire attack when
         # movement enters its authored range. Fixture values never alter rules.
@@ -64,15 +68,16 @@ def main():
         adversary["monster_abilities"] = [{"id": "fire_proof", "kind": "special_attack",
             "spell_id": "fire_proof", "cooldown_rounds": 2, "target_policy": "nearest_hostile"}]
         adversary["scavenging_profile_id"] = None
-    catalog_path = output / "combat-catalog.json"
-    catalog_path.write_text(json.dumps(catalog) + "\n")
+        catalog_path = output / "combat-catalog.json"
+        catalog_path.write_text(json.dumps(catalog) + "\n")
     fixture = {"source_catalog_sha256": hashlib.sha256(catalog_source).hexdigest(),
-               "fixture_catalog_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
+               "served_catalog_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
                "cause": args.cause,
-               "overrides": {"scavenger_attack": 80, "scavenging": False} if args.cause == "ordinary"
+               "production_content": args.cause == "ordinary",
+               "overrides": {} if args.cause == "ordinary"
                else {"fire_proof_damage_kind": "fire", "potency": 100, "range": 0, "lane": "monster_special",
                      "cast_class": "not_applicable", "scavenger_ability": "fire_proof", "scavenging": False},
-               "initial_player_hp": 1 if args.cause == "ordinary" else 40, "resource_maxima_unchanged": True}
+               "initial_player_hp": 40, "resource_maxima_unchanged": True}
     for engine in engines:
         for alignment, body in [("lawful", "male"), ("neutral", "female")]:
             world = replace(world_fixture(), catalog=str(catalog_path))
@@ -98,10 +103,72 @@ def main():
                                         env={**os.environ, "NODE_EXTRA_CA_CERTS": str(server.authority)})
                 if result.returncode:
                     raise RuntimeError(f"{engine}/{alignment}: {result.stderr[-3500:]}")
-                reports.append(json.loads((output / f"{engine}-{alignment}.json").read_text()))
+                report = json.loads((output / f"{engine}-{alignment}.json").read_text())
+                if args.cause == "ordinary":
+                    report["restart"] = prove_restart_durability(server)
+                reports.append(report)
                 print(f"PASS {engine}/{alignment}", flush=True)
     receipt.write_text(json.dumps({"verdict": "INSPECTION" if args.engine else "PASS",
                                   "release": str(release), "fixture": fixture, "reports": reports}, indent=2) + "\n")
+
+
+def facet_checkpoint_hash(database_url: str) -> str:
+    """The stored checkpoint's own digest, read without modifying anything."""
+    result = subprocess.run(
+        ["psql", database_url, "-tA", "-v", "ON_ERROR_STOP=1", "-c",
+         "SELECT encode(checkpoint_sha256,'hex') FROM tme.facets"],
+        capture_output=True, text=True, check=False)
+    if result.returncode:
+        raise RuntimeError(f"checkpoint digest unavailable: {result.stderr.strip()}")
+    return result.stdout.strip()
+
+
+def prove_restart_durability(server) -> dict:
+    """Stop the serving process, serve the same database, and play again.
+
+    The durable checkpoint must be byte-identical across the restart, and a
+    fresh authenticated session must still select the same character, observe
+    the same life state and location, and have an ordinary command accepted.
+    """
+    def observed(frame: dict) -> dict:
+        actor_id = frame["observer_actor_id"]
+        self_row = next(row for row in frame["actors"] if row["actor_id"] == actor_id)
+        return {
+            "life_state": self_row["life_state"],
+            "hp": self_row["hp"],
+            "location": frame["observation_center"],
+            "actor_id": actor_id,
+            "character_id": frame["social"]["character_id"],
+            "carried_gold": frame["carried"]["gold"]["sack"],
+            "items": sorted(row["item_instance_id"] for row in frame["carried"]["items"]),
+            "skill_ledger": frame["character"]["skill_ledger"],
+        }
+
+    with LiveWireClient(server) as before:
+        before.wait_for(lambda frame: frame.get("frame") is not None)
+        death = observed(before.frame)
+    digest_before = facet_checkpoint_hash(server.database_url)
+    server.restart()
+    digest_after = facet_checkpoint_hash(server.database_url)
+    if digest_before != digest_after:
+        raise RuntimeError("the durable checkpoint changed across a serving-process restart")
+    with LiveWireClient(server) as after:
+        after.wait_for(lambda frame: frame.get("frame") is not None)
+        recovered = observed(after.frame)
+        for field in ["life_state", "hp", "location", "actor_id", "character_id",
+                      "carried_gold", "items", "skill_ledger"]:
+            if recovered[field] != death[field]:
+                raise RuntimeError(
+                    f"restart changed {field}: {recovered[field]!r} != {death[field]!r}"
+                )
+        intent = {"kind": "request_resurrection"} if recovered["life_state"] == "ghost" else {"kind": "wait"}
+        result, _ = after.command(intent)
+        disposition = result.get("disposition", {})
+        if disposition.get("kind") != "accepted":
+            raise RuntimeError(f"a fresh authenticated command was refused after restart: {result!r}")
+    return {"checkpoint_sha256": digest_after, "unchanged_across_restart": True,
+            "before": death, "after": recovered, "accepted_intent": intent,
+            "accepted_command": True}
 
 
 if __name__ == "__main__":

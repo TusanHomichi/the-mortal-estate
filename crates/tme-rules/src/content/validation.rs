@@ -3050,6 +3050,18 @@ impl ValidationBundle {
         }
 
         if target.kind == SpellTargetKind::SelfTarget {
+            // A self target names the caster, and the direct-damage family
+            // resolves against an actor target rather than the caster's own
+            // identity. Authoring that pair would admit a cast whose execution
+            // can only stub after consuming resources, so refuse the content
+            // here. No self-damage mechanic is created by this refusal.
+            if let Some(effect) = &spell.effect
+                && effect.family == SpellEffectFamily::DirectDamage
+            {
+                errors.push(format!(
+                    "spells[{index}].target.kind cannot be self for direct_damage spells"
+                ));
+            }
             if target.range.is_some() {
                 errors.push(format!(
                     "spells[{index}].target.range is invalid for self target"

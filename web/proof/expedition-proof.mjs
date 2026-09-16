@@ -115,10 +115,22 @@ try {
   await mark("temple"); await enter("d1_entry");
   assert.deepEqual(here().position, { x:24,y:7 }); await mark("descent");
   await walkTo(23,9);
-  for (let attempts=0; attempts<6 && frame.actors.some(a => a.actor_id === "cellar_scavenger" && a.life_state !== "dead"); attempts++) {
+  // The encounter is the shipped opponent at its shipped ratings. Record what
+  // the exchange actually cost: a block animation or a fast kill would not show
+  // that the opponent is dangerous, and an instant loss would not show that it
+  // is survivable.
+  const encounterHpBefore = frame.character.resources.hp;
+  let encounterDamageTaken = 0, encounterRounds = 0;
+  for (let attempts=0; attempts<40 && frame.actors.some(a => a.actor_id === "cellar_scavenger" && a.life_state !== "dead"); attempts++) {
     await action(i => i.kind === "physical_attack" && i.target_actor_id === "cellar_scavenger" && i.mode === "fight");
+    encounterRounds += 1;
+    encounterDamageTaken = encounterHpBefore - frame.character.resources.hp;
   }
   assert(frame.corpses.length > 0, "encounter did not produce a corpse");
+  assert(frame.actors.some(a => a.actor_id === "cellar_scavenger" && a.life_state === "dead"), "the opponent survived the fight");
+  assert(encounterRounds > 1, `the encounter ended in ${encounterRounds} round(s); the opponent never acted`);
+  assert(encounterDamageTaken > 0, "the shipped opponent never injured the character");
+  assert(frame.character.resources.hp > 0, "the character did not survive its own starting encounter");
   await action(i => i.kind === "search_corpse");
   await action(i => i.kind === "move_item" && i.item_instance_id === "found_charm" && i.destination.kind === "carried" && i.destination.position === "sack_item_3");
   await action(i => i.kind === "move_gold" && i.source.kind === "ground" && i.destination.kind === "carried" && i.destination.position === "sack");
@@ -144,7 +156,8 @@ try {
   await wait(() => document.body.dataset.phase === "signed_out");
   assert.equal(await page.locator("#world-canvas").getAttribute("data-study-level"), null);
   assert.deepEqual(errors, []);
-  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true },null,2));
+  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
+    production_encounter:{rounds:encounterRounds, damage_taken:encounterDamageTaken, starting_hp:encounterHpBefore, hp_after:frame.character.resources.hp, opponent_hp_authored:18, player_ratings_authored:true} },null,2));
   await context.close();
 } catch(error) {
   await writeFile(path.join(config.output, `${config.engine}-failure.json`), JSON.stringify({ stage, error:String(error), errors, frame, staticContext, commandCount:commands.length, lastResult:results.at(-1) },null,2));
