@@ -417,6 +417,7 @@ try {
     const destination = config.destination;
     await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({
       verdict: "PASS", engine: config.engine, journey: "death", renderer: launched.renderer,
+      source: config.source,
       checkpoints, commands: commands.map(command => command.intent.kind),
       created_through_ui: true, authored_world: true, normal_tls: true, scratch_postgres: true,
       candidate_art: true, return_destination: destination,
@@ -484,7 +485,7 @@ try {
   await wait(() => document.body.dataset.phase === "signed_out");
   assert.equal(await page.locator("#world-canvas").getAttribute("data-study-level"), null);
   assert.deepEqual(errors, []);
-  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, journey:"success", renderer:launched.renderer, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
+  await writeFile(path.join(config.output, `${config.engine}-expedition.json`), JSON.stringify({ verdict:"PASS", engine:config.engine, journey:"success", renderer:launched.renderer, source:config.source, checkpoints, commands:commands.map(c=>c.intent.kind), created_through_ui:true, authored_world:true, normal_tls:true, scratch_postgres:true, reconnect_preserved_state:true, candidate_art:true,
     encounter_rounds_logged:encounterLog.length,
     // The encounter figures are the ones frozen when combat ended, and the
     // receipt also says what later recovery did to the character, so a healed

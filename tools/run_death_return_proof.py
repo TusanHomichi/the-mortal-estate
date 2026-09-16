@@ -154,7 +154,7 @@ def main():
                 journey = "death" if args.cause == "ordinary" else "fire"
                 config = dict(engine=engine, alignment=alignment, body=body, origin=server.origin,
                               authority=str(server.authority), username=server.username, password=server.password,
-                              output=str(output), journey=journey,
+                              output=str(output), journey=journey, source=source_identity(),
                               destination=policy[f"{alignment}_destination"])
                 proof = "fire-return" if args.cause == "fire" else "death-return"
                 stem = f"{engine}-{journey}"
@@ -195,7 +195,8 @@ def main():
                 reports.append(report)
                 print(f"PASS {engine}/{alignment}", flush=True)
     receipt.write_text(json.dumps({"verdict": "INSPECTION" if args.engine else "PASS",
-                                  "release": str(release), "fixture": fixture, "reports": reports}, indent=2) + "\n")
+                                  "source": source_identity(), "release": str(release),
+                                  "fixture": fixture, "reports": reports}, indent=2) + "\n")
 
 
 @dataclass
@@ -368,6 +369,22 @@ def terminate_child(child: subprocess.Popen) -> None:
 #: Volatile checkpoint facts that any client session start, end or absence
 #: mark legitimately rewrites. They are named here rather than silently ignored.
 VOLATILE_CHECKPOINT_FIELDS = ("character_presence",)
+
+
+def source_identity() -> dict:
+    """The checkout the proof code itself is running from.
+
+    The release receipt binds the served binary and content; this binds the
+    proof that drove it, so a receipt can say which source produced the run
+    rather than leaving that to the PR description.
+    """
+    def git(*arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments], cwd=REPOSITORY_ROOT, capture_output=True, text=True,
+            check=False).stdout.strip()
+
+    return {"head": git("rev-parse", "HEAD"), "tree": git("write-tree"),
+            "worktree_dirty": bool(git("status", "--porcelain"))}
 
 
 def stored_checkpoint(database_url: str) -> dict:

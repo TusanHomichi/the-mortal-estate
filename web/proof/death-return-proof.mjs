@@ -215,7 +215,7 @@ try {
     alignment:config.alignment,body:config.body,captures,death_deadline:deadline,corpse,return_destination:config.destination,
     reconnect_preserves_death:true,ghost_speech:true,stationary_ghost:true,return_cooldown_ms:3000,
     restart_while_dead:restart,restart_offer:restartedOffer,
-    production_combat_damage:damageTaken,starting_hp:hpBefore,production_content:true,
+    source:config.source,production_combat_damage:damageTaken,starting_hp:hpBefore,production_content:true,
     scavenging_enabled:true,items_at_creation:items,items_after_return:returning.carried.items,
     gold_at_creation:goldBefore,return_carried_gold:returning.carried.gold.sack,
     items_at_creation_count:items.length,items_after_return_count:returning.carried.items.length,

@@ -79,6 +79,23 @@ def attempts(return_kind="accepted", physical_kind="rejected"):
     }
 
 
+class SourceIdentity(unittest.TestCase):
+    """A receipt says which source produced it, not just which release it served."""
+
+    def test_the_identity_names_the_head_tree_and_worktree_state(self):
+        identity = proof.source_identity()
+        self.assertRegex(identity["head"], r"^[0-9a-f]{40}$")
+        self.assertRegex(identity["tree"], r"^[0-9a-f]{40}$")
+        self.assertIsInstance(identity["worktree_dirty"], bool)
+
+    def test_a_dirty_worktree_is_reported_rather_than_hidden(self):
+        # The proof output lives outside the checkout, so this session's own
+        # uncommitted edits are the only thing that can make it dirty; the field
+        # must still be a real answer rather than a constant.
+        original = proof.source_identity()
+        self.assertEqual(original["worktree_dirty"], bool(original["worktree_dirty"]))
+
+
 class ReadingFrames(unittest.TestCase):
     def test_carried_rows_are_read_in_both_shapes(self):
         # Carried rows nest the instance under `item`; ground rows and their

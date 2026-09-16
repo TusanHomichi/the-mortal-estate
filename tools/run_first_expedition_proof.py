@@ -9,6 +9,7 @@ from live_server_harness import REPOSITORY_ROOT, World, read_admin_url, run
 from run_browser_services_proof import BrowserFront, BrowserServer
 from run_death_return_proof import (
     LedgerAudit,
+    source_identity,
     ProofHandshake,
     prove_restart_durability,
     run_proof_child,
@@ -88,7 +89,7 @@ def main():
             with server:
                 config = dict(origin=server.origin, authority=str(server.authority), engine=engine,
                               username=server.username, password=server.password, output=str(output),
-                              journey=arguments.journey,
+                              journey=arguments.journey, source=source_identity(),
                               destination=destinations[destination_key] if destination_key else None)
                 if alignment:
                     config["alignment"] = alignment
@@ -142,8 +143,8 @@ def main():
                 reports.append(report)
                 print(f"PASS {engine}/{arguments.journey}{'/' + alignment if alignment else ''}",
                       flush=True)
-    receipt.write_text(json.dumps(dict(verdict="PASS", destination_policy=policy,
-                                     reports=reports), indent=2) + "\n")
+    receipt.write_text(json.dumps(dict(verdict="PASS", source=source_identity(),
+                                     destination_policy=policy, reports=reports), indent=2) + "\n")
 
 
 if __name__ == "__main__":
