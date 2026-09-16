@@ -31,6 +31,11 @@ const PROFILE: &str = "profile/first_expedition";
 const PLAYER_DEFINITION: &str = "actor/first_expedition/player";
 const SCAVENGER_DEFINITION: &str = "actor/first_expedition/cellar_scavenger";
 const PLAYER_REGISTRY: &str = "actor-definition/first_expedition/player";
+/// The authored health change in this catalog cutover is the enemy's, so only
+/// that definition declares a health rebuild.
+fn scavenger_health_declaration() -> BTreeSet<String> {
+    BTreeSet::from([SCAVENGER_DEFINITION.to_string()])
+}
 const SCAVENGER_REGISTRY: &str = "actor-definition/first_expedition/cellar_scavenger";
 const SCAVENGER: &str = "cellar_scavenger";
 /// Authored `attack`/`defense`/`hp` for the player and the cellar scavenger.
@@ -415,8 +420,10 @@ fn migrated_characters_keep_their_earned_state_and_join_the_reconciled_encounter
     let after_identity = after.content_identity().definition_sha256.clone();
 
     // The cutover is explicit: a plan that leaves a retained actor on superseded
-    // authored ratings is refused rather than silently accepted.
-    let plan = |rederive: BTreeSet<String>| CheckpointContentMigration {
+    // authored ratings, or on a superseded authored health pool, is refused
+    // rather than silently accepted. Combat ratings and health are separate
+    // declarations because they move different facts.
+    let plan = |rederive: BTreeSet<String>, health: BTreeSet<String>| CheckpointContentMigration {
         from_definition_sha256: before_identity.clone(),
         to_definition_sha256: after_identity.clone(),
         retire_npcs: BTreeSet::new(),
@@ -424,13 +431,18 @@ fn migrated_characters_keep_their_earned_state_and_join_the_reconciled_encounter
         relocations: Vec::new(),
         initialize_new_topology: false,
         rederive_actor_stats: rederive,
+        rebuild_actor_health: health,
     };
+    let both = BTreeSet::from([
+        PLAYER_DEFINITION.to_string(),
+        SCAVENGER_DEFINITION.to_string(),
+    ]);
     assert!(
         Engine::migrate_content_checkpoint(
             before.clone(),
             after.clone(),
             &checkpoint,
-            &plan(BTreeSet::new())
+            &plan(BTreeSet::new(), BTreeSet::new())
         )
         .is_err(),
         "an unreconciled retired rating must refuse the cutover"
@@ -440,23 +452,47 @@ fn migrated_characters_keep_their_earned_state_and_join_the_reconciled_encounter
             before.clone(),
             after.clone(),
             &checkpoint,
-            &plan(BTreeSet::from(["absent_definition".to_string()]))
+            &plan(
+                BTreeSet::from(["absent_definition".to_string()]),
+                both.clone()
+            )
         )
         .is_err(),
         "a plan naming an absent definition must be refused"
     );
+    assert!(
+        Engine::migrate_content_checkpoint(
+            before.clone(),
+            after.clone(),
+            &checkpoint,
+            &plan(both.clone(), BTreeSet::new())
+        )
+        .is_err(),
+        "an undeclared health-pool change must refuse the cutover"
+    );
 
-    let migrated = Engine::migrate_content_checkpoint(
+    let (migrated, health_rebuilds) = Engine::migrate_content_checkpoint_reported(
         before,
         after.clone(),
         &checkpoint,
-        &plan(BTreeSet::from([
-            PLAYER_DEFINITION.to_string(),
-            SCAVENGER_DEFINITION.to_string(),
-        ])),
+        &plan(both, scavenger_health_declaration()),
     )
     .expect("declared reconciliation");
     let mut restored = Engine::hydrate_checkpoint(after, &migrated).expect("recovery");
+    assert_eq!(
+        health_rebuilds
+            .iter()
+            .map(|rebuild| (
+                rebuild.definition_id.as_str(),
+                rebuild.maximum_before,
+                rebuild.maximum_after,
+                rebuild.current_before,
+                rebuild.current_after
+            ))
+            .collect::<Vec<_>>(),
+        vec![(SCAVENGER_DEFINITION, 6, 18, 6, 6)],
+        "the health policy is applied to the retained enemy and to nothing else"
+    );
 
     let player = actor(&restored, &actor_id);
     assert_eq!(player.stats.attack, 10);
@@ -492,11 +528,24 @@ fn migrated_characters_keep_their_earned_state_and_join_the_reconciled_encounter
     );
     assert_eq!(
         opponent.hp, 6,
-        "current HP is live state; rating reconciliation must not heal or damage anyone"
+        "current HP is live state; a health-pool cutover must not heal or damage anyone"
+    );
+    assert_eq!(
+        opponent.max_hp(),
+        18,
+        "the retained opponent's authored health ceiling is the reconciled one"
     );
     assert!(
         opponent.hp <= opponent.stats.hp,
         "a retained actor may not exceed its authored maximum"
+    );
+    assert_eq!(
+        opponent
+            .character
+            .as_ref()
+            .map(|character| character.resources.max_hp),
+        None,
+        "a monster has no character sheet to keep in step"
     );
 
     // The recovered character now participates in the reconciled encounter

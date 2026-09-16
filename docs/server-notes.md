@@ -134,14 +134,45 @@ moves an authored rating cannot leave a retained actor on the old one: ordinary
 recovery refuses a changed content identity, so the stale value would survive
 indefinitely and the world would quietly run two rule sets.
 `rederive_actor_stats` names the runtime actor definition IDs whose authored
-ratings move. Every movement between the two definitions must be declared, a
-declared ID that did not move fails the plan, and the declared ratings are then
-written into every retained actor that references them before any other rule
-reads them. Nothing else about an actor is touched — identity, kind, resources,
+**ratings** move, and it moves those two fields and nothing else. Every movement
+between the two definitions must be declared, a declared ID that did not move
+fails the plan, and the declared ratings are written into every retained actor
+that references them before any other rule reads them. Identity, kind, resources,
 life state, progression, inventory, balances, deadlines and timing are preserved
-exactly, and current HP is never healed or damaged by a rating change. Authored
-health is out of scope for this field; moving it needs its own explicit decision
-about current and maximum pools.
+exactly.
+
+Authored **health** is a different fact and has its own declaration.
+`Stats.hp` is both an immutable authored maximum and the ceiling of a mutable
+current value, so replacing the block silently would move a monster's maximum
+without saying so — and preserving current HP alone would not demonstrate that
+health was preserved. `rebuild_actor_health` names the definition IDs whose
+authored pool moves, and a cutover that moves a pool without declaring it is
+refused. The applied policy is `ActorHealthPolicy::PreserveCurrent`, and it is
+exactly this:
+
+- a retained actor's current health is kept as the checkpoint holds it, so a
+  wounded actor stays wounded by the same number of points — the cutover is
+  never a heal and never damage;
+- a living actor's current health is clamped down only when the destination
+  authors a smaller pool than the actor currently holds, and never below one, so
+  a health change cannot kill someone;
+- a dead actor keeps its zero and its life state: a health-pool change is not a
+  resurrection, and defeat cleanup owns everything after it;
+- a character-backed actor's sheet follows the authored pool — `max_hp` becomes
+  the new maximum, `peak_hp` is raised to it when the pool grows and kept when
+  the pool shrinks, which preserves the sheet's own `max_hp <= peak_hp`
+  invariant;
+- nothing else about the actor changes, and an actor whose pool did not move is
+  left byte-identical.
+
+`Engine::migrate_content_checkpoint_reported` returns the same artifact plus one
+`ActorHealthRebuild` row per affected actor, so a proof can show what the policy
+did instead of asserting that it ran. Deployment uses the report-free form.
+
+A definition added by the destination is content addition, not a rating change:
+no retained source actor can reference it, so it needs no declaration. A
+definition the destination removes is refused while any retained actor still
+references it, because that actor would be left without authored rules.
 
 The server command `checkpoint migrate-content <before-bootstrap> <after-bootstrap>
 <checkpoint> <plan> <output>` validates both complete definitions, retains the
