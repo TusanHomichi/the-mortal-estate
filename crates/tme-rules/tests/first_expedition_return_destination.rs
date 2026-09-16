@@ -168,7 +168,10 @@ fn die_and_return(engine: &mut Engine, actor_id: &ActorId) -> WorldPosition {
     let mut rounds = 0;
     while actor(engine, actor_id).is_alive() {
         rounds += 1;
-        assert!(rounds < 500, "the authored opponent could not defeat the character");
+        assert!(
+            rounds < 500,
+            "the authored opponent could not defeat the character"
+        );
         wait(engine, actor_id);
     }
     let deadline = match actor(engine, actor_id).life_state {
@@ -219,8 +222,14 @@ fn a_lawful_created_character_returns_at_the_authored_lawful_destination() {
     let (mut engine, actor_id) = create(&definition, 13);
     assert_eq!(alignment(&engine, &actor_id), CharacterAlignment::Lawful);
     let landed = die_and_return(&mut engine, &actor_id);
-    assert_eq!(landed, lawful, "a lawful character returns at the lawful destination");
-    assert_ne!(landed, neutral, "the two authored branches are distinct places");
+    assert_eq!(
+        landed, lawful,
+        "a lawful character returns at the lawful destination"
+    );
+    assert_ne!(
+        landed, neutral,
+        "the two authored branches are distinct places"
+    );
 }
 
 #[test]
@@ -243,13 +252,19 @@ fn an_unjust_kill_makes_the_created_character_neutral_and_moves_its_return() {
         CharacterAlignment::Neutral,
         "an unjust lawful kill is the authored way to become neutral"
     );
-    assert_ne!(lawful, neutral, "the two authored branches are distinct places");
+    assert_ne!(
+        lawful, neutral,
+        "the two authored branches are distinct places"
+    );
     let landed = die_and_return(&mut engine, &actor_id);
     assert_eq!(
         landed, neutral,
         "a neutral character returns at the authored neutral destination"
     );
-    assert_ne!(landed, lawful, "the neutral branch did not fall back to the lawful one");
+    assert_ne!(
+        landed, lawful,
+        "the neutral branch did not fall back to the lawful one"
+    );
 }
 
 #[test]
@@ -259,7 +274,8 @@ fn the_opponent_is_chaotic_so_defeating_it_is_never_an_unjust_lawful_kill() {
     // the character's alignment and the journey's destination would depend on
     // how the fight ended.
     let catalog = read_json("content/lands/first-expedition/catalog.json");
-    let opponent = &catalog["actor_definitions"]["actor-definition/first_expedition/cellar_scavenger"];
+    let opponent =
+        &catalog["actor_definitions"]["actor-definition/first_expedition/cellar_scavenger"];
     assert_eq!(opponent["social"]["nature"].as_str(), Some("other"));
     assert_eq!(
         opponent["social"]["alignment_source"]["alignment"].as_str(),

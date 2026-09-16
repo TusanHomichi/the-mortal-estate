@@ -31,8 +31,8 @@ use std::sync::Arc;
 use serde_json::Value;
 use tme_rules::model::ActorState;
 use tme_rules::{
-    ActorId, CatalogProfileKey, CatalogV6, CharacterId, Engine, Event, GameDefinition, ItemHolderId,
-    ItemLocation, PhysicalAttackMode, PlayerIntent, ValidatedWorldSeed, WorldSeedDef,
+    ActorId, CatalogProfileKey, CatalogV6, CharacterId, Engine, Event, GameDefinition,
+    ItemHolderId, ItemLocation, PhysicalAttackMode, PlayerIntent, ValidatedWorldSeed, WorldSeedDef,
     WorldTemplateV4,
 };
 
@@ -231,7 +231,11 @@ impl Ledger {
             ItemLocation::Locker {
                 vault_id,
                 owner_character_id,
-            } => format!("locker:{}:{}", vault_id.as_str(), owner_character_id.as_str()),
+            } => format!(
+                "locker:{}:{}",
+                vault_id.as_str(),
+                owner_character_id.as_str()
+            ),
             ItemLocation::Offered {
                 sender_character_id,
                 recipient_character_id,
@@ -506,7 +510,11 @@ fn the_ledger_oracle_refuses_loss_duplication_replacement_and_minted_gold() {
     );
 
     let mut resized = after.clone();
-    resized.items.get_mut(&victim).expect("the victim exists").quantity += 1;
+    resized
+        .items
+        .get_mut(&victim)
+        .expect("the victim exists")
+        .quantity += 1;
     assert!(
         audit(&before, &resized)
             .iter()
@@ -551,7 +559,9 @@ fn an_empty_purse_and_an_empty_inventory_do_not_pass_the_oracle() {
     };
     let defects = audit(&before, &emptied);
     assert!(
-        defects.iter().any(|defect| defect.contains("stopped existing")),
+        defects
+            .iter()
+            .any(|defect| defect.contains("stopped existing")),
         "an emptied world must fail the oracle: {defects:?}"
     );
     assert!(
@@ -622,7 +632,8 @@ fn a_ghost_may_not_hold_an_item_after_its_death() {
         carried_items(&ledger, &holder)
     );
     assert_eq!(
-        actor(&engine, &actor_id).carried.gold.sack, 0,
+        actor(&engine, &actor_id).carried.gold.sack,
+        0,
         "the ghost's own purse is empty; the coins are in the world's ledger"
     );
     let corpse = engine
