@@ -317,10 +317,15 @@ A browser proof cannot replace the serving process it is talking to, so
 `tools/run_death_return_proof.py` own one file-pair protocol between the two
 halves. Each request carries a sequence, the stale answer is removed before the
 request is written, and every sequence is answered exactly once, so a reused pair
-cannot hand back an earlier answer. Two kinds exist: `restart` (the runner
-replaces the process and reports what the durable checkpoint did) and `ledger`
-(the runner reads the authoritative item and coin ledger from the stored
-checkpoint, and audits a later reading against an earlier capture).
+cannot hand back an earlier answer. The request is written to a temporary name
+and renamed, and the runner treats an unreadable request as "not yet", because it
+polls the path and can otherwise catch the file between creation and content.
+Two kinds exist: `restart` (the runner replaces the process and reports what the
+durable checkpoint did) and `ledger` (the runner reads the authoritative item and
+coin ledger from the stored checkpoint, and audits a later reading against an
+earlier capture). Both runners and both browser receipts record the checkout's
+head, tree and worktree state, so a receipt names the source that produced it;
+a tree without a repository reports its identity as unknown rather than as text.
 
 Restart receipts are computed from what was read. The raw stored digest is
 reported as an observation; the enforced claim is that the gameplay payload is
