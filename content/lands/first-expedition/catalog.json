@@ -121,9 +121,9 @@
         "owner_relation": "none"
       },
       "stats": {
-        "attack": 2,
-        "defense": 4,
-        "hp": 6
+        "attack": 18,
+        "defense": 8,
+        "hp": 18
       },
       "xp_value": 5
     },
@@ -277,8 +277,8 @@
         "owner_relation": "none"
       },
       "stats": {
-        "attack": 40,
-        "defense": 40,
+        "attack": 10,
+        "defense": 14,
         "hp": 40
       },
       "xp_value": null

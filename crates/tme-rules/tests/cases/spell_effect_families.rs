@@ -368,3 +368,6 @@ mod typed_capabilities_apply_without_stub_or_invented_consumers;
 
 #[path = "spell_effect_families/turn_undead_uses_visible_stable_actor_order_and_shared_flee_without_damage.rs"]
 mod turn_undead_uses_visible_stable_actor_order_and_shared_flee_without_damage;
+
+#[path = "spell_effect_families/self_target_direct_damage_is_refused_not_stubbed.rs"]
+mod self_target_direct_damage_is_refused_not_stubbed;

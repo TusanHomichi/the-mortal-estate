@@ -15,11 +15,16 @@ from run_production_smoke import PublicClient
 
 
 class LiveWireClient:
-    def __init__(self, server: LiveServer, timeout: float = 30.0):
+    def __init__(self, server: LiveServer, timeout: float = 30.0, character_id: str | None = None):
         endpoint = urlsplit(server.origin)
         self.public = PublicClient(endpoint.hostname, endpoint.port, timeout)
         self.public.context.load_verify_locations(cafile=str(server.authority))
         self.server = server
+        # One account can own more than one character: the harness enrolls one
+        # and a proof that creates its own through the UI owns another. Selecting
+        # by ID is how a caller asks for the character it is actually observing,
+        # rather than whichever one the harness happened to create.
+        self.character_id = character_id or server.character_id
         self.session = None
         self.gameplay = None
 
@@ -27,7 +32,7 @@ class LiveWireClient:
         try:
             self.session = self.public.login(self.server.username, self.server.password)
             characters = self.session.bootstrap["characters"]
-            selected = next(row for row in characters if row["character_id"] == self.server.character_id)
+            selected = next(row for row in characters if row["character_id"] == self.character_id)
             self.session.select(selected["slot"])
             self.gameplay = self.session.connect()
             self.frame

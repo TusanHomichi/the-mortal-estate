@@ -283,6 +283,14 @@ impl WorldPosition {
         self.realm == other.realm && self.level == other.level
     }
 
+    /// Whether two addresses name the same cell. A realm owns its own level
+    /// map, so a matching level name and coordinate in another realm is a
+    /// different place; every spatial membership test uses this rather than
+    /// comparing a level name and coordinates separately.
+    pub fn same_cell(&self, other: &Self) -> bool {
+        self.same_site(other) && self.position == other.position
+    }
+
     pub fn label(&self) -> String {
         format!(
             "{}/{}:{},{}",

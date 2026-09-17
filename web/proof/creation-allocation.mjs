@@ -8,9 +8,16 @@ const title = key => key[0].toUpperCase() + key.slice(1);
 const button = (page, name) => page.getByRole("button", { name, exact: true });
 
 export async function openCreation(page, { className } = {}) {
-  const response = page.waitForResponse(row => row.url().endsWith("/characters/creation"));
+  // Read the response body the moment it arrives. The click below navigates, and
+  // a body read afterwards fails with "no data found for resource" because the
+  // page has already moved on. Reading it in the handler is what makes this
+  // independent of how fast the navigation completes.
+  let options = null;
+  const received = page.waitForResponse(row => row.url().endsWith("/characters/creation"))
+    .then(async response => { options = (await response.json()).options; });
   await button(page, "Create a new character").click();
-  const options = (await (await response).json()).options;
+  await received;
+  assert(options, "character creation options did not arrive");
   await page.locator("#creation-form").waitFor({ state: "visible" });
   assert.equal(await page.locator("#creation-profile input").count(), options.length, "creation UI shows every server option");
   assert.equal(await page.getByRole("button", { name: /suggested|recommended/i }).count(), 0, "unsubstantiated allocation presets are absent");
