@@ -73,7 +73,7 @@ These add to the house rules above; each says where it is stricter.
 - **Keep slices bounded and context lean.** Fix or file every finding and
   document lessons. Decomposing a large file follows the
   [refactor threshold](docs/agent-workflow.md#the-refactor-threshold).
-- **Prove what changed.** Use the runner below.
+- **Prove what changed.** Use the runner below, not only the flake gate.
   Complete the [closeout](docs/agent-workflow.md#closeout) before handing off.
 - **Work from evidence.** Use the [standing workflow](docs/agent-workflow.md#slice-workflow)
   and one [canonical graph](docs/agent-workflow.md#task-graph-and-continuation)
@@ -163,7 +163,10 @@ python3 tools/run_verification.py --list --scope fast --changed-path <path>
 python3 tools/run_verification.py --scope fast --changed-path <path>
 ```
 
-Repeat `--changed-path` for every changed path. Use `--scope full` for complete
+Repeat `--changed-path` for every changed path. `nix flake check` is the
+house gate (rustfmt, clippy, the Cargo tests and ruff's error rules, through
+[`flake.nix`](flake.nix)); `nix develop` gives the toolchains. It is a subset of
+the runner's `full` scope, not a substitute for it. Use `--scope full` for complete
 proof before merge; live Workbench use requires no verification run. Capability
 setup, incomplete verdicts, capture, and CI are in
 [verification](docs/verification.md). **UNAVAILABLE is never PASS.**

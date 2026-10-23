@@ -482,8 +482,12 @@ own command line — it matches your own shell.
 Resolve the current repository from `git remote get-url origin` and confirm it
 with `gh repo view --json nameWithOwner` before GitHub lifecycle work.
 
-`.github/workflows/verify.yml` runs on every pull request and on pushes to `main`.
-It has **two jobs**, and between them they run the complete lane: one runs
+Two workflows run on every pull request and on pushes to `main`.
+`.github/workflows/flake.yml` is the house gate: it calls burrow's shared
+workflow, which runs `nix flake check` (rustfmt, clippy, the Cargo tests and
+ruff's error rules, as burrow's `lib/project.nix` defines them). It overlaps
+the `rust` lane on purpose and replaces none of it; the runner stays the step
+authority. `.github/workflows/verify.yml` has **two jobs**, and between them they run the complete lane: one runs
 everything this checkout can prove, the other runs the clean-clone proof. Why
 two rather than one is [The disk budget](#the-disk-budget) below.
 
@@ -614,5 +618,5 @@ not obstruction; discovering it after the merge is.
   additional implementation-language family.
 - Generated-documentation tooling, freshness scoring, or heuristic prose
   deduplication.
-- CI beyond the workflow above, scheduled automation, or repository hooks.
+- CI beyond the two workflows above, scheduled automation, or repository hooks.
 - An AI runtime of any kind ([boundary-map.md](boundary-map.md#part-3-ai-is-never-game-authority)).
