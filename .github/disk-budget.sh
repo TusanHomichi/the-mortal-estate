@@ -8,8 +8,10 @@
 # said either.
 #
 # So this runs first in every job that builds, and it prints `df` on both sides
-# of the reclamation. The four directories below are GitHub-hosted image
-# payloads this repository has no use for — a .NET SDK, an Android SDK, a
+# of the reclamation, for the root disk and for the runner's temp directory,
+# which the clean-clone proof builds in (/tmp stopped being on / by
+# 2026-10-23). The four directories below are GitHub-hosted image payloads
+# this repository has no use for — a .NET SDK, an Android SDK, a
 # Haskell toolchain, and a CodeQL bundle. Removing them is not a workaround for
 # a lane that is too big: the lane is measured to fit without it (see
 # docs/agent-workflow.md, "The disk budget"), and this is the margin that keeps
@@ -22,7 +24,7 @@
 set -u
 
 echo "--- disk before"
-df -h /
+df -h / "${RUNNER_TEMP:-/tmp}"
 
 for payload in \
   /usr/share/dotnet \
@@ -40,4 +42,4 @@ do
 done
 
 echo "--- disk after"
-df -h /
+df -h / "${RUNNER_TEMP:-/tmp}"
