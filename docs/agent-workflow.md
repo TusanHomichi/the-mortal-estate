@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-10-23
-revision: 15
+revision: 16
 status: Standing evidence-driven workflow; project boundaries, activation rulings and owner-scoped permissions remain binding.
 public_safe: true
 summary: Evidence-driven slices, task graphs, model roles, authority, verification feedback and closeout.
@@ -73,8 +73,9 @@ message, and not in a conversation.
 
 ## Models and delegation
 
-[AGENTS.md](../AGENTS.md#operating-rules) owns the project's requested models and
-roles. Select the exact model and `max` effort explicitly when spawning a worker.
+[AGENTS.md](../AGENTS.md#operating-rules) owns the project's roles; which model
+fills each role, and at what effort, is machine configuration that no tracked
+file names. Select the configured model and effort explicitly when spawning a worker.
 The graph records both the requested route and whatever runtime identity the host
 actually exposes; configuration and a successful dispatch are not independent
 attestation of execution. Report unavailable routing without substituting a model
@@ -88,9 +89,9 @@ together only when its inputs and file ownership allow it. The parent inspects
 the resulting artifacts and proof before accepting completion; the
 [implementer-autonomy rule](#implementer-autonomy) still owns integration.
 
-DeepSeek's pause is preserved. Only an explicit owner re-enablement permits a
-supervised narrow task with a concrete benefit. If re-enabled, retain the actual
-model, corrections, reliability and independent verification in the applicable
+A model the owner has paused stays paused. Only an explicit owner re-enablement
+permits a supervised narrow task with a concrete benefit. If re-enabled, retain its
+corrections, reliability and independent verification in the applicable
 execution record; do not create evaluation-only work or transfer primary design
 or integration to it.
 
@@ -117,7 +118,7 @@ common inputs, effort policy and one next action. Each node needs:
 | Evidence | Original sources for source claims; exact revisions or candidate hashes and check receipts for implementation claims |
 | Effort policy | Explicit limit or owner waiver with its source, inherited when shared |
 
-Astra selects ready nodes and reviews graph changes. A worker's completion claim
+The planning role selects ready nodes and reviews graph changes. A worker's completion claim
 does not unlock dependents: inspect its artifact and acceptance evidence first.
 Mark a node complete only when its stated acceptance is met. A failed check creates
 a scoped repair or investigation under the same effort policy. Missing evidence
