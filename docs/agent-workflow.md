@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-23
-revision: 14
+last_updated: 2026-10-23
+revision: 15
 status: Standing evidence-driven workflow; project boundaries, activation rulings and owner-scoped permissions remain binding.
 public_safe: true
 summary: Evidence-driven slices, task graphs, model roles, authority, verification feedback and closeout.
@@ -545,7 +545,9 @@ order does not reorder product priority, and an open issue is not a plan.
 the clean-copy proof. Disable incremental artifacts and retain line-table debug
 information there; do not change developer Cargo profiles to fit a CI runner.
 CI separates the normal and clean-copy builds onto two jobs and reclaims unused
-preinstalled payloads with `.github/disk-budget.sh`.
+preinstalled payloads with `.github/disk-budget.sh`. The clean-copy job points `TMPDIR` at
+`runner.temp`: hosted runners now give `/tmp` its own quota, too small for a
+cold build, and the budget script reports both filesystems.
 
 Budget for peak usage, not just artifacts left afterward. `--report-disk` logs
 size/free space after build steps; the clean-copy proof samples its peak.

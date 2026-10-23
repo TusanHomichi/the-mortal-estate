@@ -8,7 +8,8 @@
 # said either.
 #
 # So this runs first in every job that builds, and it prints `df` on both sides
-# of the reclamation. The four directories below are GitHub-hosted image
+# of the reclamation, for the root disk and for the filesystem temporary
+# files land on (on 2026-10-23 those stopped being the same one). The four directories below are GitHub-hosted image
 # payloads this repository has no use for — a .NET SDK, an Android SDK, a
 # Haskell toolchain, and a CodeQL bundle. Removing them is not a workaround for
 # a lane that is too big: the lane is measured to fit without it (see
@@ -22,7 +23,7 @@
 set -u
 
 echo "--- disk before"
-df -h /
+df -h / "${TMPDIR:-/tmp}"
 
 for payload in \
   /usr/share/dotnet \
@@ -40,4 +41,4 @@ do
 done
 
 echo "--- disk after"
-df -h /
+df -h / "${TMPDIR:-/tmp}"

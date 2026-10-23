@@ -117,6 +117,14 @@ jobs:
   cleanclone:
     name: a clean copy builds and tests with no private root
     runs-on: ubuntu-latest
+    env:
+      # The proof's scratch copy and its cold build come from `tempfile`, so
+      # they land wherever TMPDIR says. By 2026-10-23 the hosted image had
+      # given /tmp its own ~8 GB quota'd filesystem, and the build, which
+      # peaked at 7,267 MiB on 2026-09-23, hit `Disk quota exceeded` on
+      # every pull request. runner.temp is on the root disk the budget
+      # step reclaims and measures.
+      TMPDIR: "${{ runner.temp }}"
     steps:
       - uses: actions/checkout@v7
         with:
