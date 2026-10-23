@@ -545,9 +545,9 @@ order does not reorder product priority, and an open issue is not a plan.
 the clean-copy proof. Disable incremental artifacts and retain line-table debug
 information there; do not change developer Cargo profiles to fit a CI runner.
 CI separates the normal and clean-copy builds onto two jobs and reclaims unused
-preinstalled payloads with `.github/disk-budget.sh`. The clean-copy job points `TMPDIR` at
-`runner.temp`: hosted runners now give `/tmp` its own quota, too small for a
-cold build, and the budget script reports both filesystems.
+preinstalled payloads with `.github/disk-budget.sh`. The clean-copy proof step
+points `TMPDIR` at `runner.temp`: hosted runners now give `/tmp` its own quota,
+too small for a cold build, and the budget script reports both filesystems.
 
 Budget for peak usage, not just artifacts left afterward. `--report-disk` logs
 size/free space after build steps; the clean-copy proof samples its peak.
