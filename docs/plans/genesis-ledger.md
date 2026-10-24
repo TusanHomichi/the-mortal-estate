@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-13
-revision: 101
-status: Ordinary and immediate fire return are tracked through PRs 75 and 77; the separate presentation experiment remains paused.
+last_updated: 2026-09-23
+revision: 103
+status: Evidence-driven workflow setup is complete locally; PR 82 owns authorized delivery and cleanup, while gameplay continuation retains its existing owner.
 public_safe: true
-summary: Ordinary and immediate fire return continuation, delivered 3D and martial motion, and remaining acceptance gates.
+summary: Standing workflow, reviewed death-return source baseline, material limits and links to the next gameplay continuation and dated history.
 ---
 
 # The genesis ledger
@@ -27,6 +27,43 @@ boundary map; 8 tooling and the verification lane split; 9 Workbench V1;
 owner's and are numbered by the phase they guard.
 
 ## Current checkpoint
+
+Updated 2026-09-23.
+
+**Completed local setup:** the [standing workflow](../agent-workflow.md)
+now owns evidence-driven graphs, model delegation, effort and continuation.
+The [archived setup record](2026-09-23-evidence-workflow.md) retains the completed
+graph, failed-check repair and verification receipts. The owner's subsequent
+merge-and-cleanup request is tracked by the canonical delivery graph in
+[PR #82](https://github.com/TusanHomichi/the-mortal-estate/pull/82), which owns its
+current state and next action. The existing gameplay dispatch below is preserved
+for its next resumption.
+
+**What works in the reviewed source:** `main` at
+`0764c639d3a4fa10e200eb885479ca3ffb21acfa` includes corpse-bound ordinary control
+and immediate lawful/neutral fire return. PR #77's merged state was checked on
+September 23. The [death-return record](2026-09-13-death-return.md) owns behavior,
+proof and the previously dispatched progression toward succession and ancestors.
+The full-world 3D and martial-motion deliveries remain linked in the dated
+checkpoint below. Source inspection does not establish the current installed
+preview; [server notes](../server-notes.md#private-development-deployment) owns
+its release and saved-state proof.
+
+**Material limits and gates:** exceptional return routes, dead-world entry and
+lineage remain incomplete; ordinary automatic timing still needs evidence.
+The death-return record routes those findings and combat-balance follow-ups.
+The separate presentation experiment remains paused before P1, artwork and motion
+remain provisional, and G10/G11 remain open. Setup changes none of those rulings.
+
+Read PR #82's delivery disposition before resuming the gameplay record.
+Earlier deliveries are
+[dated checkpoint history](#september-13-checkpoint-history) and
+[phase records](#phase-records), not additional current task lists.
+
+## September 13 checkpoint history
+
+The following is the retained September 13 checkpoint. Its delivery descriptions
+are dated evidence; the current entry and maintained owners above govern resumption.
 
 Updated 2026-09-13.
 

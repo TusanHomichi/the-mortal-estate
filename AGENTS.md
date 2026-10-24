@@ -39,6 +39,20 @@ operating rules; detailed workflow and verification usage have linked owners.
 - **Prove what changed.** Use the runner below; claim only commands and results
   actually observed. Complete the [closeout](docs/agent-workflow.md#closeout)
   before handing off.
+- **Work from evidence.** Define the observable outcome and acceptance before
+  editing. Use the [standing workflow](docs/agent-workflow.md#slice-workflow)
+  and one [canonical graph](docs/agent-workflow.md#task-graph-and-continuation)
+  for dependent work; simple changes need only a short plan. Continue ready,
+  authorized work through verified closeout and preserve its evidence.
+
+**Agent roles:** GPT-6 Astra (`gpt-6-astra`, `max`) owns planning, architecture,
+review and integration; GPT-6 Sol (`gpt-6-sol`, `max`) handles complex
+implementation; GPT-6 Luna (`gpt-6-luna`, `max`) handles bounded routine work.
+Use explicit routing when delegation helps, report unavailable routes, and keep
+the parent responsible for verification. DeepSeek remains paused. Detailed
+[delegation](docs/agent-workflow.md#models-and-delegation) and
+[authority and effort](docs/agent-workflow.md#authority-and-effort) live in the
+workflow; these instructions do not change an already running model.
 
 **Stack:** Rust for rules, protocol, simulation, authoring, and one
 PostgreSQL-backed server; TypeScript with Three.js world and character rendering, Canvas 2D material and label preparation for the browser client (under the [visual ruling](docs/presentation-direction.md#3d-reopening)); Tauri

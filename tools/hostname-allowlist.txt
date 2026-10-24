@@ -43,6 +43,10 @@ request.kenney.nl    # request link carried verbatim in the Kenney in-pack CC0 n
 patreon.com          # creator-support link carried verbatim in two Kenney notices
 twitter.com          # creator profile link carried verbatim in two Kenney notices
 
+# --- Official instruction guidance cited by the workflow documents ---
+learn.chatgpt.com      # official Codex AGENTS.md instruction-discovery guidance only
+developers.openai.com  # official GPT-6 Astra instruction-design article only
+
 # --- Code and configuration patterns matching hostname heuristics ---
 gl.link                   # WebGL gl.LINK_STATUS constant, not a network hostname
 18-main.service           # systemd template instance name in postgresql@18-main.service

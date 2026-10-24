@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-10
-revision: 13
-status: Standing workflow; internal-cutover policy is conditional on server-owned activation status.
+last_updated: 2026-10-23
+revision: 15
+status: Standing evidence-driven workflow; project boundaries, activation rulings and owner-scoped permissions remain binding.
 public_safe: true
-summary: Scope, context loading, ownership, conditional internal cutovers, saved-state obligations, verification and closeout.
+summary: Evidence-driven slices, task graphs, model roles, authority, verification feedback and closeout.
 always: true
 ---
 
@@ -34,17 +34,35 @@ paths, credentials, installed MCP servers, and disposable lab state belong in
 local configuration, not repository-wide instructions. A handoff names the
 objective, owners, evidence, and next step; it does not repeat the manual.
 
+For Codex setup or instruction changes, inspect the effective global and project
+instruction chain, including `AGENTS.override.md` and any configured fallback
+names. Referenced Markdown is task-routed reading, not automatically loaded
+instructions. Verify discovery in a fresh session when the host supports it;
+record an unavailable check separately from a file inspection. The
+[official discovery guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+owns the host's loading behavior. Inspect configuration selectively; keep private
+configuration and session logs outside this public tree.
+
 ## Slice workflow
 
 For anything non-trivial:
 
-1. Clarify intent and scope, and write the scope down.
-2. Read the owners the work touches — start from [AGENTS.md](../AGENTS.md).
-3. Write or update the owning document when behaviour, architecture, a content
-   model, or the workflow changes.
-4. Implement only the agreed slice.
-5. Verify with the commands that match what changed.
-6. Close out (below), and leave a clean handoff.
+1. Inspect applicable instructions, working-tree state, current checkpoint and
+   relevant owners, issue/PR conventions and proof. Read what the slice needs.
+2. Record one observable outcome, explicit non-goals, acceptance checks, authority
+   and effort policy before editing. Name the source evidence for disputed facts.
+3. Select ready work in the canonical graph below. Update the sole owning
+   document when behaviour, architecture, content or procedure changes.
+4. Implement the agreed slice with the cheapest useful existing feedback. Repair
+   observed failures within its effort policy; review every completed child of a
+   failed batch before choosing a repair.
+5. Review and freeze the candidate before expensive gates. Isolate mutable build
+   inputs, output directories, databases and ports. Run independent local and
+   hosted checks concurrently only when publication is already authorized and the
+   [host constraints](#running-lanes-on-one-host--observed-2026-08-21) permit it.
+6. Review the diff, behavior and raw proof; distinguish self-review from a separate
+   review. Complete [closeout](#closeout), archive the graph, and continue the next
+   ready task only within the recorded authorization.
 
 Tiny typo fixes and mechanical corrections may skip the ceremony. They may not
 skip verification.
@@ -52,6 +70,108 @@ skip verification.
 Prefer durable repository truth over chat-only decisions. If a decision will
 matter later, it goes in the document that owns the fact — not in a commit
 message, and not in a conversation.
+
+## Models and delegation
+
+[AGENTS.md](../AGENTS.md#operating-rules) owns the project's requested models and
+roles. Select the exact model and `max` effort explicitly when spawning a worker.
+The graph records both the requested route and whatever runtime identity the host
+actually exposes; configuration and a successful dispatch are not independent
+attestation of execution. Report unavailable routing without substituting a model
+or reducing effort. Editing instructions cannot switch a running conversation.
+
+Delegate when a bounded task benefits from it. Give each worker the exact input
+references, acceptance check, effort policy, file ownership and concurrency
+constraints. Tell editing workers that others may be working in the checkout and
+that they must preserve and accommodate those changes. Independent work may run
+together only when its inputs and file ownership allow it. The parent inspects
+the resulting artifacts and proof before accepting completion; the
+[implementer-autonomy rule](#implementer-autonomy) still owns integration.
+
+DeepSeek's pause is preserved. Only an explicit owner re-enablement permits a
+supervised narrow task with a concrete benefit. If re-enabled, retain the actual
+model, corrections, reliability and independent verification in the applicable
+execution record; do not create evaluation-only work or transfer primary design
+or integration to it.
+
+## Task graph and continuation
+
+Use one canonical graph for substantive dependent work in its existing issue,
+PR or dated `docs/plans/` execution record. The [genesis ledger](plans/genesis-ledger.md#current-checkpoint)
+is the concise current-state entry point and links to that record; it does not
+copy the graph. GitHub issues remain the finding index. An issue or PR may link to
+a local execution record without maintaining a second mutable task list. Simple
+changes need only an outcome, short plan, check and next action.
+
+At graph level record the bounded outcome, canonical location, authority source,
+common inputs, effort policy and one next action. Each node needs:
+
+| Field | Required content |
+| --- | --- |
+| ID and outcome | Stable identifier and one observable result |
+| Dependencies | Node IDs whose acceptance must already be verified |
+| Owner | Responsible agent/person, requested model and effort; observed routing limits |
+| Inputs | Owner ruling, source evidence, exact candidate or predecessor receipts |
+| Acceptance | Concrete command or observation, including required negative proof |
+| State | `pending`, `ready`, `running`, `blocked` or `complete` |
+| Evidence | Original sources for source claims; exact revisions or candidate hashes and check receipts for implementation claims |
+| Effort policy | Explicit limit or owner waiver with its source, inherited when shared |
+
+Astra selects ready nodes and reviews graph changes. A worker's completion claim
+does not unlock dependents: inspect its artifact and acceptance evidence first.
+Mark a node complete only when its stated acceptance is met. A failed check creates
+a scoped repair or investigation under the same effort policy. Missing evidence
+names the exact blocked acceptance and the input or decision needed; independent
+ready work continues. A graph edit grants no permissions, resets no budget and
+does not silently change success criteria.
+
+After interruption, reconcile the graph with the actual branch, revision,
+working-tree changes, running processes and fresh receipts before restarting.
+Preserve failed and interrupted attempts. A changed code, test or gate input
+invalidates affected acceptance; reopen the relevant nodes and rerun their checks.
+Keep unaffected receipts with their original scope and identity.
+
+Archive a completed graph in place by marking its execution record as History,
+retaining final node states, evidence, limitations and the next action. Link it
+from the checkpoint before advancing to the next authorized graph. Unfinished
+acceptance remains unfinished. Reuse the existing handoff/issue/PR record rather
+than adding a tracker or database. Graph-guided continuation is an agent procedure;
+there is no automatic dispatcher, restart service or enforcement implemented by
+these instructions.
+
+## Authority and effort
+
+Record the permissions that actually apply to each outcome, with their source.
+An earlier authorization continues within its scope; do not ask for it again.
+Neither this workflow nor a permission from another project grants new authority.
+
+| Surface | Standing project policy and owner |
+| --- | --- |
+| Local implementation and checks | Complete the authorized slice under [implementer autonomy](#implementer-autonomy); preserve others' work and use isolated, reproducible dependencies. Read-only Git inspection does not change repository state. |
+| Git lifecycle and remote writes | Follow the [entry contract](../AGENTS.md#what-needs-an-owner-decision). Record whether the dispatch includes staging/commits, branches/worktrees, PR or issue writes, merge and cleanup. A previous slice's delivery permission does not automatically cover a new outcome. |
+| Authorized delivery | Continue through the authorized PR, both required CI jobs, merge, exact-main verification, evidence archive/read-back and owned branch/worktree cleanup. A local pass does not prove hosted checks or the merged revision. |
+| Preview and publication | [Server notes](server-notes.md#private-development-deployment) owns standing private-preview refresh and saved-state protection. [Public-boundary policy](public-boundary-policy.md#the-premise) owns the separate publication boundary. Documentation-only work has no playable-build activation to perform. |
+| Spending and other external effects | Remain owner decisions under the entry contract; record explicit scope before using paid services or changing external systems. |
+| Protected inputs and cleanup | [Public-boundary policy](public-boundary-policy.md) and [working-root policy](working-root-policy.md) govern private references, denylist, credentials and disposable state. Remove only owned task resources; preserve saved state, other work and required evidence. |
+
+**Owner ruling, 2026-09-23:** there is no numeric repair-cycle limit within an
+authorized outcome. The owner rejected an arbitrary two-cycle cap during the
+[workflow setup](plans/2026-09-23-evidence-workflow.md#outcome-and-authority).
+Graphs inherit this effort waiver unless the owner supplies a task-specific
+limit. Continue causal, in-scope repairs until acceptance is met or a concrete
+source, capability or authority blocker prevents further useful work. Preserve
+the failure evidence and explain what each next attempt changes; repeated activity
+without a new observation or repair hypothesis is not progress.
+
+This waiver grants no additional scope, spending or external permissions. Record
+any task-specific limit and its source; reaching that limit requires an owner
+decision before more repairs. New ideas and renamed nodes cannot reset it.
+
+Continue ready work within the assigned outcome or explicitly authorized queue.
+The execution record names whether completion stops at a local handoff or includes
+delivery and subsequent tasks. An open backlog issue alone authorizes neither.
+Complete independent preparation and make any required final approval concrete and
+reviewable before asking for the blocking decision.
 
 ## Document families and precedence
 
@@ -177,7 +297,7 @@ engineering findings and reports the complete result at the end.
   findings, full diff, and independent verification before any commit. A single
   agent performs its own review; this rule does not require delegation.
 - **Hard stops are ownership questions, not engineering ones:** the owner's play
-  and gate verdicts, Git operations, boundary crossings, external-boundary
+  and gate verdicts, Git lifecycle work, boundary crossings, external-boundary
   activation, spending, and product decisions.
 - Plans say "resolve and record" for in-scope engineering findings, not "stop and
   report".
@@ -258,6 +378,26 @@ The activation criteria and policy after activation are owned by
 [verification usage](verification.md) owns how to drive it. The lessons below are
 owned here because they concern method rather than commands. Their evidence
 remains with the relevant proof.
+
+### Evidence and repair feedback
+
+Use original source references for source claims and an exact revision or hashed
+working candidate for implementation claims. The
+[verification receipt guidance](verification.md#manual-run-receipts) owns command and result capture.
+Preserve failures and inspect raw logs; a successful wrapper exit is insufficient
+when its runner reports degradation, an incomplete result or unexecuted children.
+Keep local configured, default, native-browser and hosted proof distinct.
+
+Add feedback only for a concrete missing observation. A new correctness check
+needs a meaningful negative control under [the qualification rule](#a-check-earns-its-blocking-status).
+Do not broaden or repeat successful testing without changed inputs, an observed
+failure or a remaining concern. Claim a speedup only from comparable completed
+measurements with commands, environment and scope stated.
+
+Record procedural improvements in the existing execution record: observed problem,
+smallest corrective change, review and actual verification. Update the sole
+procedure owner when the lesson should persist. Neither a lesson nor a graph edit
+may weaken required checks, expand scope or grant permissions.
 
 ### Prove the real path, not a reconstruction of it
 
@@ -351,9 +491,9 @@ python3 tools/run_verification.py --scope portable --scope web --scope gated --a
 python3 tools/run_verification.py --scope cleanclone --allow-unavailable --report-disk
 ```
 
-**CI lists no steps of its own.** It names lanes; the runner resolves them. That
-is what makes "CI passes" and "it passes locally" the same claim rather than two
-claims that happen to agree today. To see exactly what CI will run, run
+**CI lists no steps of its own.** It names lanes; the runner resolves them.
+Local and hosted runs share that step authority, but their capabilities and
+observed verdicts remain separate evidence. To see exactly what CI will run, run
 `python3 tools/run_verification.py --list --scope full`.
 
 **And the two jobs are asserted to be `full`, exactly.** Splitting a lane across
@@ -405,7 +545,9 @@ order does not reorder product priority, and an open issue is not a plan.
 the clean-copy proof. Disable incremental artifacts and retain line-table debug
 information there; do not change developer Cargo profiles to fit a CI runner.
 CI separates the normal and clean-copy builds onto two jobs and reclaims unused
-preinstalled payloads with `.github/disk-budget.sh`.
+preinstalled payloads with `.github/disk-budget.sh`. The clean-copy proof step
+points `TMPDIR` at `runner.temp`: hosted runners now give `/tmp` its own quota,
+too small for a cold build, and the budget script reports both filesystems.
 
 Budget for peak usage, not just artifacts left afterward. `--report-disk` logs
 size/free space after build steps; the clean-copy proof samples its peak.
@@ -436,6 +578,11 @@ Complete these in order. An item may be `N/A` only with a stated reason.
 9. Report the complete result. The responsible agent handles Git, pull requests,
    required checks, and merge state when the owner has authorized that lifecycle.
    With delegated work, that responsibility stays with the supervising agent.
+10. Preserve the evidence and verify its read-back before removing owned scratch
+    resources. Archive the completed graph in place, refresh the concise checkpoint
+    and record one next action. Recheck affected documentation after closeout edits;
+    carry unfinished gates and limits explicitly. Continue only within the existing
+    outcome or authorized queue.
 
 ## Handoffs
 
@@ -443,6 +590,10 @@ A handoff should let the next agent resume without reopening settled decisions o
 widening the work. Include: current branch; `HEAD`; clean or dirty; the documents
 to read first; the exact next objective; explicit non-goals; the verification
 commands already run and their observed results; and known blockers.
+
+Link the canonical graph and its authority and effort sources. Reconcile resumed
+work with actual processes and receipt identities before repeating commands; a
+stale handoff is evidence of an earlier state, not proof of the current one.
 
 Keep it concrete. "Continue the architecture work" is not a handoff.
 

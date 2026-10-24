@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-13
-revision: 9
-status: Standing verification usage with independent staged/unstaged whitespace checks and observable proof-resource cleanup.
+last_updated: 2026-09-23
+revision: 10
+status: Standing verification usage, manual run receipts, independent staged/unstaged whitespace checks and observable proof-resource cleanup.
 public_safe: true
-summary: Lane usage, pending whitespace surfaces, served-proof prerequisites, browser roster and resource cleanup.
+summary: Lane usage, manual evidence receipts, pending whitespace surfaces, capabilities, browser proof and resource cleanup.
 routes:
   - tools/run_verification.py
   - tools/verification/**
@@ -61,9 +61,14 @@ select (`web`) still run.
 
 The whitespace step checks the index and working tree independently. A staged
 defect must fail even when an unstaged correction cancels it in the combined
-diff against HEAD. Committed history is the baseline; untracked files enter the
-index before the final source check. The runner's real temporary-repository tests
-exercise each pending surface and their cancellation case.
+diff against HEAD. Committed history is the baseline. Before an authorized
+source commit, include new files in the index for the final source check. Until
+then, boundary carried-file scans include non-ignored untracked files, but
+`git diff --check` does not inspect them; review their whitespace explicitly.
+With `git diff --no-index --check`, a clean added file still has a difference
+exit status; distinguish that status from emitted whitespace diagnostics.
+The runner's real temporary-repository tests exercise each pending surface and
+their cancellation case.
 
 One honest qualification, since Workbench V1: the Workbench reaches the authoring
 compiler's semantics through one command, because there is exactly one
@@ -107,6 +112,38 @@ Served-world proofs require `private-terms` as well as their database and browse
 capabilities. Missing private terms make those proofs unavailable before launch;
 the boundary mechanism's separate synthetic-fixture degradation does not satisfy
 the served world's input requirement.
+
+## Manual run receipts
+
+Use authorized project setup and the prescribed lockfile-based dependency setup
+where one exists before recording an installed tool or dependency as absent;
+then resolve the plan and probe capabilities with the existing `--list` and
+`--capabilities` options. A requirement that remains absent is still
+`UNAVAILABLE`. The private denylist is owner-provisioned out of band and must
+never be manufactured; the tracked synthetic fixture remains only the runner's
+declared degraded proof.
+
+For each claimed acceptance, retain a manual receipt in the existing dated plan,
+PR, or handoff. Include the actual command and working directory; base revision
+and, for a dirty candidate, its tracked patch plus hashes for untracked inputs;
+the resolved plan and capability state; UTC start and end, elapsed time, process
+exit code and printed runner verdict; and the complete emitted log with its
+digest. Distinguish a configured local run, a default-environment run, hosted CI
+and native browser proof, and reference separate captures or external logs.
+Keep machine-specific paths and secrets out of public documentation.
+
+The runner prints text step/total timings and a verdict; it creates no structured
+receipt or archive, and successful quiet-test steps may show summaries only.
+Review preserved raw logs and proof artifacts before recording a claim; where a
+successful quiet-test step emitted only a summary, record that limitation
+without attributing hidden child output. The `web` scope covers install,
+typecheck, unit tests and build; native browser proof and owner visual acceptance
+require their own evidence and decision. A changed input invalidates the affected
+acceptance. Keep prior, failing and interrupted receipts under their original run
+identity. Archive/read-back is a manual check that the stored artifact and digest
+are present and match; no automatic archive or read-back enforcement is
+implemented. Link retained records and external logs from the existing plan, PR
+or handoff.
 
 ## Historical baseline, 2026-08-20
 

@@ -1,9 +1,9 @@
 ---
-last_updated: 2026-09-06
-revision: 4
-status: Boundary checks retain fail-closed private-term requirements; clean authored gameplay uses the existing clean-content scan.
+last_updated: 2026-09-23
+revision: 5
+status: Boundary checks remain fail-closed; exact hostname reasons live in the tracked allowlist.
 public_safe: true
-summary: Public-boundary checks, clean authored provenance, private-term resolution, scan scope and mutant qualification.
+summary: Public-boundary checks, scan scope, exact-host allowlists and mutant qualification.
 routes:
   - tools/check_*.py
   - tools/boundary_common.py
@@ -184,12 +184,11 @@ giving the reason it exists, and the lists hold what the tree actually contains
 rather than what it might contain later.
 
 - `tools/hostname-allowlist.txt` — hosts and IPv4 literals accepted anywhere in
-  the tree. Today: the two hosts in the AGPL license text, the two named by the
-  Cargo dependency metadata and the comment explaining it, and the seven
-  synthetic strings that exist only as this check's own mutants inside
-  `tests/test_check_hostnames.py`. Reserved names (`.invalid`, `.test`,
-  `.example`, `.localhost`, the `example` domains), loopback addresses, and the
-  RFC 5737 documentation ranges are allowed by rule and need no entry.
+  the tree, with an exact reason for every entry. This file is the sole current
+  inventory of accepted hostname literals and their reasons. Reserved names
+  (`.invalid`, `.test`, `.example`, `.localhost`, the `example` domains),
+  loopback addresses, and the RFC 5737 documentation ranges are allowed by rule
+  and need no entry.
 - `tools/clean-room-allowlist.txt` — the files permitted to name a
   predecessor-private root. Only files that define, ignore, document, or prove
   the rule. A **stale entry naming a file the tree does not carry is a
