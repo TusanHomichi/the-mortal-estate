@@ -19,7 +19,7 @@ await build({ configFile: false, root: web,
       if(/\/play\/studyRenderer\.|\/play\/pixel|\/authoritative\/renderer\./.test(id))throw new Error(`Retired renderer reached the product: ${id}`);
     }
   } }], build: { outDir: output, emptyOutDir: true,
-  rollupOptions: { input: path.join(web, "play.html") } } });
+  rolldownOptions: { input: path.join(web, "play.html") } } });
 await mkdir(output, { recursive: true });
 await copyFile(path.join(output,"play.html"),path.join(output,"index.html"));
 const target = path.resolve(root, process.env.CARGO_TARGET_DIR || "target");
