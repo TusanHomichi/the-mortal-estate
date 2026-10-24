@@ -86,6 +86,8 @@ the pixel-only restriction. Earlier visual choices remain evidence to reassess.
 | Unavailable proof | Missing capability cannot become a pass. | [verification](verification.md#what-the-exit-code-means) |
 | Working roots | Disposable files, retention, and promotion. | [working-root policy](working-root-policy.md) |
 | Spec starting point | Charter, reopened decisions, owners, proof, design. | [agent workflow](agent-workflow.md#where-authoring-a-gameplay-spec-starts) |
+| Spatial identity | A place is realm, level and coordinates together; a matching level name in another realm is elsewhere. | [boundary map](boundary-map.md#11-the-authoredruntime-contract-seam) |
+| Spell content versus execution | Unsupported target/family pairs are refused by validation, not stubbed after spending resources. | [boundary map](boundary-map.md#13-rust-is-the-sole-gameplay-semantic-validator-and-it-fails-closed) |
 
 ## Traps already paid for
 

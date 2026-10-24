@@ -22,6 +22,7 @@ single `run:` line, so none can hide inside a block this does not read.
 
 from __future__ import annotations
 
+import json
 import re
 import tomllib
 import unittest
@@ -44,7 +45,9 @@ INSTALL_SCRIPT_NAME = ".github/install-rust.sh"
 
 #: Current Node 24 action majors, selected from their official releases on
 #: 2026-08-27 (checkout, setup-python) and 2026-09-02 (setup-node). A future
-#: runtime migration changes these deliberately.
+#: runtime migration changes these deliberately. The workflow pins each to a
+#: commit and names the major in a trailing `# vN` comment (Renovate keeps the
+#: digest current); `action_uses` reads that pair back as `owner/action@vN`.
 CHECKOUT_ACTION = "actions/checkout@v7"
 SETUP_PYTHON_ACTION = "actions/setup-python@v7"
 SETUP_NODE_ACTION = "actions/setup-node@v7"
@@ -58,7 +61,8 @@ EXPECTED_ACTION_STEPS = {
 
 RUNNER = "tools/run_verification.py"
 _RUN_LINE = re.compile(r"^\s*run:\s*(python3 " + re.escape(RUNNER) + r".*?)\s*$")
-_USES_LINE = re.compile(r"^\s*-\s+uses:\s*(\S+)\s*$")
+_USES_LINE = re.compile(r"^\s*-\s+uses:\s*(\S+?)@(\S+)(?:\s+#\s*(\S+))?\s*$")
+_DIGEST = re.compile(r"^[0-9a-f]{40}$")
 _JOB_HEADER = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_-]*):\s*$")
 _ENV_ENTRY = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_]*):\s*(.*?)\s*$")
 _SCOPE = re.compile(r"--scope\s+(\S+)")
@@ -125,12 +129,17 @@ def runner_commands(block: list[str]) -> list[str]:
 
 
 def action_uses(block: list[str]) -> tuple[str, ...]:
-    """Every action reference from an actual `uses:` step, in workflow order."""
+    """Every action reference from an actual `uses:` step, in workflow order.
+
+    A digest pin reads as the tag its comment names, so the reviewed majors
+    below stay legible; `TheActionsArePinnedToCommits` holds the digests.
+    """
     found = []
     for line in block:
         match = _USES_LINE.match(line)
         if match is not None:
-            found.append(match.group(1))
+            action, ref, tag = match.groups()
+            found.append(f"{action}@{tag if _DIGEST.match(ref) and tag else ref}")
     return tuple(found)
 
 
@@ -171,6 +180,24 @@ class TheWorkflowIsReadable(unittest.TestCase):
             "      - uses: actions/checkout@v8",
         ]
         self.assertEqual(action_uses(block), ("actions/checkout@v8",))
+
+    def test_action_reader_reads_a_digest_pin_as_its_commented_tag(self) -> None:
+        block = [f"      - uses: actions/checkout@{'a' * 40} # v8"]
+        self.assertEqual(action_uses(block), ("actions/checkout@v8",))
+
+
+class TheActionsArePinnedToCommits(unittest.TestCase):
+    """A tag can be moved under us; a commit cannot (burrow's repo baseline)."""
+
+    def test_every_action_is_a_full_commit_digest_with_its_tag(self) -> None:
+        for name, block in job_blocks().items():
+            for line in block:
+                match = _USES_LINE.match(line)
+                if match is None:
+                    continue
+                action, ref, tag = match.groups()
+                self.assertRegex(ref, _DIGEST, f"{name}: {action} is not pinned")
+                self.assertRegex(tag or "", r"^v\d+", f"{name}: {action} names no tag")
 
 
 class TheJobsCoverTheCompleteLane(unittest.TestCase):
@@ -317,17 +344,33 @@ class TheLeanProfileIsDeclaredOnce(unittest.TestCase):
 class TheRustToolchainPinsAgree(unittest.TestCase):
     """Local selection, Cargo's floor, and CI must name one baseline."""
 
-    def test_the_exact_local_and_ci_pins_match_the_workspace_floor(self) -> None:
+    def test_the_workspace_floor_is_the_exact_local_pin(self) -> None:
         toolchain = tomllib.loads(RUST_TOOLCHAIN.read_text(encoding="utf-8"))[
             "toolchain"
         ]
         workspace = tomllib.loads(CARGO_MANIFEST.read_text(encoding="utf-8"))[
             "workspace"
         ]["package"]
-        exact = toolchain["channel"]
 
-        self.assertEqual(workflow_environment().get("RUST_TOOLCHAIN_VERSION"), exact)
-        self.assertEqual(workspace["rust-version"], exact.removesuffix(".0"))
+        self.assertEqual(workspace["rust-version"], toolchain["channel"])
+
+    def test_ci_reads_the_pin_rather_than_restating_it(self) -> None:
+        """Renovate bumps rust-toolchain.toml; a second copy would lag it."""
+        self.assertNotIn("RUST_TOOLCHAIN_VERSION", workflow_environment())
+        script = (REPO_ROOT / INSTALL_SCRIPT_NAME).read_text(encoding="utf-8")
+        self.assertIn("rust-toolchain.toml", script)
+
+    def test_renovate_bumps_the_floor_with_the_pin(self) -> None:
+        config = json.loads((REPO_ROOT / "renovate.json").read_text(encoding="utf-8"))
+        (manager,) = config["customManagers"]
+        self.assertEqual(manager["depNameTemplate"], "rust")
+        (pattern,) = manager["matchStrings"]
+        # Renovate patterns are JavaScript; Python spells a named group `(?P<`.
+        python_pattern = pattern.replace("(?<", "(?P<")
+        found = re.search(python_pattern, CARGO_MANIFEST.read_text(encoding="utf-8"))
+        self.assertIsNotNone(found, pattern)
+        self.assertEqual(found.group("currentValue"), tomllib.loads(
+            RUST_TOOLCHAIN.read_text(encoding="utf-8"))["toolchain"]["channel"])
 
     def test_the_local_pin_carries_the_proof_components(self) -> None:
         toolchain = tomllib.loads(RUST_TOOLCHAIN.read_text(encoding="utf-8"))[

@@ -233,7 +233,7 @@ that presentation and the shared adult/door scale. Production owns the enlarged
 floor spacing; the browser owns cutaway for observed empty routes. No authority,
 visibility, content, collision or timing changes are included.
 
-A supervised DeepSeek geometry review completed in 20.705 seconds. It identified
+A supervised second-model geometry review completed in 20.705 seconds. It identified
 wall height relative to floor depth and actor-only cutaway as likely contributors.
 The parent retained the current ground aspect and tall structures in response to
 the owner's consistency concern, choosing more floor area and observed-floor
@@ -281,7 +281,7 @@ one row, lone-player centering, both doorway planes, fixed-frame door opening,
 observed-floor cutaway and black unseen background. Its desktop capture exposed
 a framing cost: the prior enlargement showed fewer than four square rows. Dungeon
 enlargement is therefore bounded separately, and changing levels recomputes the
-viewport so town regains its original framing. A supervised DeepSeek review also
+viewport so town regains its original framing. A supervised second-model review also
 identified the visible-row tradeoff and side-wall draw-order concerns. The parent
 retains the existing ascending near-edge order and joined corner geometry; the
 worker's proposed reverse order and door redesign were not adopted.
