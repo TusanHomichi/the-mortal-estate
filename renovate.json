@@ -1,0 +1,13 @@
+{
+  "customManagers": [
+    {
+      "description": "The workspace rust-version is the exact toolchain pin (tests/test_ci_workflow.py); bump it with rust-toolchain.toml.",
+      "customType": "regex",
+      "managerFilePatterns": ["/^Cargo\\.toml$/"],
+      "matchStrings": ["rust-version\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""],
+      "depNameTemplate": "rust",
+      "packageNameTemplate": "rust-lang/rust",
+      "datasourceTemplate": "github-releases"
+    }
+  ]
+}

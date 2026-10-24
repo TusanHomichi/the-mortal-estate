@@ -175,7 +175,8 @@ setup, incomplete verdicts, capture, and CI are in
 
 Reopened product decisions; action timing; multiple live worlds; external
 product-boundary activation or outside players; publication; visual acceptance
-and accepted masters; adding an AI runtime; Git lifecycle work; spending; and
+and accepted masters; adding an AI runtime; Git lifecycle work (other than the
+merge, which is the steward's: see [Pull requests](#pull-requests)); spending; and
 effects outside this machine. Timing changes follow the current D5 ruling.
 Routine private-preview refresh already has standing authorization under the
 [latest-build ruling](docs/server-notes.md#private-development-deployment).
@@ -184,6 +185,35 @@ If a request conflicts with an owner ruling, the charter, a boundary, or the
 public-boundary policy, state the conflict and risk and get explicit owner
 confirmation before proceeding. In-scope implementation follows
 [implementer autonomy](docs/agent-workflow.md#implementer-autonomy).
+
+## Pull requests
+
+Open PRs as drafts and leave them to the steward: it asks Codex for a review,
+and once Codex finds nothing on your head, every review thread is resolved and
+CI is green, it marks the PR ready and merges it. Fix or answer every finding:
+push the fix and reply with the commit, or reply with why it's wrong, then
+resolve the thread. Don't merge or mark ready yourself. Merging needs no
+separate owner grant (the owner's call, 2026-10-23); everything else in
+[What needs an owner decision](#what-needs-an-owner-decision) still does, and a
+PR that crosses one of those lines says so and waits for the owner.
+
+## Code Review Rules
+
+For reviewers, Codex included. Flag as P1:
+
+- a change that makes a check pass without fixing the thing it checks
+- tests or checks weakened, skipped or deleted to get green
+- secrets, tokens or personal data in the diff or the logs it adds
+- behavior changed beyond what the PR says it does
+- a change that overrides an owner ruling (D5 timing, the visual ruling, the
+  first-land map template) or decides something listed under "What needs an
+  owner decision" without the owner's recorded confirmation
+- anything that breaks the public-boundary policy: publication, outside players,
+  or the private denylist made optional
+- a world or storage migration that would enter through an ordinary binary swap
+- an UNAVAILABLE verification verdict reported or treated as PASS
+- an adjustable fact hardcoded instead of living in validated content
+- a candidate image or packet promoted to an accepted master
 
 ## Private
 

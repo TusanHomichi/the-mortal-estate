@@ -48,9 +48,9 @@ env:
   # releases named checkout v7.0.1 and setup-python v7.0.0; this workflow pins
   # their supported v7 majors. The workspace was originally
   # proven on Rust 1.96.0 and Python 3.14 on 2026-08-19; issue #25 raised the
-  # Rust baseline on 2026-08-26. The workflow pin, rust-toolchain.toml, and the
-  # workspace rust-version are held together by tests/test_ci_workflow.py.
-  RUST_TOOLCHAIN_VERSION: "1.98.0"
+  # Rust baseline on 2026-08-26. The Rust pin lives only in rust-toolchain.toml:
+  # .github/install-rust.sh reads it from there, and tests/test_ci_workflow.py
+  # holds the workspace rust-version equal to it.
   PYTHON_VERSION: "3.14"
 
   # The disposable-build profile. A proof build has no next build to make fast
@@ -95,7 +95,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
           cache-dependency-path: web/package-lock.json
 
