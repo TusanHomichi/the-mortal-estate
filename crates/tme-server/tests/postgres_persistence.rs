@@ -4,7 +4,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpStream};
 use std::path::PathBuf;
 use std::time::Duration;
 
-use argon2::password_hash::{PasswordHasher, SaltString};
+use argon2::PasswordHasher;
 use argon2::{Algorithm, Argon2, Params, Version};
 use futures_util::{SinkExt, StreamExt};
 use sha2::{Digest, Sha256};

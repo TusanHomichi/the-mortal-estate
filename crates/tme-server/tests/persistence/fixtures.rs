@@ -12,9 +12,8 @@ async fn insert_account_named(
 ) {
     let params = Params::new(65_536, 3, 4, Some(32)).unwrap();
     let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
-    let salt = SaltString::encode_b64(&[salt_byte; 16]).unwrap();
     let phc = argon
-        .hash_password(PASSWORD.as_bytes(), &salt)
+        .hash_password_with_salt(PASSWORD.as_bytes(), &[salt_byte; 16])
         .unwrap()
         .to_string();
     sqlx::query("INSERT INTO tme.accounts(account_id,username,display_name) VALUES($1,$2,$3)")

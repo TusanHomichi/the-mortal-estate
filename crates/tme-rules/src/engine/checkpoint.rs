@@ -175,6 +175,7 @@ use world::*;
 mod actors_inventory;
 use actors_inventory::*;
 mod secondary;
+pub use secondary::hex_lower;
 use secondary::*;
 mod content_migration;
 pub use content_migration::{CheckpointContentMigration, ContentRelocation};

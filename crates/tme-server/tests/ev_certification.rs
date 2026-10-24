@@ -10,7 +10,7 @@ use std::sync::mpsc;
 use std::thread::JoinHandle as ThreadJoinHandle;
 use std::time::{Duration, Instant};
 
-use argon2::password_hash::{PasswordHasher, SaltString};
+use argon2::PasswordHasher;
 use argon2::{Algorithm, Argon2, Params, Version};
 use futures_util::{StreamExt, future::join_all};
 use sha2::{Digest, Sha256};

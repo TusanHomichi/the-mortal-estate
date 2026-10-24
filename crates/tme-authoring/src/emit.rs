@@ -20,7 +20,7 @@ pub fn json<T: Serialize>(value: &T) -> Result<Vec<u8>> {
 }
 
 pub fn digest(bytes: &[u8]) -> String {
-    format!("{:x}", Sha256::digest(bytes))
+    tme_rules::hex_lower(&Sha256::digest(bytes))
 }
 
 /// Write a projected artifact, or in check mode assert the tracked bytes are

@@ -200,7 +200,8 @@ pub(super) fn position_bools(
     Ok(result)
 }
 
-pub(super) fn hex_lower(bytes: &[u8]) -> String {
+/// Lowercase hex, the form every recorded SHA-256 in this workspace takes.
+pub fn hex_lower(bytes: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let mut encoded = String::with_capacity(bytes.len() * 2);
     for byte in bytes {

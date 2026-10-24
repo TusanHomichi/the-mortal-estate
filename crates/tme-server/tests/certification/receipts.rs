@@ -146,7 +146,7 @@ async fn facet_identity(pool: &sqlx::PgPool, facet_id: wire::FacetId) -> String 
             .fetch_one(pool)
             .await
             .unwrap();
-    format!("{:x}", Sha256::digest(identity.as_bytes()))
+    tme_rules::hex_lower(&Sha256::digest(identity.as_bytes()))
 }
 
 async fn facet_durable_state(pool: &sqlx::PgPool, facet_id: wire::FacetId) -> FacetDurableState {
