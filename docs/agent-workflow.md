@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-10-23
-revision: 15
+revision: 16
 status: Standing evidence-driven workflow; project boundaries, activation rulings and owner-scoped permissions remain binding.
 public_safe: true
 summary: Evidence-driven slices, task graphs, model roles, authority, verification feedback and closeout.
@@ -73,8 +73,9 @@ message, and not in a conversation.
 
 ## Models and delegation
 
-[AGENTS.md](../AGENTS.md#operating-rules) owns the project's requested models and
-roles. Select the exact model and `max` effort explicitly when spawning a worker.
+[AGENTS.md](../AGENTS.md#operating-rules) owns the project's roles; which model
+fills each role, and at what effort, is machine configuration that no tracked
+file names. Select the configured model and effort explicitly when spawning a worker.
 The graph records both the requested route and whatever runtime identity the host
 actually exposes; configuration and a successful dispatch are not independent
 attestation of execution. Report unavailable routing without substituting a model
@@ -88,9 +89,9 @@ together only when its inputs and file ownership allow it. The parent inspects
 the resulting artifacts and proof before accepting completion; the
 [implementer-autonomy rule](#implementer-autonomy) still owns integration.
 
-DeepSeek's pause is preserved. Only an explicit owner re-enablement permits a
-supervised narrow task with a concrete benefit. If re-enabled, retain the actual
-model, corrections, reliability and independent verification in the applicable
+A model the owner has paused stays paused. Only an explicit owner re-enablement
+permits a supervised narrow task with a concrete benefit. If re-enabled, retain its
+corrections, reliability and independent verification in the applicable
 execution record; do not create evaluation-only work or transfer primary design
 or integration to it.
 
@@ -117,7 +118,7 @@ common inputs, effort policy and one next action. Each node needs:
 | Evidence | Original sources for source claims; exact revisions or candidate hashes and check receipts for implementation claims |
 | Effort policy | Explicit limit or owner waiver with its source, inherited when shared |
 
-Astra selects ready nodes and reviews graph changes. A worker's completion claim
+The planning role selects ready nodes and reviews graph changes. A worker's completion claim
 does not unlock dependents: inspect its artifact and acceptance evidence first.
 Mark a node complete only when its stated acceptance is met. A failed check creates
 a scoped repair or investigation under the same effort policy. Missing evidence
@@ -148,8 +149,8 @@ Neither this workflow nor a permission from another project grants new authority
 | Surface | Standing project policy and owner |
 | --- | --- |
 | Local implementation and checks | Complete the authorized slice under [implementer autonomy](#implementer-autonomy); preserve others' work and use isolated, reproducible dependencies. Read-only Git inspection does not change repository state. |
-| Git lifecycle and remote writes | Follow the [entry contract](../AGENTS.md#what-needs-an-owner-decision). Record whether the dispatch includes staging/commits, branches/worktrees, PR or issue writes, merge and cleanup. A previous slice's delivery permission does not automatically cover a new outcome. |
-| Authorized delivery | Continue through the authorized PR, both required CI jobs, merge, exact-main verification, evidence archive/read-back and owned branch/worktree cleanup. A local pass does not prove hosted checks or the merged revision. |
+| Git lifecycle and remote writes | Follow the [entry contract](../AGENTS.md#what-needs-an-owner-decision). Record whether the dispatch includes staging/commits, branches/worktrees, PR or issue writes and cleanup. Merging is the steward's ([pull requests](../AGENTS.md#pull-requests)). A previous slice's delivery permission does not automatically cover a new outcome. |
+| Authorized delivery | Continue through the authorized draft PR and its review loop, both required CI jobs, the steward's merge, exact-main verification, evidence archive/read-back and owned branch/worktree cleanup. A local pass does not prove hosted checks or the merged revision. |
 | Preview and publication | [Server notes](server-notes.md#private-development-deployment) owns standing private-preview refresh and saved-state protection. [Public-boundary policy](public-boundary-policy.md#the-premise) owns the separate publication boundary. Documentation-only work has no playable-build activation to perform. |
 | Spending and other external effects | Remain owner decisions under the entry contract; record explicit scope before using paid services or changing external systems. |
 | Protected inputs and cleanup | [Public-boundary policy](public-boundary-policy.md) and [working-root policy](working-root-policy.md) govern private references, denylist, credentials and disposable state. Remove only owned task resources; preserve saved state, other work and required evidence. |
@@ -481,8 +482,12 @@ own command line — it matches your own shell.
 Resolve the current repository from `git remote get-url origin` and confirm it
 with `gh repo view --json nameWithOwner` before GitHub lifecycle work.
 
-`.github/workflows/verify.yml` runs on every pull request and on pushes to `main`.
-It has **two jobs**, and between them they run the complete lane: one runs
+Two workflows run on every pull request and on pushes to `main`.
+`.github/workflows/flake.yml` is the house gate: it calls burrow's shared
+workflow, which runs `nix flake check` (rustfmt, clippy, the Cargo tests and
+ruff's error rules, as burrow's `lib/project.nix` defines them). It overlaps
+the `rust` lane on purpose and replaces none of it; the runner stays the step
+authority. `.github/workflows/verify.yml` has **two jobs**, and between them they run the complete lane: one runs
 everything this checkout can prove, the other runs the clean-clone proof. Why
 two rather than one is [The disk budget](#the-disk-budget) below.
 
@@ -575,8 +580,9 @@ Complete these in order. An item may be `N/A` only with a stated reason.
 7. Record the decisions that will matter later in the document that owns them.
 8. File or fix every finding that is not in scope. Nothing carries forward
    unrecorded.
-9. Report the complete result. The responsible agent handles Git, pull requests,
-   required checks, and merge state when the owner has authorized that lifecycle.
+9. Report the complete result. The responsible agent handles Git, pull requests
+   and required checks when the owner has authorized that lifecycle; the steward
+   merges.
    With delegated work, that responsibility stays with the supervising agent.
 10. Preserve the evidence and verify its read-back before removing owned scratch
     resources. Archive the completed graph in place, refresh the concise checkpoint
@@ -613,5 +619,5 @@ not obstruction; discovering it after the merge is.
   additional implementation-language family.
 - Generated-documentation tooling, freshness scoring, or heuristic prose
   deduplication.
-- CI beyond the workflow above, scheduled automation, or repository hooks.
+- CI beyond the two workflows above, scheduled automation, or repository hooks.
 - An AI runtime of any kind ([boundary-map.md](boundary-map.md#part-3-ai-is-never-game-authority)).
