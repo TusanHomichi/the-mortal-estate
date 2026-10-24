@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-09-13
-revision: 18
+last_updated: 2026-10-23
+revision: 19
 status: Historical pixel production method; the full 3D cutover retires its renderer and proof tools.
 public_safe: true
 summary: Historical pixel asset preparation and proof, with current production routed to the 3D reopening.
@@ -57,7 +57,7 @@ owns their selection and evidence.
 These are the historical pixel workflow roles, superseded for new production by
 the [current status](#production-status).
 
-1. **Built-in GPT image generation:** concept design, rich scene plates, focused
+1. **Built-in image generation:** concept design, rich scene plates, focused
    appearance revisions and isolated source illustrations. Supply the selected
    project image as a reference; write the invariants explicitly.
 2. **PixelLab Pixen:** prepare an isolated character as a detailed sprite and
@@ -79,9 +79,9 @@ the [current status](#production-status).
    hash/alpha checks and diagnostic contact sheets. Keep semantic generation and
    deterministic preparation distinct in the receipt.
 
-**Owner preference, September 8:** prefer GPT Image 2.5 for future source art when
-available. The [official announcement](https://openai.com/index/introducing-chatgpt-images-2-5/)
-reports its rollout to Codex on this date. The tool interface inspected during
+**Owner preference, September 8:** prefer the newest built-in image model for
+future source art when available; which model that is stays out of tracked
+files, like every model choice. The tool interface inspected during
 the cutover had no model selector or reported model identity. Record the actual
 identity when exposed; otherwise record built-in image generation with model
 unreported. Do not claim an upgrade based on appearance or a prompt asking for
@@ -226,7 +226,7 @@ working robes and the open hand. Maude can retain an older, fuller body. Similar
 display height does not require identical build. No Christian crosses, church
 vestments or invented religious lore.
 
-The successful source workflow was a detailed GPT concept, proportionally
+The successful source workflow was a detailed generated concept, proportionally
 prepared for a 256px square Pixen input, followed by an inspected transparent
 sprite and eight V3 facings. Keep the complete hair and both soles. Preserve the
 original concept before any resizing; a large generated illustration is not
@@ -242,7 +242,7 @@ larger desktop presentation and filtered reduction that addressed that loss.
 
 Prompt for real transparent PNG alpha, no backdrop, floor, halo, checkerboard,
 border or environmental shadow. Then **inspect the untouched output**. Several
-apparently transparent GPT results were RGB images with a painted checker.
+apparently transparent generated results were RGB images with a painted checker.
 They remained disposable references; extraction created a different candidate.
 
 Require RGBA with both transparent and non-transparent pixels. Composite each
