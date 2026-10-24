@@ -36,7 +36,8 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     receipt = output / "verification.json"
     receipt.write_text(json.dumps({"verdict": "INCOMPLETE"}) + "\n")
-    template = json.loads((release / "content/lands/first-expedition/generated/world_template.json").read_text())
+    template_path = release / "content/lands/first-expedition/generated/world_template.json"
+    template = json.loads(template_path.read_text())
     policy = template["resurrection"]["first_expedition"]
     engines = [args.engine] if args.engine else json.loads((REPOSITORY_ROOT / "web/proof/engines.json").read_text())
     reports = []
@@ -44,7 +45,7 @@ def main():
     catalog_source = (release / declared.catalog).read_bytes()
     catalog = json.loads(catalog_source)
     seed_source_bytes = (release / "content/lands/first-expedition/simulation_seed.json").read_bytes()
-    template_bytes = (release / "content/lands/first-expedition/generated/world_template.json").read_bytes()
+    template_bytes = template_path.read_bytes()
     adversary = next(actor for actor in catalog["actor_definitions"].values()
                      if actor["id"] == "actor/first_expedition/cellar_scavenger")
     # This runner serves the release catalog unchanged, but its **seed is a
@@ -94,7 +95,8 @@ def main():
                     "served_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
                     "catalog_changed": catalog_path.read_bytes() != catalog_source},
         "template_release_sha256": hashlib.sha256(template_bytes).hexdigest(),
-        "template_served_sha256": hashlib.sha256(template_bytes).hexdigest(),
+        # Measured from the bootstrap input itself, below.
+        "template_served_sha256": None,
         "seed_release_sha256": hashlib.sha256(seed_source_bytes).hexdigest(),
         # Filled per run below: each run serves its own modified seed.
         "seed_served_sha256": {},
@@ -110,10 +112,14 @@ def main():
             # Content comes from the release under proof, not from the checkout
             # that happens to be running this script. `world_fixture` carries the
             # seed in memory, so it is re-read from the release here.
-            world = replace(world_fixture(), catalog=str(catalog_path),
+            world = replace(world_fixture(), catalog=str(catalog_path), world_template=str(template_path),
                             generated_seed=json.loads((
                                 release / "content/lands/first-expedition/simulation_seed.json"
                             ).read_text()))
+            # The bootstrap manifest names REPOSITORY_ROOT / world_template
+            # (an absolute path stays itself); that file is what is served.
+            fixture["template_served_sha256"] = hashlib.sha256(
+                (REPOSITORY_ROOT / world.world_template).read_bytes()).hexdigest()
             player = next(actor for actor in world.generated_seed["actors"] if actor["id"] == world.controlled_actor)
             player["location"] = dict(realm="first_expedition", level="d1_entry", position=dict(x=23, y=9))
             player["character"]["identity"]["sex_or_gender_display"] = body

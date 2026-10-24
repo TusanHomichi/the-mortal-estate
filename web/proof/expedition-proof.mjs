@@ -309,6 +309,9 @@ try {
     assert(BigInt(returning.carried.gold.sack) <= BigInt(goldBefore), "a return cannot create gold");
     await mark("returned");
     await page.locator("#world-canvas").focus();
+    // The return's cooldown gates keyboard actions (frame.can_act): a key
+    // pressed before it expires is dropped, so wait until it may act.
+    await ready();
     const beforeMove = commands.length;
     await page.keyboard.press("ArrowUp");
     await eventually(() => commands.length > beforeMove && JSON.stringify(frame.observation_center) !== JSON.stringify(config.destination));
