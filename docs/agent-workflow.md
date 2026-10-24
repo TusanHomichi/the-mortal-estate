@@ -148,8 +148,8 @@ Neither this workflow nor a permission from another project grants new authority
 | Surface | Standing project policy and owner |
 | --- | --- |
 | Local implementation and checks | Complete the authorized slice under [implementer autonomy](#implementer-autonomy); preserve others' work and use isolated, reproducible dependencies. Read-only Git inspection does not change repository state. |
-| Git lifecycle and remote writes | Follow the [entry contract](../AGENTS.md#what-needs-an-owner-decision). Record whether the dispatch includes staging/commits, branches/worktrees, PR or issue writes, merge and cleanup. A previous slice's delivery permission does not automatically cover a new outcome. |
-| Authorized delivery | Continue through the authorized PR, both required CI jobs, merge, exact-main verification, evidence archive/read-back and owned branch/worktree cleanup. A local pass does not prove hosted checks or the merged revision. |
+| Git lifecycle and remote writes | Follow the [entry contract](../AGENTS.md#what-needs-an-owner-decision). Record whether the dispatch includes staging/commits, branches/worktrees, PR or issue writes and cleanup. Merging is the steward's ([pull requests](../AGENTS.md#pull-requests)). A previous slice's delivery permission does not automatically cover a new outcome. |
+| Authorized delivery | Continue through the authorized draft PR and its review loop, both required CI jobs, the steward's merge, exact-main verification, evidence archive/read-back and owned branch/worktree cleanup. A local pass does not prove hosted checks or the merged revision. |
 | Preview and publication | [Server notes](server-notes.md#private-development-deployment) owns standing private-preview refresh and saved-state protection. [Public-boundary policy](public-boundary-policy.md#the-premise) owns the separate publication boundary. Documentation-only work has no playable-build activation to perform. |
 | Spending and other external effects | Remain owner decisions under the entry contract; record explicit scope before using paid services or changing external systems. |
 | Protected inputs and cleanup | [Public-boundary policy](public-boundary-policy.md) and [working-root policy](working-root-policy.md) govern private references, denylist, credentials and disposable state. Remove only owned task resources; preserve saved state, other work and required evidence. |
@@ -575,8 +575,9 @@ Complete these in order. An item may be `N/A` only with a stated reason.
 7. Record the decisions that will matter later in the document that owns them.
 8. File or fix every finding that is not in scope. Nothing carries forward
    unrecorded.
-9. Report the complete result. The responsible agent handles Git, pull requests,
-   required checks, and merge state when the owner has authorized that lifecycle.
+9. Report the complete result. The responsible agent handles Git, pull requests
+   and required checks when the owner has authorized that lifecycle; the steward
+   merges.
    With delegated work, that responsibility stays with the supervising agent.
 10. Preserve the evidence and verify its read-back before removing owned scratch
     resources. Archive the completed graph in place, refresh the concise checkpoint
