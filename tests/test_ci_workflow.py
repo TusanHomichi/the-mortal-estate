@@ -22,6 +22,7 @@ single `run:` line, so none can hide inside a block this does not read.
 
 from __future__ import annotations
 
+import json
 import re
 import tomllib
 import unittest
@@ -317,17 +318,33 @@ class TheLeanProfileIsDeclaredOnce(unittest.TestCase):
 class TheRustToolchainPinsAgree(unittest.TestCase):
     """Local selection, Cargo's floor, and CI must name one baseline."""
 
-    def test_the_exact_local_and_ci_pins_match_the_workspace_floor(self) -> None:
+    def test_the_workspace_floor_is_the_exact_local_pin(self) -> None:
         toolchain = tomllib.loads(RUST_TOOLCHAIN.read_text(encoding="utf-8"))[
             "toolchain"
         ]
         workspace = tomllib.loads(CARGO_MANIFEST.read_text(encoding="utf-8"))[
             "workspace"
         ]["package"]
-        exact = toolchain["channel"]
 
-        self.assertEqual(workflow_environment().get("RUST_TOOLCHAIN_VERSION"), exact)
-        self.assertEqual(workspace["rust-version"], exact.removesuffix(".0"))
+        self.assertEqual(workspace["rust-version"], toolchain["channel"])
+
+    def test_ci_reads_the_pin_rather_than_restating_it(self) -> None:
+        """Renovate bumps rust-toolchain.toml; a second copy would lag it."""
+        self.assertNotIn("RUST_TOOLCHAIN_VERSION", workflow_environment())
+        script = (REPO_ROOT / INSTALL_SCRIPT_NAME).read_text(encoding="utf-8")
+        self.assertIn("rust-toolchain.toml", script)
+
+    def test_renovate_bumps_the_floor_with_the_pin(self) -> None:
+        config = json.loads((REPO_ROOT / "renovate.json").read_text(encoding="utf-8"))
+        (manager,) = config["customManagers"]
+        self.assertEqual(manager["depNameTemplate"], "rust")
+        (pattern,) = manager["matchStrings"]
+        # Renovate patterns are JavaScript; Python spells a named group `(?P<`.
+        python_pattern = pattern.replace("(?<", "(?P<")
+        found = re.search(python_pattern, CARGO_MANIFEST.read_text(encoding="utf-8"))
+        self.assertIsNotNone(found, pattern)
+        self.assertEqual(found.group("currentValue"), tomllib.loads(
+            RUST_TOOLCHAIN.read_text(encoding="utf-8"))["toolchain"]["channel"])
 
     def test_the_local_pin_carries_the_proof_components(self) -> None:
         toolchain = tomllib.loads(RUST_TOOLCHAIN.read_text(encoding="utf-8"))[
