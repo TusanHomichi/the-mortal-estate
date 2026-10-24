@@ -64,8 +64,8 @@ upright presentation when constructing the next area. The initial
 [pixel-temple record](2026-09-08-pixel-temple.md) retains experimental evidence.
 No new image generation or provider spending occurs in this cutover.
 
-The owner prefers ChatGPT Images 2.5 if available after the Codex update. The
-[tool policy](../pixel-art-production.md) records the verified announcement and
+The owner prefers the newest built-in image model if available after the Codex update. The
+[tool policy](../pixel-art-production.md) records that preference and
 current inability to select or identify a model through the built-in tool. Use
 the included generation route; do not substitute a separately billed API or
 claim a version that the tool does not report.
