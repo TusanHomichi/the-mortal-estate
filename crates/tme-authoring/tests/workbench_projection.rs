@@ -162,7 +162,7 @@ fn every_named_source_digest_is_the_file_on_disk() {
         let claimed = source["sha256"].as_str().expect("a digest");
         let bytes = fs::read(root.join(path)).expect("the named source is readable");
         assert_eq!(
-            format!("{:x}", Sha256::digest(&bytes)),
+            tme_rules::hex_lower(&Sha256::digest(&bytes)),
             claimed,
             "{path} digest does not match the bytes on disk"
         );

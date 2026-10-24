@@ -26,7 +26,7 @@ mod creation;
 mod checkpoint;
 pub use checkpoint::{
     CheckpointContentMigration, CheckpointError, ContentIdentityV1, ContentRelocation,
-    FACET_CHECKPOINT_SCHEMA_VERSION, FacetCheckpointV5,
+    FACET_CHECKPOINT_SCHEMA_VERSION, FacetCheckpointV5, hex_lower,
 };
 mod damage;
 mod deadlines;

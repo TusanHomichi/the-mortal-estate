@@ -128,7 +128,7 @@ fn a_master_edited_and_resigned_together_is_rejected() {
         let path = root.join(land.master().document);
         let mut bytes = fs::read(&path).unwrap();
         bytes.push(b'\n');
-        let resigned = format!("{:x}", <sha2::Sha256 as sha2::Digest>::digest(&bytes));
+        let resigned = tme_rules::hex_lower(&<sha2::Sha256 as sha2::Digest>::digest(&bytes));
         fs::write(&path, bytes).unwrap();
         let mut value = receipt(&root, land);
         value["master"]["sha256"] = json!(resigned);
@@ -338,7 +338,7 @@ fn a_changed_companion_landing_and_resigned_receipt_fail_geography_identity() {
         "landing_cell_x",
     ) = json!(1);
     let bytes = serde_json::to_vec_pretty(&document).unwrap();
-    let digest = format!("{:x}", <sha2::Sha256 as sha2::Digest>::digest(&bytes));
+    let digest = tme_rules::hex_lower(&<sha2::Sha256 as sha2::Digest>::digest(&bytes));
     fs::write(root.join(path), bytes).unwrap();
     let mut value = receipt(&root, land);
     value["companions"]

@@ -3,8 +3,7 @@ use std::net::IpAddr;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use argon2::password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString};
-use argon2::{Algorithm, Argon2, Params, Version};
+use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
 use tme_protocol as wire;
 use tokio::sync::Semaphore;
 use unicode_normalization::UnicodeNormalization;
@@ -56,9 +55,8 @@ impl AuthService {
         tokio::task::spawn_blocking(move || {
             let _permit = permit;
             let salt = random_bytes::<16>()?;
-            let salt = SaltString::encode_b64(&salt).map_err(|error| error.to_string())?;
             argon2_instance()?
-                .hash_password(normalized.as_bytes(), &salt)
+                .hash_password_with_salt(normalized.as_bytes(), &salt)
                 .map(|hash| hash.to_string())
                 .map_err(|error| error.to_string())
         })
@@ -83,11 +81,7 @@ impl AuthService {
             let verified = argon2_instance()?
                 .verify_password(normalized.as_bytes(), &parsed)
                 .is_ok();
-            let mut salt_bytes = [0_u8; 64];
-            let salt_len = parsed
-                .salt
-                .and_then(|salt| salt.decode_b64(&mut salt_bytes).ok())
-                .map(<[u8]>::len);
+            let salt_len = parsed.salt.as_ref().map(|salt| salt.len());
             let needs_rehash = parsed.algorithm.as_str() != "argon2id"
                 || parsed.version != Some(19)
                 || parsed.params.get_decimal("m") != Some(ARGON2_MEMORY_KIB)
@@ -271,9 +265,8 @@ mod tests {
 
         let old_params = Params::new(32_768, 2, 1, Some(16)).unwrap();
         let old_argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, old_params);
-        let salt = SaltString::encode_b64(&[7_u8; 16]).unwrap();
         let old_phc = old_argon
-            .hash_password(password.as_bytes(), &salt)
+            .hash_password_with_salt(password.as_bytes(), &[7_u8; 16])
             .unwrap()
             .to_string();
         let old_verification = auth.verify(password, old_phc).await.unwrap();

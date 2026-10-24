@@ -133,8 +133,8 @@ fn prepare_content_migration(
     file.sync_all().map_err(|e| e.to_string())?;
     println!(
         "{}",
-        serde_json::json!({"before_sha256": format!("{:x}", Sha256::digest(checkpoint.as_bytes())),
-        "after_sha256": format!("{:x}", Sha256::digest(migrated.as_bytes())), "database_modified": false})
+        serde_json::json!({"before_sha256": tme_rules::hex_lower(&Sha256::digest(checkpoint.as_bytes())),
+        "after_sha256": tme_rules::hex_lower(&Sha256::digest(migrated.as_bytes())), "database_modified": false})
     );
     Ok(())
 }
