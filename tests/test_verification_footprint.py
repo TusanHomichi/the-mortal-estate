@@ -7,15 +7,19 @@ direction that matters: reporting *less* than the disk is actually paying.
 
 from __future__ import annotations
 
+import os
 import shutil
 import tempfile
 import threading
+import time
 import unittest
 from pathlib import Path
 
 from verification_test_support import REPO_ROOT  # noqa: F401  (path setup)
 
 from verification import footprint
+
+ALLOCATION_DEADLINE = 30.0
 
 
 class Scratch(unittest.TestCase):
@@ -24,9 +28,20 @@ class Scratch(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.root, True)
 
     def write(self, relative: str, size: int) -> Path:
+        """Random bytes, returned once the filesystem has allocated them.
+
+        A compressing filesystem such as ZFS allocates nothing for zeros, and
+        reports new blocks only when its transaction group commits, seconds
+        after the write. Measuring before then tests the filesystem, not this.
+        """
         target = self.root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(b"\0" * size)
+        target.write_bytes(os.urandom(size))
+        deadline = time.monotonic() + ALLOCATION_DEADLINE
+        while target.lstat().st_blocks * 512 < size:
+            if time.monotonic() > deadline:
+                self.fail(f"{target} was never allocated {size} bytes")
+            time.sleep(0.05)
         return target
 
 
@@ -106,10 +121,9 @@ class ThePeak(Scratch):
         sampler = footprint.PeakFootprint(self.root, interval=0.01)
         with sampler:
             big = self.write("big.bin", 8 * footprint.MEBIBYTE)
-            settled = threading.Event()
-            while not settled.wait(0.02):
-                if sampler.peak_bytes >= 8 * footprint.MEBIBYTE:
-                    break
+            deadline = time.monotonic() + ALLOCATION_DEADLINE
+            while sampler.peak_bytes < 8 * footprint.MEBIBYTE and time.monotonic() < deadline:
+                time.sleep(0.02)
             big.unlink()
         self.assertGreaterEqual(sampler.peak_bytes, 8 * footprint.MEBIBYTE)
         self.assertLess(footprint.directory_bytes(self.root), footprint.MEBIBYTE)
