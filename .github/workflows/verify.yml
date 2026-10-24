@@ -74,7 +74,7 @@ jobs:
     name: the complete lane, except the clean-clone proof
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # The markdown link check and the boundary checks ask git what the
           # tree carries. A shallow checkout is fine; a detached blobless one
@@ -89,11 +89,11 @@ jobs:
       - name: install the pinned Rust toolchain
         run: bash .github/install-rust.sh
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: "24"
           cache: npm
@@ -118,7 +118,7 @@ jobs:
     name: a clean copy builds and tests with no private root
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 1
 
@@ -128,7 +128,7 @@ jobs:
       - name: install the pinned Rust toolchain
         run: bash .github/install-rust.sh
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
