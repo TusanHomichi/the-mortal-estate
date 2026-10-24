@@ -188,6 +188,27 @@ no observed projection that leaks a fact outside the observed set.
 **Proof.** `crates/tme-rules/tests/` visibility coverage; the observer projection
 tests below.
 
+### Spatial identity is the whole address
+
+**Owner.** `WorldPosition` in `crates/tme-rules/src/model.rs` owns the address:
+`same_site` compares realm and level, `same_cell` compares all three. A realm
+owns its own level map (`content/world_template.rs`), so a level name is unique
+only inside its realm.
+
+**Rule.** Any test of "is this actor here" uses `same_site` or `same_cell`. No
+module compares a level name and coordinates separately: that pair silently
+matches a same-named level in another realm, and realm separation is exactly what
+the death programme depends on.
+
+**Never.** No globally unique level-name convention as a substitute for the
+realm comparison, and no spatial membership test pushed into the social
+assessor.
+
+**Proof.** `crates/tme-rules/tests/cases/spell_realm_identity.rs` — two realms
+with the same level name and coordinates, driven through the ordinary cast
+command, with the off-realm twin's damage, effects, rewards and RNG evolution
+compared against an equivalent world without it.
+
 ## 1.7 One item, one location, one transaction
 
 **Owner.** `crates/tme-rules/src/engine/inventory.rs`; the location type is

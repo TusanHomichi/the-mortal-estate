@@ -56,13 +56,13 @@ results; a worker's completion message alone does not satisfy acceptance.
 
 | ID | Concrete outcome | Depends on | Assigned owner / effort | Inputs | Acceptance | State | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| W1 | Identify existing gates, evidence conventions and instruction chain | none | `gpt-6-luna` / `max`, parent review by `gpt-6-astra` / `max` | `AGENTS.md`, workflow, verification, runner, CI, current ledger | Source-backed bounded report reviewed against the setup scope | complete | Parent-reviewed source report; `carried_files`, Markdown checker and CLI inspected; listed plan selects `meta, docs, boundary` |
-| W2 | Establish the standing procedure and concise checkpoint | W1 | `gpt-6-astra` / `max` | W1, owner setup request, maintained boundaries | Diff preserves rulings, assigns one owner per workflow fact and records actual authority | complete | Parent self-review of contract, workflow and checkpoint; effort ruling recorded by W2-E |
-| W2-V | Document actual verification receipt and capability usage | W1 | `gpt-6-luna` / `max`; owns only `docs/verification.md` | Runner CLI/executor, carried-file scanning, W1 | Parent-reviewed concise guidance with no invented automation or new gate | complete | Parent inspected diff and runner output code; clarified separate configured/default evidence and refreshed summary |
-| W2-E | Set the standing repair-effort limit or waiver | none | owner decision; `gpt-6-astra` / `max` records it | Existing autonomy rule and September 23 owner response | Explicit owner choice recorded in the workflow, with its source | complete | Owner rejected an arbitrary repair-cycle limit; standing scoped waiver recorded |
-| W3-R | Register the cited documentation hosts under existing policy | W2, W2-V | `gpt-6-luna` / `max`; owns hostname allowlist and boundary-check documentation | Failed W3 log, exact source URLs, existing allowlist policy | Only two reasoned exact-host entries; current inventory has one owner; scanner rules retained | complete | Parent reviewed actual two-file diff, exact-host policy and unchanged scanner; clarified the citation comment's scope |
-| W3 | Prove documentation and instruction discovery | W2, W2-V, W3-R | `gpt-6-luna` / `max` for documentation gates; `gpt-6-astra` / `max` for fresh-session review | Exact candidate, resolved check plan, official instruction guidance | Changed-path gates, supplemental new-file review and fresh-session result retained separately | complete | Parent reviewed all 14 PASS steps and 670 Python tests, fresh-session response and qualified whitespace control; receipts below |
-| W4 | Review, archive and hand off the completed setup | W3, W2-E | `gpt-6-astra` / `max` | Final diff, raw W3 receipts, graph and permission record | Parent review, affected rechecks, evidence read-back and owned cleanup; remaining limits and one next action recorded | complete | Parent self-review and receipt read-back; graph archived here, final affected-check receipts retained in the handoff bundle |
+| W1 | Identify existing gates, evidence conventions and instruction chain | none | routine role / `max`, parent review by planning role / `max` | `AGENTS.md`, workflow, verification, runner, CI, current ledger | Source-backed bounded report reviewed against the setup scope | complete | Parent-reviewed source report; `carried_files`, Markdown checker and CLI inspected; listed plan selects `meta, docs, boundary` |
+| W2 | Establish the standing procedure and concise checkpoint | W1 | planning role / `max` | W1, owner setup request, maintained boundaries | Diff preserves rulings, assigns one owner per workflow fact and records actual authority | complete | Parent self-review of contract, workflow and checkpoint; effort ruling recorded by W2-E |
+| W2-V | Document actual verification receipt and capability usage | W1 | routine role / `max`; owns only `docs/verification.md` | Runner CLI/executor, carried-file scanning, W1 | Parent-reviewed concise guidance with no invented automation or new gate | complete | Parent inspected diff and runner output code; clarified separate configured/default evidence and refreshed summary |
+| W2-E | Set the standing repair-effort limit or waiver | none | owner decision; planning role / `max` records it | Existing autonomy rule and September 23 owner response | Explicit owner choice recorded in the workflow, with its source | complete | Owner rejected an arbitrary repair-cycle limit; standing scoped waiver recorded |
+| W3-R | Register the cited documentation hosts under existing policy | W2, W2-V | routine role / `max`; owns hostname allowlist and boundary-check documentation | Failed W3 log, exact source URLs, existing allowlist policy | Only two reasoned exact-host entries; current inventory has one owner; scanner rules retained | complete | Parent reviewed actual two-file diff, exact-host policy and unchanged scanner; clarified the citation comment's scope |
+| W3 | Prove documentation and instruction discovery | W2, W2-V, W3-R | routine role / `max` for documentation gates; planning role / `max` for fresh-session review | Exact candidate, resolved check plan, official instruction guidance | Changed-path gates, supplemental new-file review and fresh-session result retained separately | complete | Parent reviewed all 14 PASS steps and 670 Python tests, fresh-session response and qualified whitespace control; receipts below |
+| W4 | Review, archive and hand off the completed setup | W3, W2-E | planning role / `max` | Final diff, raw W3 receipts, graph and permission record | Parent review, affected rechecks, evidence read-back and owned cleanup; remaining limits and one next action recorded | complete | Parent self-review and receipt read-back; graph archived here, final affected-check receipts retained in the handoff bundle |
 
 Original setup handoff: at the next gameplay resumption, reconcile the
 [death-return record](2026-09-13-death-return.md) against current source and
@@ -107,7 +107,7 @@ groups ran 99, 55, 161, 172 and 183 tests: 670 in total. The private denylist wa
 available; this was a configured local COMPLETE verdict without degradation.
 
 The fresh instruction check completed in 66.371 seconds with exit 0. A separate
-CLI invocation explicitly requested `gpt-6-astra` / `max`, read-only operation and
+CLI invocation explicitly requested planning role / `max`, read-only operation and
 no tools. Its sole response reproduced the new project evidence bullet and the
 machine/project rules while correctly identifying linked documents as unread.
 The event log contains no tool calls. The parent read the raw response and
@@ -116,17 +116,17 @@ verified its stored SHA-256:
 The project entry file has not changed since that check; later procedure and
 receipt edits still receive their own affected documentation checks.
 
-The active host exposes the requested three GPT model names and `max` effort.
-The local CLI configuration requests `gpt-6-astra` / `max`; the native worker was
-explicitly requested as `gpt-6-luna` / `max`. Neither a configuration nor a routing
-request independently attests the running model. Sol has no necessary task in
-this documentation slice. DeepSeek remains paused under the existing owner
+The active host exposes the three requested models and `max` effort.
+The local CLI configuration requests planning role / `max`; the native worker was
+explicitly requested as routine role / `max`. Neither a configuration nor a routing
+request independently attests the running model. The implementation role has no necessary task in
+this documentation slice. The paused model remains paused under the existing owner
 instruction; the generic template's optional-helper paragraph does not re-enable
 it.
 
 Official sources consulted for the instruction-loading check:
 [AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-and [concise, task-routed instructions](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra).
+and the host vendor's article on concise, task-routed instructions.
 These explain host behavior; the owner selects the project's model division.
 
 ## Receipts and closeout
@@ -170,7 +170,7 @@ point with dated history; this completed graph is History. The hostname allowlis
 is configuration owned by the boundary checker. The historical checkpoint was
 preserved verbatim below the new concise entry.
 
-Review was parent self-review with bounded Luna exploration, documentation edits
+Review was parent self-review with bounded routine-role exploration, documentation edits
 and check execution. It was not a separate independent full review. The parent
 inspected actual diffs, all completed step results, the fresh-session event log
 and stored artifact hashes. No findings remain unrecorded. The disposable

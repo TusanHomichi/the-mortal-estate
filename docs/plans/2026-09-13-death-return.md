@@ -169,6 +169,47 @@ and a looting opponent legitimately removes corpse contents during the wait.
 This fixture isolates return and inventory restoration. It changes no production
 combat resolver or installed catalog and proves no claim about initial balance.
 
+### Ordinary death now runs on unmodified production content
+
+Issue #74 reconciled the authored starter encounter, so the ordinary cause no
+longer needs an adversary fixture at all. `--cause ordinary` serves the shipped
+catalog **byte for byte** and records one digest as both the source and the
+served catalog: the character walks onto the authored opponent with real
+movement and then stands there until production combat removes it. The receipt
+records the HP the character actually lost, and a case fails if that is zero.
+No attribute, attack value, starting HP, scavenging profile, AI or geography is
+overridden on this route.
+
+The receipt also names what *is* a fixture, because the catalog is not the whole
+world. This runner still places the controlled character (location, body,
+alignment, starting pool) and the opponent before its own bootstrap, so it
+serves a **modified seed with the release catalog** rather than a byte-identical
+world, and it selects a preseeded character instead of creating one through the
+ordinary flow. The receipt says so in `kind`, `seed_overrides`,
+`character_created_through_ui` and in the source/served digests it binds for the
+catalog, the template and the seed. The composed journey with ordinary creation
+on the unmodified release world is
+`tools/run_first_expedition_proof.py --journey death`.
+
+
+The attack-80, non-scavenging fixture survives only where it is still the right
+tool: `--cause fire` needs a monster-delivered fire attack that production
+content does not author, and that receipt labels itself as a fixture. Nothing
+here changes the resolver or the installed catalog.
+
+The runner also proves restart durability for the ordinary route. It stops the
+serving process, serves the same database again, and then requires the stored
+checkpoint's gameplay payload to be unchanged and a fresh authenticated session
+to observe the same actor, character identity, life state, location, carried
+items, balance and earned progression before accepting another ordinary command.
+The one field a restart may legitimately move is the presence ledger, and it is
+judged rather than ignored: a character appearing in or vanishing from it, or a
+control epoch moving, fails. The receipt reports the raw stored digest as an
+observation and names the narrower claim it does enforce, so byte equality is
+never claimed for a stage that rewrites presence. The restart is a real process
+restart through the harness's own lifecycle and writes no gameplay state.
+
+
 
 ## Immediate fire-return continuation
 
