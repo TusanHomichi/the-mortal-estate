@@ -315,6 +315,8 @@ fn explicit_content_cutover_preserves_owned_state_and_replays_new_defense() {
             merge_merchants: Default::default(),
             relocations: Vec::new(),
             initialize_new_topology: false,
+            rederive_actor_stats: Default::default(),
+            rebuild_actor_health: Default::default(),
         },
     )
     .unwrap();
