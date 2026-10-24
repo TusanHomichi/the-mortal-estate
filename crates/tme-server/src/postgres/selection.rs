@@ -33,7 +33,7 @@ impl PostgresState {
     ) -> Result<(u64, crate::facet::PreparedFacetCheckpoint, Vec<bool>), SessionError> {
         let epoch = self
             .next_transfer_epoch
-            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
+            .try_update(Ordering::AcqRel, Ordering::Acquire, |value| {
                 value.checked_add(1)
             })
             .map_err(|_| SessionError::Unavailable)?;
@@ -65,7 +65,7 @@ impl PostgresState {
     ) -> Result<PreparedCharacterExit, SessionError> {
         let epoch = self
             .next_transfer_epoch
-            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |value| {
+            .try_update(Ordering::AcqRel, Ordering::Acquire, |value| {
                 value.checked_add(1)
             })
             .map_err(|_| SessionError::Unavailable)?;

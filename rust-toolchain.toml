@@ -1,6 +1,6 @@
 # Issue #25: local development and CI prove the same exact compiler baseline.
 [toolchain]
-channel = "1.98.0"
+channel = "1.99.1"
 components = ["rustfmt", "clippy"]
 targets = ["wasm32-unknown-unknown"]
 profile = "minimal"
