@@ -27,6 +27,7 @@ crates.io    # named in the comment above; the registry the index URL belongs to
 registry.npmjs.org # npm writes canonical package tarball URLs into web/package-lock.json
 opencollective.com # npm writes package-maintainer funding metadata into web/package-lock.json
 tidelift.com       # npm writes package-maintainer funding metadata into web/package-lock.json
+spectrum-os.org    # Nix writes the git URL of an input of burrow (microvm.nix's spectrum) into flake.lock
 
 # --- Real external hosts, in package repository configurations ---
 apt.postgresql.org # PostgreSQL APT repository URL in deploy prepare-packages
@@ -45,7 +46,6 @@ twitter.com          # creator profile link carried verbatim in two Kenney notic
 
 # --- Official instruction guidance cited by the workflow documents ---
 learn.chatgpt.com      # official Codex AGENTS.md instruction-discovery guidance only
-developers.openai.com  # official GPT-6 Astra instruction-design article only
 
 # --- Code and configuration patterns matching hostname heuristics ---
 gl.link                   # WebGL gl.LINK_STATUS constant, not a network hostname
@@ -76,6 +76,5 @@ www.w3.org         # the SVG namespace URI in web/src/walk/cursors.ts (cursor ar
 history.siggraph.org # primary technical-art paper cited in the coastal-water research plan
 kstocky.github.io    # contributing developer's authored calm-water-zone portfolio, research citation only
 developer.nvidia.com # GPU Gems primary implementation reference for depth-dependent water, research citation only
-openai.com # official Images 2.5 announcement supplied by owner; art-tool availability citation only
 retrodiffusion.ai # official standard/neural Pixel Fixer documentation in the pixel-art production guide; research citation only
 www.gamedeveloper.com # owner-supplied developer breakdown of pixel lighting, fog and foliage; research citation only
