@@ -96,7 +96,8 @@ def main():
         "template_release_sha256": hashlib.sha256(template_bytes).hexdigest(),
         "template_served_sha256": hashlib.sha256(template_bytes).hexdigest(),
         "seed_release_sha256": hashlib.sha256(seed_source_bytes).hexdigest(),
-        "seed_served_sha256": None,
+        # Filled per run below: each run serves its own modified seed.
+        "seed_served_sha256": {},
         "seed_overrides": ["controlled_actor_location", "sex_or_gender_display", "alignment",
                            "current_hp", "opponent_location", "opponent_location_offset"],
         "catalog_overrides": overrides,
@@ -118,12 +119,6 @@ def main():
             player["character"]["identity"]["sex_or_gender_display"] = body
             player["character"]["alignment_state"]["alignment"] = alignment
             player["character"]["resources"]["hp"] = fixture["initial_player_hp"]
-            if fixture["seed_served_sha256"] is None:
-                # The seed the run actually serves, hashed after every fixture
-                # change, so `seed_overrides` above cannot drift from reality.
-                fixture["seed_served_sha256"] = hashlib.sha256(
-                    json.dumps(world.generated_seed, sort_keys=True).encode("utf-8")
-                ).hexdigest()
             monster = next(actor for actor in world.generated_seed["actors"] if actor["id"] == "cellar_scavenger")
             monster["location"] = copy.deepcopy(player["location"])
             # The opponent holds ground, so a real East movement command is what
@@ -147,6 +142,13 @@ def main():
                 packet = args.assets
             server.assets = packet
             with server:
+                # The seed file this run's server was bootstrapped from, hashed
+                # after every fixture change, so `seed_overrides` above cannot
+                # drift from what was actually served.
+                seed_served_sha256 = hashlib.sha256(
+                    server.world.seed_path(server.run_directory).read_bytes()
+                ).hexdigest()
+                fixture["seed_served_sha256"][f"{engine}/{alignment}"] = seed_served_sha256
                 # `journey` is the browser half's own name for this route, and it
                 # is half of every handshake file name. Both halves build those
                 # names from the same two fields, so a rename here without one
@@ -192,6 +194,7 @@ def main():
                 if result.returncode:
                     raise RuntimeError(f"{engine}/{alignment}: {result.stderr[-3500:]}")
                 report = json.loads((output / f"{engine}-{alignment}.json").read_text())
+                report["seed_served_sha256"] = seed_served_sha256
                 reports.append(report)
                 print(f"PASS {engine}/{alignment}", flush=True)
     receipt.write_text(json.dumps({"verdict": "INSPECTION" if args.engine else "PASS",
@@ -244,7 +247,11 @@ class ProofHandshake:
         self.answered_sequence = sequence
         response = self.answer(requested)
         response["sequence"] = sequence
-        self.complete_path.write_text(json.dumps(response, indent=2) + "\n")
+        # The browser polls for this file and parses it as soon as it exists,
+        # so it is written aside and renamed into place, as requests are.
+        staged = self.complete_path.with_name(self.complete_path.name + ".tmp")
+        staged.write_text(json.dumps(response, indent=2) + "\n")
+        os.replace(staged, self.complete_path)
         return response
 
 

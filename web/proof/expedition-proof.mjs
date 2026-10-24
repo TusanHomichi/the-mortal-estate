@@ -161,7 +161,11 @@ try {
   /// again after travel, rest and reconnect would report a later, healed state.
   async function fightToVictory(encounterLog) {
     const hpBefore = frame.character.resources.hp;
-    let rounds = 0, damagingHits = 0, damageTaken = 0;
+    // Damage and healing are accumulated from each round's own change, because
+    // active recovery runs during the fight: a net loss from the starting HP
+    // would hide every point healed and undercount what the opponent dealt.
+    let rounds = 0, damagingHits = 0, damageTaken = 0, healingDuringCombat = 0;
+    let previousHp = hpBefore;
     for (let attempts = 0; attempts < 60 && !opponentDefeated(); attempts++) {
       // Fight reaches one square, which is where the previous step put the
       // character; the closing kick is the authored alternative when the offered
@@ -169,16 +173,18 @@ try {
       const offered = () => frame.action_options.some(a => a.enabled && a.intent && opponent(a.intent) && a.intent.mode === "fight");
       await action(offered() ? (i => opponent(i) && i.mode === "fight") : (i => opponent(i) && i.mode === "jumpkick"));
       rounds += 1;
-      damageTaken = hpBefore - frame.character.resources.hp;
-      damagingHits = encounterLog.filter(row => row.player_hp_before > row.player_hp).length + 1;
+      const hp = frame.character.resources.hp;
+      if (hp < previousHp) { damageTaken += previousHp - hp; damagingHits += 1; }
+      else healingDuringCombat += hp - previousHp;
       encounterLog.push({
         round: rounds, opponent_hp: frame.actors.find(row => row.actor_id === "cellar_scavenger")?.hp ?? null,
-        player_hp: frame.character.resources.hp, player_hp_before: hpBefore,
+        player_hp: hp, player_hp_before: previousHp,
         held: frame.carried.items.filter(row => row.position === "right_hand").map(row => row.item.item_definition_id),
         ground: frame.ground_items.map(definitionOf),
         corpse: frame.corpses.flatMap(row => (row.contents ?? []).map(definitionOf)),
       });
       await writeFile(path.join(config.output, `${config.engine}-encounter-log.json`), JSON.stringify(encounterLog, null, 2));
+      previousHp = hp;
     }
     // Snapshot immediately, before any later step can heal or rest. Cumulative
     // damage taken, the net change across the exchange and any healing inside it
@@ -189,7 +195,7 @@ try {
       rounds, damage_taken: damageTaken, damaging_hits: damagingHits,
       starting_hp: hpBefore, hp_at_end_of_combat: hpAtEnd,
       net_hp_change: hpBefore - hpAtEnd,
-      healing_during_combat: damageTaken - (hpBefore - hpAtEnd),
+      healing_during_combat: healingDuringCombat,
       opponent_defeated: opponentDefeated(),
       corpse_present: frame.corpses.some(row => row.origin_actor_id === "cellar_scavenger"),
     };
