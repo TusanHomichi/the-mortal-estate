@@ -1,12 +1,14 @@
-//! A world's folder: `world.toml` (its settings), `world.key` (the secret
-//! that proves it's this world; keep it), and `world.db` (accounts, journal
-//! and snapshots).
+//! A world's folder: `world.toml` (its settings and invite code),
+//! `world.key` (the secret that proves it's this world; keep it), and
+//! `world.db` (accounts, journal and snapshots). The first two are
+//! credentials, readable by the host alone.
 
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use tme_sim::world::Settings;
-use tme_wire::{Identity, Invite};
+use tme_wire::{Identity, Invite, create_private};
 
 /// `world.toml`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -76,11 +78,22 @@ impl Folder {
         })?;
         tme_content::load(&content)
             .map_err(|p| FolderError(format!("the content doesn't compile:\n{p}")))?;
-        fs::create_dir_all(path)
+        // The folder holds the world's credentials: a new one is its host's
+        // alone, and each credential's file is, wherever the folder is.
+        let mut folder = fs::DirBuilder::new();
+        folder.recursive(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            folder.mode(0o700);
+        }
+        folder
+            .create(path)
             .map_err(|e| FolderError(format!("can't make {}: {e}", path.display())))?;
         let config = Config {
             name: new.name.to_owned(),
-            seed: u64::from_le_bytes(random()[..8].try_into().expect("8 bytes")),
+            // TOML's integers are signed, so 63 bits.
+            seed: u64::from_le_bytes(random()[..8].try_into().expect("8 bytes")) >> 1,
             bind: new.bind.to_owned(),
             address: new.address.to_owned(),
             invite: invite_code(),
@@ -91,7 +104,8 @@ impl Folder {
         let identity = Identity::create(&key)
             .map_err(|e| FolderError(format!("can't write {}: {e}", key.display())))?;
         let text = toml::to_string(&config).expect("the config encodes");
-        fs::write(path.join("world.toml"), text)
+        create_private(&path.join("world.toml"))
+            .and_then(|mut f| f.write_all(text.as_bytes()))
             .map_err(|e| FolderError(format!("can't write world.toml: {e}")))?;
         Ok(Folder {
             path: path.to_owned(),
@@ -108,8 +122,19 @@ impl Folder {
                 toml_path.display()
             ))
         })?;
-        let config: Config = toml::from_str(&text)
-            .map_err(|e| FolderError(format!("{}: {e}", toml_path.display())))?;
+        // Not the error's own text: it quotes the line, which can be the
+        // invite code.
+        let config: Config = toml::from_str(&text).map_err(|e| {
+            let line = e
+                .span()
+                .map(|s| format!(" on line {}", text[..s.start].lines().count().max(1)));
+            FolderError(format!(
+                "{}{}: {}",
+                toml_path.display(),
+                line.unwrap_or_default(),
+                e.message()
+            ))
+        })?;
         let identity = Identity::load(&path.join("world.key"))
             .map_err(|e| FolderError(format!("world.key: {e}")))?;
         Ok(Folder {

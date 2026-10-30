@@ -119,14 +119,7 @@ impl Identity {
     /// by its owner only, where the system has owners.
     pub fn create(path: &Path) -> io::Result<Identity> {
         let identity = Identity::generate();
-        let mut options = fs::OpenOptions::new();
-        options.write(true).create_new(true);
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::OpenOptionsExt;
-            options.mode(0o600);
-        }
-        options.open(path)?.write_all(&identity.secret())?;
+        create_private(path)?.write_all(&identity.secret())?;
         Ok(identity)
     }
 
@@ -163,6 +156,20 @@ pub fn world_proof(nonce: &Nonce, client: &PublicKey) -> Vec<u8> {
 /// What a client signs to join a world: the world's challenge and key.
 pub fn join_proof(challenge: &Nonce, world: &PublicKey) -> Vec<u8> {
     [b"tme join v1".as_slice(), &challenge.0, &world.0].concat()
+}
+
+/// A new file at `path`, which must not exist yet, that only its owner can
+/// read or write, where the system has owners: from the moment it exists,
+/// whatever the umask.
+pub fn create_private(path: &Path) -> io::Result<fs::File> {
+    let mut options = fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.mode(0o600);
+    }
+    options.open(path)
 }
 
 fn random_bytes() -> [u8; 32] {

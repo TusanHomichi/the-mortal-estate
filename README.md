@@ -29,15 +29,18 @@ and a bot harness measures what it costs. The client comes next.
 
 ```sh
 cargo run -p tme-server -- init worlds/home --name "Home" --address HOST:7420
+cargo run -p tme-server -- invite worlds/home
 cargo run -p tme-server -- run worlds/home
 ```
 
-`init` makes the world's folder: its settings (`world.toml`), its key
-(`world.key`, which never leaves the folder) and, once it runs, its journal
-and snapshots (`world.db`). It prints the invite link to give the people you
-want in; `invite` prints it again. Someone new needs the link; someone who's
-been before comes back with their own key. `run` keeps the world until Ctrl-C
-or a service manager stops it, and picks up where it left off the next time.
+`init` makes the world's folder: its settings and invite code (`world.toml`),
+its key (`world.key`, which never leaves the folder) and, once it runs, its
+journal and snapshots (`world.db`). Both credentials are readable by the host
+alone. `invite` prints the link to give the people you want in, and is the one
+command that prints its code, so it stays out of a service's logs. Someone new
+needs the link; someone who's been before comes back with their own key. `run`
+keeps the world until Ctrl-C or a service manager stops it, and picks up where
+it left off the next time.
 
 ## Measuring a world
 

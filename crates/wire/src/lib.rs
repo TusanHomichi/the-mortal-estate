@@ -14,7 +14,9 @@ mod keys;
 mod view;
 
 pub use invite::{Invite, NotAnInvite};
-pub use keys::{Identity, Nonce, PublicKey, Signature, join_proof, verify, world_proof};
+pub use keys::{
+    Identity, Nonce, PublicKey, Signature, create_private, join_proof, verify, world_proof,
+};
 pub use view::{BodyView, You};
 
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
