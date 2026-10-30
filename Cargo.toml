@@ -1,0 +1,21 @@
+[workspace]
+members = ["crates/*"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/TusanHomichi/the-mortal-estate"
+publish = false
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+toml = "1"
+tme-sim = { path = "crates/sim" }
+tme-content = { path = "crates/content" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }

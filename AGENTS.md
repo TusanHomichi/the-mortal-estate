@@ -1,9 +1,9 @@
 # Agent guide
 
 **The Mortal Estate** is an original game about a family line, a land where
-death stopped working, and a world that remembers. It's at the design stage:
-[docs/DESIGN.md](docs/DESIGN.md) is the spec everything here builds toward, and
-there is no code yet.
+death stopped working, and a world that remembers. It's building its first
+playable slice: [docs/DESIGN.md](docs/DESIGN.md) is the spec everything here
+builds toward.
 
 <!-- house:rules v1 begin. Copied from FieldmouseWorks/burrow house/rules.md, verbatim. Change it there, not here: burrow's house sync rewrites everything between these markers. -->
 ## House rules
@@ -58,10 +58,15 @@ body, when there is one, says why.
 
 ## Build and test
 
-There's nothing to build yet. `nix flake check` is the gate, the same locally
-and in CI: lychee, offline, over every Markdown file, so every local link and
-`#fragment` must resolve. `nix develop` has lychee. The skeleton brings the Rust
-workspace and its checks ([how it's checked](docs/DESIGN.md#how-its-checked)).
+One Cargo workspace in `crates/`: `sim` is the rules and the world they run
+(plain Rust, no engine in it), `content` compiles `content/` into what the
+simulation runs on. `nix flake check` is the gate, the same locally and in CI:
+rustfmt, clippy on all targets with warnings as errors, and the workspace's
+tests, on the toolchain `rust-toolchain.toml` pins; and lychee, offline, over
+every Markdown file, so every local link and `#fragment` must resolve. Plain
+cargo runs the same Rust checks (`cargo fmt --check`,
+`cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace`).
+`nix develop` has the toolchain and lychee.
 
 ## What needs the owner
 

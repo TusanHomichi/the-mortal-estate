@@ -1,0 +1,14 @@
+# The rules that aren't any one entry's. Formats: crates/content/src/files.rs.
+
+# The body every person has (bodies/person.toml).
+person = "person"
+# Where someone new to the world first stands (places/lattermead.toml).
+arrival = "lattermead"
+
+# What turning up costs: the rite at a threshold that brings the dead back.
+[turning_up]
+base_ms = 4000
+# Each tardy already carried makes the rite this much longer.
+per_tardy_ms = 2000
+# A life carrying this many can't turn up again; it stays in Lately.
+max_tardies = 3

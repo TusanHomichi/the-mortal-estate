@@ -18,14 +18,16 @@ the next.
 
 ## Status
 
-Design stage, started fresh on 2026-10-30. [docs/DESIGN.md](docs/DESIGN.md) is
-the spec; there is no code yet, and the first playable slice is
-[the next step](docs/DESIGN.md#the-first-playable-slice).
+Building the [first playable slice](docs/DESIGN.md#the-first-playable-slice),
+started fresh on 2026-10-30; [docs/DESIGN.md](docs/DESIGN.md) is the spec. The
+rules and the world run headless and are tested: free movement, committed
+attacks, the dun, dying into Lately and turning up again, on one small map.
+The server and the client come next.
 
 ## Working here
 
-[AGENTS.md](AGENTS.md) is the first stop. `nix flake check` is the gate; until
-there's code it checks that every local link in the Markdown resolves.
+[AGENTS.md](AGENTS.md) is the first stop. `nix flake check` is the gate, and
+plain `cargo test --workspace` runs the same tests.
 
 ## Licensing
 

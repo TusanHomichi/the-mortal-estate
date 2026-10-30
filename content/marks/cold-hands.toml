@@ -1,0 +1,6 @@
+name = "Cold Hands"
+description = "Your hands remember the chill of the other side. Steadier, and slower."
+
+[effects]
+max_health = 4
+speed_percent = -6
