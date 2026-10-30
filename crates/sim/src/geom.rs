@@ -11,6 +11,11 @@ pub type Mm = i32;
 /// A metre, in millimetres.
 pub const METRE: Mm = 1000;
 
+/// The farthest anything in a place can be from its middle, either way:
+/// a hundred kilometres. Far enough for any place, and near enough that
+/// distances squared never overflow.
+pub const FARTHEST: Mm = 100_000 * METRE;
+
 /// A point or offset on the ground plane: x east, y north, in millimetres.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Vec2 {
@@ -87,11 +92,26 @@ pub fn isqrt(n: i64) -> i64 {
 
 /// A direction and how far it's pushed, as a stick or keys give it: a vector
 /// no longer than [`Dir::UNIT`]. Full speed is a vector [`Dir::UNIT`] long;
-/// a stick half over is half as long.
+/// a stick half over is half as long. One read from outside (a player's
+/// input, a snapshot) is cut to length like any other.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(from = "Pushed")]
 pub struct Dir {
     x: i16,
     y: i16,
+}
+
+/// A direction as it's written, before it's cut to length.
+#[derive(Deserialize)]
+struct Pushed {
+    x: i16,
+    y: i16,
+}
+
+impl From<Pushed> for Dir {
+    fn from(p: Pushed) -> Dir {
+        Dir::new(p.x.into(), p.y.into())
+    }
 }
 
 impl Dir {
@@ -167,6 +187,18 @@ impl Rect {
     pub fn contains(&self, p: Vec2) -> bool {
         p.x >= self.min.x && p.x <= self.max.x && p.y >= self.min.y && p.y <= self.max.y
     }
+
+    /// Whether its corners are the right way round and it has some size.
+    pub fn is_ordered(&self) -> bool {
+        self.min.x < self.max.x && self.min.y < self.max.y
+    }
+
+    /// Whether it's all within [`FARTHEST`] of the middle.
+    pub fn is_near(&self) -> bool {
+        [self.min, self.max]
+            .iter()
+            .all(|p| p.x.abs() <= FARTHEST && p.y.abs() <= FARTHEST)
+    }
 }
 
 /// Something solid a body can't pass through.
@@ -177,6 +209,76 @@ pub enum Shape {
 }
 
 impl Shape {
+    /// Whether it's a shape at all: a circle with some radius, a box with
+    /// its corners the right way round.
+    pub fn is_whole(&self) -> bool {
+        match self {
+            Shape::Circle { radius, .. } => *radius > 0,
+            Shape::Box(rect) => rect.is_ordered(),
+        }
+    }
+
+    /// Whether the straight line from `a` to `b` passes through its inside.
+    /// A line that only grazes its edge or a corner gets past.
+    pub fn crosses(&self, a: Vec2, b: Vec2) -> bool {
+        let d = b - a;
+        match *self {
+            Shape::Circle { centre, radius } => {
+                let r = i128::from(radius);
+                let off = centre - a;
+                let along = i128::from(off.dot(d));
+                let length = i128::from(d.length_sq());
+                if along <= 0 || length == 0 {
+                    // The nearest point of the line is `a`.
+                    return i128::from(off.length_sq()) < r * r;
+                }
+                if along >= length {
+                    // The nearest point is `b`.
+                    return i128::from((centre - b).length_sq()) < r * r;
+                }
+                // Square of the distance from the centre to the line, times
+                // its length squared.
+                let cross =
+                    i128::from(off.x) * i128::from(d.y) - i128::from(off.y) * i128::from(d.x);
+                cross * cross < r * r * length
+            }
+            Shape::Box(rect) => {
+                // Where along the line (a fraction, top over bottom) it's
+                // inside the box on both axes at once.
+                let (mut enter, mut leave) = ((0_i64, 1_i64), (1_i64, 1_i64));
+                for (from, step, low, high) in [
+                    (a.x, d.x, rect.min.x, rect.max.x),
+                    (a.y, d.y, rect.min.y, rect.max.y),
+                ] {
+                    let (from, step, low, high) = (
+                        i64::from(from),
+                        i64::from(step),
+                        i64::from(low),
+                        i64::from(high),
+                    );
+                    if step == 0 {
+                        if from <= low || from >= high {
+                            return false;
+                        }
+                        continue;
+                    }
+                    let (near, far) = if step > 0 {
+                        ((low - from, step), (high - from, step))
+                    } else {
+                        ((from - high, -step), (from - low, -step))
+                    };
+                    if near.0 * enter.1 > enter.0 * near.1 {
+                        enter = near;
+                    }
+                    if far.0 * leave.1 < leave.0 * far.1 {
+                        leave = far;
+                    }
+                }
+                enter.0 * leave.1 < leave.0 * enter.1
+            }
+        }
+    }
+
     /// Where a body of `radius` at `p` ends up once pushed out of this
     /// shape, the shortest way. A body that doesn't overlap it stays put.
     pub fn push_out(&self, p: Vec2, radius: Mm) -> Vec2 {
@@ -255,6 +357,43 @@ mod tests {
         assert!(d.as_vec().length() <= i64::from(Dir::UNIT));
         assert!(d.as_vec().length() >= i64::from(Dir::UNIT) - 2);
         assert_eq!(Dir::new(100, 0).as_vec(), Vec2::new(100, 0));
+    }
+
+    #[test]
+    fn a_direction_read_from_outside_is_cut_to_length() {
+        use serde::Deserialize;
+        use serde::de::value::{Error, SeqDeserializer};
+        let read = |x: i16, y: i16| {
+            Dir::deserialize(SeqDeserializer::<_, Error>::new([x, y].into_iter())).unwrap()
+        };
+        assert!(read(i16::MAX, 0).as_vec().length() <= i64::from(Dir::UNIT));
+        assert_eq!(read(i16::MAX, 0).travel(200), Vec2::new(200, 0));
+        // A partial push and no push at all come through as they were.
+        assert_eq!(read(300, -400), Dir::new(300, -400));
+        assert_eq!(read(0, 0), Dir::NONE);
+    }
+
+    #[test]
+    fn a_line_through_a_solid_is_blocked_and_one_past_it_is_not() {
+        let wall = Shape::Box(Rect {
+            min: Vec2::new(0, -2000),
+            max: Vec2::new(1000, 2000),
+        });
+        assert!(wall.crosses(Vec2::new(-1000, 0), Vec2::new(2000, 0)));
+        assert!(wall.crosses(Vec2::new(2000, 500), Vec2::new(-1000, -500)));
+        // Past its end, or stopping short of it.
+        assert!(!wall.crosses(Vec2::new(-1000, 2500), Vec2::new(2000, 2500)));
+        assert!(!wall.crosses(Vec2::new(-1000, 0), Vec2::new(-10, 0)));
+        // Along its face, and through its corner exactly.
+        assert!(!wall.crosses(Vec2::new(0, -3000), Vec2::new(0, 3000)));
+        assert!(!wall.crosses(Vec2::new(-1000, 1000), Vec2::new(1000, 3000)));
+        let post = Shape::Circle {
+            centre: Vec2::ZERO,
+            radius: 500,
+        };
+        assert!(post.crosses(Vec2::new(-2000, 0), Vec2::new(2000, 100)));
+        assert!(!post.crosses(Vec2::new(-2000, 600), Vec2::new(2000, 600)));
+        assert!(!post.crosses(Vec2::new(-2000, 0), Vec2::new(-600, 0)));
     }
 
     #[test]

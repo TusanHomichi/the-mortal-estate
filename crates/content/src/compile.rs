@@ -1,6 +1,6 @@
 //! From files to a checked catalogue and scenery.
 
-use crate::files::{self, Point, Sides};
+use crate::files::{self, Metres, Point, Sides};
 use crate::{Content, Problem, Problems};
 use serde::de::DeserializeOwned;
 use std::collections::BTreeMap;
@@ -10,7 +10,7 @@ use tme_sim::catalogue::{
     Attack, Behaviour, BodyKind, Catalogue, Dodge, Effect, Lair, Mark, Place, Rules, Threshold,
     TurningUp, steps_from_ms,
 };
-use tme_sim::geom::{Mm, Rect, Shape, Vec2};
+use tme_sim::geom::{METRE, Mm, Rect, Shape, Vec2};
 use tme_sim::{Id, STEPS_PER_SECOND, Side};
 
 /// How a kind of body is drawn.
@@ -141,6 +141,9 @@ pub fn compile(dir: &Path) -> Result<Content, Problems> {
     let bodies: BTreeMap<String, (PathBuf, files::Body)> = r.folder(&dir.join("bodies"));
     let marks: BTreeMap<String, (PathBuf, files::Mark)> = r.folder(&dir.join("marks"));
     let places: BTreeMap<String, (PathBuf, files::Place)> = r.folder(&dir.join("places"));
+    // A file that didn't read leaves a hole every reference to it falls in:
+    // checking the whole would only blame the files that are fine.
+    let whole = r.problems.is_empty();
 
     let mut catalogue_bodies = BTreeMap::new();
     let mut looks = BTreeMap::new();
@@ -178,9 +181,10 @@ pub fn compile(dir: &Path) -> Result<Content, Problems> {
             },
         },
     };
-    if let Err(e) = catalogue.check() {
+    let unsound = if whole { catalogue.check().err() } else { None };
+    for e in unsound.unwrap_or_default() {
         let file = if e.entry == "rules" {
-            rules_path
+            rules_path.clone()
         } else {
             dir.join(format!("{}.toml", e.entry))
         };
@@ -197,8 +201,13 @@ pub fn compile(dir: &Path) -> Result<Content, Problems> {
     }
 }
 
-fn mm(m: f64) -> Mm {
-    (m * 1000.0).round() as Mm
+/// Whole millimetres, to the nearest: in range, as `Metres` are.
+fn mm(m: Metres) -> Mm {
+    (m.0 * f64::from(METRE)).round() as Mm
+}
+
+fn halved(m: Metres) -> Metres {
+    Metres(m.0 / 2.0)
 }
 
 fn point(p: Point) -> Vec2 {
@@ -206,9 +215,6 @@ fn point(p: Point) -> Vec2 {
 }
 
 fn body(r: &mut Report, path: &Path, b: &files::Body) -> (BodyKind, Look) {
-    if b.radius_m <= 0.0 {
-        r.add(path, None, "radius_m must be above 0");
-    }
     if b.health <= 0 {
         r.add(path, None, "health must be above 0");
     }
@@ -230,7 +236,7 @@ fn body(r: &mut Report, path: &Path, b: &files::Body) -> (BodyKind, Look) {
     let kind = BodyKind {
         name: b.name.clone(),
         radius: mm(b.radius_m),
-        speed: mm(b.speed_m_per_s / f64::from(STEPS_PER_SECOND)),
+        speed: mm(Metres(b.speed_m_per_s.0 / f64::from(STEPS_PER_SECOND))),
         health: b.health,
         attack: Attack {
             wind_up: steps_from_ms(b.attack.wind_up_ms),
@@ -306,30 +312,6 @@ fn place(r: &mut Report, path: &Path, p: &files::Place) -> (Place, Scenery) {
         min: point(p.bounds[0]),
         max: point(p.bounds[1]),
     };
-    if bounds.min.x >= bounds.max.x || bounds.min.y >= bounds.max.y {
-        r.add(
-            path,
-            None,
-            "bounds must be [south-west corner, north-east corner]",
-        );
-    }
-    let inside = |r: &mut Report, what: &str, at: Point| {
-        if !bounds.contains(point(at)) {
-            r.add(
-                path,
-                None,
-                format!("{what} at {at:?} is outside the bounds"),
-            );
-        }
-    };
-    inside(r, "arrival", p.arrival);
-    for t in &p.thresholds {
-        inside(r, "a threshold", t.at);
-        inside(r, "a threshold's exit", t.exit);
-    }
-    for l in &p.lairs {
-        inside(r, "a lair", l.at);
-    }
 
     let (mut living, mut lately) = (Vec::new(), Vec::new());
     let mut solid = |sides: Sides, shape: Shape| {
@@ -352,7 +334,7 @@ fn place(r: &mut Report, path: &Path, p: &files::Place) -> (Place, Scenery) {
                 },
             ),
             Some(files::Solid::Box { size_m }) => {
-                let half = Vec2::new(mm(size_m[0] / 2.0), mm(size_m[1] / 2.0));
+                let half = Vec2::new(mm(halved(size_m[0])), mm(halved(size_m[1])));
                 solid(
                     prop.sides,
                     Shape::Box(Rect {
@@ -386,12 +368,16 @@ fn place(r: &mut Report, path: &Path, p: &files::Place) -> (Place, Scenery) {
             );
             continue;
         }
-        if run.every_m <= 0.0 || run.models.is_empty() {
-            r.add(path, None, "a run needs models and every_m above 0");
+        let every = i64::from(mm(run.every_m));
+        if every <= 0 || run.models.is_empty() {
+            r.add(
+                path,
+                None,
+                "a run needs models, and every_m of at least a millimetre",
+            );
             continue;
         }
         let length = (to - from).length();
-        let every = i64::from(mm(run.every_m));
         let count = (length / every).max(1);
         let dir = (to - from).with_length(1000);
         for i in 0..count {
@@ -410,7 +396,7 @@ fn place(r: &mut Report, path: &Path, p: &files::Place) -> (Place, Scenery) {
             });
         }
         if let Some(t) = run.thickness_m {
-            let half = mm(t / 2.0);
+            let half = mm(halved(t));
             let (min, max) = (
                 Vec2::new(from.x.min(to.x), from.y.min(to.y)),
                 Vec2::new(from.x.max(to.x), from.y.max(to.y)),

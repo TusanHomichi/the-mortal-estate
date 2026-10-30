@@ -195,6 +195,12 @@ impl Place {
             Side::Lately => &self.lately,
         }
     }
+
+    /// Whether nothing solid on `side` stands between `a` and `b`: what a
+    /// swing needs to reach.
+    pub fn unobstructed(&self, side: Side, a: Vec2, b: Vec2) -> bool {
+        !self.solids(side).iter().any(|s| s.crosses(a, b))
+    }
 }
 
 /// A place where the two sides touch: the dead turn up here.
@@ -263,25 +269,29 @@ impl fmt::Display for Unsound {
 impl std::error::Error for Unsound {}
 
 impl Catalogue {
-    /// Every reference between entries resolved, and the rules satisfiable:
-    /// the first thing wrong, if anything is.
-    pub fn check(&self) -> Result<(), Unsound> {
-        let unsound = |entry: &str, problem: String| {
-            Err(Unsound {
-                entry: entry.to_owned(),
-                problem,
-            })
+    /// Every reference between entries resolved, every shape whole and the
+    /// rules satisfiable: everything wrong, if anything is.
+    pub fn check(&self) -> Result<(), Vec<Unsound>> {
+        let mut wrong = Vec::new();
+        let mut unsound = |entry: String, problem: String| {
+            wrong.push(Unsound { entry, problem });
         };
         let missing = |what: String| format!("names {what}, which doesn't exist");
         if !self.bodies.contains_key(&self.rules.person) {
-            return unsound("rules", missing(format!("bodies/{}", self.rules.person)));
+            unsound(
+                "rules".into(),
+                missing(format!("bodies/{}", self.rules.person)),
+            );
         }
         if !self.places.contains_key(&self.rules.arrival) {
-            return unsound("rules", missing(format!("places/{}", self.rules.arrival)));
+            unsound(
+                "rules".into(),
+                missing(format!("places/{}", self.rules.arrival)),
+            );
         }
         if self.rules.turning_up.max_tardies > self.marks.len() {
-            return unsound(
-                "rules",
+            unsound(
+                "rules".into(),
                 format!(
                     "lets a life carry {} tardies, and there are only {} kinds in marks/",
                     self.rules.turning_up.max_tardies,
@@ -289,35 +299,100 @@ impl Catalogue {
                 ),
             );
         }
+        for (id, kind) in &self.bodies {
+            let entry = format!("bodies/{id}");
+            if kind.radius <= 0 {
+                unsound(entry.clone(), "has no radius".into());
+            }
+            if kind.speed < 0 {
+                unsound(entry.clone(), "has a speed below 0".into());
+            }
+            if let Some(b) = &kind.behaviour
+                && (b.sense < 0 || b.leash < 0 || b.roam < 0)
+            {
+                unsound(
+                    entry.clone(),
+                    "has a behaviour with a distance below 0".into(),
+                );
+            }
+            if *id == self.rules.person && kind.behaviour.is_some() {
+                unsound(
+                    entry,
+                    "is the people's body, and has a creature's behaviour".into(),
+                );
+            }
+        }
+        // The widest body has to fit in every place: anyone may go anywhere.
+        let widest = self.bodies.values().map(|k| k.radius).max().unwrap_or(0);
         for (id, place) in &self.places {
+            let entry = format!("places/{id}");
+            let b = place.bounds;
+            if !b.is_ordered() || !b.is_near() {
+                unsound(
+                    entry.clone(),
+                    format!(
+                        "has bounds that aren't a south-west corner then a north-east one, \
+                         within {} km of the middle",
+                        crate::geom::FARTHEST / 1_000_000
+                    ),
+                );
+            } else if b.max.x - b.min.x < 2 * widest || b.max.y - b.min.y < 2 * widest {
+                unsound(
+                    entry.clone(),
+                    format!("is too small to hold a body {widest} mm across"),
+                );
+            }
+            let mut inside = |what: &str, at: Vec2| {
+                if !b.contains(at) {
+                    unsound(
+                        entry.clone(),
+                        format!("has {what} at {at:?}, outside its bounds"),
+                    );
+                }
+            };
+            inside("its arrival", place.arrival);
+            for t in &place.thresholds {
+                inside("a threshold", t.at);
+                inside("a threshold's exit", t.exit);
+            }
+            for lair in &place.lairs {
+                inside("a lair", lair.at);
+            }
+            for t in &place.thresholds {
+                if t.radius <= 0 {
+                    unsound(entry.clone(), "has a threshold with no radius".into());
+                }
+            }
+            let mut broken: Vec<&Shape> = Vec::new();
+            for s in place.living.iter().chain(&place.lately) {
+                if !s.is_whole() && !broken.contains(&s) {
+                    broken.push(s);
+                }
+            }
+            for s in broken {
+                unsound(
+                    entry.clone(),
+                    format!(
+                        "has a solid with no size, or a box whose corners are the wrong way \
+                         round: {s:?}"
+                    ),
+                );
+            }
             for lair in &place.lairs {
                 match self.bodies.get(&lair.kind) {
-                    None => {
-                        return unsound(
-                            &format!("places/{id}"),
-                            missing(format!("bodies/{}", lair.kind)),
-                        );
-                    }
-                    Some(kind) if kind.behaviour.is_none() => {
-                        return unsound(
-                            &format!("places/{id}"),
-                            format!(
-                                "has a lair of bodies/{}, which has no behaviour to hunt with",
-                                lair.kind
-                            ),
-                        );
-                    }
+                    None => unsound(entry.clone(), missing(format!("bodies/{}", lair.kind))),
+                    Some(kind) if kind.behaviour.is_none() => unsound(
+                        entry.clone(),
+                        format!(
+                            "has a lair of bodies/{}, which has no behaviour to hunt with",
+                            lair.kind
+                        ),
+                    ),
                     Some(_) => {}
                 }
             }
         }
-        if self.bodies[&self.rules.person].behaviour.is_some() {
-            return unsound(
-                &format!("bodies/{}", self.rules.person),
-                "is the people's body, and has a creature's behaviour".to_owned(),
-            );
-        }
-        Ok(())
+        if wrong.is_empty() { Ok(()) } else { Err(wrong) }
     }
 
     pub fn body(&self, id: &Id<BodyKind>) -> &BodyKind {

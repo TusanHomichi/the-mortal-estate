@@ -5,8 +5,10 @@ mod common;
 
 use common::*;
 use std::sync::Arc;
+use tme_sim::body::{Action, Doing};
+use tme_sim::catalogue::Lair;
 use tme_sim::world::{Input, Intent, Mismatch, Settings};
-use tme_sim::{Dir, Id, World};
+use tme_sim::{Dir, Id, Side, Vec2, World};
 
 /// A busy few hundred steps: two people wandering and fighting, the beast
 /// hunting, deaths, a return.
@@ -108,4 +110,50 @@ fn a_saved_world_must_fit_its_content() {
     let mut fewer = catalogue();
     fewer.places.values_mut().for_each(|p| p.lairs.clear());
     assert!(World::load(Arc::new(fewer), w.state().clone()).is_err());
+}
+
+#[test]
+fn what_a_saved_body_is_in_the_middle_of_must_fit_its_content_too() {
+    let mut w = world();
+    act(&mut w, ALICE, Intent::Dodge(Dir::NORTH)).unwrap();
+    let dodging = w.state().clone();
+    let mut no_dodge = catalogue();
+    no_dodge.bodies.get_mut(&Id::new("person")).unwrap().dodge = None;
+    assert!(World::load(Arc::new(no_dodge), dodging).is_err());
+
+    let mut rite = w.state().clone();
+    rite.people.get_mut(&ALICE).unwrap().body.action = Some(Action {
+        doing: Doing::TurnUp {
+            threshold: 0,
+            length: 40,
+        },
+        started: 0,
+    });
+    let mut no_threshold = catalogue();
+    no_threshold
+        .places
+        .values_mut()
+        .for_each(|p| p.thresholds.clear());
+    assert!(World::load(Arc::new(no_threshold), rite).is_err());
+
+    // A creature whose kind can no longer hunt.
+    w.step();
+    assert_eq!(w.state().creatures.len(), 1);
+    let mut tame = catalogue();
+    tame.bodies.get_mut(&Id::new("beast")).unwrap().behaviour = None;
+    assert!(World::load(Arc::new(tame), w.state().clone()).is_err());
+}
+
+#[test]
+fn a_lair_added_since_the_world_was_saved_does_not_fit() {
+    let w = world();
+    let mut more = catalogue();
+    more.places.values_mut().for_each(|p| {
+        p.lairs.push(Lair {
+            kind: Id::new("beast"),
+            at: Vec2::new(-10_000, 10_000),
+            side: Side::Living,
+        })
+    });
+    assert!(World::load(Arc::new(more), w.state().clone()).is_err());
 }

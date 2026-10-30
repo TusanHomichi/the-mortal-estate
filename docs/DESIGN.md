@@ -290,7 +290,8 @@ the typing, and stays easy for a host without one.
   or touch on the web build.
 - Actions commit. An attack, a spell or a use winds up, lands and recovers, and
   once you start one you're in it until it's done. The only way out of a
-  wind-up is a dodge, which commits you too.
+  wind-up is a dodge, which commits you too. Leaving the world isn't a way
+  out either: your body sees the action through, then goes.
 - Creatures commit the same way and show their wind-ups, so you see the blow
   coming and can be somewhere else. Where you stand is most of the skill:
   range, cover, footing, and who's beside you.

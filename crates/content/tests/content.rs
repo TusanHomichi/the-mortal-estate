@@ -111,3 +111,48 @@ fn the_rules_cannot_ask_for_more_tardies_than_there_are() {
     let p = problems(&dir);
     assert_eq!(p[0].file, Path::new("rules.toml"));
 }
+
+/// The place file with `from` replaced by `to`, compiled: its problems.
+fn break_place(name: &str, from: &str, to: &str) -> Vec<Problem> {
+    let dir = scratch(name);
+    let place = dir.join("places/lattermead.toml");
+    let text = fs::read_to_string(&place).unwrap();
+    assert!(text.contains(from), "the place file has {from:?}");
+    fs::write(&place, text.replacen(from, to, 1)).unwrap();
+    problems(&dir)
+}
+
+#[test]
+fn a_number_that_is_not_a_distance_names_its_line() {
+    for (name, number) in [("nan", "nan"), ("inf", "inf"), ("far", "1e12")] {
+        let p = break_place(name, "radius_m = 1.6", &format!("radius_m = {number}"));
+        assert_eq!(p.len(), 1, "{p:?}");
+        assert_eq!(p[0].line, Some(20), "{}", p[0]);
+        assert!(p[0].message.contains("metres"), "{}", p[0]);
+    }
+}
+
+#[test]
+fn a_run_spaced_closer_than_a_millimetre_is_refused() {
+    let p = break_place("spacing", "every_m = 2.0", "every_m = 0.0001");
+    assert_eq!(p.len(), 1, "{p:?}");
+    assert!(p[0].message.contains("every_m"), "{}", p[0]);
+}
+
+#[test]
+fn a_solid_with_no_size_is_refused() {
+    let p = break_place("negative", "size_m = [3.4, 3.2]", "size_m = [-3.4, 3.2]");
+    assert_eq!(p.len(), 1, "{p:?}");
+    assert_eq!(p[0].file, Path::new("places/lattermead.toml"));
+    assert!(p[0].message.contains("solid"), "{}", p[0]);
+}
+
+#[test]
+fn a_place_too_small_for_a_body_is_refused() {
+    let p = break_place(
+        "narrow",
+        "bounds = [[-32.0, -24.0], [32.0, 24.0]]",
+        "bounds = [[-32.0, -24.0], [-31.9, 24.0]]",
+    );
+    assert!(p.iter().any(|p| p.message.contains("too small")), "{p:?}");
+}

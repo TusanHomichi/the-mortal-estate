@@ -53,31 +53,6 @@ pub fn lairs(catalogue: &Catalogue) -> Vec<LairState> {
         .collect()
 }
 
-/// `saved` as it would be laid out from `catalogue`: the same if the
-/// catalogue's lairs are the ones it was saved with.
-pub fn relaid(catalogue: &Catalogue, saved: &[LairState]) -> Vec<LairState> {
-    lairs(catalogue)
-        .into_iter()
-        .zip(saved)
-        .map(|(fresh, old)| LairState {
-            creature: old.creature,
-            ready_at: old.ready_at,
-            ..fresh
-        })
-        .chain(
-            saved
-                .iter()
-                .skip(lairs(catalogue).len())
-                .cloned()
-                .map(|mut extra| {
-                    // A lair the catalogue no longer has can't match.
-                    extra.index = usize::MAX;
-                    extra
-                }),
-        )
-        .collect()
-}
-
 /// Empty lairs that are ready let out a new creature.
 pub fn arise(catalogue: &Catalogue, state: &mut State, events: &mut Vec<Event>) {
     let now = state.step;
@@ -144,7 +119,7 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
         let pos = creature.body.at.pos;
         let leashed = pos.distance_sq(home) > sq(behaviour.leash);
         let hunts = |p: &crate::world::Person| {
-            p.present
+            p.in_world()
                 && p.body.side == creature.body.side
                 && p.body.at.place == creature.body.at.place
                 && p.body.at.level == creature.body.at.level
@@ -180,7 +155,10 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
                 let reach =
                     kind.radius + catalogue.body(&quarry.kind).radius + kind.attack.reach * 3 / 4;
                 roam_to = None;
-                if quarry.at.pos.distance_sq(pos) <= sq(reach) {
+                let place = catalogue.place(&creature.body.at.place);
+                if quarry.at.pos.distance_sq(pos) <= sq(reach)
+                    && place.unobstructed(creature.body.side, pos, quarry.at.pos)
+                {
                     (Dir::NONE, Some(Dir::toward(pos, quarry.at.pos)))
                 } else {
                     (Dir::toward(pos, quarry.at.pos), None)

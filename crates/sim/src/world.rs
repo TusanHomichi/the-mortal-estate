@@ -35,12 +35,31 @@ pub enum BodyId {
 pub struct Person {
     pub name: String,
     pub body: Body,
-    /// Whether their player is here. Someone who leaves stays where they
-    /// were, on whichever side, until they come back.
-    pub present: bool,
+    pub presence: Presence,
     /// The marks their returns have left, oldest first.
     pub tardies: Vec<Id<Mark>>,
     pub deaths: u32,
+}
+
+/// Whether a person's player is here, and so whether their body is in the
+/// world.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Presence {
+    Here,
+    /// Their player has gone, and their body is seeing through what it was
+    /// committed to: leaving is no way out of a swing, a dodge or a rite.
+    /// Then they're away.
+    Leaving,
+    /// Their player is away. Their body is out of the world, where it was
+    /// and on whichever side, until they come back.
+    Away,
+}
+
+impl Person {
+    /// Whether their body is in the world, to be seen, struck and hunted.
+    pub fn in_world(&self) -> bool {
+        self.presence != Presence::Away
+    }
 }
 
 /// The world's settings, which its host chooses.
@@ -202,29 +221,44 @@ impl World {
         }
     }
 
-    /// A saved world, checked against the catalogue it will run on.
+    /// A saved world, checked against the catalogue it will run on: every
+    /// body, what each is in the middle of, and every lair.
     pub fn load(catalogue: Arc<Catalogue>, state: State) -> Result<World, Mismatch> {
-        let missing = |what: String| Err(Mismatch(what));
-        let bodies = state
-            .people
-            .values()
-            .map(|p| &p.body)
-            .chain(state.creatures.values().map(|c| &c.body));
-        for b in bodies {
-            if !catalogue.bodies.contains_key(&b.kind) {
-                return missing(format!("no body kind {}", b.kind));
-            }
-            if !catalogue.places.contains_key(&b.at.place) {
-                return missing(format!("no place {}", b.at.place));
-            }
+        let layout = |lairs: &[LairState]| -> Vec<(Id<crate::catalogue::Place>, usize)> {
+            lairs.iter().map(|l| (l.place.clone(), l.index)).collect()
+        };
+        if layout(&state.lairs) != layout(&creature::lairs(&catalogue)) {
+            return Err(Mismatch("its lairs have changed".to_owned()));
         }
-        for p in state.people.values() {
+        for (id, p) in &state.people {
+            fits(&catalogue, BodyId::Person(*id), &p.body).map_err(Mismatch)?;
             if let Some(t) = p.tardies.iter().find(|t| !catalogue.marks.contains_key(t)) {
-                return missing(format!("no mark {t}"));
+                return Err(Mismatch(format!("no mark {t}")));
             }
         }
-        if state.lairs != creature::relaid(&catalogue, &state.lairs) {
-            return missing("its lairs have changed".to_owned());
+        for (id, c) in &state.creatures {
+            let who = BodyId::Creature(*id);
+            fits(&catalogue, who, &c.body).map_err(Mismatch)?;
+            if catalogue.body(&c.body.kind).behaviour.is_none() {
+                return Err(Mismatch(format!(
+                    "{who:?} is bodies/{}, which has no behaviour",
+                    c.body.kind
+                )));
+            }
+            let home = state.lairs.get(c.lair);
+            if id.0 >= state.next_creature
+                || home.is_none_or(|l| l.creature != Some(*id) || l.place != c.body.at.place)
+            {
+                return Err(Mismatch(format!("{who:?} isn't its lair's")));
+            }
+        }
+        if let Some(c) = state
+            .lairs
+            .iter()
+            .filter_map(|l| l.creature)
+            .find(|c| !state.creatures.contains_key(c))
+        {
+            return Err(Mismatch(format!("a lair's {c:?} isn't in the world")));
         }
         Ok(World {
             catalogue,
@@ -268,10 +302,9 @@ impl World {
             Input::Join { person, name } => self.join(*person, name),
             Input::Leave { person } => {
                 let p = self.present_mut(*person)?;
-                p.present = false;
-                p.body.action = None;
                 p.body.held = Dir::NONE;
-                self.events.push(Event::Left { person: *person });
+                p.presence = Presence::Leaving;
+                self.finish_leaving();
                 Ok(())
             }
             Input::Act { person, intent } => self.act(*person, *intent),
@@ -280,10 +313,15 @@ impl World {
 
     fn join(&mut self, id: PersonId, name: &str) -> Result<(), Refused> {
         if let Some(p) = self.state.people.get_mut(&id) {
-            if p.present {
-                return Err(Refused::AlreadyHere);
+            match p.presence {
+                Presence::Here => return Err(Refused::AlreadyHere),
+                // Back before they'd gone: they never left.
+                Presence::Leaving => {
+                    p.presence = Presence::Here;
+                    return Ok(());
+                }
+                Presence::Away => p.presence = Presence::Here,
             }
-            p.present = true;
         } else {
             let rules = &self.catalogue.rules;
             let place = self.catalogue.place(&rules.arrival);
@@ -303,7 +341,7 @@ impl World {
             let person = Person {
                 name: name.to_owned(),
                 body,
-                present: true,
+                presence: Presence::Here,
                 tardies: Vec::new(),
                 deaths: 0,
             };
@@ -315,7 +353,7 @@ impl World {
 
     fn present_mut(&mut self, id: PersonId) -> Result<&mut Person, Refused> {
         match self.state.people.get_mut(&id) {
-            Some(p) if p.present => Ok(p),
+            Some(p) if p.presence == Presence::Here => Ok(p),
             _ => Err(Refused::NotHere),
         }
     }
@@ -403,7 +441,7 @@ impl World {
             .state
             .people
             .iter()
-            .filter(|(_, p)| p.present)
+            .filter(|(_, p)| p.in_world())
             .map(|(id, _)| BodyId::Person(*id))
             .chain(self.state.creatures.keys().map(|id| BodyId::Creature(*id)))
             .collect();
@@ -411,6 +449,17 @@ impl World {
             self.advance(id, now);
         }
         self.resolve_deaths(now);
+        self.finish_leaving();
+    }
+
+    /// Anyone leaving who's done what they were committed to goes.
+    fn finish_leaving(&mut self) {
+        for (id, p) in self.state.people.iter_mut() {
+            if p.presence == Presence::Leaving && p.body.action.is_none() {
+                p.presence = Presence::Away;
+                self.events.push(Event::Left { person: *id });
+            }
+        }
     }
 
     /// One body's step: its action carried on, or a walk.
@@ -497,16 +546,18 @@ impl World {
         }
     }
 
-    /// A swing lands: everyone hostile in its arc on this side is struck.
+    /// A swing lands: everyone hostile in its arc on this side, with
+    /// nothing solid in between, is struck.
     fn land(&mut self, by: BodyId) {
         let attacker = self.body(by).expect("the attacker is here").clone();
         let kind = self.catalogue.body(&attacker.kind).clone();
+        let place = self.catalogue.place(&attacker.at.place);
         let harm_people = self.state.settings.harm_between_players;
         let targets: Vec<BodyId> = self
             .state
             .people
             .iter()
-            .filter(|(_, p)| p.present)
+            .filter(|(_, p)| p.in_world())
             .map(|(id, p)| (BodyId::Person(*id), &p.body))
             .chain(
                 self.state
@@ -527,6 +578,7 @@ impl World {
                     && b.at.level == attacker.at.level
                     && b.health > 0
                     && in_arc(&attacker, &kind, b, self.catalogue.body(&b.kind).radius)
+                    && place.unobstructed(attacker.side, attacker.at.pos, b.at.pos)
             })
             .map(|(id, _)| id)
             .collect();
@@ -540,7 +592,7 @@ impl World {
     fn resolve_deaths(&mut self, now: u64) {
         let catalogue = Arc::clone(&self.catalogue);
         for (id, p) in self.state.people.iter_mut() {
-            if !p.present || p.body.health > 0 {
+            if !p.in_world() || p.body.health > 0 {
                 continue;
             }
             // Dying crosses over, where they stand: the same land, as it was.
@@ -579,6 +631,35 @@ impl World {
         person.body.health = body::max_health(&catalogue, &person.body.kind, &person.tardies);
         person.body.action = None;
         self.events.push(Event::TurnedUp { person: id, tardy });
+    }
+}
+
+/// Whether a saved body can go on in `catalogue`: its kind, its place, and
+/// what it's in the middle of.
+fn fits(catalogue: &Catalogue, who: BodyId, body: &Body) -> Result<(), String> {
+    let kind = catalogue
+        .bodies
+        .get(&body.kind)
+        .ok_or_else(|| format!("no body kind {}", body.kind))?;
+    let place = catalogue
+        .places
+        .get(&body.at.place)
+        .ok_or_else(|| format!("no place {}", body.at.place))?;
+    match (who, body.action.as_ref().map(|a| a.doing)) {
+        (_, Some(Doing::Dodge { .. })) if kind.dodge.is_none() => Err(format!(
+            "{who:?} is dodging, and bodies/{} has no dodge",
+            body.kind
+        )),
+        (BodyId::Creature(_), Some(Doing::TurnUp { .. })) => {
+            Err(format!("{who:?} is a creature, turning up"))
+        }
+        (_, Some(Doing::TurnUp { threshold, .. })) if threshold >= place.thresholds.len() => {
+            Err(format!(
+                "{who:?} is turning up at a threshold places/{} doesn't have",
+                body.at.place
+            ))
+        }
+        _ => Ok(()),
     }
 }
 
