@@ -8,6 +8,7 @@ use std::time::Duration;
 use tme_link::{Receiver, join};
 use tme_server::folder::{Folder, NewWorld};
 use tme_server::{Options, Server};
+use tme_sim::world::Settings;
 use tme_sim::{BodyId, Dir, Event, Intent};
 use tme_wire::session::{self, Session};
 use tme_wire::{
@@ -30,6 +31,7 @@ fn new_world(name: &str) -> PathBuf {
             content: &Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content"),
             bind: "127.0.0.1:0",
             address: "unused:0",
+            settings: Settings::default(),
         },
     )
     .expect("a new world");

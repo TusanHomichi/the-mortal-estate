@@ -55,7 +55,8 @@ cargo run --release -p tme-bots -- --bots 100 --seconds 30
 ```
 
 hosts a scratch world on Lattermead and fills it with bots that wander,
-swing, dodge, die and turn up. It prints how long the server took to compute
+swing and dodge. People can hurt each other in that world, so where bots
+crowd they die, and walk back from Lately to turn up. It prints how long the server took to compute
 each step and how long each intent took to be answered. The numbers belong to
 the machine they were taken on, so a release states the ones it was measured
 with.

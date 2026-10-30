@@ -7,6 +7,7 @@ use std::time::Duration;
 use tme_link::{LinkError, Receiver, Sender, join};
 use tme_server::folder::{Folder, NewWorld};
 use tme_server::{Options, Server};
+use tme_sim::world::Settings;
 use tme_sim::{Dir, Side, Vec2};
 use tme_wire::{Identity, Invite, Observation, ServerMsg, Turned};
 
@@ -25,6 +26,7 @@ fn new_world(name: &str) -> PathBuf {
             content: &content(),
             bind: "127.0.0.1:0",
             address: "unused:0",
+            settings: Settings::default(),
         },
     )
     .expect("a new world");

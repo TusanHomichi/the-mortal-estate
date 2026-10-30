@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use tme_server::Server;
 use tme_server::folder::{Folder, NewWorld};
+use tme_sim::world::Settings;
 
 #[derive(Parser)]
 #[command(about = "Host a world of The Mortal Estate")]
@@ -64,6 +65,7 @@ fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
                     content: &content,
                     bind: &bind,
                     address: &address,
+                    settings: Settings::default(),
                 },
             )?;
             println!("made {name} in {}", folder.path.display());

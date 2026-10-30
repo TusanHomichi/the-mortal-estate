@@ -65,6 +65,7 @@ pub struct NewWorld<'a> {
     pub content: &'a Path,
     pub bind: &'a str,
     pub address: &'a str,
+    pub settings: Settings,
 }
 
 impl Folder {
@@ -101,7 +102,7 @@ impl Folder {
             address: new.address.to_owned(),
             invite: invite_code(),
             content,
-            harm_between_players: false,
+            harm_between_players: new.settings.harm_between_players,
         };
         let key = path.join("world.key");
         let identity = Identity::create(&key)

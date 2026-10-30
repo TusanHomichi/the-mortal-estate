@@ -7,6 +7,7 @@ use std::fs;
 use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
 use std::path::{Path, PathBuf};
 use tme_server::folder::{Folder, NewWorld};
+use tme_sim::world::Settings;
 
 fn scratch(name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!("tme-folder-{}-{name}", std::process::id()));
@@ -22,6 +23,7 @@ fn create(dir: &Path) {
             content: &Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content"),
             bind: "127.0.0.1:0",
             address: "unused:0",
+            settings: Settings::default(),
         },
     )
     .expect("a new world");

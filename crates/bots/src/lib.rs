@@ -1,7 +1,8 @@
 //! The bot harness: a world hosted for the run, headless players joining it
 //! over real sockets, and what that cost. Each bot wanders the place, swings
 //! and dodges now and then, and once it's dead walks to a threshold and
-//! turns up. The harness records how long each of the server's steps took
+//! turns up. People can hurt each other in the harness's world, so where
+//! bots crowd they die. The harness records how long each of the server's steps took
 //! to compute and how long each intent took to be answered, so how many
 //! players a world holds is measured, not hoped.
 
@@ -18,8 +19,16 @@ use tme_sim::catalogue::{Catalogue, Threshold};
 use tme_sim::geom::{METRE, Mm};
 use tme_sim::nav::{Grid, Nav};
 use tme_sim::rng::Rng;
+use tme_sim::world::Settings;
 use tme_sim::{Dir, Event, Intent, STEPS_PER_SECOND, Side, Vec2};
 use tme_wire::{Identity, Invite, ServerMsg, You};
+
+/// The harness's world: people can hurt each other, so a crowd of bots
+/// fights and its dead walk back from Lately. A world where people die and
+/// turn up is the heavier one to host.
+pub const SETTINGS: Settings = Settings {
+    harm_between_players: true,
+};
 
 /// A run: how many bots, for how long, and how long the world's step lasts.
 #[derive(Clone, Debug)]
@@ -75,6 +84,7 @@ pub async fn measure(content: &Path, plan: Plan) -> Result<Report, String> {
             content,
             bind: "127.0.0.1:0",
             address: "unused:0",
+            settings: SETTINGS,
         },
     )
     .map_err(|e| e.to_string())?;
@@ -412,7 +422,7 @@ impl fmt::Display for Report {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tme_sim::world::{Input, Settings};
+    use tme_sim::world::Input;
     use tme_sim::{PersonId, World};
 
     const WREN: PersonId = PersonId(1);
@@ -452,6 +462,54 @@ mod tests {
             }
         }
         Err(You::of(&world, WREN).expect("here").body.pos)
+    }
+
+    /// How many of a crowd of bots, minds driving a world in the harness's
+    /// settings, die and turn up in `seconds`.
+    fn crowd(catalogue: &Arc<Catalogue>, bots: u32, seconds: u64) -> (usize, usize) {
+        let mut world = World::new(Arc::clone(catalogue), 7, SETTINGS);
+        let mut minds = Vec::new();
+        for n in 1..=bots {
+            let person = PersonId(n);
+            let join = Input::Join {
+                person,
+                name: format!("Bot {n}"),
+            };
+            world.apply(&join).expect("joins");
+            minds.push((person, Mind::new(u64::from(n), world.step_count())));
+        }
+        let (mut died, mut turned_up) = (0, 0);
+        for _ in 0..seconds * SECOND {
+            for (person, mind) in &mut minds {
+                let you = You::of(&world, *person).expect("here");
+                if you.action.is_none()
+                    && let Some(intent) = mind.next(&you, catalogue, world.step_count())
+                {
+                    let person = *person;
+                    let _ = world.apply(&Input::Act { person, intent });
+                }
+            }
+            world.step();
+            for e in world.take_events() {
+                match e {
+                    Event::WentToLately { .. } => died += 1,
+                    Event::TurnedUp { .. } => turned_up += 1,
+                    _ => {}
+                }
+            }
+        }
+        (died, turned_up)
+    }
+
+    #[test]
+    fn a_crowd_of_bots_dies_and_turns_up() {
+        let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+        let catalogue = Arc::new(tme_content::load(&content).expect("content").catalogue);
+        let (died, turned_up) = crowd(&catalogue, 40, 60);
+        assert!(
+            died > 0 && turned_up > 0,
+            "died {died}, turned up {turned_up}"
+        );
     }
 
     #[test]
