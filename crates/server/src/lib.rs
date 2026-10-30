@@ -18,7 +18,6 @@ use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use store::Store;
-use tme_sim::World;
 use tme_wire::Invite;
 
 /// A running server.
@@ -27,9 +26,11 @@ pub struct Server {
     pub local: SocketAddr,
     invite: Invite,
     sim: mpsc::Sender<ToSim>,
-    world: Option<JoinHandle<Result<(), store::StoreError>>>,
+    world: Option<JoinHandle<Result<(), String>>>,
     net: Option<(tokio::sync::oneshot::Sender<()>, JoinHandle<()>)>,
     times: Arc<Mutex<StepTimes>>,
+    /// Closed when the world has stopped, asked to or not.
+    stopped: tokio::sync::watch::Receiver<()>,
 }
 
 #[derive(Debug)]
@@ -68,16 +69,18 @@ impl Server {
     pub fn start_with(path: &Path, options: Options) -> Result<Server, StartError> {
         let fail = |what: &str, e: &dyn std::fmt::Display| StartError(format!("{what}: {e}"));
         let folder = Folder::open(path).map_err(|e| fail("the world folder", &e))?;
+        // Nothing reads or writes the world's database before this.
+        let lock = folder.lock().map_err(|e| fail("the world folder", &e))?;
         let content = tme_content::load(&folder.config.content)
             .map_err(|e| fail("the world's content", &e))?;
-        let catalogue = Arc::new(content.catalogue);
         let mut store =
             Store::open(&folder.database()).map_err(|e| fail("the world's database", &e))?;
         let config = folder.config.clone();
-        let world = sim::restore(
+        let restored = sim::restore(
             &mut store,
-            || World::new(Arc::clone(&catalogue), config.seed, config.settings()),
-            |state| World::load(Arc::clone(&catalogue), state).map_err(|e| e.to_string()),
+            Arc::new(content.catalogue),
+            config.seed,
+            config.settings(),
         )
         .map_err(|e| fail("restoring the world", &e))?;
         let accounts =
@@ -94,7 +97,19 @@ impl Server {
 
         let (sim_tx, sim_rx) = mpsc::channel();
         let times = Arc::new(Mutex::new(StepTimes::default()));
-        let world = sim::spawn(world, store, sim_rx, Arc::clone(&times), options.step);
+        let (stopping, stopped) = tokio::sync::watch::channel(());
+        let world = sim::spawn(restored, store, sim_rx, Arc::clone(&times), options.step);
+        // The world's thread holds the lock until it has saved everything,
+        // and says it's stopped by ending.
+        let world = std::thread::Builder::new()
+            .name("world-watch".into())
+            .spawn(move || {
+                let ended = world.join();
+                drop(stopping);
+                drop(lock);
+                ended.unwrap_or_else(|_| Err("the world's thread panicked".into()))
+            })
+            .map_err(|e| fail("the world's thread", &e))?;
         let shared = Arc::new(net::Shared::new(
             config.name.clone(),
             folder.identity.clone(),
@@ -104,7 +119,9 @@ impl Server {
         ));
         // The network runs on a thread of its own with its own runtime, so a
         // server starts and stops the same from async code or plain code.
+        // It stops when asked to, or when the world has.
         let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
+        let mut world_stopped = stopped.clone();
         let net = std::thread::Builder::new()
             .name("net".into())
             .spawn(move || {
@@ -118,6 +135,7 @@ impl Server {
                     tokio::select! {
                         () = net::serve(listener, shared) => {}
                         _ = stop_rx => {}
+                        _ = world_stopped.changed() => {}
                     }
                 });
             })
@@ -129,7 +147,15 @@ impl Server {
             world: Some(world),
             net: Some((stop_tx, net)),
             times,
+            stopped,
         })
+    }
+
+    /// Wait until the world stops without being asked to: it couldn't save
+    /// what was played. [`Server::stop`] then says why.
+    pub async fn stopped(&self) {
+        let mut stopped = self.stopped.clone();
+        while stopped.changed().await.is_ok() {}
     }
 
     /// The world's invite link.
@@ -159,7 +185,7 @@ impl Server {
             Some(world) => world
                 .join()
                 .map_err(|_| StartError("the world's thread panicked".into()))?
-                .map_err(|e| StartError(format!("saving the world: {e}"))),
+                .map_err(StartError),
             None => Ok(()),
         }
     }

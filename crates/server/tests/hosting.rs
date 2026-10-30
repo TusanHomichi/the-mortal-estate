@@ -231,3 +231,93 @@ async fn the_world_both_sides_survives_a_restart() {
     assert_eq!(bob_is.body.pos, bob_was.body.pos);
     server.stop().unwrap();
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_world_runs_on_one_server_at_a_time() {
+    let dir = new_world("one-at-a-time");
+    let server = Server::start_with(&dir, fast()).unwrap();
+    let (_, mut tx, mut rx) = join(&invite(&server), &Identity::generate(), "Me")
+        .await
+        .unwrap();
+    // A second server for the same world, by another way to its folder and
+    // on another port, is refused before it touches the world.
+    let refused = Server::start_with(&dir.join("."), fast())
+        .err()
+        .expect("refused");
+    assert!(refused.to_string().contains("another server"), "{refused}");
+    let seq = tx.act(tme_sim::Intent::Move(Dir::NORTH)).await.unwrap();
+    applied(&mut rx, seq).await;
+    server.stop().unwrap();
+    // Once it has stopped, the world can be run again.
+    Server::start_with(&dir, fast()).unwrap().stop().unwrap();
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_world_that_cannot_save_stops_serving() {
+    let dir = new_world("unsaved");
+    let server = Server::start_with(&dir, fast()).unwrap();
+    let (_, _tx, mut rx) = join(&invite(&server), &Identity::generate(), "Me")
+        .await
+        .unwrap();
+    // Something else takes the world's database and keeps it.
+    let db = rusqlite::Connection::open(dir.join("world.db")).unwrap();
+    db.execute_batch("BEGIN EXCLUSIVE").unwrap();
+    tokio::time::timeout(Duration::from_secs(10), server.stopped())
+        .await
+        .expect("the world stops");
+    let let_go = tokio::time::timeout(Duration::from_secs(5), async {
+        while let Some(Ok(_)) = rx.next().await {}
+    })
+    .await;
+    assert!(let_go.is_ok(), "its players are let go");
+    let why = server.stop().expect_err("it says why").to_string();
+    assert!(why.contains("saving the world"), "{why}");
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_crash_loses_no_more_than_the_last_moment() {
+    let dir = new_world("crash");
+    let me = Identity::generate();
+    // The real server, so it can be killed outright.
+    let mut child = std::process::Command::new(env!("CARGO_BIN_EXE_tme-server"))
+        .arg("run")
+        .arg(&dir)
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut said = String::new();
+    std::io::BufRead::read_line(
+        &mut std::io::BufReader::new(child.stdout.take().unwrap()),
+        &mut said,
+    )
+    .unwrap();
+    let address = said.trim().strip_prefix("listening on ").expect(&said);
+    let link = Invite {
+        address: address.to_owned(),
+        ..Folder::open(&dir).unwrap().invite()
+    };
+    let (_, mut tx, mut rx) = join(&link, &me, "Me").await.unwrap();
+    let from = observe(&mut rx).await.you.body.pos;
+    // West, and keep going: nothing more is said after this.
+    tx.act(tme_sim::Intent::Move(Dir::new(-i32::from(Dir::UNIT), 0)))
+        .await
+        .unwrap();
+    let mut o = observe(&mut rx).await;
+    while o.you.body.pos.x > from.x - 2000 {
+        o = observe(&mut rx).await;
+    }
+    tokio::time::sleep(Duration::from_millis(300)).await;
+    child.kill().unwrap();
+    child.wait().unwrap();
+
+    let server = Server::start_with(&dir, fast()).unwrap();
+    let (back, _tx, mut rx) = join(&invite(&server), &me, "Me").await.unwrap();
+    assert!(back.step >= o.step, "{} steps, then {}", o.step, back.step);
+    let now = observe(&mut rx).await.you.body.pos;
+    assert!(
+        now.x <= o.you.body.pos.x,
+        "walked to {:?}, back at {now:?}",
+        o.you.body.pos
+    );
+    server.stop().unwrap();
+}

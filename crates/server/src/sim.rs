@@ -1,17 +1,19 @@
 //! The simulation thread: the one owner of the world. It steps at a fixed
 //! rate, applies inputs as they arrive from the network, sends each
-//! connected person what they observe, and hands accepted inputs and
-//! snapshots to the journal's writer, off its own path.
+//! connected person what they observe, and hands accepted inputs, each
+//! step's completion and snapshots to the journal's writer, off its own
+//! path. If the writer fails, the world stops: play that isn't saved isn't
+//! offered.
 
 use crate::observe::{Index, Observer};
-use crate::store::{Store, StoreError};
+use crate::store::{ContentId, Store, StoreError};
 use std::collections::BTreeMap;
-use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
+use std::sync::mpsc::{self, Receiver, RecvTimeoutError, SyncSender};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
-use tme_sim::world::{Input, Intent, PersonId, Presence, State};
-use tme_sim::{STEPS_PER_SECOND, World};
+use tme_sim::world::{Input, Intent, PersonId, Presence, Settings, State};
+use tme_sim::{Catalogue, STEPS_PER_SECOND, World};
 use tme_wire::{ServerMsg, Turned};
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -40,9 +42,20 @@ pub enum ToSim {
 
 /// What the journal's writer is handed.
 enum ToWriter {
-    Entries(Vec<(u64, Input)>),
+    /// Inputs accepted since the last, and the steps completed now.
+    Entries {
+        entries: Vec<(u64, Input)>,
+        stepped: u64,
+    },
     Snapshot(Box<State>),
 }
+
+/// How many batches the writer can fall behind before the world waits for
+/// it: about three seconds of steps.
+const WRITER_BACKLOG: usize = 64;
+
+/// The writer has stopped: it failed, and says why when it's joined.
+struct WriterGone;
 
 /// How often a snapshot is taken.
 const SNAPSHOT_EVERY: u64 = 60 * STEPS_PER_SECOND as u64;
@@ -83,7 +96,7 @@ struct Sim {
     index: Index,
     /// Accepted inputs not yet handed to the writer.
     entries: Vec<(u64, Input)>,
-    writer: Sender<ToWriter>,
+    writer: SyncSender<ToWriter>,
 }
 
 impl Sim {
@@ -151,7 +164,7 @@ impl Sim {
         }
     }
 
-    fn step(&mut self) {
+    fn step(&mut self) -> Result<(), WriterGone> {
         self.world.step();
         let events = self.world.take_events();
         self.index = Index::new(&self.world, &self.index);
@@ -160,37 +173,57 @@ impl Sim {
                 let _ = c.out.send(ServerMsg::Observe(o));
             }
         }
-        self.flush(false);
+        self.flush(false)
     }
 
-    /// Hand journal entries to the writer, and a snapshot when one is due
-    /// (or `snapshot` asks for one).
-    fn flush(&mut self, snapshot: bool) {
-        if !self.entries.is_empty() {
-            let _ = self
-                .writer
-                .send(ToWriter::Entries(std::mem::take(&mut self.entries)));
-        }
+    /// Hand the writer the inputs accepted since the last flush and the
+    /// steps completed, and a snapshot when one is due (or `snapshot` asks
+    /// for one). It waits while the writer is far behind.
+    fn flush(&mut self, snapshot: bool) -> Result<(), WriterGone> {
+        let entries = ToWriter::Entries {
+            entries: std::mem::take(&mut self.entries),
+            stepped: self.world.step_count(),
+        };
+        self.writer.send(entries).map_err(|_| WriterGone)?;
         if snapshot || self.world.step_count().is_multiple_of(SNAPSHOT_EVERY) {
-            let _ = self
-                .writer
-                .send(ToWriter::Snapshot(Box::new(self.world.state().clone())));
+            let state = Box::new(self.world.state().clone());
+            self.writer
+                .send(ToWriter::Snapshot(state))
+                .map_err(|_| WriterGone)?;
         }
+        Ok(())
     }
 }
 
-/// Restore the world from its database: the latest snapshot and the
-/// journal since, replayed. Anyone who was here when the server stopped
-/// has left.
+/// A world restored and saved again, ready to run.
+pub struct Restored {
+    pub world: World,
+    /// The content it runs, as the store numbers it.
+    pub content: ContentId,
+}
+
+/// Restore the world from its database and make it ready to run on
+/// `catalogue` with `settings`. What was saved is replayed on the content
+/// it was played on: the latest snapshot, the journal since, and every step
+/// completed after. Anyone who was here when the server stopped leaves.
+/// Then the world moves onto `catalogue` and `settings`, which it must fit,
+/// and that's saved as a snapshot along with the leaving. Nothing is
+/// written unless all of it works. A world never saved starts from `seed`.
 pub fn restore(
     store: &mut Store,
-    fresh: impl FnOnce() -> World,
-    load: impl FnOnce(State) -> Result<World, String>,
-) -> Result<World, String> {
+    catalogue: Arc<Catalogue>,
+    seed: u64,
+    settings: Settings,
+) -> Result<Restored, String> {
     let saved = store.load().map_err(|e| e.to_string())?;
     let mut world = match saved.snapshot {
-        Some(state) => load(state)?,
-        None => fresh(),
+        Some((state, played_on)) => {
+            World::load(Arc::new(played_on), state).map_err(|e| format!("the saved world: {e}"))?
+        }
+        None if saved.since.is_empty() => {
+            World::new(Arc::clone(&catalogue), seed, settings.clone())
+        }
+        None => return Err("the world's database has a journal and no snapshot".into()),
     };
     for (step, input) in saved.since {
         while world.step_count() < step {
@@ -200,6 +233,9 @@ pub fn restore(
         world.apply(&input).map_err(|r| {
             format!("replaying the journal at step {step}: {input:?} was refused ({r})")
         })?;
+    }
+    while world.step_count() < saved.stepped {
+        world.step();
     }
     let present: Vec<PersonId> = world
         .state()
@@ -214,50 +250,70 @@ pub fn restore(
         world.apply(&input).expect("a present person can leave");
         left.push((world.step_count(), input));
     }
-    if !left.is_empty() {
-        store.journal(&left).map_err(|e| e.to_string())?;
-    }
-    world.take_events();
-    Ok(world)
+    let mut state = world.state().clone();
+    state.settings = settings;
+    let world = World::load(catalogue, state).map_err(|e| e.to_string())?;
+    let content = store
+        .begin(&left, world.state(), world.catalogue())
+        .map_err(|e| e.to_string())?;
+    Ok(Restored { world, content })
 }
 
 /// Run the world on its own thread, and the journal's writer on another.
+/// The world's thread ends when the inbox closes or `Shutdown` comes, after
+/// a last snapshot, or as soon as the writer fails, with its error.
 pub fn spawn(
-    world: World,
+    restored: Restored,
     store: Store,
     inbox: Receiver<ToSim>,
     times: Arc<Mutex<StepTimes>>,
     tick: Duration,
-) -> JoinHandle<Result<(), StoreError>> {
-    let (writer_tx, writer_rx) = mpsc::channel();
+) -> JoinHandle<Result<(), String>> {
+    let (writer_tx, writer_rx) = mpsc::sync_channel(WRITER_BACKLOG);
+    let content = restored.content;
     let writer = thread::Builder::new()
         .name("journal".into())
-        .spawn(move || write(store, writer_rx))
+        .spawn(move || write(store, content, writer_rx))
         .expect("a thread starts");
     thread::Builder::new()
         .name("world".into())
         .spawn(move || {
             let mut sim = Sim {
-                world,
+                world: restored.world,
                 connected: BTreeMap::new(),
                 index: Index::default(),
                 entries: Vec::new(),
                 writer: writer_tx,
             };
-            run(&mut sim, &inbox, &times, tick);
-            // Everyone leaves; the last snapshot holds the world as it stopped.
-            let conns: Vec<Conn> = sim.connected.keys().copied().collect();
-            for conn in conns {
-                sim.handle(ToSim::Leave { conn });
-            }
-            sim.flush(true);
+            let ran = run(&mut sim, &inbox, &times, tick).and_then(|()| {
+                // Everyone leaves; the last snapshot holds the world as it
+                // stopped.
+                let conns: Vec<Conn> = sim.connected.keys().copied().collect();
+                for conn in conns {
+                    sim.handle(ToSim::Leave { conn });
+                }
+                sim.flush(true)
+            });
             drop(sim);
-            writer.join().expect("the writer doesn't panic")
+            let wrote = match writer.join() {
+                Ok(wrote) => wrote.map_err(|e| format!("saving the world: {e}")),
+                Err(_) => Err("saving the world: the journal's writer panicked".to_owned()),
+            };
+            match (ran, wrote) {
+                (_, Err(e)) => Err(e),
+                (Err(WriterGone), Ok(())) => Err("saving the world: the writer stopped".into()),
+                (Ok(()), Ok(())) => Ok(()),
+            }
         })
         .expect("a thread starts")
 }
 
-fn run(sim: &mut Sim, inbox: &Receiver<ToSim>, times: &Mutex<StepTimes>, tick: Duration) {
+fn run(
+    sim: &mut Sim,
+    inbox: &Receiver<ToSim>,
+    times: &Mutex<StepTimes>,
+    tick: Duration,
+) -> Result<(), WriterGone> {
     let mut next = Instant::now() + tick;
     loop {
         // Inputs are applied the moment they arrive, until the step is due.
@@ -267,13 +323,13 @@ fn run(sim: &mut Sim, inbox: &Receiver<ToSim>, times: &Mutex<StepTimes>, tick: D
                 break;
             }
             match inbox.recv_timeout(next - now) {
-                Ok(ToSim::Shutdown) | Err(RecvTimeoutError::Disconnected) => return,
+                Ok(ToSim::Shutdown) | Err(RecvTimeoutError::Disconnected) => return Ok(()),
                 Ok(msg) => sim.handle(msg),
                 Err(RecvTimeoutError::Timeout) => break,
             }
         }
         let started = Instant::now();
-        sim.step();
+        sim.step()?;
         times
             .lock()
             .expect("not poisoned")
@@ -286,22 +342,31 @@ fn run(sim: &mut Sim, inbox: &Receiver<ToSim>, times: &Mutex<StepTimes>, tick: D
     }
 }
 
-fn write(mut store: Store, inbox: Receiver<ToWriter>) -> Result<(), StoreError> {
+fn write(
+    mut store: Store,
+    content: ContentId,
+    inbox: Receiver<ToWriter>,
+) -> Result<(), StoreError> {
     while let Ok(first) = inbox.recv() {
         // Everything waiting goes in one go: entries in one transaction.
         let mut entries = Vec::new();
+        let mut stepped = 0;
         for msg in std::iter::once(first).chain(inbox.try_iter()) {
             match msg {
-                ToWriter::Entries(e) => entries.extend(e),
+                ToWriter::Entries {
+                    entries: e,
+                    stepped: s,
+                } => {
+                    entries.extend(e);
+                    stepped = s;
+                }
                 ToWriter::Snapshot(state) => {
-                    store.journal(&std::mem::take(&mut entries))?;
-                    store.snapshot(&state)?;
+                    store.journal(&std::mem::take(&mut entries), stepped)?;
+                    store.snapshot(&state, content)?;
                 }
             }
         }
-        if !entries.is_empty() {
-            store.journal(&entries)?;
-        }
+        store.journal(&entries, stepped)?;
     }
     Ok(())
 }

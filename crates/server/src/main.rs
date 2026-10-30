@@ -79,9 +79,21 @@ fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
                 .build()?;
-            rt.block_on(asked_to_stop())?;
-            println!("saving the world");
+            // Asked to stop, or the world stopped on its own because it
+            // couldn't save: either way, stop says how it went.
+            let asked = rt.block_on(async {
+                tokio::select! {
+                    asked = asked_to_stop() => asked.map(|()| true),
+                    () = server.stopped() => Ok(false),
+                }
+            })?;
+            if asked {
+                println!("saving the world");
+            }
             server.stop()?;
+            if !asked {
+                return Err("the world stopped".into());
+            }
         }
     }
     Ok(())

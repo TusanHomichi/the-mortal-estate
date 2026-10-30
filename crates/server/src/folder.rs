@@ -1,7 +1,10 @@
 //! A world's folder: `world.toml` (its settings and invite code),
-//! `world.key` (the secret that proves it's this world; keep it), and
-//! `world.db` (accounts, journal and snapshots). The first two are
-//! credentials, readable by the host alone.
+//! `world.key` (the secret that proves it's this world; keep it),
+//! `world.db` (accounts, journal and snapshots) and `world.lock`, which the
+//! server running the world holds. The first two are credentials, readable
+//! by the host alone. `world.toml` is read when the world starts: its
+//! settings and content apply from then, and its seed only to a world
+//! that's never run.
 
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -146,6 +149,28 @@ impl Folder {
 
     pub fn database(&self) -> PathBuf {
         self.path.join("world.db")
+    }
+
+    /// Hold the world for one server: the lock on `world.lock` lasts as
+    /// long as what's returned, and ends with the process however it ends.
+    /// One server at a time restores and runs a world, however its folder
+    /// is reached.
+    pub fn lock(&self) -> Result<fs::File, FolderError> {
+        let path = self.path.join("world.lock");
+        let file = fs::OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .write(true)
+            .open(&path)
+            .map_err(|e| FolderError(format!("{}: {e}", path.display())))?;
+        match file.try_lock() {
+            Ok(()) => Ok(file),
+            Err(fs::TryLockError::WouldBlock) => Err(FolderError(format!(
+                "another server is running the world in {}",
+                self.path.display()
+            ))),
+            Err(fs::TryLockError::Error(e)) => Err(FolderError(format!("{}: {e}", path.display()))),
+        }
     }
 
     /// The link that brings someone new into this world.

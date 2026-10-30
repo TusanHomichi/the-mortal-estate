@@ -40,7 +40,11 @@ alone. `invite` prints the link to give the people you want in, and is the one
 command that prints its code, so it stays out of a service's logs. Someone new
 needs the link; someone who's been before comes back with their own key. `run`
 keeps the world until Ctrl-C or a service manager stops it, and picks up where
-it left off the next time.
+it left off the next time, crash or not. One server runs a world at a time,
+and if it can't save what's played it stops rather than carry on unsaved.
+`world.toml` is read at each start: its settings, and new content the saved
+world fits, apply from then on, while what was already played keeps the
+content it was played on.
 
 ## Measuring a world
 
