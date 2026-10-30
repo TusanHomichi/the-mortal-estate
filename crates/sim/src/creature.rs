@@ -1,7 +1,7 @@
 //! Creatures: where they come from, how they hunt, and how they fall. They
 //! commit to their swings like anyone, and wind up where you can see it.
 
-use crate::body::{Action, Address, Body, Doing};
+use crate::body::{self, Action, Address, Body, Doing};
 use crate::catalogue::{Catalogue, Id, Place};
 use crate::geom::{Dir, Vec2};
 use crate::nav::Nav;
@@ -114,8 +114,10 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
             .behaviour
             .as_ref()
             .expect("a creature's kind has a behaviour");
-        let home =
-            catalogue.place(&creature.body.at.place).lairs[state.lairs[creature.lair].index].at;
+        let place = catalogue.place(&creature.body.at.place);
+        // Home, and anywhere it wanders, is somewhere it can stand.
+        let standing = |p: Vec2| body::settle(place, creature.body.side, p, kind.radius);
+        let home = standing(place.lairs[state.lairs[creature.lair].index].at);
         let pos = creature.body.at.pos;
         let leashed = pos.distance_sq(home) > sq(behaviour.leash);
         let hunts = |p: &crate::world::Person| {
@@ -155,7 +157,6 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
                 let reach =
                     kind.radius + catalogue.body(&quarry.kind).radius + kind.attack.reach * 3 / 4;
                 roam_to = None;
-                let place = catalogue.place(&creature.body.at.place);
                 if quarry.at.pos.distance_sq(pos) <= sq(reach)
                     && place.unobstructed(creature.body.side, pos, quarry.at.pos)
                 {
@@ -176,7 +177,8 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
                 }
                 if roam_to.is_none() && now >= idle_since + IDLE_STEPS {
                     let r = behaviour.roam;
-                    roam_to = Some(home + Vec2::new(state.rng.spread(r), state.rng.spread(r)));
+                    let spot = home + Vec2::new(state.rng.spread(r), state.rng.spread(r));
+                    roam_to = Some(standing(spot));
                 }
                 match roam_to {
                     // Wandering is an amble: half a push.
@@ -215,14 +217,19 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
                     {
                         path.remove(0);
                     }
+                    // A wanderer at the end of its way is as near where it
+                    // was going as a body gets.
+                    if path.len() == 1 && pos.distance_sq(path[0]) < sq(400) && target.is_none() {
+                        path.clear();
+                    }
                     match path.first() {
                         Some(next) => {
                             let push = held.as_vec().length() as i32;
                             let d = Dir::toward(pos, *next).as_vec().with_length(push);
                             held = Dir::new(d.x, d.y);
                         }
-                        // No way there: a wanderer picks somewhere else; a
-                        // hunter waits.
+                        // No way there, or the end of it: a wanderer stands
+                        // a while, then picks somewhere else; a hunter waits.
                         None => {
                             held = Dir::NONE;
                             if target.is_none() {

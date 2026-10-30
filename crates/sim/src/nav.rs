@@ -3,16 +3,22 @@
 //! across it. Creatures use it to come round walls instead of pressing
 //! against them. Integer costs and fixed tie-breaks keep it deterministic.
 
-use crate::catalogue::{Catalogue, Id, Place, Side};
+use crate::catalogue::{Catalogue, Id, LARGEST_PLACE, Place, Side};
 use crate::geom::{Mm, Vec2};
 use std::cmp::Reverse;
-use std::collections::{BTreeMap, BinaryHeap};
+use std::collections::{BTreeMap, BinaryHeap, HashMap};
 
 /// The side of a cell.
 const CELL: Mm = 500;
 
 /// The most cells a search looks at before it gives up.
 const SEARCH_LIMIT: usize = 40_000;
+
+/// A cell, by its column and row.
+type Cell = (i32, i32);
+
+/// A cell a search has reached: its cost so far, and the cell it came from.
+type Reached = (i32, Option<Cell>);
 
 /// One side of one place, for bodies of one radius.
 pub struct Grid {
@@ -23,10 +29,19 @@ pub struct Grid {
 }
 
 impl Grid {
+    /// The grid of `place`, which a checked catalogue keeps within
+    /// [`LARGEST_PLACE`] a side.
     pub fn build(place: &Place, side: Side, radius: Mm) -> Grid {
         let b = place.bounds;
-        let width = (b.max.x - b.min.x) / CELL + 1;
-        let height = (b.max.y - b.min.y) / CELL + 1;
+        let side_cells = |lo: Mm, hi: Mm| (i64::from(hi) - i64::from(lo)) / i64::from(CELL) + 1;
+        let (width, height) = (side_cells(b.min.x, b.max.x), side_cells(b.min.y, b.max.y));
+        let most = i64::from(LARGEST_PLACE / CELL + 1);
+        assert!(
+            (1..=most).contains(&width) && (1..=most).contains(&height),
+            "{} is {width} by {height} cells; a checked catalogue's places are at most {most}",
+            place.name
+        );
+        let (width, height) = (width as i32, height as i32);
         let mut blocked = Vec::with_capacity((width * height) as usize);
         for cy in 0..height {
             for cx in 0..width {
@@ -101,19 +116,21 @@ impl Grid {
     }
 
     /// The shortest way from `from` to `to`, as points to walk through in
-    /// turn, ending at `to`; `None` if there isn't one.
+    /// turn; `None` if there isn't one. It ends at `to` when `to`'s own
+    /// cell is free, and otherwise at the free cell nearest it, so a body
+    /// can always reach its end. What it holds grows with the cells it
+    /// looks at, which [`SEARCH_LIMIT`] caps, not with the place.
     pub fn path(&self, from: Vec2, to: Vec2) -> Option<Vec<Vec2>> {
         let start = self.nearest_free(from)?;
         let goal = self.nearest_free(to)?;
-        let index = |(x, y): (i32, i32)| (y * self.width + x) as usize;
         let h = |(x, y): (i32, i32)| {
             let (dx, dy) = ((x - goal.0).abs(), (y - goal.1).abs());
             10 * (dx + dy) - 6 * dx.min(dy)
         };
-        let mut cost = vec![i32::MAX; self.blocked.len()];
-        let mut came: Vec<Option<(i32, i32)>> = vec![None; self.blocked.len()];
+        let mut reached: HashMap<Cell, Reached> = HashMap::new();
+        let cost = |reached: &HashMap<_, (i32, _)>, c| reached.get(&c).map_or(i32::MAX, |r| r.0);
         let mut open = BinaryHeap::new();
-        cost[index(start)] = 0;
+        reached.insert(start, (0, None));
         open.push(Reverse((h(start), 0, start.1, start.0)));
         let mut looked = 0;
         while let Some(Reverse((_, g, y, x))) = open.pop() {
@@ -121,7 +138,7 @@ impl Grid {
             if c == goal {
                 break;
             }
-            if g > cost[index(c)] {
+            if g > cost(&reached, c) {
                 continue;
             }
             looked += 1;
@@ -147,26 +164,29 @@ impl Grid {
                 }
                 let step = if dx != 0 && dy != 0 { 14 } else { 10 };
                 let ng = g + step;
-                if ng < cost[index(n)] {
-                    cost[index(n)] = ng;
-                    came[index(n)] = Some(c);
+                if ng < cost(&reached, n) {
+                    reached.insert(n, (ng, Some(c)));
                     open.push(Reverse((ng + h(n), ng, n.1, n.0)));
                 }
             }
         }
-        if cost[index(goal)] == i32::MAX {
+        if !reached.contains_key(&goal) {
             return None;
         }
         let mut cells = vec![goal];
-        while let Some(prev) = came[index(*cells.last().expect("not empty"))] {
+        while let Some(&(_, Some(prev))) = reached.get(cells.last().expect("not empty")) {
             cells.push(prev);
         }
         cells.reverse();
         let mut points: Vec<Vec2> = cells.into_iter().skip(1).map(|c| self.centre(c)).collect();
-        if let Some(last) = points.last_mut() {
-            *last = to;
-        } else {
-            points.push(to);
+        let own = (
+            (to.x - self.origin.x).div_euclid(CELL),
+            (to.y - self.origin.y).div_euclid(CELL),
+        );
+        let end = if goal == own { to } else { self.centre(goal) };
+        match points.last_mut() {
+            Some(last) => *last = end,
+            None => points.push(end),
         }
         Some(points)
     }
@@ -235,6 +255,24 @@ mod tests {
         // The other side of the same place has no wall.
         let lately = Grid::build(&field(), Side::Lately, 400);
         assert!(lately.clear(a, b));
+    }
+
+    #[test]
+    fn a_way_to_somewhere_solid_ends_where_a_body_can_stand() {
+        let place = field();
+        let grid = Grid::build(&place, Side::Living, 400);
+        let inside_the_wall = Vec2::new(0, 0);
+        let end = *grid
+            .path(Vec2::new(-3000, 0), inside_the_wall)
+            .expect("a way to beside it")
+            .last()
+            .unwrap();
+        assert_ne!(end, inside_the_wall);
+        assert_eq!(
+            crate::body::settle(&place, Side::Living, end, 400),
+            end,
+            "a body can stand at the end"
+        );
     }
 
     #[test]

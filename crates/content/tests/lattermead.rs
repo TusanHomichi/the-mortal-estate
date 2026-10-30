@@ -114,6 +114,37 @@ fn die_in_the_hall_walk_out_of_its_past_and_turn_up_at_the_arch() {
 }
 
 #[test]
+fn the_dun_never_wanders_toward_somewhere_it_cannot_reach() {
+    // Seed 35 once sent the dun's first wander into the hall's table, and
+    // it pressed against the table's edge for good.
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+    let content = tme_content::load(&dir).expect("content/ compiles");
+    for seed in [35, 1, 2, 3] {
+        let mut w = World::new(
+            Arc::new(content.catalogue.clone()),
+            seed,
+            Settings::default(),
+        );
+        let mut held_since = (None, 0);
+        for step in 0..(150 * tme_sim::STEPS_PER_SECOND) {
+            w.step();
+            let Some(dun) = w.state().creatures.values().next() else {
+                continue;
+            };
+            if dun.roam_to != held_since.0 {
+                held_since = (dun.roam_to, step);
+            }
+            assert!(
+                dun.roam_to.is_none() || step - held_since.1 < 20 * tme_sim::STEPS_PER_SECOND,
+                "seed {seed}: the dun has been going to {:?} for 20 s, and is at {:?}",
+                dun.roam_to,
+                dun.body.at.pos
+            );
+        }
+    }
+}
+
+#[test]
 fn the_hamlet_is_out_of_the_duns_reach() {
     let mut w = world();
     for _ in 0..(60 * tme_sim::STEPS_PER_SECOND) {

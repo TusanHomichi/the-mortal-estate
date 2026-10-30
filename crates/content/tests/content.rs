@@ -156,3 +156,13 @@ fn a_place_too_small_for_a_body_is_refused() {
     );
     assert!(p.iter().any(|p| p.message.contains("too small")), "{p:?}");
 }
+
+#[test]
+fn a_place_too_large_to_find_a_way_across_is_refused() {
+    let p = break_place(
+        "vast",
+        "bounds = [[-32.0, -24.0], [32.0, 24.0]]",
+        "bounds = [[-12000.0, -12000.0], [12000.0, 12000.0]]",
+    );
+    assert!(p.iter().any(|p| p.message.contains("larger than")), "{p:?}");
+}

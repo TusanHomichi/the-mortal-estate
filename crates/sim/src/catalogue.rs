@@ -2,7 +2,7 @@
 //! the places and the rules, as `tme-content` compiles them from `content/`.
 //! The simulation only reads it.
 
-use crate::geom::{Mm, Rect, Shape, Vec2};
+use crate::geom::{METRE, Mm, Rect, Shape, Vec2};
 use crate::{STEP_MS, Steps};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -203,6 +203,10 @@ impl Place {
     }
 }
 
+/// The longest side a place can have: creatures find their way across a
+/// place's whole grid, which grows with its area.
+pub const LARGEST_PLACE: Mm = 500 * METRE;
+
 /// A place where the two sides touch: the dead turn up here.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Threshold {
@@ -339,7 +343,15 @@ impl Catalogue {
             } else if b.max.x - b.min.x < 2 * widest || b.max.y - b.min.y < 2 * widest {
                 unsound(
                     entry.clone(),
-                    format!("is too small to hold a body {widest} mm across"),
+                    format!("is too small to hold a body {} mm across", 2 * widest),
+                );
+            } else if b.max.x - b.min.x > LARGEST_PLACE || b.max.y - b.min.y > LARGEST_PLACE {
+                unsound(
+                    entry.clone(),
+                    format!(
+                        "is larger than {} m a side; a bigger area is several places",
+                        LARGEST_PLACE / METRE
+                    ),
                 );
             }
             let mut inside = |what: &str, at: Vec2| {
