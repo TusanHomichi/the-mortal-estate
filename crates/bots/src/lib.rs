@@ -218,8 +218,10 @@ const SECOND: u64 = STEPS_PER_SECOND as u64;
 struct Mind {
     rng: Rng,
     nav: Nav,
-    /// The points still to walk through, and the step it gives up by.
+    /// The points still to walk through, how near the last counts as
+    /// reached, and the step it gives up by.
     route: Vec<Vec2>,
+    arrive: i64,
     give_up: u64,
     /// The side it planned its route on: dying, or turning up, plans anew.
     side: Side,
@@ -246,6 +248,7 @@ impl Mind {
             rng,
             nav: Nav::default(),
             route: Vec::new(),
+            arrive: REACHED,
             give_up: 0,
             side: Side::Living,
             held: Dir::NONE,
@@ -274,23 +277,37 @@ impl Mind {
         if side == Side::Lately {
             let within = |t: &&Threshold| pos.distance_sq(t.at) <= i64::from(t.radius).pow(2);
             if place.thresholds.iter().any(|t| within(&t)) {
+                // Stand, then use it.
+                if self.held != Dir::NONE {
+                    self.held = Dir::NONE;
+                    return Some(Intent::Move(Dir::NONE));
+                }
                 return act(&mut self.act_at, step, SECOND, || Intent::Use);
             }
             if self.route.is_empty() {
                 // The nearest threshold by the way there, not as the crow
-                // flies; stuck on the way, a step aside first.
+                // flies, and only by a way that ends where it can be used:
+                // one set in something solid has a way only to its edge.
+                // Stuck on the way, a step aside first.
                 let way = if stuck {
                     None
                 } else {
                     place
                         .thresholds
                         .iter()
-                        .filter_map(|t| grid.path(pos, t.at))
-                        .min_by_key(|way| length(pos, way))
+                        .filter_map(|t| {
+                            let radius = i64::from(t.radius);
+                            let arrive = (radius / 2).min(REACHED);
+                            let way = grid.path(pos, t.at)?;
+                            let end = *way.last()?;
+                            let short = radius - arrive;
+                            (end.distance_sq(t.at) < short * short).then_some((way, arrive))
+                        })
+                        .min_by_key(|(way, _)| length(pos, way))
                 };
-                self.route = match way {
+                (self.route, self.arrive) = match way {
                     Some(way) => way,
-                    None => wander(&mut self.rng, grid, pos, 5 * METRE)?,
+                    None => (wander(&mut self.rng, grid, pos, 5 * METRE)?, REACHED),
                 };
                 self.give_up = step + 60 * SECOND;
             }
@@ -310,15 +327,20 @@ impl Mind {
                 let b = place.bounds;
                 let far = (b.max.x - b.min.x).max(b.max.y - b.min.y);
                 self.route = wander(&mut self.rng, grid, pos, far)?;
+                self.arrive = REACHED;
                 self.give_up = step + 20 * SECOND;
             }
         }
         // Walk to the furthest of the next few points in a clear line.
-        while self
-            .route
-            .first()
-            .is_some_and(|p| pos.distance_sq(*p) < REACHED * REACHED)
-        {
+        while let Some(p) = self.route.first() {
+            let near = if self.route.len() == 1 {
+                self.arrive
+            } else {
+                REACHED
+            };
+            if pos.distance_sq(*p) >= near * near {
+                break;
+            }
             self.route.remove(0);
         }
         if let Some(ahead) = (1..self.route.len().min(8))
@@ -510,6 +532,47 @@ mod tests {
             died > 0 && turned_up > 0,
             "died {died}, turned up {turned_up}"
         );
+    }
+
+    /// Lattermead's content with its map as `edit` leaves it.
+    fn edited(name: &str, edit: impl Fn(&str) -> String) -> Arc<Catalogue> {
+        fn copy(from: &Path, to: &Path) {
+            std::fs::create_dir_all(to).unwrap();
+            for entry in std::fs::read_dir(from).unwrap() {
+                let entry = entry.unwrap();
+                let into = to.join(entry.file_name());
+                if entry.file_type().unwrap().is_dir() {
+                    copy(&entry.path(), &into);
+                } else {
+                    std::fs::copy(entry.path(), into).unwrap();
+                }
+            }
+        }
+        let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+        let dir = std::env::temp_dir().join(format!("tme-bots-{}-{name}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        copy(&content, &dir);
+        let map = dir.join("places/lattermead.toml");
+        let text = std::fs::read_to_string(&map).unwrap();
+        std::fs::write(&map, edit(&text)).unwrap();
+        let catalogue = tme_content::load(&dir).expect("content").catalogue;
+        std::fs::remove_dir_all(&dir).unwrap();
+        Arc::new(catalogue)
+    }
+
+    #[test]
+    fn a_dead_bot_goes_only_to_a_threshold_it_can_use() {
+        // One set in the well, nearer than the arch but with no way into
+        // it, and the arch made smaller than how near a point on a way
+        // counts as reached.
+        let catalogue = edited("thresholds", |map| {
+            map.replace("radius_m = 1.6", "radius_m = 0.15")
+                + "\n[[threshold]]\nat = [-14.0, -6.0]\nradius_m = 0.5\nexit = [-14.0, -3.0]\n"
+        });
+        let by_the_well = Vec2::new(-12 * METRE, -3 * METRE);
+        if let Err(stopped) = turns_up_from(&catalogue, by_the_well) {
+            panic!("never turned up: stopped at {stopped:?}");
+        }
     }
 
     #[test]
