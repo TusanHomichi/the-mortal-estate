@@ -1,0 +1,15 @@
+# The gate is the flake: CI only runs `nix flake check`, through burrow's
+# shared workflow. Jobs the flake can't hold (browsers, VMs) go alongside.
+name: flake
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  check:
+    uses: FieldmouseWorks/burrow/.github/workflows/flake-check.yml@2de07dacf7e57cc7a4fc11dad63886f8ae1db959 # main
+    # What the shared workflow needs to attest its result.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write

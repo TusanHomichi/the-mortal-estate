@@ -1,0 +1,144 @@
+{
+  "nodes": {
+    "burrow": {
+      "inputs": {
+        "crane": "crane",
+        "microvm": "microvm",
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1793356841,
+        "narHash": "sha256-eTDWBv317wDHEKg6vJ+tGFnq/DZSicmqunFK57GMtN8=",
+        "ref": "refs/heads/main",
+        "rev": "3d203ddf9a83767f27639812864d8a166f8abf7a",
+        "revCount": 227,
+        "type": "git",
+        "url": "https://github.com/FieldmouseWorks/burrow"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/FieldmouseWorks/burrow"
+      }
+    },
+    "crane": {
+      "locked": {
+        "lastModified": 1792350552,
+        "narHash": "sha256-292lvpvxTGKryKxh3/3tcIVi85CwYGdl4oOi113Sob8=",
+        "ref": "refs/heads/master",
+        "rev": "e675a36b7377bebe41d548388a2501cbb16d380d",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ipetkov/crane"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/ipetkov/crane"
+      }
+    },
+    "microvm": {
+      "inputs": {
+        "nixpkgs": [
+          "burrow",
+          "nixpkgs"
+        ],
+        "spectrum": "spectrum"
+      },
+      "locked": {
+        "lastModified": 1793281488,
+        "narHash": "sha256-ErGIqtoWEX9KKC8NFtJDx2pGGG02Cr6LGxrvzLd2sqA=",
+        "ref": "refs/heads/main",
+        "rev": "b7bd556974fa8a171b5b639200e81d52244dfde4",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/microvm-nix/microvm.nix"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/microvm-nix/microvm.nix"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1793294725,
+        "narHash": "sha256-loLMnbbS4KhmG2ln9EY6f0YMNCA273Yx02oWYQ9IMeE=",
+        "ref": "nixos-26.05",
+        "rev": "6f06d204d8f2d8761d9da78778745974a3216381",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      },
+      "original": {
+        "ref": "nixos-26.05",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1793110635,
+        "narHash": "sha256-dhoW6VgFWlaodSY5jrBn+CF2FLmaUvDVgM7+C7T2+NM=",
+        "ref": "nixos-unstable",
+        "rev": "31ecbaca1bdefa45dffc409f0250bd8039ea0010",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      },
+      "original": {
+        "ref": "nixos-unstable",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/NixOS/nixpkgs"
+      }
+    },
+    "root": {
+      "inputs": {
+        "burrow": "burrow"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "burrow",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793348683,
+        "narHash": "sha256-qv+P8z2xS5Xdws5Kigvr/WKJiaJSa6Ke8iH7ozmO53w=",
+        "ref": "refs/heads/master",
+        "rev": "96a0986b0486341fbc163fa2fabc6d3b44cdcbf1",
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/oxalica/rust-overlay"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "https://github.com/oxalica/rust-overlay"
+      }
+    },
+    "spectrum": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786032750,
+        "narHash": "sha256-+Ba/kIn5BjvV7PN8bWOo7RoqgTY/Yv2M7qeMf3wS2Ag=",
+        "ref": "refs/heads/main",
+        "rev": "77d2389874bb092b8dbf05ecc5b1030372e80e98",
+        "revCount": 1417,
+        "type": "git",
+        "url": "https://spectrum-os.org/git/spectrum"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://spectrum-os.org/git/spectrum"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
