@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "4xbyj85hyjb1fx5nzr1swn9m8q",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 124,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/124",
+  "summary": "Lock file maintenance (nix)",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "de5e5dc36dbadd096172b6726c3dff5bb01ec8cff151902a6c329862052f1236",
+    "before": "00819247c75345d7045a6c5ad487866cd8bd1581",
+    "after": "74c54326e3bf72527028fab7b6d8c18b40c80b4e",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793171755910
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40647649959/job/122680102617"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40647649560/job/122680101413"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40647649560/job/122680101222"
+    }
+  ]
+}

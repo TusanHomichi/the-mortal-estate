@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "53vrfbe5g52ary97ph2mq3am3y",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 91,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/91",
+  "summary": "Update npm packages",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "115afb4aeb6366eafdd58f6719bb35d50685c614c7faabc53d979846fe42908d",
+    "before": "9ec4ede942ba39b675738defe1eed804f0c27296",
+    "after": "854741b636023fe5278bfe12a4bef26508559a5a",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142680600
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40049508200/job/120738772482"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40049508200/job/120738772298"
+    },
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    }
+  ]
+}

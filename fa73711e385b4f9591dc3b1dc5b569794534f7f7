@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "7nnq6rzrr4x2ar8d5ergmb3552",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 137,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/137",
+  "summary": "Update FieldmouseWorks/burrow digest to c4b6766",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "3e0f47327a7e9fca0acf2c6ceb655f37273e689f309b222b5213847b234a2bfe",
+    "before": "6a019cf25f93b5194382b54d76e99619c00d2ad5",
+    "after": "fa73711e385b4f9591dc3b1dc5b569794534f7f7",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793270306328
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40856526932/job/123388767354"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40856526932/job/123388766837"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40856526498/job/123388764585"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40856526498/job/123388764928"
+    }
+  ]
+}

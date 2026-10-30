@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "0wvgxb2252epnvv6q9xt6j0r1b",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 94,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/94",
+  "summary": "Update dependency typescript to v7",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "76934f106b468519cac0e7e522deaf8a7f6642de5bda658c780ada7dc253325a",
+    "before": "7aeb4b174b6440c3a8774e062c7daec1fbd2ca9f",
+    "after": "43e11579ce15d837abc5ddf348871b239552e581",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142723451
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40173817675/job/121110133232"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40173817533/job/121110132850"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40173817533/job/121110132746"
+    }
+  ]
+}

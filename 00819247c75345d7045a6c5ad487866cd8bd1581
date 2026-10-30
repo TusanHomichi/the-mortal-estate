@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "4m058nbax2qtafednet26z1yff",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 122,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/122",
+  "summary": "house: the Pull requests section as burrow's house block",
+  "task": "FieldmouseWorks/burrow#87",
+  "author": {
+    "kind": "agent",
+    "login": "TusanHomichi",
+    "session": "https://claude.ai/code/session_01QzLmB1pT9Tck6N9Vf13a9M"
+  },
+  "landing": {
+    "revision": "7168757c58b2fd636b6a99b3f4a36c5bc5188ba68a0167309658f34abb238479",
+    "before": "ead886045c7766a29685b57f75ebe0b4e8bbd776",
+    "after": "00819247c75345d7045a6c5ad487866cd8bd1581",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793167255393
+  },
+  "evidence": [
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/122#pullrequestreview-5677699148"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40630663092/job/122626012564"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40630662734/job/122626011717"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40630662734/job/122626011454"
+    }
+  ]
+}

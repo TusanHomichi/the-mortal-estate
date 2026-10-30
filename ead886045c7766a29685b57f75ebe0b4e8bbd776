@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "7xydm70bjhzmq0bffd8hcqy6we",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 121,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/121",
+  "summary": "presentation: close the Nomos adoption experiment and retire its harness",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qDHGz7HGVkXVmpWc3KyAaeV",
+  "author": {
+    "kind": "agent",
+    "login": "TusanHomichi",
+    "session": "https://claude.ai/code/session_01BkHcyBa7nQpKXXAEX68JGv"
+  },
+  "landing": {
+    "revision": "248073e8c68c0b43ccf722ef4507ea493bdf0930f1cbd08e76f73049965f394f",
+    "before": "0256d6bd275a83d179127763e009460c00138972",
+    "after": "ead886045c7766a29685b57f75ebe0b4e8bbd776",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793156884356
+  },
+  "evidence": [
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/121#pullrequestreview-5677043819"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40621228844/job/122595491783"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40621228584/job/122595491177"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40621228584/job/122595490907"
+    }
+  ]
+}

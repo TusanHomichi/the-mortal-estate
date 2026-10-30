@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "03kzg42s5req2nb5nrk8s54a58",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 92,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/92",
+  "summary": "Update Rust crates",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "09594ec41a556e58ef854462c4236ae47a6f6c8f89b383bafc98ecb9123eabdf",
+    "before": "7fd2dcf76181339d292169e134d5698df1f95ce0",
+    "after": "99763c26d8c8106d581b922241335155d33d71d4",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142717230
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40108762218/job/120915864849"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40108761997/job/120915864252"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40108761997/job/120915864173"
+    }
+  ]
+}

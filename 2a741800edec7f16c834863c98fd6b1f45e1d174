@@ -1,0 +1,65 @@
+{
+  "conary": "note v1",
+  "change": "7k3v3bq6trmaz1x1sah3jy6g21",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 142,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/142",
+  "summary": "Update FieldmouseWorks/burrow digest to 509b3c2",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "24d2bf297e6409e2a06da372dabcea49c499e4fb27ec2748657fd8c8361fc240",
+    "before": "e90c977408c16b276ba98f2d39b1f2381edbdfa2",
+    "after": "2a741800edec7f16c834863c98fd6b1f45e1d174",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793306257587
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40917445632/job/123601337840"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40917445632/job/123601338654"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "fail",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40917444736/job/123601335432"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40917444736/job/123601334665"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40917444736/job/123709613706"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40917444736/job/123709610866"
+    }
+  ]
+}

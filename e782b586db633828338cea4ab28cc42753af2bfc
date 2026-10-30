@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "3y3m2cwapa93yjpv31kxhvqfcy",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 105,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/105",
+  "summary": "Update dependency vitest to v5",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "0e2897a856041711956b16a79922be1feebb96c7eb75d418081addb64e3bbf33",
+    "before": "1127ed0fb97a7a2f73c59ec172b1704b74a3ba87",
+    "after": "e782b586db633828338cea4ab28cc42753af2bfc",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142760087
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40588410136/job/122485945663"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40588409618/job/122485944502"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40588409618/job/122485944104"
+    },
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    }
+  ]
+}

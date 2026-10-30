@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "4ej2awavnrb7a2nda31kcjnv5n",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 109,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/109",
+  "summary": "Update Rust crate uuid to v1.29.0",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "b114528cdcf10a59a7d75af188f1fc3c7f264e1508ff064f5d280c17de5240f9",
+    "before": "43e11579ce15d837abc5ddf348871b239552e581",
+    "after": "0ec864dcacd8169fba1219b8eec5be29ec5994c4",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142726447
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40304219887/job/121509218594"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40304219025/job/121509215366"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40304219025/job/121509215073"
+    },
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    }
+  ]
+}

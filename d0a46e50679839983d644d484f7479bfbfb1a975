@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "6h196pcfg3zsszscegemx31009",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 86,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/86",
+  "summary": "Update dependency vitest to v4 [SECURITY]",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "feaaf308e50b24b68a8828d30557196f0e177b8c541073763dcf22c8bee7926c",
+    "before": "8518e3e9ba14b6dc873753d23603e055d19002f4",
+    "after": "d0a46e50679839983d644d484f7479bfbfb1a975",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142706412
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40079299298/job/120829293661"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40079299181/job/120829293334"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40079299181/job/120829293213"
+    }
+  ]
+}

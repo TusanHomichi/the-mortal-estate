@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "6pwx4sxz1dda1rq7z47320sj3t",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 87,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/87",
+  "summary": "Pin dependencies",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "62f44056eea87b7d3b4f42a87f02444b097d50001d591ea18151b95ee554ba54",
+    "before": "19e4a8156783a76e95929e64fe89c377970c7249",
+    "after": "6a4b9e588c34b268db577332c3b47ed58119294f",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142695312
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40065455938/job/120787643038"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40065455630/job/120787642429"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40065455630/job/120787642345"
+    }
+  ]
+}

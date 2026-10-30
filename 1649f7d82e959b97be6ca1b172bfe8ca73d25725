@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "4e64he6cbq6xsbyeagvnw5dhsf",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 128,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/128",
+  "summary": "Pin FieldmouseWorks/burrow action to ce26da5",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "e7667388fffdc3940baad99c98ad5705bfa038b0b6818c6a8db4a1be1ba36745",
+    "before": "77fa65366945cd707496afde72aae1df4956a17d",
+    "after": "1649f7d82e959b97be6ca1b172bfe8ca73d25725",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793247776832
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40810263888/job/123238640742"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40810263872/job/123238640455"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40810263872/job/123238640130"
+    }
+  ]
+}

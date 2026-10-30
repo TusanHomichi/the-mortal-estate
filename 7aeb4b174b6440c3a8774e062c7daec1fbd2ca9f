@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "00zs8sjef5ewrz6j6tv48x9k6h",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 107,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/107",
+  "summary": "Update Rust crate tokio to v1.54.1",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "6878525b4f524471bbe82b785e76d9850680fcca80090184ffa2d562b16125dd",
+    "before": "99763c26d8c8106d581b922241335155d33d71d4",
+    "after": "7aeb4b174b6440c3a8774e062c7daec1fbd2ca9f",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142720328
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40136824007/job/120999986691"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40136823671/job/120999986077"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40136823671/job/120999985816"
+    },
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "conary": "note v1",
+  "change": "2pk653stqbz3kjfkwcyg25x1dv",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 112,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/112",
+  "summary": "agents: open PRs ready for review, never as drafts",
+  "task": null,
+  "author": {
+    "kind": "agent",
+    "login": "TusanHomichi",
+    "session": "https://claude.ai/code/session_01A8jL6BSB2M5KUufXQefcf9"
+  },
+  "landing": {
+    "revision": "c60210c2303c1e8bd0d02ee32f9dfd176593b1118ef594388cfe5aaf92dd68fa",
+    "before": "496da576d0e0ca16fe96f4efd0f0a9dd208ab7f2",
+    "after": "260111b07b5a630b902f96511c6273a7bde038cd",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142738188
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40447724999/job/122002872227"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40447724488/job/122002870970"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40447724488/job/122002870776"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/112#pullrequestreview-5662094279"
+    }
+  ]
+}

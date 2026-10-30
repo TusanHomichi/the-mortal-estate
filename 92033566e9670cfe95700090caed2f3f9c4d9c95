@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "1dqsm8ymr4qrnbqfq263mra5v6",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 104,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/104",
+  "summary": "Lock file maintenance",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "bbf2004328b126c78fb377f677fefbde79e67b4781703d7b5b7ed43160bb5b05",
+    "before": "d0a46e50679839983d644d484f7479bfbfb1a975",
+    "after": "92033566e9670cfe95700090caed2f3f9c4d9c95",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142710106
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40092821164/job/120868830317"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40092820924/job/120868829595"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40092820924/job/120868829511"
+    }
+  ]
+}

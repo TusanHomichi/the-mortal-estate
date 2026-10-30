@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "2k7fad8azkvzk8n25j1d87w5js",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 106,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/106",
+  "summary": "Measure footprint tests on allocated random bytes",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "003308593cf5d935a6f942fc372d2c84a28205d97bff166f4ac69a1c27fc0a87",
+    "before": "92033566e9670cfe95700090caed2f3f9c4d9c95",
+    "after": "7fd2dcf76181339d292169e134d5698df1f95ce0",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142713460
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40097135432/job/120881633018"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40097135251/job/120881632775"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40097135251/job/120881632510"
+    }
+  ]
+}

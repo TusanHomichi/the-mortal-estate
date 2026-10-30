@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "1rq35mgyddqzq02vmkchw5b13s",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 98,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/98",
+  "summary": "Update dependency vite to v8",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "d314eb00467964d4a2b0cef1f2eb0c4176929804bb74f26daa9d29c0f6329444",
+    "before": "0ec864dcacd8169fba1219b8eec5be29ec5994c4",
+    "after": "d10bf70893cd7eeaf810475bb3000c2155012da5",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142729925
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40401239749/job/121847335549"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40401239504/job/121847334761"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40401239504/job/121847334502"
+    }
+  ]
+}

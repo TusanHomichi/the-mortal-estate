@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "02etry78je1db6qz42v7jea6p3",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 90,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/90",
+  "summary": "Update dependency rust to v1.99.1",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "043f84bb68c19a408f02e37ee7b491d6927e1975c9ba823c7f61093a0556e256",
+    "before": "6a4b9e588c34b268db577332c3b47ed58119294f",
+    "after": "1bdbfbeb273ebc34c97a2cb58b79c892668735b6",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142698718
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40070687784/job/120803251709"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40070687558/job/120803251083"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40070687558/job/120803250858"
+    }
+  ]
+}

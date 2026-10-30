@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "6ww7hsrbm9f69ytepxg8qzrbg8",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 81,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/81",
+  "summary": "Reconcile the starter encounter, bind spell targets to the whole address, and prove the shipped expedition",
+  "task": "TusanHomichi/the-mortal-estate#74",
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "cc2e293b0227a6975f4b80fa5ffcdb295b4de7cb791dcbeea1b14cb0d4b05027",
+    "before": "1bdbfbeb273ebc34c97a2cb58b79c892668735b6",
+    "after": "8518e3e9ba14b6dc873753d23603e055d19002f4",
+    "by": {
+      "kind": "status",
+      "login": "TusanHomichi"
+    },
+    "at": 1793142702862
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40074606644/job/120815184359"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40074606375/job/120815183206"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/40074606375/job/120815183119"
+    }
+  ]
+}

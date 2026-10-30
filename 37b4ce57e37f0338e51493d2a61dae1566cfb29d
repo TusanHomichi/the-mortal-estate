@@ -1,0 +1,59 @@
+{
+  "conary": "note v1",
+  "change": "2cmmwfpasmf2kg4wshm45vfv5m",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 173,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/173",
+  "summary": "plans: record that the Nomos repository is deleted",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qPKJvJUeRnos49k4hsP4V59",
+  "author": {
+    "kind": "agent",
+    "login": "TusanHomichi",
+    "session": "https://claude.ai/code/session_01BkHcyAcGEuj6GQqH3eajzC"
+  },
+  "landing": {
+    "revision": "7fd6c99697cc034e35a06f565f8a3c68b2bd56905075ddef1a5f0b394f81c76b",
+    "before": "9b06950edc0cd402683d0c701b8cff1fe004b5a7",
+    "after": "37b4ce57e37f0338e51493d2a61dae1566cfb29d",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793380411535
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41094555116/job/124196818298"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/173#pullrequestreview-5715770225"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41094555116/job/124196818719"
+    },
+    {
+      "kind": "ci",
+      "check": "a clean copy builds and tests with no private root",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41094554806/job/124196817732"
+    },
+    {
+      "kind": "ci",
+      "check": "the complete lane, except the clean-clone proof",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41094554806/job/124196817173"
+    }
+  ]
+}
