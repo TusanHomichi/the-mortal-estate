@@ -350,14 +350,8 @@ fn run(
         .expect("a runtime to wait in");
     let mut next = Instant::now() + tick;
     loop {
-        // Inputs are applied the moment they arrive, until the step is due.
-        loop {
-            let due = tokio::time::Instant::from_std(next);
-            match waiting.block_on(async { tokio::time::timeout_at(due, inbox.recv()).await }) {
-                Ok(Some(msg)) => sim.handle(msg),
-                Ok(None) => return Ok(()),
-                Err(_) => break,
-            }
+        if !take_inputs(&waiting, &mut inbox, next, |msg| sim.handle(msg)) {
+            return Ok(());
         }
         let started = Instant::now();
         sim.step()?;
@@ -371,6 +365,27 @@ fn run(
             next = Instant::now() + tick;
         }
     }
+}
+
+/// Apply inputs the moment they arrive, until `due`; whether the inbox is
+/// still open. The clock is read before each one, so an inbox that's never
+/// empty can't hold the step up: a wait's own deadline is only looked at
+/// once there's nothing to take.
+fn take_inputs(
+    waiting: &tokio::runtime::Runtime,
+    inbox: &mut Inbox<ToSim>,
+    due: Instant,
+    mut handle: impl FnMut(ToSim),
+) -> bool {
+    let until = tokio::time::Instant::from_std(due);
+    while Instant::now() < due {
+        match waiting.block_on(async { tokio::time::timeout_at(until, inbox.recv()).await }) {
+            Ok(Some(msg)) => handle(msg),
+            Ok(None) => return false,
+            Err(_) => break,
+        }
+    }
+    true
 }
 
 fn write(
@@ -400,4 +415,50 @@ fn write(
         store.journal(&entries, stepped)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_step_comes_when_due_however_much_input_is_waiting() {
+        let waiting = tokio::runtime::Builder::new_current_thread()
+            .enable_time()
+            .build()
+            .unwrap();
+        let (tx, mut inbox) = tokio::sync::mpsc::channel(INBOX);
+        for conn in 0..INBOX as Conn {
+            tx.try_send(ToSim::Leave { conn }).unwrap();
+        }
+        // Each input takes a millisecond, and there are seconds of them.
+        let started = Instant::now();
+        let mut taken = 0;
+        let open = take_inputs(
+            &waiting,
+            &mut inbox,
+            started + Duration::from_millis(20),
+            |_| {
+                taken += 1;
+                thread::sleep(Duration::from_millis(1));
+            },
+        );
+        assert!(open);
+        let took = started.elapsed();
+        assert!(
+            took < Duration::from_millis(100),
+            "the step waited {took:?}"
+        );
+        assert!(taken < INBOX, "took all {taken}");
+        // And with nothing waiting, it waits until due.
+        while inbox.try_recv().is_ok() {}
+        let started = Instant::now();
+        assert!(take_inputs(
+            &waiting,
+            &mut inbox,
+            started + Duration::from_millis(20),
+            |_| {}
+        ));
+        assert!(started.elapsed() >= Duration::from_millis(20));
+    }
 }
