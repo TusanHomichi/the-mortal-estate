@@ -38,19 +38,25 @@ fn new_world(name: &str) -> PathBuf {
     dir
 }
 
-fn start(name: &str) -> (Server, Invite) {
-    let server = Server::start_with(
-        &new_world(name),
-        Options {
-            step: Duration::from_millis(1),
-            handshake: Duration::from_millis(500),
-        },
-    )
-    .unwrap();
+/// A world whose steps last `step`, with half a second to join it.
+fn start_stepping(name: &str, step: Duration) -> (Server, Invite, PathBuf) {
+    let dir = new_world(name);
+    let options = Options {
+        step,
+        handshake: Duration::from_millis(500),
+    };
+    let server = Server::start_with(&dir, options).unwrap();
     let invite = Invite {
         address: server.local.to_string(),
         ..server.invite().clone()
     };
+    (server, invite, dir)
+}
+
+/// A world that steps every millisecond, so a test's seconds are minutes
+/// of play.
+fn start(name: &str) -> (Server, Invite) {
+    let (server, invite, _) = start_stepping(name, Duration::from_millis(1));
     (server, invite)
 }
 
@@ -141,7 +147,9 @@ async fn a_frame_replayed_or_slipped_in_ends_the_session() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn a_client_that_floods_the_world_is_turned_away() {
-    let (server, invite) = start("flood");
+    // At the world's own pace, so what a flood is doesn't hang on how fast
+    // this machine can send: 500 intents at once are minutes' worth.
+    let (server, invite, _) = start_stepping("flood", Options::default().step);
     let (mut ws, _, mut session) = handshake(connect(&invite).await, &invite).await;
     for seq in 1..=500 {
         let act = ClientMsg::Act {
