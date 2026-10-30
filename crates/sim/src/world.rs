@@ -6,6 +6,7 @@ use crate::body::{self, Action, Address, Body, Doing};
 use crate::catalogue::{Catalogue, Id, Mark, Side};
 use crate::creature::{self, Creature, LairState};
 use crate::geom::{Dir, Vec2};
+use crate::nav::Nav;
 use crate::rng::Rng;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -178,6 +179,7 @@ pub struct World {
     catalogue: Arc<Catalogue>,
     state: State,
     events: Vec<Event>,
+    nav: Nav,
 }
 
 impl World {
@@ -196,6 +198,7 @@ impl World {
             },
             catalogue,
             events: Vec::new(),
+            nav: Nav::default(),
         }
     }
 
@@ -227,6 +230,7 @@ impl World {
             catalogue,
             state,
             events: Vec::new(),
+            nav: Nav::default(),
         })
     }
 
@@ -389,7 +393,12 @@ impl World {
         self.state.step += 1;
         let now = self.state.step;
         creature::arise(&self.catalogue, &mut self.state, &mut self.events);
-        creature::think(&self.catalogue, &mut self.state, &mut self.events);
+        creature::think(
+            &self.catalogue,
+            &mut self.state,
+            &mut self.nav,
+            &mut self.events,
+        );
         let ids: Vec<BodyId> = self
             .state
             .people

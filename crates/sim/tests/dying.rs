@@ -174,3 +174,28 @@ fn a_tardy_changes_the_life_it_marks() {
     assert!(body::sees_lately(&cat, &[tme_sim::Id::new("second-sight")]));
     assert!(!body::sees_lately(&cat, &[tme_sim::Id::new("pale")]));
 }
+
+#[test]
+fn a_beast_with_a_wall_between_it_and_you_finds_a_way_round() {
+    let mut cat = catalogue();
+    let field = cat.places.values_mut().next().unwrap();
+    // Its lair just east of the living wall, which runs north-south.
+    field.lairs[0].at = Vec2::new(-3500, 0);
+    let mut w = tme_sim::World::new(
+        std::sync::Arc::new(cat),
+        3,
+        tme_sim::world::Settings::default(),
+    );
+    join(&mut w, ALICE);
+    // Round the wall's north end to stand just west of it, face to face
+    // with the beast through it.
+    place(&mut w, ALICE, Vec2::new(0, 4500));
+    place(&mut w, ALICE, Vec2::new(-8000, 4500));
+    place(&mut w, ALICE, Vec2::new(-7000, 0));
+    let struck = until(
+        &mut w,
+        2000,
+        |e| matches!(e, Event::Struck { target, .. } if *target == BodyId::Person(ALICE)),
+    );
+    assert!(struck.is_some(), "the beast gets round the wall");
+}

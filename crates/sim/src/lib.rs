@@ -6,6 +6,7 @@ pub mod body;
 pub mod catalogue;
 pub mod creature;
 pub mod geom;
+pub mod nav;
 pub mod rng;
 pub mod world;
 

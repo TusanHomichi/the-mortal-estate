@@ -4,6 +4,7 @@
 use crate::body::{Action, Address, Body, Doing};
 use crate::catalogue::{Catalogue, Id, Place};
 use crate::geom::{Dir, Vec2};
+use crate::nav::Nav;
 use crate::world::{BodyId, CreatureId, Event, PersonId, State};
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +19,10 @@ pub struct Creature {
     pub roam_to: Option<Vec2>,
     /// The step it last stood idle from.
     pub idle_since: u64,
+    /// The way it's following round whatever's between it and where it's
+    /// going, and where that was when the way was found.
+    pub path: Vec<Vec2>,
+    pub path_to: Option<Vec2>,
 }
 
 /// A lair in the world: whether its creature is out, and when the next one
@@ -105,6 +110,8 @@ pub fn arise(catalogue: &Catalogue, state: &mut State, events: &mut Vec<Event>) 
                 target: None,
                 roam_to: None,
                 idle_since: now,
+                path: Vec::new(),
+                path_to: None,
             },
         );
         lair.creature = Some(id);
@@ -115,8 +122,11 @@ pub fn arise(catalogue: &Catalogue, state: &mut State, events: &mut Vec<Event>) 
 /// How long a creature stands about before wandering on, in steps.
 const IDLE_STEPS: u64 = 40;
 
+/// How far what a creature is after can move before it finds a new way.
+const REPATH: i32 = 2000;
+
 /// Every creature decides what to do this step.
-pub fn think(catalogue: &Catalogue, state: &mut State, events: &mut Vec<Event>) {
+pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &mut Vec<Event>) {
     let now = state.step;
     let ids: Vec<CreatureId> = state.creatures.keys().copied().collect();
     for id in ids {
@@ -159,6 +169,11 @@ pub fn think(catalogue: &Catalogue, state: &mut State, events: &mut Vec<Event>) 
             });
         let mut roam_to = creature.roam_to;
         let mut idle_since = creature.idle_since;
+        let goal = match target {
+            Some(t) => Some(state.people[&t].body.at.pos),
+            None if leashed => Some(home),
+            None => None,
+        };
         let (held, swing_at) = match target {
             Some(t) => {
                 let quarry = &state.people[&t].body;
@@ -195,10 +210,62 @@ pub fn think(catalogue: &Catalogue, state: &mut State, events: &mut Vec<Event>) 
                 }
             }
         };
+        // Where something stands in the way, it follows the shortest way
+        // round rather than pressing against it.
+        let goal = goal.or(roam_to);
+        let mut path = creature.path.clone();
+        let mut path_to = creature.path_to;
+        let mut held = held;
+        match goal {
+            Some(g) if !held.is_none() => {
+                let grid = nav.grid(
+                    catalogue,
+                    &creature.body.at.place,
+                    creature.body.side,
+                    kind.radius,
+                );
+                if grid.clear(pos, g) {
+                    path.clear();
+                    path_to = None;
+                } else {
+                    if path.is_empty() || path_to.is_none_or(|p| p.distance_sq(g) > sq(REPATH)) {
+                        path = grid.path(pos, g).unwrap_or_default();
+                        path_to = Some(g);
+                    }
+                    while path.len() > 1
+                        && (pos.distance_sq(path[0]) < sq(400) || grid.clear(pos, path[1]))
+                    {
+                        path.remove(0);
+                    }
+                    match path.first() {
+                        Some(next) => {
+                            let push = held.as_vec().length() as i32;
+                            let d = Dir::toward(pos, *next).as_vec().with_length(push);
+                            held = Dir::new(d.x, d.y);
+                        }
+                        // No way there: a wanderer picks somewhere else; a
+                        // hunter waits.
+                        None => {
+                            held = Dir::NONE;
+                            if target.is_none() {
+                                roam_to = None;
+                                idle_since = now;
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {
+                path.clear();
+                path_to = None;
+            }
+        }
         let creature = state.creatures.get_mut(&id).expect("listed");
         creature.target = target;
         creature.roam_to = roam_to;
         creature.idle_since = idle_since;
+        creature.path = path;
+        creature.path_to = path_to;
         creature.body.held = held;
         if let Some(aim) = swing_at {
             if let Some(face) = aim.full() {
