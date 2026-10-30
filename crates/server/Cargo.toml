@@ -1,0 +1,30 @@
+[package]
+name = "tme-server"
+description = "A world's server: the only authority, one persistent world, hosted by anyone"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+clap.workspace = true
+futures-util.workspace = true
+getrandom.workspace = true
+postcard.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+socket2.workspace = true
+tme-content.workspace = true
+tme-sim.workspace = true
+tme-wire.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
+rusqlite.workspace = true
+tme-link.workspace = true
+
+[lints]
+workspace = true

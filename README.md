@@ -20,9 +20,47 @@ the next.
 
 Building the [first playable slice](docs/DESIGN.md#the-first-playable-slice),
 started fresh on 2026-10-30; [docs/DESIGN.md](docs/DESIGN.md) is the spec. The
-rules and the world run headless and are tested: free movement, committed
-attacks, the dun, dying into Lately and turning up again, on one small map.
-The server and the client come next.
+rules and the world are tested headless: free movement, committed attacks,
+the dun, dying into Lately and turning up again, on one small map. A server
+hosts a world over the network, by invite, and keeps it through a restart,
+and a bot harness measures what it costs. The client comes next.
+
+## Hosting a world
+
+```sh
+cargo run -p tme-server -- init worlds/home --name "Home" --address HOST:7420
+cargo run -p tme-server -- invite worlds/home
+cargo run -p tme-server -- run worlds/home
+```
+
+`init` makes the world's folder: its settings and invite code (`world.toml`),
+its key (`world.key`, which never leaves the folder) and, once it runs, its
+journal and snapshots (`world.db`). Both credentials are readable by the host
+alone; Windows can't promise that yet, so a world can't be made there until it
+can ([#6](https://github.com/TusanHomichi/the-mortal-estate/issues/6)). `invite` prints the link to give the people you want in, and is the one
+command that prints its code, so it stays out of a service's logs. The link
+names the world's key, and a connection is sealed end to end to that key, so
+nothing between a player and the world can read or change what they say. Someone
+new needs the link; someone who's been before comes back with their own key. `run`
+keeps the world until Ctrl-C or a service manager stops it, and picks up where
+it left off the next time, crash or not. One server runs a world at a time,
+and if it can't save what's played it stops rather than carry on unsaved.
+`world.toml` is read at each start: its settings, and new content the saved
+world fits, apply from then on, while what was already played keeps the
+content it was played on.
+
+## Measuring a world
+
+```sh
+cargo run --release -p tme-bots -- --bots 100 --seconds 30
+```
+
+hosts a scratch world on Lattermead and fills it with bots that wander,
+swing and dodge. People can hurt each other in that world, so where bots
+crowd they die, and walk back from Lately to turn up. It prints how long the server took to compute
+each step and how long each intent took to be answered. The numbers belong to
+the machine they were taken on, so a release states the ones it was measured
+with.
 
 ## Working here
 
