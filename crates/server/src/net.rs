@@ -4,7 +4,7 @@
 //!
 //! Everything a client can make the server hold is bounded: how many
 //! connections can be joining at once, how long joining may take, from
-//! the first byte to the last, how big a frame can be, how fast intents
+//! being accepted to the last byte, account lookup included, how big a frame can be, how fast intents
 //! may come, and how far a client can fall behind reading, in the system's
 //! buffers and the world's outbox, before it's let go.
 
@@ -20,7 +20,7 @@ use tme_wire::{
     ClientMsg, Greeting, Hello, Identity, Join, PROTOCOL, ServerMsg, Turned, decode, encode,
 };
 use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::{Semaphore, mpsc};
+use tokio::sync::{OwnedSemaphorePermit, Semaphore, mpsc};
 use tokio::time::{Instant, timeout, timeout_at};
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
@@ -94,17 +94,21 @@ pub async fn serve(listener: TcpListener, shared: Arc<Shared>) {
         let Ok((stream, _)) = listener.accept().await else {
             continue;
         };
+        // A connection's time to join starts as it's accepted.
+        let deadline = Instant::now() + shared.handshake;
         let _ = stream.set_nodelay(true);
         let _ = socket2::SockRef::from(&stream).set_send_buffer_size(SEND_BUFFER);
         let shared = Arc::clone(&shared);
         tokio::spawn(async move {
-            let deadline = Instant::now() + shared.handshake;
-            let Ok(Some((ws, session, person, name))) =
-                timeout_at(deadline, admit(stream, &shared)).await
-            else {
+            let admitted = timeout_at(deadline, admit(stream, &shared, joining)).await;
+            // A timeout takes what's ready over its deadline, so the
+            // deadline is checked again.
+            let Ok(Some((ws, session, person, name))) = admitted else {
                 return;
             };
-            drop(joining);
+            if Instant::now() >= deadline {
+                return;
+            }
             play(ws, session, person, name, &shared).await;
         });
     }
@@ -113,8 +117,13 @@ pub async fn serve(listener: TcpListener, shared: Arc<Shared>) {
 type Ws = tokio_tungstenite::WebSocketStream<TcpStream>;
 
 /// The handshake, and who it lets in: `None` for anyone it doesn't, once
-/// they've been told why where they can be.
-async fn admit(stream: TcpStream, shared: &Shared) -> Option<(Ws, Session, PersonId, String)> {
+/// they've been told why where they can be. It holds its joining slot
+/// until it's done.
+async fn admit(
+    stream: TcpStream,
+    shared: &Arc<Shared>,
+    joining: OwnedSemaphorePermit,
+) -> Option<(Ws, Session, PersonId, String)> {
     let config = WebSocketConfig::default()
         .max_message_size(Some(LARGEST_FRAME))
         .max_frame_size(Some(LARGEST_FRAME));
@@ -138,10 +147,21 @@ async fn admit(stream: TcpStream, shared: &Shared) -> Option<(Ws, Session, Perso
         .await
         .ok()?;
     let (key, join, mut session) = answering.finish(&next_frame(&mut ws).await?).ok()?;
-    let let_in = match decode::<Join>(&join) {
-        Ok(join) => account(shared, &key, &join).map(|person| (person, clean_name(&join.name))),
-        Err(_) => Err(Turned::OutOfTurn),
-    };
+    // Accounts are in the database, which can be slow or busy: they're
+    // looked up off the network's threads, and the lookup keeps the slot
+    // until it ends, even if the connection runs out of time first.
+    let accounts = Arc::clone(shared);
+    let (let_in, _joining) = tokio::task::spawn_blocking(move || {
+        let let_in = match decode::<Join>(&join) {
+            Ok(join) => {
+                account(&accounts, &key, &join).map(|person| (person, clean_name(&join.name)))
+            }
+            Err(_) => Err(Turned::OutOfTurn),
+        };
+        (let_in, joining)
+    })
+    .await
+    .ok()?;
     match let_in {
         Ok((person, name)) => Some((ws, session, person, name)),
         Err(turned) => {

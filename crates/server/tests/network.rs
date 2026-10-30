@@ -1,6 +1,7 @@
 //! What a client can do to a world over the network, and what it can't:
 //! read or change the session, flood the world with intents, make it hold
-//! messages it won't read, or hold connections open without joining.
+//! messages it won't read, or hold connections open without joining, even
+//! while the world's database is slow to answer.
 
 use futures_util::{SinkExt, StreamExt};
 use std::path::{Path, PathBuf};
@@ -244,4 +245,38 @@ async fn connections_that_never_join_are_closed_and_bounded() {
     assert!(waited >= Duration::from_millis(300), "waited {waited:?}");
     drop(joining);
     server.stop().unwrap();
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn an_account_held_up_in_the_database_holds_up_no_one_else() {
+    let (server, invite, dir) = start_stepping("held", Duration::from_millis(1));
+    // Something else holds the world's database, so making an account
+    // waits on it for longer than anyone has to join.
+    let db = rusqlite::Connection::open(dir.join("world.db")).unwrap();
+    db.execute_batch("BEGIN EXCLUSIVE").unwrap();
+    let asked = std::time::Instant::now();
+    let joining: Vec<_> = (0..4)
+        .map(|n| {
+            let invite = invite.clone();
+            tokio::spawn(async move {
+                let joined = join(&invite, &Identity::generate(), &format!("New {n}")).await;
+                (joined.is_ok(), asked.elapsed())
+            })
+        })
+        .collect();
+    // Someone who never upgrades is let go on time all the same.
+    let mut idle = TcpStream::connect(server.local).await.unwrap();
+    let closed = tokio::time::timeout(Duration::from_secs(5), idle.read(&mut [0; 1])).await;
+    assert!(matches!(closed, Ok(Ok(0) | Err(_))), "closed: {closed:?}");
+    let idle_for = asked.elapsed();
+    // Half a second to join; the database holds each lookup for a second.
+    let on_time = Duration::from_millis(900);
+    assert!(idle_for < on_time, "the idle one went at {idle_for:?}");
+    for j in joining {
+        let (joined, after) = j.await.unwrap();
+        assert!(!joined, "nobody new got in without an account");
+        assert!(after < on_time, "a join was let go at {after:?}");
+    }
+    drop(db);
+    let _ = server.stop();
 }
