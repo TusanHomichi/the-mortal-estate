@@ -221,18 +221,17 @@ async fn connections_that_never_join_are_closed_and_bounded() {
     let mut idle = TcpStream::connect(server.local).await.unwrap();
     let closed = tokio::time::timeout(Duration::from_secs(5), idle.read(&mut [0; 1])).await;
     assert!(matches!(closed, Ok(Ok(0) | Err(_))), "closed: {closed:?}");
-    // While many are joining, one more is closed at once.
+    // While as many as can be are joining, one more waits its turn: it's
+    // let in once they've had their time, not before and not turned away.
     let mut joining = Vec::new();
     for _ in 0..64 {
         joining.push(TcpStream::connect(server.local).await.unwrap());
     }
     tokio::time::sleep(Duration::from_millis(50)).await;
-    let mut more = TcpStream::connect(server.local).await.unwrap();
-    let closed = tokio::time::timeout(Duration::from_millis(200), more.read(&mut [0; 1])).await;
-    assert!(matches!(closed, Ok(Ok(0) | Err(_))), "closed: {closed:?}");
-    // And once they've had their time, anyone can join again.
-    tokio::time::sleep(Duration::from_millis(700)).await;
+    let asked = std::time::Instant::now();
     join(&invite, &Identity::generate(), "Me").await.unwrap();
+    let waited = asked.elapsed();
+    assert!(waited >= Duration::from_millis(300), "waited {waited:?}");
     drop(joining);
     server.stop().unwrap();
 }

@@ -64,7 +64,8 @@ impl Shared {
     }
 }
 
-/// How many connections can be joining at once; more are closed at once.
+/// How many connections can be joining at once; more wait in the system's
+/// queue to be accepted until one of those is through or out of time.
 const JOINING: usize = 64;
 
 /// The most a client may send in one frame: one sealed Noise message.
@@ -87,10 +88,10 @@ const NAME_CHARS: usize = 24;
 
 pub async fn serve(listener: TcpListener, shared: Arc<Shared>) {
     loop {
-        let Ok((stream, _)) = listener.accept().await else {
-            continue;
+        let Ok(joining) = Arc::clone(&shared.joining).acquire_owned().await else {
+            return;
         };
-        let Ok(joining) = Arc::clone(&shared.joining).try_acquire_owned() else {
+        let Ok((stream, _)) = listener.accept().await else {
             continue;
         };
         let _ = stream.set_nodelay(true);
