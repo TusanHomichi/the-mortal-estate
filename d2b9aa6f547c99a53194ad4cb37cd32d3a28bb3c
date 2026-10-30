@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "0mgcync9j4vjy005ptqr7qggez",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 3,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/3",
+  "summary": "sim: the rules and the world of the first playable slice, headless",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qCxGL2zP73hXMnvwGm1Rwdo",
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "1c83def35aaee20db87bfe5b4d9903e2793f7b8868b88340167d7c90a0fd4244",
+    "before": "9f459a83349f224d9d4f00a2a1bd2ba6f288f4c3",
+    "after": "d2b9aa6f547c99a53194ad4cb37cd32d3a28bb3c",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793397785167
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41130278303/job/124319102215"
+    },
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41130278303/job/124319101860"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/3#pullrequestreview-5718876320"
+    }
+  ]
+}
