@@ -32,7 +32,7 @@ enum Command {
         #[arg(long, default_value = "127.0.0.1:7420")]
         address: String,
     },
-    /// Print the world's invite link.
+    /// Print the world's invite link: the one thing that prints its code.
     Invite { world: PathBuf },
     /// Run the world until interrupted.
     Run { world: PathBuf },
@@ -66,14 +66,16 @@ fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
                     address: &address,
                 },
             )?;
-            println!("made {name} in {}", world.display());
-            println!("invite: {}", folder.invite());
+            println!("made {name} in {}", folder.path.display());
+            println!(
+                "`tme-server invite {}` prints the link that brings someone in",
+                folder.path.display()
+            );
         }
         Command::Invite { world } => println!("{}", Folder::open(&world)?.invite()),
         Command::Run { world } => {
             let server = Server::start(&world)?;
             println!("listening on {}", server.local);
-            println!("invite: {}", server.invite());
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
                 .build()?;
