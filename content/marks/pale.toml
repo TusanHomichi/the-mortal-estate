@@ -1,0 +1,5 @@
+name = "Pale"
+description = "Your colour never quite came back, and neither did all of your strength."
+
+[effects]
+max_health = -6

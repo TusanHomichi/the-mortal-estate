@@ -1,4 +1,12 @@
 {
-  "description": "Paused while the repository is a design doc: nothing here has dependencies worth a pull request. The skeleton turns it back on.",
-  "enabled": false
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "description": "Bevy stays on the release we pinned and moves when we choose (docs/DESIGN.md, How it's built): patches within it come through, new releases don't.",
+      "matchDatasources": ["crate"],
+      "matchPackageNames": ["bevy", "bevy_*"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    }
+  ]
 }

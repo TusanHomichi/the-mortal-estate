@@ -1,0 +1,5 @@
+name = "Second Sight"
+description = "Lately shows through at the edges of things: the dead are plain to you."
+
+[effects]
+sees_lately = true

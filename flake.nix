@@ -4,13 +4,14 @@
   inputs.burrow.url = "git+https://github.com/FieldmouseWorks/burrow";
 
   # `nix develop` for the tools, `nix flake check` for the gate (see burrow's
-  # lib/project.nix). The repo is a design doc until the skeleton lands, so the
-  # gate is its own: every local link and #fragment the Markdown points at is
-  # found. The skeleton adds `rust = { };` and the client's checks.
+  # lib/project.nix): rustfmt, clippy and the workspace's tests on
+  # rust-toolchain.toml's toolchain, and every local link and #fragment the
+  # Markdown points at.
   outputs =
     { self, burrow }:
     burrow.lib.project {
       inherit self;
+      rust = { };
       packages = pkgs: [ pkgs.lychee ];
       checks = pkgs: {
         # lychee, offline, over every Markdown file. External links aren't

@@ -1,0 +1,5 @@
+name = "Light Foot"
+description = "You walk like someone who isn't entirely here yet."
+
+[effects]
+speed_percent = 8

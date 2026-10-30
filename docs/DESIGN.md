@@ -352,7 +352,9 @@ content/ (data) ──► content crate ──► server ◄── intents ─�
 - **The world lives in memory.** One simulation thread owns it and steps it at
   a fixed rate (about 20 steps a second until a measurement says otherwise):
   movement, actions under way, creatures, effects. Network tasks hand it
-  intents through a channel. Nothing locks the world per request.
+  intents through a channel. Nothing locks the world per request. Positions
+  are whole millimetres and durations whole steps, so a step works out the
+  same on every machine.
 - **Movement is predicted, never decided, by the client.** Your client moves
   you at once by running the simulation's own movement code, and the server
   confirms or corrects it; everyone else is drawn a moment in the past,

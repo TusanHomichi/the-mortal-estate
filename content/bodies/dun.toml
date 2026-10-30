@@ -1,0 +1,21 @@
+name = "Dun"
+description = "A low, bristling thing that hounds whoever's near, the way a creditor does. Nobody remembers what it's owed."
+radius_m = 0.6
+# A little slower than a person, so you can always walk away from one.
+speed_m_per_s = 3.4
+health = 30
+model = "generated/dun.gltf"
+
+[attack]
+# Long enough to see coming and be somewhere else.
+wind_up_ms = 900
+recover_ms = 1000
+reach_m = 1.1
+arc_degrees = 100
+damage = 12
+
+[behaviour]
+sense_m = 9.0
+leash_m = 16.0
+roam_m = 4.0
+respawn_ms = 45000

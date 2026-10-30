@@ -1,0 +1,452 @@
+# Lattermead: a hamlet, and the old hall on the rise above it, which burned.
+# In Lately the hall stands whole and the hamlet is younger: the tavern and
+# the green house aren't built yet, and the trees are saplings.
+#
+# Points are [east, north] in metres from the middle of the map. Models are
+# under assets/models/; the KayKit kits are scaled to one size: people at
+# 0.5, the dungeon and graveyard kits at 0.5, the hexagon kit at 4.
+
+name = "Lattermead"
+bounds = [[-32.0, -24.0], [32.0, 24.0]]
+arrival = [-14.0, -3.0]
+
+[ground]
+living = "#6f7b47"
+lately = "#3f6461"
+
+# The arch by the graves, where the two sides touch.
+[[threshold]]
+at = [2.0, 17.0]
+radius_m = 1.6
+exit = [2.0, 14.5]
+
+# A dun keeps to the old hall.
+[[lair]]
+kind = "dun"
+at = [17.0, 9.0]
+side = "living"
+
+# The hamlet.
+
+[[prop]]
+model = "kaykit-hexagon/building_well_blue.gltf"
+at = [-14.0, -6.0]
+scale = 4.0
+solid = { circle = { radius_m = 1.3 } }
+
+[[prop]]
+model = "kaykit-hexagon/building_home_A_red.gltf"
+at = [-22.0, -2.0]
+turn = 90
+scale = 4.0
+glow = true
+solid = { box = { size_m = [3.4, 3.2] } }
+
+[[prop]]
+model = "kaykit-hexagon/building_home_B_red.gltf"
+at = [-7.0, -13.0]
+turn = 180
+scale = 4.0
+glow = true
+solid = { box = { size_m = [3.6, 4.4] } }
+
+[[prop]]
+model = "kaykit-hexagon/building_tavern_red.gltf"
+at = [-22.0, -14.0]
+turn = -90
+scale = 4.0
+sides = "living"
+glow = true
+solid = { box = { size_m = [5.4, 4.8] } }
+
+[[prop]]
+model = "kaykit-hexagon/building_stage_B.gltf"
+at = [-22.0, -14.0]
+turn = -90
+scale = 4.0
+sides = "lately"
+solid = { box = { size_m = [3.6, 3.6] } }
+
+[[prop]]
+model = "kaykit-hexagon/building_home_A_green.gltf"
+at = [-6.0, -1.0]
+turn = 180
+scale = 4.0
+sides = "living"
+glow = true
+solid = { box = { size_m = [3.2, 3.4] } }
+
+[[prop]]
+model = "kaykit-hexagon/building_stage_A.gltf"
+at = [-6.0, -1.0]
+turn = 180
+scale = 4.0
+sides = "lately"
+solid = { box = { size_m = [3.6, 3.4] } }
+
+[[prop]]
+model = "kaykit-halloween/post_lantern.gltf"
+at = [-14.0, 0.5]
+scale = 0.5
+glow = true
+solid = { circle = { radius_m = 0.2 } }
+
+[[prop]]
+model = "kaykit-halloween/post_lantern.gltf"
+at = [-3.0, 6.0]
+turn = 45
+scale = 0.5
+glow = true
+solid = { circle = { radius_m = 0.2 } }
+
+[[prop]]
+model = "kaykit-hexagon/barrel.gltf"
+at = [-18.5, -11.5]
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 0.4 } }
+
+[[prop]]
+model = "kaykit-hexagon/crate_A_big.gltf"
+at = [-18.4, -12.6]
+turn = 20
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 0.45 } }
+
+[[prop]]
+model = "kaykit-hexagon/wheelbarrow.gltf"
+at = [-10.0, -5.0]
+turn = 60
+scale = 4.0
+
+[[prop]]
+model = "kaykit-hexagon/sack.gltf"
+at = [-17.5, -12.0]
+scale = 4.0
+sides = "living"
+
+# Trees: grown in the living land, saplings in Lately.
+
+[[prop]]
+model = "kaykit-hexagon/trees_A_large.gltf"
+at = [-27.0, 8.0]
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 2.5 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_A_small.gltf"
+at = [-27.0, 8.0]
+scale = 3.0
+sides = "lately"
+solid = { circle = { radius_m = 1.4 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_B_large.gltf"
+at = [-26.0, -20.0]
+turn = 30
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 2.5 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_B_small.gltf"
+at = [-26.0, -20.0]
+turn = 30
+scale = 3.0
+sides = "lately"
+solid = { circle = { radius_m = 1.4 } }
+
+[[prop]]
+model = "kaykit-hexagon/tree_single_A.gltf"
+at = [-11.0, 7.0]
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 0.6 } }
+
+[[prop]]
+model = "kaykit-hexagon/tree_single_B.gltf"
+at = [4.0, -8.0]
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 0.6 } }
+
+[[prop]]
+model = "kaykit-hexagon/tree_single_A.gltf"
+at = [4.0, -8.0]
+scale = 2.0
+sides = "lately"
+solid = { circle = { radius_m = 0.3 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_A_medium.gltf"
+at = [10.0, -18.0]
+turn = 70
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 2.0 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_A_small.gltf"
+at = [10.0, -18.0]
+turn = 70
+scale = 3.0
+sides = "lately"
+solid = { circle = { radius_m = 1.2 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_B_medium.gltf"
+at = [27.0, -10.0]
+scale = 4.0
+sides = "living"
+solid = { circle = { radius_m = 2.0 } }
+
+[[prop]]
+model = "kaykit-hexagon/trees_B_small.gltf"
+at = [27.0, -10.0]
+scale = 3.0
+sides = "lately"
+solid = { circle = { radius_m = 1.2 } }
+
+[[prop]]
+model = "kaykit-hexagon/rock_single_C.gltf"
+at = [0.0, -2.0]
+turn = 15
+scale = 8.0
+solid = { circle = { radius_m = 0.9 } }
+
+[[prop]]
+model = "kaykit-hexagon/rock_single_E.gltf"
+at = [24.0, 18.0]
+scale = 8.0
+solid = { circle = { radius_m = 1.0 } }
+
+# The old hall: whole in Lately, burned in the living land. Its walls run
+# in two-metre pieces.
+
+[[run]]
+models = ["kaykit-dungeon/wall.gltf.glb"]
+from = [10.0, 4.0]
+to = [14.0, 4.0]
+every_m = 2.0
+scale = 0.5
+sides = "lately"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall.gltf.glb", "kaykit-dungeon/wall_window_closed.gltf.glb"]
+from = [16.0, 4.0]
+to = [22.0, 4.0]
+every_m = 2.0
+scale = 0.5
+sides = "lately"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall.gltf.glb", "kaykit-dungeon/wall_arched.gltf.glb"]
+from = [10.0, 14.0]
+to = [22.0, 14.0]
+every_m = 2.0
+scale = 0.5
+sides = "lately"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall.gltf.glb", "kaykit-dungeon/wall_window_open.gltf.glb"]
+from = [10.0, 4.0]
+to = [10.0, 14.0]
+every_m = 2.0
+scale = 0.5
+sides = "lately"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall.gltf.glb", "kaykit-dungeon/wall_window_open.gltf.glb"]
+from = [22.0, 4.0]
+to = [22.0, 14.0]
+every_m = 2.0
+scale = 0.5
+sides = "lately"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall_broken.gltf.glb"]
+from = [10.0, 4.0]
+to = [12.0, 4.0]
+every_m = 2.0
+scale = 0.5
+sides = "living"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall_cracked.gltf.glb", "kaykit-dungeon/wall_broken.gltf.glb"]
+from = [10.0, 14.0]
+to = [16.0, 14.0]
+every_m = 2.0
+scale = 0.5
+sides = "living"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall_broken.gltf.glb", "kaykit-dungeon/wall_cracked.gltf.glb"]
+from = [10.0, 6.0]
+to = [10.0, 12.0]
+every_m = 2.0
+scale = 0.5
+sides = "living"
+thickness_m = 0.5
+
+[[run]]
+models = ["kaykit-dungeon/wall_broken.gltf.glb"]
+from = [22.0, 10.0]
+to = [22.0, 14.0]
+every_m = 2.0
+scale = 0.5
+sides = "living"
+thickness_m = 0.5
+
+[[prop]]
+model = "kaykit-dungeon/pillar.gltf.glb"
+at = [10.0, 4.0]
+scale = 0.5
+solid = { circle = { radius_m = 0.45 } }
+
+[[prop]]
+model = "kaykit-dungeon/pillar.gltf.glb"
+at = [22.0, 4.0]
+scale = 0.5
+sides = "lately"
+solid = { circle = { radius_m = 0.45 } }
+
+[[prop]]
+model = "kaykit-dungeon/pillar.gltf.glb"
+at = [10.0, 14.0]
+scale = 0.5
+solid = { circle = { radius_m = 0.45 } }
+
+[[prop]]
+model = "kaykit-dungeon/pillar.gltf.glb"
+at = [22.0, 14.0]
+scale = 0.5
+solid = { circle = { radius_m = 0.45 } }
+
+[[prop]]
+model = "kaykit-dungeon/rubble_large.gltf.glb"
+at = [19.0, 5.0]
+scale = 0.5
+sides = "living"
+solid = { box = { size_m = [3.6, 1.4] } }
+
+[[prop]]
+model = "kaykit-dungeon/rubble_half.gltf.glb"
+at = [17.0, 13.0]
+scale = 0.5
+sides = "living"
+solid = { box = { size_m = [1.8, 1.4] } }
+
+[[prop]]
+model = "kaykit-dungeon/table_long_broken.gltf.glb"
+at = [15.0, 9.5]
+scale = 0.5
+sides = "living"
+solid = { box = { size_m = [2.0, 0.8] } }
+
+[[prop]]
+model = "kaykit-dungeon/table_long_tablecloth_decorated_A.gltf.glb"
+at = [15.0, 9.5]
+scale = 0.5
+sides = "lately"
+solid = { box = { size_m = [2.0, 0.8] } }
+
+[[prop]]
+model = "kaykit-dungeon/torch_mounted.gltf.glb"
+at = [12.0, 13.5]
+scale = 0.5
+sides = "lately"
+glow = true
+
+[[prop]]
+model = "kaykit-dungeon/torch_mounted.gltf.glb"
+at = [20.0, 13.5]
+scale = 0.5
+sides = "lately"
+glow = true
+
+[[prop]]
+model = "kaykit-dungeon/banner_red.gltf.glb"
+at = [16.0, 13.6]
+scale = 0.5
+sides = "lately"
+
+[[prop]]
+model = "kaykit-halloween/tree_dead_large.gltf"
+at = [24.0, 7.0]
+scale = 0.8
+sides = "living"
+solid = { circle = { radius_m = 0.4 } }
+
+[[prop]]
+model = "kaykit-halloween/tree_dead_medium.gltf"
+at = [13.0, 17.0]
+turn = 120
+scale = 0.8
+sides = "living"
+solid = { circle = { radius_m = 0.3 } }
+
+# The graves, and the arch where the sides touch. Fewer graves in Lately:
+# fewer had died then.
+
+[[prop]]
+model = "kaykit-halloween/arch_gate.gltf"
+at = [2.0, 17.0]
+scale = 0.5
+
+[[prop]]
+model = "kaykit-halloween/lantern_standing.gltf"
+at = [0.5, 16.2]
+scale = 0.5
+glow = true
+
+[[prop]]
+model = "kaykit-halloween/lantern_standing.gltf"
+at = [3.5, 16.2]
+scale = 0.5
+glow = true
+
+[[prop]]
+model = "kaykit-halloween/gravestone.gltf"
+at = [-2.0, 20.0]
+scale = 0.5
+solid = { box = { size_m = [0.8, 0.4] } }
+
+[[prop]]
+model = "kaykit-halloween/grave_A.gltf"
+at = [6.0, 20.5]
+scale = 0.5
+sides = "living"
+solid = { box = { size_m = [1.0, 0.6] } }
+
+[[prop]]
+model = "kaykit-halloween/gravestone.gltf"
+at = [-4.5, 18.5]
+turn = 10
+scale = 0.5
+sides = "living"
+solid = { box = { size_m = [0.8, 0.4] } }
+
+[[prop]]
+model = "kaykit-halloween/grave_A.gltf"
+at = [8.5, 19.0]
+turn = -8
+scale = 0.5
+sides = "living"
+solid = { box = { size_m = [1.0, 0.6] } }
+
+[[run]]
+models = ["kaykit-halloween/fence.gltf", "kaykit-halloween/fence_broken.gltf"]
+from = [-6.0, 23.0]
+to = [10.0, 23.0]
+every_m = 2.0
+scale = 0.5
+thickness_m = 0.3
