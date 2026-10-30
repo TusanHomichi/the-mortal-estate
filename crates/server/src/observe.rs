@@ -133,13 +133,15 @@ impl Observer {
             now.insert(id);
         }
         let gone = self.in_view.difference(&now).copied().collect();
-        self.in_view = now;
-        let in_view = |id: &BodyId| *id == me || self.in_view.contains(id);
+        // A body that went this step was in view at the last one: what made
+        // it go (leaving, falling) is news to whoever watched it.
+        let watched = |id: &BodyId| *id == me || now.contains(id) || self.in_view.contains(id);
         let events = events
             .iter()
-            .filter(|e| subjects(e).iter().any(in_view))
+            .filter(|e| subjects(e).iter().any(watched))
             .cloned()
             .collect();
+        self.in_view = now;
         Some(Observation {
             step: world.step_count(),
             ack: self.ack,
@@ -173,6 +175,7 @@ mod tests {
 
     const ALICE: PersonId = PersonId(1);
     const BOB: PersonId = PersonId(2);
+    const CAROL: PersonId = PersonId(3);
 
     /// Lattermead with Alice and Bob standing where everyone arrives.
     fn two_people() -> World {
@@ -244,6 +247,43 @@ mod tests {
         walk(&mut world, BOB, 0);
         assert!(sees_bob(&tick(&mut world, &mut alice)), "Bob, stopping");
         assert!(!sees_bob(&tick(&mut world, &mut alice)), "Bob, stood still");
+    }
+
+    #[test]
+    fn whoever_watched_a_body_go_hears_why() {
+        let mut world = two_people();
+        world
+            .apply(&Input::Join {
+                person: CAROL,
+                name: "Carol".into(),
+            })
+            .expect("joins");
+        let mut alice = Watching {
+            alice: Observer::new(ALICE),
+            index: Index::default(),
+        };
+        // Carol walks out of Alice's view; Bob stays in it.
+        walk(&mut world, CAROL, i32::from(Dir::UNIT));
+        let out = (0..400).find(|_| {
+            tick(&mut world, &mut alice)
+                .gone
+                .contains(&BodyId::Person(CAROL))
+        });
+        assert!(out.is_some(), "Carol walks out of view");
+        for person in [BOB, CAROL] {
+            world.apply(&Input::Leave { person }).expect("leaves");
+        }
+        let o = tick(&mut world, &mut alice);
+        assert!(o.gone.contains(&BodyId::Person(BOB)), "Bob is gone");
+        assert!(
+            o.events.contains(&Event::Left { person: BOB }),
+            "and Alice saw him leave: {:?}",
+            o.events
+        );
+        assert!(
+            !o.events.contains(&Event::Left { person: CAROL }),
+            "Carol was out of view"
+        );
     }
 
     #[test]
