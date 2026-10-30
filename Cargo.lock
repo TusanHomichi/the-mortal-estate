@@ -806,6 +806,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "tme-bots"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "tme-content",
+ "tme-link",
+ "tme-server",
+ "tme-sim",
+ "tme-wire",
+ "tokio",
+]
+
+[[package]]
 name = "tme-content"
 version = "0.1.0"
 dependencies = [

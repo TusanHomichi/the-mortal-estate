@@ -22,8 +22,8 @@ Building the [first playable slice](docs/DESIGN.md#the-first-playable-slice),
 started fresh on 2026-10-30; [docs/DESIGN.md](docs/DESIGN.md) is the spec. The
 rules and the world are tested headless: free movement, committed attacks,
 the dun, dying into Lately and turning up again, on one small map. A server
-hosts a world over the network, by invite, and keeps it through a restart.
-The client comes next.
+hosts a world over the network, by invite, and keeps it through a restart,
+and a bot harness measures what it costs. The client comes next.
 
 ## Hosting a world
 
@@ -38,6 +38,18 @@ and snapshots (`world.db`). It prints the invite link to give the people you
 want in; `invite` prints it again. Someone new needs the link; someone who's
 been before comes back with their own key. `run` keeps the world until Ctrl-C
 or a service manager stops it, and picks up where it left off the next time.
+
+## Measuring a world
+
+```sh
+cargo run --release -p tme-bots -- --bots 100 --seconds 30
+```
+
+hosts a scratch world on Lattermead and fills it with bots that wander,
+swing, dodge, die and turn up. It prints how long the server took to compute
+each step and how long each intent took to be answered. The numbers belong to
+the machine they were taken on, so a release states the ones it was measured
+with.
 
 ## Working here
 
