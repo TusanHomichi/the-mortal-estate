@@ -1,0 +1,18 @@
+[package]
+name = "tme-wire"
+description = "The one contract between server and client: messages, invites and the keys that are who you are"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ed25519-dalek.workspace = true
+getrandom.workspace = true
+postcard.workspace = true
+serde.workspace = true
+tme-sim.workspace = true
+
+[lints]
+workspace = true

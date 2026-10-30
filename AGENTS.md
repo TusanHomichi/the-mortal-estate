@@ -60,7 +60,9 @@ body, when there is one, says why.
 
 One Cargo workspace in `crates/`: `sim` is the rules and the world they run
 (plain Rust, no engine in it), `content` compiles `content/` into what the
-simulation runs on. `nix flake check` is the gate, the same locally and in CI:
+simulation runs on, `wire` is what the server and its clients say to each
+other, `server` hosts a world and `link` is a client's side of the
+connection. `nix flake check` is the gate, the same locally and in CI:
 rustfmt, clippy on all targets with warnings as errors, and the workspace's
 tests, on the toolchain `rust-toolchain.toml` pins; and lychee, offline, over
 every Markdown file, so every local link and `#fragment` must resolve. Plain

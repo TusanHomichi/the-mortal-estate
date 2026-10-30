@@ -20,9 +20,24 @@ the next.
 
 Building the [first playable slice](docs/DESIGN.md#the-first-playable-slice),
 started fresh on 2026-10-30; [docs/DESIGN.md](docs/DESIGN.md) is the spec. The
-rules and the world run headless and are tested: free movement, committed
-attacks, the dun, dying into Lately and turning up again, on one small map.
-The server and the client come next.
+rules and the world are tested headless: free movement, committed attacks,
+the dun, dying into Lately and turning up again, on one small map. A server
+hosts a world over the network, by invite, and keeps it through a restart.
+The client comes next.
+
+## Hosting a world
+
+```sh
+cargo run -p tme-server -- init worlds/home --name "Home" --address HOST:7420
+cargo run -p tme-server -- run worlds/home
+```
+
+`init` makes the world's folder: its settings (`world.toml`), its key
+(`world.key`, which never leaves the folder) and, once it runs, its journal
+and snapshots (`world.db`). It prints the invite link to give the people you
+want in; `invite` prints it again. Someone new needs the link; someone who's
+been before comes back with their own key. `run` keeps the world until Ctrl-C
+or a service manager stops it, and picks up where it left off the next time.
 
 ## Working here
 

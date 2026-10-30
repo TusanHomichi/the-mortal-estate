@@ -13,6 +13,17 @@ serde = { version = "1", features = ["derive"] }
 toml = "1"
 tme-sim = { path = "crates/sim" }
 tme-content = { path = "crates/content" }
+tme-wire = { path = "crates/wire" }
+tme-link = { path = "crates/link" }
+tme-server = { path = "crates/server" }
+clap = { version = "4", features = ["derive"] }
+ed25519-dalek = "3"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+getrandom = "0.4"
+postcard = { version = "1", features = ["use-std"] }
+rusqlite = { version = "0.41", features = ["bundled"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "sync", "macros", "time", "signal"] }
+tokio-tungstenite = "0.30"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
