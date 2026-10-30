@@ -1,20 +1,29 @@
-//! The network side: WebSocket connections, the joining handshake, and
-//! frames to and from the simulation thread. Nothing here decides anything
-//! about the world.
+//! The network side: WebSocket connections, the encrypted session's
+//! handshake, and frames to and from the simulation thread. Nothing here
+//! decides anything about the world.
+//!
+//! Everything a client can make the server hold is bounded: how many
+//! connections can be joining at once, how long joining may take, from
+//! the first byte to the last, how big a frame can be, how fast intents
+//! may come, and how far a client can fall behind reading, in the system's
+//! buffers and the world's outbox, before it's let go.
 
-use crate::sim::{Conn, ToSim};
+use crate::sim::{Conn, OUTBOX, ToSim};
 use crate::store::Store;
 use futures_util::{SinkExt, StreamExt};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use tme_sim::PersonId;
+use tme_wire::session::{self, Open, Seal, Session};
 use tme_wire::{
-    ClientMsg, Identity, Nonce, PROTOCOL, ServerMsg, Turned, decode, encode, join_proof, verify,
-    world_proof,
+    ClientMsg, Greeting, Hello, Identity, Join, PROTOCOL, ServerMsg, Turned, decode, encode,
 };
 use tokio::net::{TcpListener, TcpStream};
+use tokio::sync::{Semaphore, mpsc};
+use tokio::time::{Instant, timeout, timeout_at};
 use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 
 /// What every connection shares.
 pub struct Shared {
@@ -22,7 +31,13 @@ pub struct Shared {
     pub identity: Identity,
     pub invite: String,
     pub accounts: Mutex<Store>,
-    pub sim: Mutex<Sender<ToSim>>,
+    pub sim: mpsc::Sender<ToSim>,
+    /// How long a step lasts on the wall clock, and how long a connection
+    /// has to join.
+    step: Duration,
+    handshake: Duration,
+    /// Room for connections still joining.
+    joining: Arc<Semaphore>,
     next_conn: AtomicU64,
 }
 
@@ -32,25 +47,40 @@ impl Shared {
         identity: Identity,
         invite: String,
         accounts: Store,
-        sim: Sender<ToSim>,
+        sim: mpsc::Sender<ToSim>,
+        options: &crate::Options,
     ) -> Shared {
         Shared {
             name,
             identity,
             invite,
             accounts: Mutex::new(accounts),
-            sim: Mutex::new(sim),
+            sim,
+            step: options.step,
+            handshake: options.handshake,
+            joining: Arc::new(Semaphore::new(JOINING)),
             next_conn: AtomicU64::new(1),
         }
     }
-
-    fn to_sim(&self, msg: ToSim) {
-        let _ = self.sim.lock().expect("not poisoned").send(msg);
-    }
 }
 
-/// How long a client has to say hello and join.
-const HANDSHAKE: Duration = Duration::from_secs(10);
+/// How many connections can be joining at once; more are closed at once.
+const JOINING: usize = 64;
+
+/// The most a client may send in one frame: one sealed Noise message.
+const LARGEST_FRAME: usize = 64 << 10;
+
+/// How long a frame to a client may take to go before it's let go.
+const SENDING: Duration = Duration::from_secs(10);
+
+/// How much the system holds for a client that isn't reading, beyond its
+/// outbox: plenty for a game's traffic, and a few seconds of it.
+const SEND_BUFFER: usize = 128 << 10;
+
+/// How many intents a client may send in a burst, and how many a step
+/// after that: well past anyone's hands.
+const BURST: f64 = 60.0;
+const PER_STEP: f64 = 3.0;
 
 /// The longest name a person can have, in characters.
 const NAME_CHARS: usize = 24;
@@ -60,120 +90,175 @@ pub async fn serve(listener: TcpListener, shared: Arc<Shared>) {
         let Ok((stream, _)) = listener.accept().await else {
             continue;
         };
+        let Ok(joining) = Arc::clone(&shared.joining).try_acquire_owned() else {
+            continue;
+        };
         let _ = stream.set_nodelay(true);
-        tokio::spawn(connection(stream, Arc::clone(&shared)));
+        let _ = socket2::SockRef::from(&stream).set_send_buffer_size(SEND_BUFFER);
+        let shared = Arc::clone(&shared);
+        tokio::spawn(async move {
+            let deadline = Instant::now() + shared.handshake;
+            let Ok(Some((ws, session, person, name))) =
+                timeout_at(deadline, admit(stream, &shared)).await
+            else {
+                return;
+            };
+            drop(joining);
+            play(ws, session, person, name, &shared).await;
+        });
     }
 }
 
-async fn connection(stream: TcpStream, shared: Arc<Shared>) {
-    let Ok(mut ws) = tokio_tungstenite::accept_async(stream).await else {
-        return;
+type Ws = tokio_tungstenite::WebSocketStream<TcpStream>;
+
+/// The handshake, and who it lets in: `None` for anyone it doesn't, once
+/// they've been told why where they can be.
+async fn admit(stream: TcpStream, shared: &Shared) -> Option<(Ws, Session, PersonId, String)> {
+    let config = WebSocketConfig::default()
+        .max_message_size(Some(LARGEST_FRAME))
+        .max_frame_size(Some(LARGEST_FRAME));
+    let mut ws = tokio_tungstenite::accept_async_with_config(stream, Some(config))
+        .await
+        .ok()?;
+    let hello: Hello = decode(&next_frame(&mut ws).await?).ok()?;
+    if hello.protocol != PROTOCOL {
+        let turned = Greeting::Protocol { world: PROTOCOL };
+        let _ = ws.send(Message::binary(encode(&turned))).await;
+        return None;
+    }
+    let Ok((answering, answer)) = session::answer(&shared.identity, &hello, &encode(&shared.name))
+    else {
+        let _ = ws
+            .send(Message::binary(encode(&Greeting::NotThisWorld)))
+            .await;
+        return None;
     };
-    let joined = tokio::time::timeout(HANDSHAKE, handshake(&mut ws, &shared)).await;
-    let (person, name) = match joined {
-        Ok(Ok(joined)) => joined,
-        Ok(Err(turned)) => {
-            let _ = ws
-                .send(Message::binary(encode(&ServerMsg::Turned(turned))))
-                .await;
-            let _ = ws.close(None).await;
-            return;
+    ws.send(Message::binary(encode(&Greeting::Noise(answer))))
+        .await
+        .ok()?;
+    let (key, join, mut session) = answering.finish(&next_frame(&mut ws).await?).ok()?;
+    let let_in = match decode::<Join>(&join) {
+        Ok(join) => account(shared, &key, &join).map(|person| (person, clean_name(&join.name))),
+        Err(_) => Err(Turned::OutOfTurn),
+    };
+    match let_in {
+        Ok((person, name)) => Some((ws, session, person, name)),
+        Err(turned) => {
+            let frame = session.seal.seal(&encode(&ServerMsg::Turned(turned)));
+            let _ = ws.send(Message::binary(frame)).await;
+            None
         }
-        Err(_) => return,
-    };
+    }
+}
+
+/// The person `key` is here, or becomes if they bring the invite.
+fn account(shared: &Shared, key: &tme_wire::PublicKey, join: &Join) -> Result<PersonId, Turned> {
+    let accounts = shared.accounts.lock().expect("not poisoned");
+    match accounts.account(key).map_err(|_| Turned::OutOfTurn)? {
+        Some(person) => Ok(person),
+        None if join.invite.as_deref() == Some(shared.invite.as_str()) => {
+            accounts.create_account(key).map_err(|_| Turned::OutOfTurn)
+        }
+        None => Err(Turned::NeedInvite),
+    }
+}
+
+/// A joined connection: intents to the world, what the world sends back.
+async fn play(mut ws: Ws, session: Session, person: PersonId, name: String, shared: &Shared) {
+    let Session { mut seal, mut open } = session;
     let conn: Conn = shared.next_conn.fetch_add(1, Ordering::Relaxed);
-    let (out, mut outbox) = tokio::sync::mpsc::unbounded_channel();
-    shared.to_sim(ToSim::Join {
+    let (out, mut outbox) = mpsc::channel(OUTBOX);
+    let join = ToSim::Join {
         conn,
         person,
         name,
         out,
-    });
+    };
+    if shared.sim.send(join).await.is_err() {
+        return;
+    }
+    let mut pace = Pace::new(shared.step);
     loop {
         tokio::select! {
             incoming = ws.next() => {
                 let Some(Ok(frame)) = incoming else { break };
-                match frame {
-                    Message::Binary(bytes) => match decode::<ClientMsg>(&bytes) {
-                        Ok(ClientMsg::Act { seq, intent }) => shared.to_sim(ToSim::Act { conn, seq, intent }),
-                        _ => break,
-                    },
-                    Message::Close(_) => break,
-                    _ => {}
+                let Message::Binary(bytes) = frame else {
+                    if frame.is_close() { break } else { continue }
+                };
+                let Some(ClientMsg::Act { seq, intent }) = opened(&mut open, &bytes) else {
+                    break;
+                };
+                if !pace.allow() {
+                    let _ = send(&mut ws, &mut seal, &ServerMsg::Turned(Turned::TooFast)).await;
+                    break;
+                }
+                if shared.sim.send(ToSim::Act { conn, seq, intent }).await.is_err() {
+                    break;
                 }
             }
             outgoing = outbox.recv() => {
                 let Some(msg) = outgoing else { break };
                 let last = matches!(msg, ServerMsg::Turned(_));
-                if ws.send(Message::binary(encode(&msg))).await.is_err() || last {
+                if !send(&mut ws, &mut seal, &msg).await || last {
                     break;
                 }
             }
         }
     }
-    shared.to_sim(ToSim::Leave { conn });
-    let _ = ws.close(None).await;
+    let _ = shared.sim.send(ToSim::Leave { conn }).await;
+    let _ = timeout(SENDING, ws.close(None)).await;
 }
 
-type Ws = tokio_tungstenite::WebSocketStream<TcpStream>;
+/// A sealed frame's message, if it opens and reads as one.
+fn opened(open: &mut Open, frame: &[u8]) -> Option<ClientMsg> {
+    decode(&open.open(frame).ok()?).ok()
+}
 
-async fn next_msg(ws: &mut Ws) -> Result<ClientMsg, Turned> {
+/// Send `msg`, sealed; whether it went in time.
+async fn send(ws: &mut Ws, seal: &mut Seal, msg: &ServerMsg) -> bool {
+    let frame = Message::binary(seal.seal(&encode(msg)));
+    matches!(timeout(SENDING, ws.send(frame)).await, Ok(Ok(())))
+}
+
+/// The next frame's bytes, skipping pings; `None` once there are none.
+async fn next_frame(ws: &mut Ws) -> Option<Vec<u8>> {
     loop {
-        match ws.next().await {
-            Some(Ok(Message::Binary(bytes))) => {
-                return decode(&bytes).map_err(|_| Turned::OutOfTurn);
-            }
-            Some(Ok(Message::Ping(_) | Message::Pong(_))) => continue,
-            _ => return Err(Turned::OutOfTurn),
+        match ws.next().await? {
+            Ok(Message::Binary(bytes)) => return Some(bytes.to_vec()),
+            Ok(Message::Ping(_) | Message::Pong(_)) => continue,
+            _ => return None,
         }
     }
 }
 
-/// Hello, challenge, join: who this is, and the person they are here.
-async fn handshake(ws: &mut Ws, shared: &Shared) -> Result<(tme_sim::PersonId, String), Turned> {
-    let ClientMsg::Hello {
-        protocol,
-        key,
-        nonce,
-    } = next_msg(ws).await?
-    else {
-        return Err(Turned::OutOfTurn);
-    };
-    if protocol != PROTOCOL {
-        return Err(Turned::Protocol { world: PROTOCOL });
+/// How fast a client's intents come: a bucket of [`BURST`] that refills
+/// [`PER_STEP`] a step.
+struct Pace {
+    tokens: f64,
+    at: Instant,
+    per_second: f64,
+}
+
+impl Pace {
+    fn new(step: Duration) -> Pace {
+        Pace {
+            tokens: BURST,
+            at: Instant::now(),
+            per_second: PER_STEP / step.as_secs_f64(),
+        }
     }
-    let world = shared.identity.public();
-    let challenge = Nonce::random();
-    let hello = ServerMsg::Challenge {
-        world,
-        name: shared.name.clone(),
-        challenge,
-        proof: shared.identity.sign(&world_proof(&nonce, &key)),
-    };
-    ws.send(Message::binary(encode(&hello)))
-        .await
-        .map_err(|_| Turned::OutOfTurn)?;
-    let ClientMsg::Join {
-        name,
-        invite,
-        signature,
-    } = next_msg(ws).await?
-    else {
-        return Err(Turned::OutOfTurn);
-    };
-    if !verify(&key, &join_proof(&challenge, &world), &signature) {
-        return Err(Turned::BadSignature);
+
+    fn allow(&mut self) -> bool {
+        let now = Instant::now();
+        let refill = (now - self.at).as_secs_f64() * self.per_second;
+        self.tokens = (self.tokens + refill).min(BURST);
+        self.at = now;
+        if self.tokens < 1.0 {
+            return false;
+        }
+        self.tokens -= 1.0;
+        true
     }
-    let accounts = shared.accounts.lock().expect("not poisoned");
-    let known = accounts.account(&key).map_err(|_| Turned::OutOfTurn)?;
-    let person = match known {
-        Some(p) => p,
-        None if invite.as_deref() == Some(shared.invite.as_str()) => accounts
-            .create_account(&key)
-            .map_err(|_| Turned::OutOfTurn)?,
-        None => return Err(Turned::NeedInvite),
-    };
-    Ok((person, clean_name(&name)))
 }
 
 /// A name as the world keeps it: printable, trimmed and not too long.

@@ -34,6 +34,7 @@ fn new_world(name: &str) -> PathBuf {
 fn fast() -> Options {
     Options {
         step: Duration::from_millis(1),
+        ..Options::default()
     }
 }
 
@@ -54,7 +55,7 @@ async fn observe(rx: &mut Receiver) -> Observation {
             .expect("the world is still there")
             .expect("readable");
         if let ServerMsg::Observe(o) = msg {
-            return o;
+            return *o;
         }
     }
 }

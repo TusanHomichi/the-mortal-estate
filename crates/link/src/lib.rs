@@ -1,27 +1,33 @@
 //! A client's connection to a world, for anything that plays: the game's
 //! own client, the bot harness, an AI client, tests. It joins through the
-//! handshake, checking the world is the one the invite named, then sends
-//! intents and receives what the world sends.
+//! encrypted session's handshake, which only the world the invite named can
+//! answer, then sends intents and receives what the world sends, every
+//! frame sealed.
 
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
 use std::fmt;
 use tme_sim::world::{Intent, PersonId, Settings};
+use tme_wire::session::{self, Open, Seal};
 use tme_wire::{
-    ClientMsg, Identity, Invite, Nonce, PROTOCOL, ServerMsg, Turned, decode, encode, join_proof,
-    verify, world_proof,
+    ClientMsg, Greeting, Identity, Invite, Join, PROTOCOL, ServerMsg, Turned, decode, encode,
 };
 use tokio::net::TcpStream;
 use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream};
 
 type Ws = WebSocketStream<MaybeTlsStream<TcpStream>>;
+
+/// The most a world may send in one frame.
+const LARGEST_FRAME: usize = 16 << 20;
 
 #[derive(Debug)]
 pub enum LinkError {
     /// The world couldn't be reached, or the connection dropped.
     Connection(String),
-    /// The world answering isn't the one the invite named.
+    /// The world answering isn't the one the invite named, or something
+    /// between us and it tampered with what was sent.
     WrongWorld,
     /// The world turned us away.
     Turned(Turned),
@@ -60,82 +66,65 @@ pub async fn join(
     name: &str,
 ) -> Result<(Joined, Sender, Receiver), LinkError> {
     let url = format!("ws://{}/", invite.address);
-    let (mut ws, _) = tokio_tungstenite::connect_async(url)
+    let config = WebSocketConfig::default()
+        .max_message_size(Some(LARGEST_FRAME))
+        .max_frame_size(Some(LARGEST_FRAME));
+    let (mut ws, _) = tokio_tungstenite::connect_async_with_config(url, Some(config), true)
         .await
         .map_err(|e| LinkError::Connection(e.to_string()))?;
-    if let Ok(stream) = match ws.get_ref() {
-        MaybeTlsStream::Plain(s) => Ok(s),
-        _ => Err(()),
-    } {
-        let _ = stream.set_nodelay(true);
-    }
-    let nonce = Nonce::random();
-    send(
-        &mut ws,
-        &ClientMsg::Hello {
-            protocol: PROTOCOL,
-            key: me.public(),
-            nonce,
-        },
-    )
-    .await?;
-    let ServerMsg::Challenge {
-        world,
-        name: world_name,
-        challenge,
-        proof,
-    } = recv(&mut ws).await?
-    else {
-        return Err(LinkError::Garbled);
+    let (dialing, hello) = session::dial(me, &invite.world, PROTOCOL);
+    send(&mut ws, encode(&hello)).await?;
+    let answer = match decode(&recv(&mut ws).await?).map_err(|_| LinkError::Garbled)? {
+        Greeting::Noise(answer) => answer,
+        Greeting::Protocol { world } => return Err(LinkError::Turned(Turned::Protocol { world })),
+        Greeting::NotThisWorld => return Err(LinkError::WrongWorld),
     };
-    if world != invite.world || !verify(&world, &world_proof(&nonce, &me.public()), &proof) {
-        return Err(LinkError::WrongWorld);
-    }
-    send(
-        &mut ws,
-        &ClientMsg::Join {
-            name: name.to_owned(),
-            invite: invite.code.clone(),
-            signature: me.sign(&join_proof(&challenge, &world)),
-        },
-    )
-    .await?;
-    let ServerMsg::Welcome {
-        you,
-        step,
-        settings,
-    } = recv(&mut ws).await?
-    else {
-        return Err(LinkError::Garbled);
+    let join = Join {
+        name: name.to_owned(),
+        invite: invite.code.clone(),
+    };
+    let finished = dialing
+        .finish(&answer, &encode(&join))
+        .map_err(|_| LinkError::WrongWorld)?;
+    let world: String = decode(&finished.greeting).map_err(|_| LinkError::Garbled)?;
+    send(&mut ws, finished.third).await?;
+    let session::Session { seal, mut open } = finished.session;
+    let welcome = open
+        .open(&recv(&mut ws).await?)
+        .map_err(|_| LinkError::WrongWorld)?;
+    let (you, step, settings) = match decode(&welcome).map_err(|_| LinkError::Garbled)? {
+        ServerMsg::Welcome {
+            you,
+            step,
+            settings,
+        } => (you, step, settings),
+        ServerMsg::Turned(t) => return Err(LinkError::Turned(t)),
+        _ => return Err(LinkError::Garbled),
     };
     let (sink, stream) = ws.split();
     Ok((
         Joined {
-            world: world_name,
+            world,
             you,
             step,
             settings,
         },
-        Sender { sink, seq: 0 },
-        Receiver { stream },
+        Sender { sink, seal, seq: 0 },
+        Receiver { stream, open },
     ))
 }
 
-async fn send(ws: &mut Ws, msg: &ClientMsg) -> Result<(), LinkError> {
-    ws.send(Message::binary(encode(msg)))
+async fn send(ws: &mut Ws, frame: Vec<u8>) -> Result<(), LinkError> {
+    ws.send(Message::binary(frame))
         .await
         .map_err(|e| LinkError::Connection(e.to_string()))
 }
 
-async fn recv(ws: &mut Ws) -> Result<ServerMsg, LinkError> {
+/// The next frame's bytes.
+async fn recv(ws: &mut Ws) -> Result<Vec<u8>, LinkError> {
     loop {
         match ws.next().await {
-            Some(Ok(Message::Binary(bytes))) => {
-                return match decode(&bytes).map_err(|_| LinkError::Garbled)? {
-                    ServerMsg::Turned(t) => Err(LinkError::Turned(t)),
-                    msg => Ok(msg),
-                };
-            }
+            Some(Ok(Message::Binary(bytes))) => return Ok(bytes.to_vec()),
             Some(Ok(Message::Ping(_) | Message::Pong(_))) => continue,
             Some(Ok(_)) | None => return Err(LinkError::Connection("closed".into())),
             Some(Err(e)) => return Err(LinkError::Connection(e.to_string())),
@@ -146,6 +135,7 @@ async fn recv(ws: &mut Ws) -> Result<ServerMsg, LinkError> {
 /// Intents out.
 pub struct Sender {
     sink: SplitSink<Ws, Message>,
+    seal: Seal,
     seq: u32,
 }
 
@@ -158,7 +148,7 @@ impl Sender {
             intent,
         };
         self.sink
-            .send(Message::binary(encode(&msg)))
+            .send(Message::binary(self.seal.seal(&encode(&msg))))
             .await
             .map_err(|e| LinkError::Connection(e.to_string()))?;
         Ok(self.seq)
@@ -173,6 +163,7 @@ impl Sender {
 /// What the world sends.
 pub struct Receiver {
     stream: SplitStream<Ws>,
+    open: Open,
 }
 
 impl Receiver {
@@ -180,7 +171,10 @@ impl Receiver {
     pub async fn next(&mut self) -> Option<Result<ServerMsg, LinkError>> {
         loop {
             return match self.stream.next().await? {
-                Ok(Message::Binary(bytes)) => Some(decode(&bytes).map_err(|_| LinkError::Garbled)),
+                Ok(Message::Binary(bytes)) => Some(match self.open.open(&bytes) {
+                    Ok(msg) => decode(&msg).map_err(|_| LinkError::Garbled),
+                    Err(_) => Err(LinkError::WrongWorld),
+                }),
                 Ok(Message::Close(_)) => None,
                 Ok(_) => continue,
                 Err(e) => Some(Err(LinkError::Connection(e.to_string()))),

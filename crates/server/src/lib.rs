@@ -11,10 +11,9 @@ pub mod store;
 mod net;
 
 use folder::Folder;
-use sim::{StepTimes, ToSim};
+use sim::StepTimes;
 use std::net::SocketAddr;
 use std::path::Path;
-use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use store::Store;
@@ -25,7 +24,6 @@ pub struct Server {
     /// Where it's listening.
     pub local: SocketAddr,
     invite: Invite,
-    sim: mpsc::Sender<ToSim>,
     world: Option<JoinHandle<Result<(), String>>>,
     net: Option<(tokio::sync::oneshot::Sender<()>, JoinHandle<()>)>,
     times: Arc<Mutex<StepTimes>>,
@@ -50,12 +48,16 @@ pub struct Options {
     /// How long a step lasts on the wall clock. Tests shorten it; the world
     /// itself only counts steps.
     pub step: std::time::Duration,
+    /// How long a connection has to join, from being accepted to being let
+    /// in or told why not.
+    pub handshake: std::time::Duration,
 }
 
 impl Default for Options {
     fn default() -> Options {
         Options {
             step: std::time::Duration::from_millis(u64::from(tme_sim::STEP_MS)),
+            handshake: std::time::Duration::from_secs(10),
         }
     }
 }
@@ -95,7 +97,7 @@ impl Server {
             .local_addr()
             .map_err(|e| fail("the listening address", &e))?;
 
-        let (sim_tx, sim_rx) = mpsc::channel();
+        let (sim_tx, sim_rx) = tokio::sync::mpsc::channel(sim::INBOX);
         let times = Arc::new(Mutex::new(StepTimes::default()));
         let (stopping, stopped) = tokio::sync::watch::channel(());
         let world = sim::spawn(restored, store, sim_rx, Arc::clone(&times), options.step);
@@ -115,7 +117,8 @@ impl Server {
             folder.identity.clone(),
             config.invite.clone(),
             accounts,
-            sim_tx.clone(),
+            sim_tx,
+            &options,
         ));
         // The network runs on a thread of its own with its own runtime, so a
         // server starts and stops the same from async code or plain code.
@@ -143,7 +146,6 @@ impl Server {
         Ok(Server {
             local,
             invite: folder.invite(),
-            sim: sim_tx,
             world: Some(world),
             net: Some((stop_tx, net)),
             times,
@@ -175,12 +177,12 @@ impl Server {
     }
 
     fn shut(&mut self) -> Result<(), StartError> {
-        // Close every connection first, then stop the world.
+        // Close every connection; with the network gone the world's inbox
+        // closes, and it stops.
         if let Some((stop, net)) = self.net.take() {
             let _ = stop.send(());
             let _ = net.join();
         }
-        let _ = self.sim.send(ToSim::Shutdown);
         match self.world.take() {
             Some(world) => world
                 .join()

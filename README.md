@@ -37,8 +37,10 @@ cargo run -p tme-server -- run worlds/home
 its key (`world.key`, which never leaves the folder) and, once it runs, its
 journal and snapshots (`world.db`). Both credentials are readable by the host
 alone. `invite` prints the link to give the people you want in, and is the one
-command that prints its code, so it stays out of a service's logs. Someone new
-needs the link; someone who's been before comes back with their own key. `run`
+command that prints its code, so it stays out of a service's logs. The link
+names the world's key, and a connection is sealed end to end to that key, so
+nothing between a player and the world can read or change what they say. Someone
+new needs the link; someone who's been before comes back with their own key. `run`
 keeps the world until Ctrl-C or a service manager stops it, and picks up where
 it left off the next time, crash or not. One server runs a world at a time,
 and if it can't save what's played it stops rather than carry on unsaved.

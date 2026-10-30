@@ -8,14 +8,15 @@
 use crate::observe::{Index, Observer};
 use crate::store::{ContentId, Store, StoreError};
 use std::collections::BTreeMap;
-use std::sync::mpsc::{self, Receiver, RecvTimeoutError, SyncSender};
+use std::sync::mpsc::{self, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 use tme_sim::world::{Input, Intent, PersonId, Presence, Settings, State};
 use tme_sim::{Catalogue, STEPS_PER_SECOND, World};
 use tme_wire::{ServerMsg, Turned};
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc::error::TrySendError;
+use tokio::sync::mpsc::{Receiver as Inbox, Sender as Outbox};
 
 /// A connection, numbered by the network side.
 pub type Conn = u64;
@@ -27,7 +28,7 @@ pub enum ToSim {
         conn: Conn,
         person: PersonId,
         name: String,
-        out: UnboundedSender<ServerMsg>,
+        out: Outbox<ServerMsg>,
     },
     Act {
         conn: Conn,
@@ -36,9 +37,15 @@ pub enum ToSim {
     },
     /// The connection closed.
     Leave { conn: Conn },
-    /// Everyone leaves, a last snapshot is saved, and the thread ends.
-    Shutdown,
 }
+
+/// How many messages the world will hold for a client still sending the
+/// last ones: a few seconds of steps. One that falls further behind is let
+/// go, as every observation builds on the one before.
+pub const OUTBOX: usize = 64;
+
+/// How many messages from the network can wait for the world.
+pub const INBOX: usize = 4096;
 
 /// What the journal's writer is handed.
 enum ToWriter {
@@ -86,7 +93,7 @@ impl StepTimes {
 
 struct Connected {
     observer: Observer,
-    out: UnboundedSender<ServerMsg>,
+    out: Outbox<ServerMsg>,
 }
 
 struct Sim {
@@ -124,7 +131,7 @@ impl Sim {
                 };
                 match joined {
                     Ok(()) => {
-                        let _ = out.send(ServerMsg::Welcome {
+                        let _ = out.try_send(ServerMsg::Welcome {
                             you: person,
                             step: self.world.step_count(),
                             settings: self.world.state().settings.clone(),
@@ -138,7 +145,7 @@ impl Sim {
                         );
                     }
                     Err(_) => {
-                        let _ = out.send(ServerMsg::Turned(Turned::AlreadyHere));
+                        let _ = out.try_send(ServerMsg::Turned(Turned::AlreadyHere));
                     }
                 }
             }
@@ -150,17 +157,31 @@ impl Sim {
                 let c = self.connected.get_mut(&conn).expect("checked above");
                 c.observer.ack = seq;
                 if let Err(why) = result {
-                    let _ = c.out.send(ServerMsg::Refused { seq, why });
+                    self.send(conn, ServerMsg::Refused { seq, why });
                 }
             }
-            ToSim::Leave { conn } => {
-                if let Some(c) = self.connected.remove(&conn) {
-                    let _ = self.apply(Input::Leave {
-                        person: c.observer.person,
-                    });
-                }
-            }
-            ToSim::Shutdown => unreachable!("handled by the loop"),
+            ToSim::Leave { conn } => self.leave(conn),
+        }
+    }
+
+    /// Hand `msg` to `conn`'s connection, or let them go if they've fallen
+    /// too far behind to take it.
+    fn send(&mut self, conn: Conn, msg: ServerMsg) {
+        let Some(c) = self.connected.get(&conn) else {
+            return;
+        };
+        if let Err(TrySendError::Full(_)) = c.out.try_send(msg) {
+            self.leave(conn);
+        }
+    }
+
+    /// `conn` has gone, or been let go: their person leaves. Dropping their
+    /// outbox closes the connection, if it's still open.
+    fn leave(&mut self, conn: Conn) {
+        if let Some(c) = self.connected.remove(&conn) {
+            let _ = self.apply(Input::Leave {
+                person: c.observer.person,
+            });
         }
     }
 
@@ -168,10 +189,14 @@ impl Sim {
         self.world.step();
         let events = self.world.take_events();
         self.index = Index::new(&self.world, &self.index);
-        for c in self.connected.values_mut() {
+        let mut seen = Vec::new();
+        for (conn, c) in &mut self.connected {
             if let Some(o) = c.observer.observe(&self.world, &self.index, &events) {
-                let _ = c.out.send(ServerMsg::Observe(o));
+                seen.push((*conn, o));
             }
+        }
+        for (conn, o) in seen {
+            self.send(conn, ServerMsg::Observe(Box::new(o)));
         }
         self.flush(false)
     }
@@ -260,12 +285,12 @@ pub fn restore(
 }
 
 /// Run the world on its own thread, and the journal's writer on another.
-/// The world's thread ends when the inbox closes or `Shutdown` comes, after
-/// a last snapshot, or as soon as the writer fails, with its error.
+/// The world's thread ends when the inbox closes, after a last snapshot,
+/// or as soon as the writer fails, with its error.
 pub fn spawn(
     restored: Restored,
     store: Store,
-    inbox: Receiver<ToSim>,
+    inbox: Inbox<ToSim>,
     times: Arc<Mutex<StepTimes>>,
     tick: Duration,
 ) -> JoinHandle<Result<(), String>> {
@@ -285,12 +310,12 @@ pub fn spawn(
                 entries: Vec::new(),
                 writer: writer_tx,
             };
-            let ran = run(&mut sim, &inbox, &times, tick).and_then(|()| {
+            let ran = run(&mut sim, inbox, &times, tick).and_then(|()| {
                 // Everyone leaves; the last snapshot holds the world as it
                 // stopped.
                 let conns: Vec<Conn> = sim.connected.keys().copied().collect();
                 for conn in conns {
-                    sim.handle(ToSim::Leave { conn });
+                    sim.leave(conn);
                 }
                 sim.flush(true)
             });
@@ -310,22 +335,25 @@ pub fn spawn(
 
 fn run(
     sim: &mut Sim,
-    inbox: &Receiver<ToSim>,
+    mut inbox: Inbox<ToSim>,
     times: &Mutex<StepTimes>,
     tick: Duration,
 ) -> Result<(), WriterGone> {
+    // The network hands inputs over on an async channel, bounded so it
+    // waits when the world's behind; this runtime is only the waiting.
+    let waiting = tokio::runtime::Builder::new_current_thread()
+        .enable_time()
+        .build()
+        .expect("a runtime to wait in");
     let mut next = Instant::now() + tick;
     loop {
         // Inputs are applied the moment they arrive, until the step is due.
         loop {
-            let now = Instant::now();
-            if now >= next {
-                break;
-            }
-            match inbox.recv_timeout(next - now) {
-                Ok(ToSim::Shutdown) | Err(RecvTimeoutError::Disconnected) => return Ok(()),
-                Ok(msg) => sim.handle(msg),
-                Err(RecvTimeoutError::Timeout) => break,
+            let due = tokio::time::Instant::from_std(next);
+            match waiting.block_on(async { tokio::time::timeout_at(due, inbox.recv()).await }) {
+                Ok(Some(msg)) => sim.handle(msg),
+                Ok(None) => return Ok(()),
+                Err(_) => break,
             }
         }
         let started = Instant::now();

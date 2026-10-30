@@ -3,56 +3,49 @@
 //! generate or copy. Messages travel as binary WebSocket frames, each one
 //! postcard-encoded.
 //!
-//! Joining: the client says hello with its key and a nonce; the world
-//! answers with its key, its name, a challenge and its signature over the
-//! client's nonce; the client checks that against the key its invite named
-//! and signs the challenge to join. After that the client sends intents and
-//! the world sends what its person observes, step by step.
+//! Joining: the client says [`Hello`], starting the [session]'s handshake
+//! with the world its invite named; the world answers with a [`Greeting`]
+//! that carries its name; the client finishes the handshake carrying
+//! [`Join`]. From then on every frame is sealed in the session: the world
+//! says [`ServerMsg::Welcome`] (or why it turns the client away), the client
+//! sends intents, and the world sends what its person observes, step by
+//! step.
 
 mod invite;
 mod keys;
+pub mod session;
 mod view;
 
 pub use invite::{Invite, NotAnInvite};
-pub use keys::{
-    Identity, Nonce, PublicKey, Signature, create_private, join_proof, verify, world_proof,
-};
+pub use keys::{Identity, PublicKey, create_private};
+pub use session::{Greeting, Hello};
 pub use view::{BodyView, You};
 
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use tme_sim::world::{Event, Intent, PersonId, Refused, Settings};
 
 /// This contract's version. A world and a client that differ don't talk.
-pub const PROTOCOL: u16 = 1;
+pub const PROTOCOL: u16 = 2;
 
+/// What the client says as it finishes the handshake.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Join {
+    /// What a new person is called; a returning one keeps their name.
+    pub name: String,
+    /// The invite's code: needed the first time, not after.
+    pub invite: Option<String>,
+}
+
+/// What the client sends once it's in.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum ClientMsg {
-    Hello {
-        protocol: u16,
-        key: PublicKey,
-        nonce: Nonce,
-    },
-    Join {
-        /// What a new person is called; a returning one keeps their name.
-        name: String,
-        /// The invite's code: needed the first time, not after.
-        invite: Option<String>,
-        /// Over [`join_proof`] of the world's challenge and key.
-        signature: Signature,
-    },
     /// An intent, numbered so observations can say which they've applied.
     Act { seq: u32, intent: Intent },
 }
 
+/// What the world sends once the handshake's done.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum ServerMsg {
-    Challenge {
-        world: PublicKey,
-        name: String,
-        challenge: Nonce,
-        /// Over [`world_proof`] of the client's nonce and key.
-        proof: Signature,
-    },
     Welcome {
         you: PersonId,
         step: u64,
@@ -60,7 +53,7 @@ pub enum ServerMsg {
     },
     /// The world won't have you; the connection closes after this.
     Turned(Turned),
-    Observe(Observation),
+    Observe(Box<Observation>),
     /// An intent changed nothing.
     Refused {
         seq: u32,
@@ -73,14 +66,14 @@ pub enum ServerMsg {
 pub enum Turned {
     /// The client speaks another version of this contract.
     Protocol { world: u16 },
-    /// The join wasn't signed by the key that said hello.
-    BadSignature,
     /// Someone new needs an invite, and brought none or a wrong one.
     NeedInvite,
     /// That key is already in the world on another connection.
     AlreadyHere,
     /// Something was said out of turn.
     OutOfTurn,
+    /// Intents came faster than anyone plays.
+    TooFast,
 }
 
 /// What a person observes after a step: their own state in full, and what
@@ -104,7 +97,10 @@ pub fn encode<T: Serialize>(msg: &T) -> Vec<u8> {
     postcard::to_stdvec(msg).expect("every message encodes")
 }
 
-/// A frame's bytes as a message; an error for anything malformed.
+/// A frame's bytes as a message: all of them, or an error.
 pub fn decode<T: DeserializeOwned>(bytes: &[u8]) -> Result<T, postcard::Error> {
-    postcard::from_bytes(bytes)
+    match postcard::take_from_bytes(bytes)? {
+        (msg, []) => Ok(msg),
+        _ => Err(postcard::Error::DeserializeBadEncoding),
+    }
 }

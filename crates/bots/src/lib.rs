@@ -78,8 +78,14 @@ pub async fn measure(content: &Path, plan: Plan) -> Result<Report, String> {
         },
     )
     .map_err(|e| e.to_string())?;
-    let server =
-        Server::start_with(&dir, Options { step: plan.step }).map_err(|e| e.to_string())?;
+    let server = Server::start_with(
+        &dir,
+        Options {
+            step: plan.step,
+            ..Options::default()
+        },
+    )
+    .map_err(|e| e.to_string())?;
     let invite = Invite {
         address: server.local.to_string(),
         ..server.invite().clone()
