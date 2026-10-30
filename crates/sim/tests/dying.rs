@@ -3,6 +3,7 @@
 mod common;
 
 use common::*;
+use tme_sim::geom::{Rect, Shape};
 use tme_sim::world::{Event, Intent};
 use tme_sim::{BodyId, Dir, Refused, Side, Vec2};
 
@@ -198,4 +199,44 @@ fn a_beast_with_a_wall_between_it_and_you_finds_a_way_round() {
         |e| matches!(e, Event::Struck { target, .. } if *target == BodyId::Person(ALICE)),
     );
     assert!(struck.is_some(), "the beast gets round the wall");
+}
+
+#[test]
+fn a_beast_finds_a_new_way_when_you_step_round_a_post_while_it_comes() {
+    let mut cat = catalogue();
+    let field = cat.places.values_mut().next().unwrap();
+    // A long wall with the beast west of it and Alice east of it, by a
+    // post: the beast's way round the wall's north end ends short of the
+    // post's west side, where Alice is.
+    field.living = vec![
+        Shape::Box(Rect {
+            min: Vec2::new(0, -20_000),
+            max: Vec2::new(200, 6000),
+        }),
+        Shape::Circle {
+            centre: Vec2::new(4000, 0),
+            radius: 500,
+        },
+    ];
+    field.arrival = Vec2::new(3050, 0);
+    field.lairs[0].at = Vec2::new(-3000, 0);
+    let mut w = tme_sim::World::new(
+        std::sync::Arc::new(cat),
+        3,
+        tme_sim::world::Settings::default(),
+    );
+    join(&mut w, ALICE);
+    run(&mut w, 30);
+    // While it comes round, she steps round the post to its east side:
+    // never two metres from where she was, but out of reach of where the
+    // beast's way ends.
+    for at in [(3293, -707), (4000, -1000), (4707, -707), (4950, 0)] {
+        place(&mut w, ALICE, Vec2::new(at.0, at.1));
+    }
+    let struck = until(
+        &mut w,
+        1500,
+        |e| matches!(e, Event::Struck { target, .. } if *target == BodyId::Person(ALICE)),
+    );
+    assert!(struck.is_some(), "the beast comes round the post to her");
 }

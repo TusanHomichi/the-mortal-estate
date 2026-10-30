@@ -151,18 +151,28 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
             None if leashed => Some(home),
             None => None,
         };
-        let (held, swing_at) = match target {
-            Some(t) => {
-                let quarry = &state.people[&t].body;
-                let reach =
-                    kind.radius + catalogue.body(&quarry.kind).radius + kind.attack.reach * 3 / 4;
+        // What it's hunting, and how near it has to be to swing.
+        let quarry = target.map(|t| {
+            let quarry = &state.people[&t].body;
+            let reach =
+                kind.radius + catalogue.body(&quarry.kind).radius + kind.attack.reach * 3 / 4;
+            (quarry.at.pos, reach)
+        });
+        // Whether it could swing at its quarry from a spot; with nothing to
+        // hunt, anywhere will do.
+        let strikes = |from: Vec2| {
+            quarry.is_none_or(|(at, reach)| {
+                at.distance_sq(from) <= sq(reach)
+                    && place.unobstructed(creature.body.side, from, at)
+            })
+        };
+        let (held, swing_at) = match quarry {
+            Some((at, _)) => {
                 roam_to = None;
-                if quarry.at.pos.distance_sq(pos) <= sq(reach)
-                    && place.unobstructed(creature.body.side, pos, quarry.at.pos)
-                {
-                    (Dir::NONE, Some(Dir::toward(pos, quarry.at.pos)))
+                if strikes(pos) {
+                    (Dir::NONE, Some(Dir::toward(pos, at)))
                 } else {
-                    (Dir::toward(pos, quarry.at.pos), None)
+                    (Dir::toward(pos, at), None)
                 }
             }
             None if leashed => {
@@ -208,7 +218,15 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
                     path.clear();
                     path_to = None;
                 } else {
-                    if path.is_empty() || path_to.is_none_or(|p| p.distance_sq(g) > sq(REPATH)) {
+                    // A new way once where it's going has moved far, or
+                    // at all if the old way no longer ends somewhere it
+                    // could swing from. Until then, no new way: the same
+                    // search would find the same one.
+                    let stale = path_to.is_none_or(|p| {
+                        p.distance_sq(g) > sq(REPATH)
+                            || (p != g && !path.last().is_some_and(|end| strikes(*end)))
+                    });
+                    if stale {
                         path = grid.path(pos, g).unwrap_or_default();
                         path_to = Some(g);
                     }
@@ -217,9 +235,11 @@ pub fn think(catalogue: &Catalogue, state: &mut State, nav: &mut Nav, events: &m
                     {
                         path.remove(0);
                     }
-                    // A wanderer at the end of its way is as near where it
-                    // was going as a body gets.
-                    if path.len() == 1 && pos.distance_sq(path[0]) < sq(400) && target.is_none() {
+                    // At the end of its way: a wanderer is as near where it
+                    // was going as a body gets, and a hunter that can't
+                    // swing from there has nowhere nearer to go.
+                    let at_end = path.len() == 1 && pos.distance_sq(path[0]) < sq(400);
+                    if at_end && (quarry.is_none() || !strikes(path[0])) {
                         path.clear();
                     }
                     match path.first() {
