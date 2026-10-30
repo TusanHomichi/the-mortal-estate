@@ -88,17 +88,52 @@ impl fmt::Debug for Identity {
 }
 
 /// A new file at `path`, which must not exist yet, that only its owner can
-/// read or write, where the system has owners: from the moment it exists,
-/// whatever the umask.
+/// read or write from the moment it exists, whatever the umask or the
+/// folder it's in. Where that can't be promised, nothing is created.
 pub fn create_private(path: &Path) -> io::Result<fs::File> {
-    let mut options = fs::OpenOptions::new();
-    options.write(true).create_new(true);
     #[cfg(unix)]
     {
         use std::os::unix::fs::OpenOptionsExt;
-        options.mode(0o600);
+        fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(path)
     }
-    options.open(path)
+    #[cfg(not(unix))]
+    {
+        Err(not_private(path))
+    }
+}
+
+/// A new folder at `path` (and any missing above it) that only its owner
+/// can open, on the same terms as [`create_private`].
+pub fn create_private_dir(path: &Path) -> io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(path)
+    }
+    #[cfg(not(unix))]
+    {
+        Err(not_private(path))
+    }
+}
+
+/// Windows has no mode bits, and a new file there takes its folder's
+/// permissions; until it's given its own (#6), credentials aren't written.
+#[cfg(not(unix))]
+fn not_private(path: &Path) -> io::Error {
+    io::Error::new(
+        io::ErrorKind::Unsupported,
+        format!(
+            "{}: this system can't keep it private to its owner yet",
+            path.display()
+        ),
+    )
 }
 
 fn random_bytes() -> [u8; 32] {

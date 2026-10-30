@@ -11,7 +11,7 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use tme_sim::world::Settings;
-use tme_wire::{Identity, Invite, create_private};
+use tme_wire::{Identity, Invite, create_private, create_private_dir};
 
 /// `world.toml`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -84,15 +84,7 @@ impl Folder {
             .map_err(|p| FolderError(format!("the content doesn't compile:\n{p}")))?;
         // The folder holds the world's credentials: a new one is its host's
         // alone, and each credential's file is, wherever the folder is.
-        let mut folder = fs::DirBuilder::new();
-        folder.recursive(true);
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::DirBuilderExt;
-            folder.mode(0o700);
-        }
-        folder
-            .create(path)
+        create_private_dir(path)
             .map_err(|e| FolderError(format!("can't make {}: {e}", path.display())))?;
         let config = Config {
             name: new.name.to_owned(),

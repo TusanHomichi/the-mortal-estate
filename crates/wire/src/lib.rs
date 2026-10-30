@@ -17,7 +17,7 @@ pub mod session;
 mod view;
 
 pub use invite::{Invite, NotAnInvite};
-pub use keys::{Identity, PublicKey, create_private};
+pub use keys::{Identity, PublicKey, create_private, create_private_dir};
 pub use session::{Greeting, Hello};
 pub use view::{BodyView, You};
 

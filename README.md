@@ -36,7 +36,8 @@ cargo run -p tme-server -- run worlds/home
 `init` makes the world's folder: its settings and invite code (`world.toml`),
 its key (`world.key`, which never leaves the folder) and, once it runs, its
 journal and snapshots (`world.db`). Both credentials are readable by the host
-alone. `invite` prints the link to give the people you want in, and is the one
+alone; Windows can't promise that yet, so a world can't be made there until it
+can ([#6](https://github.com/TusanHomichi/the-mortal-estate/issues/6)). `invite` prints the link to give the people you want in, and is the one
 command that prints its code, so it stays out of a service's logs. The link
 names the world's key, and a connection is sealed end to end to that key, so
 nothing between a player and the world can read or change what they say. Someone
