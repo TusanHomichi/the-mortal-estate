@@ -14,9 +14,11 @@ use std::time::{Duration, Instant};
 use tme_link::{LinkError, join};
 use tme_server::folder::{Folder, NewWorld};
 use tme_server::{Options, Server};
-use tme_sim::catalogue::Catalogue;
+use tme_sim::catalogue::{Catalogue, Threshold};
+use tme_sim::geom::{METRE, Mm};
+use tme_sim::nav::{Grid, Nav};
 use tme_sim::rng::Rng;
-use tme_sim::{Dir, Event, Intent, Side, Vec2};
+use tme_sim::{Dir, Event, Intent, STEPS_PER_SECOND, Side, Vec2};
 use tme_wire::{Identity, Invite, ServerMsg, You};
 
 /// A run: how many bots, for how long, and how long the world's step lasts.
@@ -136,7 +138,7 @@ async fn play(
 ) -> Result<Tally, LinkError> {
     let (joined, mut tx, mut rx) =
         join(&invite, &Identity::generate(), &format!("Bot {n}")).await?;
-    let mut mind = Mind::new(n as u64, Instant::now());
+    let mut mind = Mind::new(n as u64, joined.step);
     let mut tally = Tally::default();
     let mut waiting: VecDeque<(u32, Instant)> = VecDeque::new();
     loop {
@@ -170,7 +172,7 @@ async fn play(
         if heard >= until || observation.you.action.is_some() {
             continue;
         }
-        if let Some(intent) = mind.next(&observation.you, &catalogue, heard) {
+        if let Some(intent) = mind.next(&observation.you, &catalogue, observation.step) {
             let seq = tx.act(intent).await?;
             waiting.push_back((seq, Instant::now()));
         }
@@ -191,90 +193,162 @@ fn answer(waiting: &mut VecDeque<(u32, Instant)>, seq: u32, at: Instant, tally: 
     }
 }
 
-/// What a bot means to do: walk somewhere at random, swing or dodge every
-/// few seconds, and when dead, make for the nearest threshold and use it.
+/// A second, in the world's steps.
+const SECOND: u64 = STEPS_PER_SECOND as u64;
+
+/// What a bot means to do: wander the place along ways it can walk, swing
+/// or dodge every few seconds, and when dead, walk the way to the nearest
+/// threshold it can reach and use it. It keeps time in the world's steps.
 struct Mind {
     rng: Rng,
-    /// Where it's walking, and when it gives up getting there.
-    going: Option<(Vec2, Instant)>,
-    /// When it next sets its course again, and next acts.
-    steer_at: Instant,
-    act_at: Instant,
+    nav: Nav,
+    /// The points still to walk through, and the step it gives up by.
+    route: Vec<Vec2>,
+    give_up: u64,
+    /// The side it planned its route on: dying, or turning up, plans anew.
+    side: Side,
+    /// Which way it's steering, and when it may next change that.
+    held: Dir,
+    steer_at: u64,
+    /// When it next swings, dodges or uses a threshold.
+    act_at: u64,
+    /// Where it was when it last checked it's getting anywhere, and when.
+    progress: (Vec2, u64),
 }
 
+/// How near a point on a route counts as reached.
+const REACHED: i64 = 400;
+/// How far it must have got in [`STUCK`] steps to be getting anywhere.
+const PROGRESS: i64 = 500;
+const STUCK: u64 = 2 * SECOND;
+
 impl Mind {
-    fn new(seed: u64, now: Instant) -> Mind {
+    fn new(seed: u64, step: u64) -> Mind {
         let mut rng = Rng::new(seed);
-        let act_at = now + Duration::from_millis(u64::from(1000 + rng.below(3000)));
+        let act_at = step + SECOND + u64::from(rng.below(3 * SECOND as u32));
         Mind {
             rng,
-            going: None,
-            steer_at: now,
+            nav: Nav::default(),
+            route: Vec::new(),
+            give_up: 0,
+            side: Side::Living,
+            held: Dir::NONE,
+            steer_at: step,
             act_at,
+            progress: (Vec2::ZERO, step),
         }
     }
 
-    fn next(&mut self, you: &You, catalogue: &Catalogue, now: Instant) -> Option<Intent> {
+    fn next(&mut self, you: &You, catalogue: &Catalogue, step: u64) -> Option<Intent> {
         let pos = you.body.pos;
+        let side = you.body.side;
         let place = catalogue.place(&you.body.place);
-        if you.body.side == Side::Lately {
-            let t = place
-                .thresholds
-                .iter()
-                .min_by_key(|t| t.at.distance_sq(pos))?;
-            if pos.distance_sq(t.at) <= i64::from(t.radius).pow(2) {
-                return self.act(now, Duration::from_secs(1), |_| Intent::Use);
+        let radius = catalogue.body(&you.body.kind).radius;
+        let grid = self.nav.grid(catalogue, &you.body.place, side, radius);
+        let stuck = step >= self.progress.1 + STUCK
+            && pos.distance_sq(self.progress.0) < PROGRESS * PROGRESS
+            && !self.route.is_empty();
+        if step >= self.progress.1 + STUCK {
+            self.progress = (pos, step);
+        }
+        if side != self.side || stuck || step >= self.give_up {
+            self.side = side;
+            self.route.clear();
+        }
+        if side == Side::Lately {
+            let within = |t: &&Threshold| pos.distance_sq(t.at) <= i64::from(t.radius).pow(2);
+            if place.thresholds.iter().any(|t| within(&t)) {
+                return act(&mut self.act_at, step, SECOND, || Intent::Use);
             }
-            return self.steer(now, Dir::toward(pos, t.at));
-        }
-        let wait = Duration::from_millis(u64::from(1000 + self.rng.below(3000)));
-        if let Some(swing) = self.act(now, wait, |rng| {
-            let u = i32::from(Dir::UNIT);
-            let way = Dir::new(rng.spread(u), rng.spread(u));
-            if rng.below(4) == 0 {
-                Intent::Dodge(way)
-            } else {
-                Intent::Attack(way)
+            if self.route.is_empty() {
+                // The nearest threshold by the way there, not as the crow
+                // flies; stuck on the way, a step aside first.
+                let way = if stuck {
+                    None
+                } else {
+                    place
+                        .thresholds
+                        .iter()
+                        .filter_map(|t| grid.path(pos, t.at))
+                        .min_by_key(|way| length(pos, way))
+                };
+                self.route = match way {
+                    Some(way) => way,
+                    None => wander(&mut self.rng, grid, pos, 5 * METRE)?,
+                };
+                self.give_up = step + 60 * SECOND;
             }
-        }) {
-            return Some(swing);
+        } else {
+            let swing = act(&mut self.act_at, step, SECOND, || ());
+            if swing.is_some() {
+                self.act_at += u64::from(self.rng.below(3 * SECOND as u32));
+                let u = i32::from(Dir::UNIT);
+                let way = Dir::new(self.rng.spread(u), self.rng.spread(u));
+                return Some(if self.rng.below(4) == 0 {
+                    Intent::Dodge(way)
+                } else {
+                    Intent::Attack(way)
+                });
+            }
+            if self.route.is_empty() {
+                let b = place.bounds;
+                let far = (b.max.x - b.min.x).max(b.max.y - b.min.y);
+                self.route = wander(&mut self.rng, grid, pos, far)?;
+                self.give_up = step + 20 * SECOND;
+            }
         }
-        let there = |(to, by): (Vec2, Instant)| pos.distance_sq(to) < 1_000_000 || now >= by;
-        if self.going.is_none_or(there) {
-            let b = place.bounds;
-            let to = Vec2::new(
-                (b.min.x + b.max.x) / 2 + self.rng.spread((b.max.x - b.min.x) / 2),
-                (b.min.y + b.max.y) / 2 + self.rng.spread((b.max.y - b.min.y) / 2),
-            );
-            self.going = Some((to, now + Duration::from_secs(15)));
-            self.steer_at = now;
+        // Walk to the furthest of the next few points in a clear line.
+        while self
+            .route
+            .first()
+            .is_some_and(|p| pos.distance_sq(*p) < REACHED * REACHED)
+        {
+            self.route.remove(0);
         }
-        let (to, _) = self.going?;
-        self.steer(now, Dir::toward(pos, to))
-    }
-
-    /// Set course, at most once a second.
-    fn steer(&mut self, now: Instant, way: Dir) -> Option<Intent> {
-        if now < self.steer_at {
+        if let Some(ahead) = (1..self.route.len().min(8))
+            .rev()
+            .find(|i| grid.clear(pos, self.route[*i]))
+        {
+            self.route.drain(..ahead);
+        }
+        let way = self
+            .route
+            .first()
+            .map_or(Dir::NONE, |p| Dir::toward(pos, *p));
+        if way == self.held || step < self.steer_at {
             return None;
         }
-        self.steer_at = now + Duration::from_secs(1);
+        self.held = way;
+        self.steer_at = step + 2;
         Some(Intent::Move(way))
     }
+}
 
-    /// Do something, if it's time, and not again for `wait`.
-    fn act(
-        &mut self,
-        now: Instant,
-        wait: Duration,
-        what: impl FnOnce(&mut Rng) -> Intent,
-    ) -> Option<Intent> {
-        if now < self.act_at {
-            return None;
-        }
-        self.act_at = now + wait;
-        Some(what(&mut self.rng))
+/// `what`, if it's time, and not again for `wait` steps.
+fn act<T>(at: &mut u64, step: u64, wait: u64, what: impl FnOnce() -> T) -> Option<T> {
+    if step < *at {
+        return None;
     }
+    *at = step + wait;
+    Some(what())
+}
+
+/// The way to somewhere random within `within` of `pos` that can be
+/// reached; `None` if nowhere tried can be.
+fn wander(rng: &mut Rng, grid: &Grid, pos: Vec2, within: Mm) -> Option<Vec<Vec2>> {
+    (0..8).find_map(|_| {
+        let to = pos + Vec2::new(rng.spread(within), rng.spread(within));
+        grid.path(pos, to)
+    })
+}
+
+/// How far it is from `from` along `way`.
+fn length(from: Vec2, way: &[Vec2]) -> i64 {
+    std::iter::once(from)
+        .chain(way.iter().copied())
+        .zip(way.iter().copied())
+        .map(|(a, b)| (b - a).length())
+        .sum()
 }
 
 /// The value `share` of the way through `sorted`.
@@ -326,5 +400,65 @@ impl fmt::Display for Report {
             writeln!(f, "a bot failed: {why}")?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tme_sim::world::{Input, Settings};
+    use tme_sim::{PersonId, World};
+
+    const WREN: PersonId = PersonId(1);
+
+    /// Wren, dead at `at` in Lately, guided by a bot's mind: the step she
+    /// turned up on, if she did within a minute and a half.
+    fn turns_up_from(catalogue: &Arc<Catalogue>, at: Vec2) -> Result<u64, Vec2> {
+        let mut world = World::new(Arc::clone(catalogue), 7, Settings::default());
+        let join = Input::Join {
+            person: WREN,
+            name: "Wren".into(),
+        };
+        world.apply(&join).expect("joins");
+        let mut state = world.state().clone();
+        let wren = state.people.get_mut(&WREN).expect("here");
+        wren.body.side = Side::Lately;
+        wren.body.at.pos = at;
+        let mut world = World::load(Arc::clone(catalogue), state).expect("fits");
+        let mut mind = Mind::new(1, world.step_count());
+        for _ in 0..90 * SECOND {
+            let you = You::of(&world, WREN).expect("here");
+            if you.action.is_none()
+                && let Some(intent) = mind.next(&you, catalogue, world.step_count())
+            {
+                let _ = world.apply(&Input::Act {
+                    person: WREN,
+                    intent,
+                });
+            }
+            world.step();
+            if world
+                .take_events()
+                .iter()
+                .any(|e| matches!(e, Event::TurnedUp { person, .. } if *person == WREN))
+            {
+                return Ok(world.step_count());
+            }
+        }
+        Err(You::of(&world, WREN).expect("here").body.pos)
+    }
+
+    #[test]
+    fn a_dead_bot_walks_round_walls_to_a_threshold_and_turns_up() {
+        let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+        let catalogue = Arc::new(tme_content::load(&content).expect("content").catalogue);
+        let m = |x: i32, y: i32| Vec2::new(x * METRE, y * METRE);
+        // The middle of the old hall and its far corner, whose only door
+        // faces away from the threshold; behind the stage; the map's corners.
+        for at in [m(17, 9), m(21, 13), m(-25, -14), m(30, -22), m(-30, 22)] {
+            if let Err(stopped) = turns_up_from(&catalogue, at) {
+                panic!("dead at {at:?}, never turned up: stopped at {stopped:?}");
+            }
+        }
     }
 }
