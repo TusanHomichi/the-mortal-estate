@@ -1,0 +1,11 @@
+[package]
+name = "tme-models"
+description = "Models the kits don't have, generated: run it to rewrite assets/models/generated/"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

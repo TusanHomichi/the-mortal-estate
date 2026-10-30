@@ -11,7 +11,7 @@ bounds = [[-32.0, -24.0], [32.0, 24.0]]
 arrival = [-14.0, -3.0]
 
 [ground]
-living = "#6f7b47"
+living = "#5b8a46"
 lately = "#3f6461"
 
 # The arch by the graves, where the two sides touch.
