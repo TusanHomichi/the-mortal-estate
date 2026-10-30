@@ -1,0 +1,7 @@
+# Nix build results.
+result
+result-*
+
+# Machine-local agent notes, model choices included. The house style keeps
+# model names out of tracked files; CLAUDE.md imports AGENTS.md only.
+CLAUDE.local.md
