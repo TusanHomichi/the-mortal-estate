@@ -126,17 +126,16 @@ impl Folder {
                 toml_path.display()
             ))
         })?;
-        // Not the error's own text: it quotes the line, which can be the
-        // invite code.
+        // Where, never what: the parser's own words can quote the line or
+        // the value it didn't expect, and either can be the invite code.
         let config: Config = toml::from_str(&text).map_err(|e| {
             let line = e
                 .span()
                 .map(|s| format!(" on line {}", text[..s.start].lines().count().max(1)));
             FolderError(format!(
-                "{}{}: {}",
+                "{}{}: a setting is missing, misspelled, or not the kind of value it should be",
                 toml_path.display(),
                 line.unwrap_or_default(),
-                e.message()
             ))
         })?;
         let identity = Identity::load(&path.join("world.key"))

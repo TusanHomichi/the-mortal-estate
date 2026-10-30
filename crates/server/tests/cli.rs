@@ -79,12 +79,39 @@ fn a_damaged_world_toml_is_reported_without_its_invite_code() {
     let (_, code) = init(&dir);
     let path = dir.join("world.toml");
     let text = std::fs::read_to_string(&path).unwrap();
-    let broken = text.replace(&format!("\"{code}\""), &format!("\"{code}"));
-    std::fs::write(&path, broken).unwrap();
-    let out = server().arg("run").arg(&dir).output().unwrap();
-    assert!(!out.status.success());
-    let said = printed(&out);
-    assert!(said.contains("world.toml"), "says where: {said}");
-    assert!(!said.contains(&code), "the error quoted it: {said}");
+    let invite = format!("invite = \"{code}\"");
+    assert!(text.contains(&invite) && text.contains("harm_between_players = false"));
+    // A code of digits, which a host might write without quotes.
+    let digits = "31415926535897";
+    let damages = [
+        // A quote missing, so the line can't be read.
+        (
+            text.replace(&invite, &format!("invite = \"{code}")),
+            code.as_str(),
+        ),
+        // A number where words go.
+        (text.replace(&invite, &format!("invite = {digits}")), digits),
+        // Words where a yes or no goes.
+        (
+            text.replace(
+                "harm_between_players = false",
+                &format!("harm_between_players = \"{code}\""),
+            ),
+            code.as_str(),
+        ),
+        // A code under a name the world doesn't know.
+        (
+            text.replace(&invite, &format!("invite_code = \"{code}\"")),
+            code.as_str(),
+        ),
+    ];
+    for (broken, secret) in damages {
+        std::fs::write(&path, &broken).unwrap();
+        let out = server().arg("run").arg(&dir).output().unwrap();
+        assert!(!out.status.success(), "{broken}");
+        let said = printed(&out);
+        assert!(said.contains("world.toml"), "says where: {said}");
+        assert!(!said.contains(secret), "the error quoted it: {said}");
+    }
     std::fs::remove_dir_all(&dir).unwrap();
 }
