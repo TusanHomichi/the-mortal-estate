@@ -62,8 +62,12 @@ One Cargo workspace in `crates/`: `sim` is the rules and the world they run
 (plain Rust, no engine in it), `content` compiles `content/` into what the
 simulation runs on, `wire` is what the server and its clients say to each
 other, `server` hosts a world, `link` is a client's side of the
-connection, and `bots` measures a hosted world under headless players.
-`nix flake check` is the gate, the same locally and in CI:
+connection, `bots` measures a hosted world under headless players, `client`
+is the game a player runs (Bevy, pinned to one release) and `models` writes
+the generated models into `assets/models/generated/` (a test fails when the
+committed ones are stale; `cargo run -p tme-models` writes them). The client
+links udev and Wayland: on a distro, their development packages and
+pkg-config. `nix flake check` is the gate, the same locally and in CI:
 rustfmt, clippy on all targets with warnings as errors, and the workspace's
 tests, on the toolchain `rust-toolchain.toml` pins; and lychee, offline, over
 every Markdown file, so every local link and `#fragment` must resolve. Plain

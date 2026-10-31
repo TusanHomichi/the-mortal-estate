@@ -23,7 +23,8 @@ started fresh on 2026-10-30; [docs/DESIGN.md](docs/DESIGN.md) is the spec. The
 rules and the world are tested headless: free movement, committed attacks,
 the dun, dying into Lately and turning up again, on one small map. A server
 hosts a world over the network, by invite, and keeps it through a restart,
-and a bot harness measures what it costs. The client comes next.
+and a bot harness measures what it costs. The client plays it in the Lantern
+look.
 
 ## Hosting a world
 
@@ -48,6 +49,21 @@ and if it can't save what's played it stops rather than carry on unsaved.
 `world.toml` is read at each start: its settings, and new content the saved
 world fits, apply from then on, while what was already played keeps the
 content it was played on.
+
+## Playing
+
+```sh
+cargo run --release -p tme-client -- 'tme://HOST:7420/…?invite=…' --name Wren
+```
+
+The link is the one its host gave you. The first time, the client makes your
+key, which is who you are in every world, and keeps it with your other files
+(`~/.local/share/the-mortal-estate` on Linux), where only you can read it;
+like a world, a key can't be made on Windows until
+[#6](https://github.com/TusanHomichi/the-mortal-estate/issues/6). Move with WASD or a stick,
+swing with the mouse or J toward the cursor, dodge with space, and use what's
+in front of you with E. T turns the tilt-shift blur off and on; `--band`
+sets how much of the screen it keeps sharp.
 
 ## Measuring a world
 

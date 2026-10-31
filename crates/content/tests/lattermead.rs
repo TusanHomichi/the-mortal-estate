@@ -21,6 +21,16 @@ fn world() -> World {
     w
 }
 
+#[test]
+fn every_model_the_content_names_is_in_the_assets() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let content = tme_content::load(&root.join("content")).expect("content/ compiles");
+    assert_eq!(
+        tme_content::missing_models(&content, &root.join("assets/models")),
+        Vec::<String>::new()
+    );
+}
+
 fn pos(w: &World) -> Vec2 {
     w.person(ME).unwrap().body.at.pos
 }

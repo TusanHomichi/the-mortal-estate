@@ -11,7 +11,15 @@
     { self, burrow }:
     burrow.lib.project {
       inherit self;
-      rust = { };
+      # The client links udev (gamepads) and Wayland, which its build
+      # scripts find with pkg-config.
+      rust = {
+        nativeBuildInputs = pkgs: [ pkgs.pkg-config ];
+        buildInputs = pkgs: [
+          pkgs.udev
+          pkgs.wayland
+        ];
+      };
       packages = pkgs: [ pkgs.lychee ];
       checks = pkgs: {
         # lychee, offline, over every Markdown file. External links aren't

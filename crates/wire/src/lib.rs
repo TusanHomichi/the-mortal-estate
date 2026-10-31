@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use tme_sim::world::{Event, Intent, PersonId, Refused, Settings};
 
 /// This contract's version. A world and a client that differ don't talk.
-pub const PROTOCOL: u16 = 2;
+pub const PROTOCOL: u16 = 3;
 
 /// What the client says as it finishes the handshake.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

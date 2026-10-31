@@ -16,6 +16,10 @@ tme-content = { path = "crates/content" }
 tme-wire = { path = "crates/wire" }
 tme-link = { path = "crates/link" }
 tme-server = { path = "crates/server" }
+tme-client = { path = "crates/client" }
+# Pinned to one release, upgraded when we choose (renovate.json holds it).
+# No audio yet, so no ALSA to link.
+bevy = { version = "0.20.1", default-features = false, features = ["3d", "ui"] }
 clap = { version = "4", features = ["derive"] }
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 getrandom = "0.4"

@@ -70,6 +70,9 @@ pub struct You {
     pub deaths: u32,
     /// What they're committed to, if anything.
     pub action: Option<Action>,
+    /// The way the world holds them steering. It can let go of a steer on
+    /// its own (dying does), so a client can't take its last one as held.
+    pub held: Dir,
     /// Whether the dead show clearly to them.
     pub sees_lately: bool,
 }
@@ -82,6 +85,7 @@ impl You {
             tardies: person.tardies.clone(),
             deaths: person.deaths,
             action: person.body.action.clone(),
+            held: person.body.held,
             sees_lately: body::sees_lately(world.catalogue(), &person.tardies),
         })
     }
