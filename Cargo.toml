@@ -23,7 +23,8 @@ bevy = { version = "0.20.1", default-features = false, features = ["3d", "ui"] }
 clap = { version = "4", features = ["derive"] }
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 getrandom = "0.4"
-postcard = { version = "1", features = ["use-std"] }
+# No heapless: its CAS feature pulls in the unmaintained atomic-polyfill, and we only encode to Vec.
+postcard = { version = "1", default-features = false, features = ["use-std"] }
 rusqlite = { version = "0.41", features = ["bundled"] }
 snow = "0.10"
 socket2 = "0.6"
