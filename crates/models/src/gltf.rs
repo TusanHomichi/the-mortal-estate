@@ -28,6 +28,8 @@ impl Part {
         }
     }
 
+    /// A face, its corners counter-clockwise as seen from the side it
+    /// faces: the side that's drawn and lit.
     fn triangle(&mut self, a: V, b: V, c: V) {
         self.corners.extend([a, b, c]);
     }
@@ -63,8 +65,8 @@ impl Part {
         let ring = ring(from, to, radius, sides);
         for i in 0..sides as usize {
             let (a, b) = (ring[i], ring[(i + 1) % ring.len()]);
-            self.triangle(a, to, b);
-            self.triangle(a, b, from);
+            self.triangle(a, b, to);
+            self.triangle(b, a, from);
         }
     }
 
@@ -74,15 +76,16 @@ impl Part {
         let high: Vec<V> = low.iter().map(|p| add(*p, sub(to, from))).collect();
         for i in 0..sides as usize {
             let j = (i + 1) % low.len();
-            self.triangle(low[i], high[i], low[j]);
-            self.triangle(low[j], high[i], high[j]);
-            self.triangle(low[j], from, low[i]);
-            self.triangle(high[i], to, high[j]);
+            self.triangle(low[i], low[j], high[i]);
+            self.triangle(low[j], high[j], high[i]);
+            self.triangle(low[i], from, low[j]);
+            self.triangle(high[j], to, high[i]);
         }
     }
 }
 
-/// Points round the axis from `from` to `to`, at `from`.
+/// Points round the axis from `from` to `to`, at `from`, counter-clockwise
+/// as seen from `to`.
 fn ring(from: V, to: V, radius: f32, sides: u32) -> Vec<V> {
     let axis = normal(sub(to, from));
     let other = if axis[1].abs() < 0.9 {
@@ -244,12 +247,47 @@ fn base64(bytes: &[u8]) -> String {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    /// Whether every face of `part`, a solid that bulges everywhere, faces
+    /// away from its middle.
+    fn faces_out(part: &Part) -> bool {
+        let n = part.corners.len() as f32;
+        let middle = part
+            .corners
+            .iter()
+            .fold([0.0; 3], |m, c| add(m, scale(*c, 1.0 / n)));
+        part.corners.chunks(3).all(|t| {
+            let facing = cross(sub(t[1], t[0]), sub(t[2], t[0]));
+            let centre = scale(add(add(t[0], t[1]), t[2]), 1.0 / 3.0);
+            let away = sub(centre, middle);
+            facing[0] * away[0] + facing[1] * away[1] + facing[2] * away[2] > 0.0
+        })
+    }
+
+    #[test]
+    fn every_solid_faces_out() {
+        let part = || Part::new("test", [1.0; 3], 1.0, [0.0; 3]);
+        let mut egg = part();
+        egg.ellipsoid([0.0, 0.5, 0.0], [0.4, 0.3, 0.6], 9, 5);
+        assert!(faces_out(&egg), "an ellipsoid");
+        // Up, and leaning over: the ring's axis is found two ways.
+        for to in [[0.1, 1.0, 0.0], [1.0, 0.2, -0.3]] {
+            let mut spike = part();
+            spike.spike([0.0; 3], to, 0.1, 4);
+            assert!(faces_out(&spike), "a spike to {to:?}");
+            let mut post = part();
+            post.post([0.0; 3], to, 0.1, 5);
+            assert!(faces_out(&post), "a post to {to:?}");
+        }
+    }
+
     #[test]
     fn base64_matches_the_standard() {
-        assert_eq!(super::base64(b""), "");
-        assert_eq!(super::base64(b"f"), "Zg==");
-        assert_eq!(super::base64(b"fo"), "Zm8=");
-        assert_eq!(super::base64(b"foo"), "Zm9v");
-        assert_eq!(super::base64(b"foobar"), "Zm9vYmFy");
+        assert_eq!(base64(b""), "");
+        assert_eq!(base64(b"f"), "Zg==");
+        assert_eq!(base64(b"fo"), "Zm8=");
+        assert_eq!(base64(b"foo"), "Zm9v");
+        assert_eq!(base64(b"foobar"), "Zm9vYmFy");
     }
 }
