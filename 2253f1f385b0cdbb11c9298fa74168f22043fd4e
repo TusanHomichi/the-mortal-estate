@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "714t619cp09j5wqrzff1aet557",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 7,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/7",
+  "summary": "client: play a world in the Lantern look",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qCxGL2zP73hXMnvwGm1Rwdo",
+  "author": {
+    "kind": "agent",
+    "login": "TusanHomichi",
+    "session": "https://claude.ai/code/session_01BkHcyCKefQXXXn7Xm9h8C1"
+  },
+  "landing": {
+    "revision": "7941ecafdd8a2bd9aa2ec33ae946906d52765b8f188ea467a690e9f2e3f11be3",
+    "before": "fd3c9810b84083e93ff65fbd5243d300e0c17851",
+    "after": "2253f1f385b0cdbb11c9298fa74168f22043fd4e",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793430251440
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41149471207/job/124382277541"
+    },
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41149471207/job/124382277266"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/7#pullrequestreview-5720123286"
+    }
+  ]
+}
