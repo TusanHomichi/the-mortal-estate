@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "7243pky0ecrs4dhzd44fjw5f1z",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 18,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/18",
+  "summary": "deps: lock file maintenance (nix)",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "e5a240cdc41549be0a1e3e25cde20974cd64cbd57dd94250d876614b8b66f9a1",
+    "before": "0e403bc2d0391abe404be02c7cbe657edd238327",
+    "after": "314226863a89debe53a43fbf6ef64111d49919b7",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793436022128
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41184452111/job/124488374407"
+    },
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41184452111/job/124488374717"
+    }
+  ]
+}
