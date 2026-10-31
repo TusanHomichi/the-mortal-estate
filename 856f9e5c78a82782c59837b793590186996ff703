@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "1ersz37762g2xpwzvs7pdwgj7m",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 4,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/4",
+  "summary": "server: host a world by invite, keep it through a restart, and measure it",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qCxGL2zP73hXMnvwGm1Rwdo",
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "8f6d8778d3db731095e918ccc5d94cd3818684effdf78de453b4e8e84410f886",
+    "before": "d2b9aa6f547c99a53194ad4cb37cd32d3a28bb3c",
+    "after": "856f9e5c78a82782c59837b793590186996ff703",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793404951820
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41144195762/job/124365311598"
+    },
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41144195762/job/124365311349"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/4#pullrequestreview-5719776247"
+    }
+  ]
+}
