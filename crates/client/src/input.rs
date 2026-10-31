@@ -101,25 +101,21 @@ fn act(
     }
     let now = time.elapsed_secs_f64();
     let pad = |b: GamepadButton| pads.iter().any(|p| p.just_pressed(b));
-    let aim = || {
-        for p in &pads {
-            let stick = p.right_stick();
-            if stick.length() > DEAD_ZONE {
-                return dir(stick.normalize());
+    let pad_swung = pad(GamepadButton::South) || pad(GamepadButton::RightTrigger2);
+    if let Some(hand) = swung(&mouse, &keys, pad_swung) {
+        let aim = match hand {
+            Hand::Cursor => {
+                let (camera, at) = *camera;
+                cursor_on_ground(&window, camera, at).map(|target| Dir::toward(me.pos, target))
             }
-        }
-        let (camera, at) = *camera;
-        cursor_on_ground(&window, camera, at)
-            .filter(|_| mouse.just_pressed(MouseButton::Left))
-            .map_or(Dir::NONE, |target| Dir::toward(me.pos, target))
-    };
-    if mouse.just_pressed(MouseButton::Left)
-        || keys.just_pressed(KeyCode::KeyJ)
-        || pad(GamepadButton::South)
-        || pad(GamepadButton::RightTrigger2)
-    {
-        let aim = aim();
-        me.commit(Intent::Attack(aim), &mut net, now);
+            Hand::Stick => pads
+                .iter()
+                .map(|p| p.right_stick())
+                .find(|stick| stick.length() > DEAD_ZONE)
+                .map(|stick| dir(stick.normalize())),
+        };
+        // Pointing nowhere, a swing goes the way the body faces.
+        me.commit(Intent::Attack(aim.unwrap_or(Dir::NONE)), &mut net, now);
     } else if mouse.just_pressed(MouseButton::Right)
         || keys.just_pressed(KeyCode::Space)
         || pad(GamepadButton::East)
@@ -128,6 +124,30 @@ fn act(
         me.commit(Intent::Dodge(way), &mut net, now);
     } else if keys.just_pressed(KeyCode::KeyE) || pad(GamepadButton::West) {
         me.commit(Intent::Use, &mut net, now);
+    }
+}
+
+/// What a swing is aimed with.
+#[derive(Debug, PartialEq)]
+enum Hand {
+    /// The mouse or the keys: at the cursor.
+    Cursor,
+    /// A gamepad: with its right stick.
+    Stick,
+}
+
+/// The hand that just swung, if one did.
+fn swung(
+    mouse: &ButtonInput<MouseButton>,
+    keys: &ButtonInput<KeyCode>,
+    pad_swung: bool,
+) -> Option<Hand> {
+    if mouse.just_pressed(MouseButton::Left) || keys.just_pressed(KeyCode::KeyJ) {
+        Some(Hand::Cursor)
+    } else if pad_swung {
+        Some(Hand::Stick)
+    } else {
+        None
     }
 }
 
@@ -141,5 +161,23 @@ fn settings(
     }
     if keys.just_pressed(KeyCode::Escape) {
         exit.write(AppExit::Success);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_mouse_and_the_keys_swing_at_the_cursor_and_a_gamepad_with_its_stick() {
+        let (no_mouse, no_keys) = (ButtonInput::default(), ButtonInput::default());
+        let mut clicked = ButtonInput::default();
+        clicked.press(MouseButton::Left);
+        let mut j = ButtonInput::default();
+        j.press(KeyCode::KeyJ);
+        assert_eq!(swung(&clicked, &no_keys, false), Some(Hand::Cursor));
+        assert_eq!(swung(&no_mouse, &j, false), Some(Hand::Cursor));
+        assert_eq!(swung(&no_mouse, &no_keys, true), Some(Hand::Stick));
+        assert_eq!(swung(&no_mouse, &no_keys, false), None);
     }
 }
