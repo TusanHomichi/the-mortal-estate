@@ -8,3 +8,10 @@ CLAUDE.local.md
 
 # Cargo build output.
 /target
+
+# Editor files.
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
