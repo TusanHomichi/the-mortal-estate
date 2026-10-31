@@ -1,0 +1,47 @@
+{
+  "conary": "note v1",
+  "change": "7rp6qcnh93pqnzc94xf08hzmwy",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 28,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/28",
+  "summary": "wire: drop postcard's heapless default to remove atomic-polyfill",
+  "task": null,
+  "author": {
+    "kind": "bot",
+    "login": "fieldmouseworks-workers[bot]",
+    "session": null
+  },
+  "landing": {
+    "revision": "78ed96e12b5090c305081929ec4904a6ed159bc493b0c5a39553352145e58cc8",
+    "before": "ca2b2bdbe021e40b98f71832c0add89943264d21",
+    "after": "9cd625f903028ed6040692433a7846acd6dd32a9",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793450236512
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41200743773/job/124535875554"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41200743773/job/124535875910"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/28#pullrequestreview-5722698816"
+    }
+  ]
+}
