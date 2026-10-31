@@ -1,0 +1,59 @@
+{
+  "conary": "note v1",
+  "change": "5n6e6htmdbf6tjtnse2en4mt8j",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 29,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/29",
+  "summary": "ci: run the flake gate again when a PR's base changes",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8q44tUrWuRekRs3fR3f6j9A6",
+  "author": {
+    "kind": "agent",
+    "login": "TusanHomichi",
+    "session": "https://claude.ai/code/session_01BkHcyEnVW8sqvYR8o1Cd9h"
+  },
+  "landing": {
+    "revision": "1282743b623479592c28350977687b53c063cc021a92a3d9a9fcb3560a6d5d0e",
+    "before": "9cd625f903028ed6040692433a7846acd6dd32a9",
+    "after": "c784379e51aebda91ac696c5f73020df8782a279",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793458750256
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41211943607/job/124568588030"
+    },
+    {
+      "kind": "ci",
+      "check": "rust-first / python",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41211943589/job/124568587523"
+    },
+    {
+      "kind": "ci",
+      "check": "rust-first (#29)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41211943589"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41211943607/job/124568588204"
+    },
+    {
+      "kind": "review",
+      "check": "codex",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/pull/29#pullrequestreview-5723412981"
+    }
+  ]
+}
