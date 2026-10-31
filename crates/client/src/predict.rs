@@ -30,8 +30,10 @@ pub struct Me {
     pub shown: Vec3,
     /// Which way it's drawn facing.
     pub facing: Dir,
-    /// The way the player is steering.
+    /// The way the player is steering, as far as the world knows.
     held: Dir,
+    /// The last steer sent, by its number.
+    moved: u32,
     /// What each step walked here did, newest last: replayed from the
     /// world's word when it comes.
     walked: VecDeque<Dir>,
@@ -56,13 +58,14 @@ const SNAP: i64 = 2 * METRE as i64;
 const KEPT: usize = 40;
 
 impl Me {
-    /// Steer: sent only when it changes.
+    /// Steer: sent only when it isn't the way the world holds.
     pub fn steer(&mut self, dir: Dir, net: &mut Net, now: f64) {
         if dir == self.held {
             return;
         }
         self.held = dir;
         let seq = net.act(Intent::Move(dir));
+        self.moved = seq;
         self.time(seq, now);
     }
 
@@ -116,6 +119,12 @@ fn reconcile(mut me: ResMut<Me>, seen: Res<Seen>, content: Res<Content>, time: R
     }
     if me.pending.is_some_and(|seq| seen.ack >= seq) {
         me.pending = None;
+    }
+    // Once the world has every steer sent, the way it holds is the way the
+    // body goes. If it let go of one (dying does), the keys' way differs and
+    // goes again.
+    if seen.ack >= me.moved {
+        me.held = you.held;
     }
     let body = &you.body;
     if you.action.is_some() || !me.known {
@@ -189,4 +198,112 @@ fn show(mut me: ResMut<Me>, time: Res<Time>) {
     let keep = (-time.delta_secs() * 12.0).exp();
     me.offset *= keep;
     me.shown = ground(me.pos) + me.offset;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use bevy::ecs::system::RunSystemOnce;
+    use std::path::Path;
+    use std::sync::Arc;
+    use tme_sim::world::{Input, PersonId, Settings};
+    use tme_wire::You;
+    use tokio::sync::mpsc::UnboundedReceiver;
+
+    const ME: PersonId = PersonId(1);
+
+    /// A client that has joined Lattermead, and what it sends.
+    struct Client {
+        app: World,
+        net: Net,
+        sent: UnboundedReceiver<Intent>,
+        /// The player as the world first shows them.
+        you: You,
+    }
+
+    impl Client {
+        fn new() -> Client {
+            let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+            let content = tme_content::load(&dir).expect("content/ compiles");
+            let catalogue = Arc::new(content.catalogue.clone());
+            let mut world = tme_sim::World::new(catalogue, 1, Settings::default());
+            world
+                .apply(&Input::Join {
+                    person: ME,
+                    name: "Me".into(),
+                })
+                .unwrap();
+            let you = You::of(&world, ME).unwrap();
+            let mut app = World::new();
+            app.insert_resource(Content(Arc::new(content)));
+            app.init_resource::<Seen>();
+            app.init_resource::<Me>();
+            app.insert_resource(Time::<()>::default());
+            let (net, sent) = Net::offline();
+            Client {
+                app,
+                net,
+                sent,
+                you,
+            }
+        }
+
+        fn steer(&mut self, dir: Dir) {
+            self.app.resource_mut::<Me>().steer(dir, &mut self.net, 0.0);
+        }
+
+        /// The world says it has applied intents up to `ack` and holds the
+        /// player steering `held`.
+        fn observe(&mut self, ack: u32, held: Dir) {
+            let mut seen = self.app.resource_mut::<Seen>();
+            seen.step += 1;
+            seen.ack = ack;
+            seen.you = Some(You {
+                held,
+                ..self.you.clone()
+            });
+            self.app.run_system_once(reconcile).unwrap();
+        }
+
+        fn sent(&mut self) -> Vec<Intent> {
+            std::iter::from_fn(|| self.sent.try_recv().ok()).collect()
+        }
+    }
+
+    #[test]
+    fn a_steer_the_world_lets_go_of_is_sent_again() {
+        let mut client = Client::new();
+        client.steer(Dir::NORTH);
+        client.observe(1, Dir::NORTH);
+        client.steer(Dir::NORTH);
+        assert_eq!(client.sent(), [Intent::Move(Dir::NORTH)]);
+        // The player dies with the key still down: the world lets go.
+        client.observe(1, Dir::NONE);
+        assert_eq!(client.app.resource::<Me>().held, Dir::NONE, "walks on");
+        client.steer(Dir::NORTH);
+        assert_eq!(client.sent(), [Intent::Move(Dir::NORTH)]);
+        // Let go of in turn, nothing more needs saying.
+        client.observe(2, Dir::NORTH);
+        client.steer(Dir::NONE);
+        client.observe(3, Dir::NONE);
+        client.steer(Dir::NONE);
+        assert_eq!(client.sent(), [Intent::Move(Dir::NONE)]);
+    }
+
+    #[test]
+    fn a_steer_on_its_way_is_not_taken_back() {
+        let east = Dir::new(Dir::UNIT.into(), 0);
+        let mut client = Client::new();
+        client.steer(Dir::NORTH);
+        client.steer(east);
+        // The world has only the first.
+        client.observe(1, Dir::NORTH);
+        client.steer(east);
+        client.observe(2, east);
+        client.steer(east);
+        assert_eq!(
+            client.sent(),
+            [Intent::Move(Dir::NORTH), Intent::Move(east)]
+        );
+    }
 }

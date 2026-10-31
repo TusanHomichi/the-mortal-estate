@@ -40,6 +40,25 @@ impl Net {
         let inbox = self.inbox.lock().expect("the inbox isn't poisoned");
         inbox.try_iter().collect()
     }
+
+    /// A connection to no world, as person 1, and what's sent on it.
+    #[cfg(test)]
+    pub fn offline() -> (Net, async_mpsc::UnboundedReceiver<Intent>) {
+        let (intents, sent) = async_mpsc::unbounded_channel();
+        let joined = Joined {
+            world: "Nowhere".into(),
+            you: tme_sim::PersonId(1),
+            step: 0,
+            settings: tme_sim::world::Settings::default(),
+        };
+        let net = Net {
+            joined,
+            intents,
+            inbox: Mutex::new(mpsc::channel().1),
+            sent: 0,
+        };
+        (net, sent)
+    }
 }
 
 /// Join the world `invite` names, and keep talking to it on its own thread.
