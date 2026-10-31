@@ -1,0 +1,41 @@
+{
+  "conary": "note v1",
+  "change": "4p6288751299n1hxkpha7qv3gb",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 14,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/14",
+  "summary": "chore: update fieldmouseworks/burrow digest to c4aeb5e",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "9404522988c88557fc2bb143d4ea227d5da19558486deaf7026cc00fb1d515f5",
+    "before": "2253f1f385b0cdbb11c9298fa74168f22043fd4e",
+    "after": "16919cd03db45e181d2af9b4f08a6f91d58cd8a1",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793432345183
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41179682045/job/124474339023"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41179682045/job/124474339414"
+    }
+  ]
+}
