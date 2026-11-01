@@ -9,11 +9,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1793524175,
-        "narHash": "sha256-Tv4rtGfyc+R3ByVDtTVlkbdfW1SF8kbkaXNaybROw4Q=",
+        "lastModified": 1793524658,
+        "narHash": "sha256-8aOQqZin9GS0pqIXCUgSwVTf21/7KmkfLdGaoI4adJo=",
         "ref": "refs/heads/main",
-        "rev": "bf03a0ba381f4c97bee9d6812c5727df472989d9",
-        "revCount": 354,
+        "rev": "7c4c9875bb9ceb873b6e302e53ef45c5ca336cfd",
+        "revCount": 356,
         "type": "git",
         "url": "https://github.com/FieldmouseWorks/burrow"
       },
@@ -108,10 +108,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1793434469,
-        "narHash": "sha256-+sgVNI2c67di+XIeMaz5KSei4T65kX68s5Nl0E5Gzbc=",
+        "lastModified": 1793523538,
+        "narHash": "sha256-vHPjEGxtV+StSLW9DJpa3c3gt0UD0s1q4nC98AZ0N0c=",
         "ref": "refs/heads/master",
-        "rev": "6ecf534a7c16e7c969f26838fdd8c93597ae93f3",
+        "rev": "c85ccd343087c57da6021cafa1647142ad03e32e",
         "shallow": true,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay"
