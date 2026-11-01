@@ -1,0 +1,83 @@
+{
+  "conary": "note v1",
+  "change": "7d5z28n6qh01p6gc0d15g5e0s9",
+  "repo": {
+    "owner": "tusanhomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 50,
+  "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/50",
+  "summary": "deps: update fieldmouseworks/burrow digest to ecf8e51",
+  "task": null,
+  "author": {
+    "kind": "bot",
+    "login": "fieldmouseworks-workers[bot]",
+    "session": null
+  },
+  "landing": {
+    "revision": "e0e2488a3c9f6eb95dba6e64f3206f4e8603f5b3b484661b255647b35bef7b61",
+    "before": "7ef3e3c021ed62afafdaded799c1c7f74603cb4e",
+    "after": "00db945856106acb0fedc6707b1a0c88cd0f4b9e",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793560858556
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "check / lane into main",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301734/job/124948671820"
+    },
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301734/job/124948671281"
+    },
+    {
+      "kind": "ci",
+      "check": "house",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301228/job/124948669651"
+    },
+    {
+      "kind": "ci",
+      "check": "house/title (#50)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301228"
+    },
+    {
+      "kind": "ci",
+      "check": "house/rust-first (#50)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301228"
+    },
+    {
+      "kind": "ci",
+      "check": "house/timers (#50)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301228"
+    },
+    {
+      "kind": "ci",
+      "check": "house/file-size (#50)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301228"
+    },
+    {
+      "kind": "ci",
+      "check": "house/model-names (#50)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301228"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/41340301734/job/124948697119"
+    }
+  ]
+}
