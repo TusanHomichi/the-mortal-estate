@@ -7,7 +7,7 @@
   },
   "pr": 94,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/94",
-  "summary": "Update dependency typescript to v7",
+  "summary": "deps: update fieldmouseworks/burrow to 1de34a2",
   "task": null,
   "author": {
     "kind": "person",
