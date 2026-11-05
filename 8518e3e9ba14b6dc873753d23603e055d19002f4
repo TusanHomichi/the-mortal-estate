@@ -7,8 +7,8 @@
   },
   "pr": 81,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/81",
-  "summary": "Reconcile the starter encounter, bind spell targets to the whole address, and prove the shipped expedition",
-  "task": "TusanHomichi/the-mortal-estate#74",
+  "summary": "deps: update fieldmouseworks/burrow to f58c910",
+  "task": null,
   "author": {
     "kind": "person",
     "login": "TusanHomichi",
