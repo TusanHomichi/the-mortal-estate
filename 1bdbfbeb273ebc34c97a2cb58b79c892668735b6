@@ -7,8 +7,8 @@
   },
   "pr": 90,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/90",
-  "summary": "Update dependency rust to v1.99.1",
-  "task": null,
+  "summary": "flake: docs-only PRs take the docs lane",
+  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qSzn5WzQJjCL1vFq9oGEMdg",
   "author": {
     "kind": "person",
     "login": "TusanHomichi",
