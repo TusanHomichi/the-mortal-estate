@@ -18,3 +18,7 @@ jobs:
       contents: read
       id-token: write
       attestations: write
+    # The same docs lane as flake.yml's.
+    with:
+      docs-paths: README.md AGENTS.md CLAUDE.md docs/**
+      docs-checks: links secrets

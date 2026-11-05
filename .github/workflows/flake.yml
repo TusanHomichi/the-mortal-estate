@@ -14,3 +14,9 @@ jobs:
       contents: read
       id-token: write
       attestations: write
+    with:
+      # What no check but the link checker and gitleaks reads (no crate
+      # includes a Markdown file): a PR touching only these skips the Rust
+      # build and tests and gets those two alone.
+      docs-paths: README.md AGENTS.md CLAUDE.md docs/**
+      docs-checks: links secrets
