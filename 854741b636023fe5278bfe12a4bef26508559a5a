@@ -7,7 +7,7 @@
   },
   "pr": 91,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/91",
-  "summary": "Update npm packages",
+  "summary": "deps: update fieldmouseworks/burrow to 4d648c4",
   "task": null,
   "author": {
     "kind": "person",
