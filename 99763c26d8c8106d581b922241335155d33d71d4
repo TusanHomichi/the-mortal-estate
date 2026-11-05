@@ -7,7 +7,7 @@
   },
   "pr": 92,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/92",
-  "summary": "Update Rust crates",
+  "summary": "deps: update fieldmouseworks/burrow to de98c8a",
   "task": null,
   "author": {
     "kind": "person",
