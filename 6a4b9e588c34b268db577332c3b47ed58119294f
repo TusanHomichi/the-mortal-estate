@@ -7,7 +7,7 @@
   },
   "pr": 87,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/87",
-  "summary": "Pin dependencies",
+  "summary": "deps: lock file maintenance (cargo)",
   "task": null,
   "author": {
     "kind": "person",
