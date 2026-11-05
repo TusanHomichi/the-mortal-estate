@@ -1,0 +1,131 @@
+{
+  "conary": "note v1",
+  "change": "5vqh5dkwx8sz7qvmkx8701z6fk",
+  "repo": {
+    "owner": "TusanHomichi",
+    "name": "the-mortal-estate"
+  },
+  "pr": 85,
+  "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/85",
+  "summary": "deps: lock file maintenance (cargo)",
+  "task": null,
+  "author": {
+    "kind": "person",
+    "login": "TusanHomichi",
+    "session": null
+  },
+  "landing": {
+    "revision": "e5bb81c2c042dd2c942931f0b72b6ac966ddcae87faf35b696dd7f56a10e15e4",
+    "before": "c9f1963148eae6602640f749a8eed4607d1d0d21",
+    "after": "b77092d1abc430b5f79a3c75b750b5acf6a86ce9",
+    "by": {
+      "kind": "status",
+      "login": "fieldmouseworks-steward[bot]"
+    },
+    "at": 1793871602883
+  },
+  "evidence": [
+    {
+      "kind": "ci",
+      "check": "house",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002543377/job/127161089527"
+    },
+    {
+      "kind": "ci",
+      "check": "check / lane into main",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535804/job/127161066324"
+    },
+    {
+      "kind": "ci",
+      "check": "check / negative",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535804/job/127161066280"
+    },
+    {
+      "kind": "ci",
+      "check": "check / commits",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535804/job/127161066047"
+    },
+    {
+      "kind": "ci",
+      "check": "house",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535037/job/127161062645"
+    },
+    {
+      "kind": "ci",
+      "check": "renovate/stability-days",
+      "result": "pass",
+      "source": "https://docs.renovatebot.com/key-concepts/minimum-release-age/"
+    },
+    {
+      "kind": "ci",
+      "check": "house/title (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002543377"
+    },
+    {
+      "kind": "ci",
+      "check": "house/title (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535037"
+    },
+    {
+      "kind": "ci",
+      "check": "house/rust-first (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002543377"
+    },
+    {
+      "kind": "ci",
+      "check": "house/rust-first (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535037"
+    },
+    {
+      "kind": "ci",
+      "check": "house/timers (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535037"
+    },
+    {
+      "kind": "ci",
+      "check": "house/timers (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002543377"
+    },
+    {
+      "kind": "ci",
+      "check": "house/file-size (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535037"
+    },
+    {
+      "kind": "ci",
+      "check": "house/file-size (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002543377"
+    },
+    {
+      "kind": "ci",
+      "check": "house/model-names (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535037"
+    },
+    {
+      "kind": "ci",
+      "check": "house/model-names (#85)",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002543377"
+    },
+    {
+      "kind": "ci",
+      "check": "check / check",
+      "result": "pass",
+      "source": "https://github.com/TusanHomichi/the-mortal-estate/actions/runs/42002535804/job/127161126071"
+    }
+  ]
+}
