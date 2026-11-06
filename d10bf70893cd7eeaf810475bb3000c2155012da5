@@ -7,7 +7,7 @@
   },
   "pr": 98,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/98",
-  "summary": "Update dependency vite to v8",
+  "summary": "deps: update fieldmouseworks/burrow to eb55208",
   "task": null,
   "author": {
     "kind": "person",
