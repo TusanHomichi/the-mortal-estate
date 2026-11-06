@@ -7,7 +7,7 @@
   },
   "pr": 106,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/106",
-  "summary": "Measure footprint tests on allocated random bytes",
+  "summary": "house: the house blocks, as burrow has them now",
   "task": null,
   "author": {
     "kind": "person",
