@@ -7,7 +7,7 @@
   },
   "pr": 105,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/105",
-  "summary": "Update dependency vitest to v5",
+  "summary": "deps: update fieldmouseworks/burrow to 11ece3c",
   "task": null,
   "author": {
     "kind": "person",
