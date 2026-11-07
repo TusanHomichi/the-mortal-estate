@@ -7,7 +7,7 @@
   },
   "pr": 109,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/109",
-  "summary": "Update Rust crate uuid to v1.29.0",
+  "summary": "deps: update rust crate toml to v1.2.0",
   "task": null,
   "author": {
     "kind": "person",
