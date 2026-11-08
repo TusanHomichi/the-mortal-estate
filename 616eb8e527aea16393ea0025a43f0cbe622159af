@@ -7,7 +7,7 @@
   },
   "pr": 113,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/113",
-  "summary": "Lock file maintenance (cargo)",
+  "summary": "deps: update fieldmouseworks/burrow to aeb284d",
   "task": null,
   "author": {
     "kind": "person",

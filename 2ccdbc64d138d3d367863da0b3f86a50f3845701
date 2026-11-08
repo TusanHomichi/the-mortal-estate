@@ -7,7 +7,7 @@
   },
   "pr": 114,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/114",
-  "summary": "Lock file maintenance (nix)",
+  "summary": "deps: lock file maintenance (cargo)",
   "task": null,
   "author": {
     "kind": "person",
