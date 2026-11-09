@@ -71,10 +71,11 @@ async fn walk(tx: &mut Sender, rx: &mut Receiver, waypoints: &[Vec2]) -> Observa
             if at.distance_sq(to) < 500 * 500 {
                 break;
             }
-            tx.act(tme_sim::Intent::Move(Dir::toward(at, to)))
+            let seq = tx
+                .act(tme_sim::Intent::Move(Dir::toward(at, to)))
                 .await
                 .unwrap();
-            o = observe(rx).await;
+            o = applied(rx, seq).await;
         }
         assert!(
             o.you.body.pos.distance_sq(to) < 500 * 500,
@@ -196,13 +197,16 @@ async fn the_world_both_sides_survives_a_restart() {
         let (_, mut b_tx, mut b_rx) = join(&link, &bob, "Bob").await.unwrap();
         // Bob takes a walk by the well; Alice goes into the hall and stays
         // until the dun has killed her.
-        let bob_was = walk(&mut b_tx, &mut b_rx, &[m(-10.0, 2.0)]).await.you;
-        walk(
-            &mut a_tx,
-            &mut a_rx,
-            &[m(-6.0, 3.0), m(6.0, 2.0), m(15.0, 2.0), m(15.0, 6.0)],
-        )
-        .await;
+        // Both clients keep reading while the world runs. An idle reader
+        // otherwise queues old positions and can fill the bounded outbox.
+        let bob_walk = async {
+            let was = walk(&mut b_tx, &mut b_rx, &[m(-10.0, 2.0)]).await.you;
+            let drain = tokio::spawn(async move { while b_rx.next().await.is_some() {} });
+            (was, drain)
+        };
+        let alice_route = [m(-6.0, 3.0), m(6.0, 2.0), m(15.0, 2.0), m(15.0, 6.0)];
+        let ((bob_was, bob_reader), _) =
+            tokio::join!(bob_walk, walk(&mut a_tx, &mut a_rx, &alice_route),);
         let mut o = observe(&mut a_rx).await;
         // Three blows kill her: a few seconds of world time.
         for _ in 0..5000 {
@@ -215,6 +219,7 @@ async fn the_world_both_sides_survives_a_restart() {
         let alice_was = o.you;
         let step = o.step;
         server.stop().unwrap();
+        bob_reader.await.unwrap();
         (alice_was, bob_was, step)
     };
     let server = Server::start_with(&dir, fast()).unwrap();
