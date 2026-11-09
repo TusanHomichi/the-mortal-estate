@@ -7,8 +7,8 @@
   },
   "pr": 121,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/121",
-  "summary": "presentation: close the Nomos adoption experiment and retire its harness",
-  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qDHGz7HGVkXVmpWc3KyAaeV",
+  "summary": "server: synchronize hosting test steering with acknowledged moves",
+  "task": null,
   "author": {
     "kind": "agent",
     "login": "TusanHomichi",
