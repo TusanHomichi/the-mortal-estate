@@ -7,8 +7,8 @@
   },
   "pr": 118,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/118",
-  "summary": "ci: grant the shared gate what it needs to attest its result",
-  "task": "FieldmouseWorks/Conary#15",
+  "summary": "deps: lock file maintenance (cargo)",
+  "task": null,
   "author": {
     "kind": "agent",
     "login": "TusanHomichi",
