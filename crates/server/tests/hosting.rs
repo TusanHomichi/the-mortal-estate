@@ -71,10 +71,13 @@ async fn walk(tx: &mut Sender, rx: &mut Receiver, waypoints: &[Vec2]) -> Observa
             if at.distance_sq(to) < 500 * 500 {
                 break;
             }
-            tx.act(tme_sim::Intent::Move(Dir::toward(at, to)))
+            let seq = tx
+                .act(tme_sim::Intent::Move(Dir::toward(at, to)))
                 .await
                 .unwrap();
-            o = observe(rx).await;
+            // Drain queued observations before steering again: they can describe
+            // positions from before the previous direction was applied.
+            o = applied(rx, seq).await;
         }
         assert!(
             o.you.body.pos.distance_sq(to) < 500 * 500,
