@@ -7,7 +7,7 @@
   },
   "pr": 116,
   "url": "https://github.com/TusanHomichi/the-mortal-estate/pull/116",
-  "summary": "Lock file maintenance (nix)",
+  "summary": "deps: update fieldmouseworks/burrow to 765b5e6",
   "task": null,
   "author": {
     "kind": "person",
