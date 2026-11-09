@@ -8,7 +8,7 @@
   "pr": 120,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/120",
   "summary": "server: keep restart test clients reading current observations",
-  "task": "tusanhomichi/the-mortal-estate#119",
+  "task": "TusanHomichi/the-mortal-estate#119",
   "author": {
     "kind": "agent",
     "login": "TusanHomichi",
