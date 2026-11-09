@@ -7,8 +7,8 @@
   },
   "pr": 120,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/120",
-  "summary": "readme: say how to build and check the workspace",
-  "task": "https://claude.ai/code/project/chan_01Ad4f4oDXfFTCEzLHzMTD8q?thread=cmsg_01Ad4f4oDXfFTCEzLHzMTD8qGSsbJNVPM6mi8QFtgedrnv",
+  "summary": "server: keep restart test clients reading current observations",
+  "task": "tusanhomichi/the-mortal-estate#119",
   "author": {
     "kind": "agent",
     "login": "TusanHomichi",
