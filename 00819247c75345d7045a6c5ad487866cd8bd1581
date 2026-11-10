@@ -7,8 +7,8 @@
   },
   "pr": 122,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/122",
-  "summary": "house: the Pull requests section as burrow's house block",
-  "task": "FieldmouseWorks/burrow#87",
+  "summary": "deps: update fieldmouseworks/burrow to 5f191d4",
+  "task": null,
   "author": {
     "kind": "agent",
     "login": "TusanHomichi",

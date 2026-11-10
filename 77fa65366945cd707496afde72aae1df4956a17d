@@ -7,7 +7,7 @@
   },
   "pr": 123,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/123",
-  "summary": "Update dependency node to v26",
+  "summary": "deps: lock file maintenance (cargo)",
   "task": null,
   "author": {
     "kind": "person",
