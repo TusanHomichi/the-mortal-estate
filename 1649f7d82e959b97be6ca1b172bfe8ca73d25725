@@ -7,7 +7,7 @@
   },
   "pr": 128,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/128",
-  "summary": "Pin FieldmouseWorks/burrow action to ce26da5",
+  "summary": "deps: update fieldmouseworks/burrow to 4e3957f",
   "task": null,
   "author": {
     "kind": "person",
