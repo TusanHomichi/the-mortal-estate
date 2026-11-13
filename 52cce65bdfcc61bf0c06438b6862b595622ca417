@@ -7,7 +7,7 @@
   },
   "pr": 133,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/133",
-  "summary": "Lock file maintenance (npm)",
+  "summary": "deps: lock file maintenance (cargo)",
   "task": null,
   "author": {
     "kind": "person",
