@@ -7,7 +7,7 @@
   },
   "pr": 135,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/135",
-  "summary": "Update FieldmouseWorks/burrow digest to fc3618a",
+  "summary": "deps: update rust crate rusqlite to 0.42",
   "task": null,
   "author": {
     "kind": "person",
