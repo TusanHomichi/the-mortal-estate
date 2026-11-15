@@ -7,7 +7,7 @@
   },
   "pr": 135,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/135",
-  "summary": "deps: update rust crate rusqlite to 0.42",
+  "summary": "deps: update dependencies",
   "task": null,
   "author": {
     "kind": "person",
