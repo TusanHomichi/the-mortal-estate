@@ -22,3 +22,7 @@ jobs:
     with:
       docs-paths: README.md AGENTS.md CLAUDE.md docs/**
       docs-checks: links secrets
+      # As in flake.yml: a retargeted PR's pass names the same gate, so
+      # main's push can reuse it.
+      gate-reuse: true
+      gate-reuse-lookup: https://remi.fieldmouseworks.com/conary/gate-reuse
