@@ -7,8 +7,8 @@
   },
   "pr": 139,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/139",
-  "summary": "Update FieldmouseWorks/burrow digest to 40baab1",
-  "task": null,
+  "summary": "flake: reuse an attested gate pass on main's push",
+  "task": "FieldmouseWorks/Conary#387",
   "author": {
     "kind": "person",
     "login": "TusanHomichi",
