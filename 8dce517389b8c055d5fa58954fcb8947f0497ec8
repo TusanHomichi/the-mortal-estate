@@ -7,7 +7,7 @@
   },
   "pr": 140,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/140",
-  "summary": "Update FieldmouseWorks/burrow digest to e3ef5a2",
+  "summary": "deps: bump heapless to 0.9.4 for RUSTSEC-2026-0574..0582",
   "task": null,
   "author": {
     "kind": "person",
