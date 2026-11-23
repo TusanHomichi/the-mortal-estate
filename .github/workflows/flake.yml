@@ -8,7 +8,7 @@ on:
     branches: [main]
 jobs:
   check:
-    uses: FieldmouseWorks/burrow/.github/workflows/flake-check.yml@202d1c06990656145a30a290b8dd134f61006b4a # main
+    uses: FieldmouseWorks/burrow/.github/workflows/flake-check.yml@18976c2adc38f19315d91b9f0113b35eecd9c075 # main
     # What the shared workflow needs to attest its result.
     permissions:
       contents: read
@@ -20,3 +20,9 @@ jobs:
       # build and tests and gets those two alone.
       docs-paths: README.md AGENTS.md CLAUDE.md docs/**
       docs-checks: links secrets
+      # Names this gate in what it attests, so a later push of the same tree
+      # can be matched to it. Only main's push asks remi's lookup, and on a
+      # hit it builds nothing (burrow's flake-check README, "Reusing an
+      # attested pass"). The URL is the public one: GitHub hosts the runners.
+      gate-reuse: true
+      gate-reuse-lookup: https://remi.fieldmouseworks.com/conary/gate-reuse

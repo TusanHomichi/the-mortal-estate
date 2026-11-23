@@ -12,7 +12,7 @@ on:
 jobs:
   check:
     if: github.event.changes.base
-    uses: FieldmouseWorks/burrow/.github/workflows/flake-check.yml@202d1c06990656145a30a290b8dd134f61006b4a # main
+    uses: FieldmouseWorks/burrow/.github/workflows/flake-check.yml@18976c2adc38f19315d91b9f0113b35eecd9c075 # main
     # What the shared workflow needs to attest its result.
     permissions:
       contents: read
@@ -22,3 +22,7 @@ jobs:
     with:
       docs-paths: README.md AGENTS.md CLAUDE.md docs/**
       docs-checks: links secrets
+      # As in flake.yml: a retargeted PR's pass names the same gate, so
+      # main's push can reuse it.
+      gate-reuse: true
+      gate-reuse-lookup: https://remi.fieldmouseworks.com/conary/gate-reuse
