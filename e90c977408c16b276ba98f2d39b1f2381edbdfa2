@@ -8,7 +8,7 @@
   "pr": 141,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/141",
   "summary": "ci: run the gate on conary's train candidates",
-  "task": "tusanhomichi/the-mortal-estate#137",
+  "task": "TusanHomichi/the-mortal-estate#137",
   "author": {
     "kind": "person",
     "login": "TusanHomichi",
