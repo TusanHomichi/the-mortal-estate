@@ -7,8 +7,8 @@
   },
   "pr": 141,
   "url": "https://github.com/tusanhomichi/the-mortal-estate/pull/141",
-  "summary": "Update FieldmouseWorks/burrow digest to 24e8455",
-  "task": null,
+  "summary": "ci: run the gate on conary's train candidates",
+  "task": "tusanhomichi/the-mortal-estate#137",
   "author": {
     "kind": "person",
     "login": "TusanHomichi",
